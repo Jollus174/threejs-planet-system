@@ -15,7 +15,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -32,7 +32,7 @@ const addElements = () => {
 	moon.position.z = 30;
 	moon.position.x = -10;
 	// scene.add(torus, moon);
-	// scene.add(sun);
+	scene.add(sun);
 	Array(300)
 		.fill()
 		.forEach(() => {
@@ -54,6 +54,7 @@ const addElements = () => {
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sun.material.uniforms.time.value += 0.2 * delta;
+	moon.rotation.y += 0.0125 * delta;
 	// sun.rotation.x += 0.05 * delta;
 	// sun.rotation.y += 0.0125 * delta;
 

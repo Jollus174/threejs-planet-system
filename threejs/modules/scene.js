@@ -5,16 +5,16 @@ const scene = new THREE.Scene();
 const textureLoader = new THREE.TextureLoader();
 
 const materialPaths = [
-	'img/textures/pz.jpg',
-	'img/textures/nz.jpg',
-	'img/textures/py.jpg',
-	'img/textures/ny.jpg',
-	'img/textures/px.jpg',
-	'img/textures/nx.jpg'
+	'img/textures/space_ft.png',
+	'img/textures/space_bk.png',
+	'img/textures/space_up.png',
+	'img/textures/space_dn.png',
+	'img/textures/space_rt.png',
+	'img/textures/space_lt.png'
 ];
 const materialArray = materialPaths.map((image) => {
 	const texture = textureLoader.load(image);
-	// texture.encoding = THREE.sRGBEncoding;
+	texture.encoding = THREE.sRGBEncoding;
 	return new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
 });
 
