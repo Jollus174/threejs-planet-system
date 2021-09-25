@@ -6,11 +6,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { scene } from './modules/scene';
 import { torus, moon } from './modules/objects';
-// import { torus } from './modules/torus.js';
-// import { star } from './modules/star.js';
-// import { moon } from './modules/moon';
-
-// const scene = new THREE.Scene();
+import { star_test } from './modules/star';
 
 const aspectRatio = window.innerWidth / window.innerHeight;
 const renderTarget = document.querySelector('#bg');
@@ -20,12 +16,17 @@ const renderer = new THREE.WebGLRenderer({
 	canvas: renderTarget
 });
 
+let docTop = document.body.getBoundingClientRect().top;
+
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.z = 50;
+camera.position.x = -3;
+camera.position.z = 30;
 
 const addElements = () => {
-	moon.position.z = 25;
+	moon.position.z = 30;
+	moon.position.x = -10;
+	// scene.add(torus, moon);
 	scene.add(torus, moon);
 
 	const pointLight = new THREE.PointLight(0xffffff);
@@ -36,6 +37,12 @@ const addElements = () => {
 	const gridHelper = new THREE.GridHelper(200, 50);
 	scene.add(pointLight, ambientLight);
 	scene.add(lightHelper, gridHelper);
+
+	Array(5)
+		.fill()
+		.forEach(() => {
+			scene.add(star_test);
+		});
 
 	Array(200)
 		.fill()
@@ -68,21 +75,29 @@ const animate = () => {
 	renderer.render(scene, camera);
 };
 
-animate();
-addElements();
-
-const moveCamera = () => {
-	const t = document.body.getBoundingClientRect().top;
+const moveCamera = (t) => {
+	// const theDiff = THREE.MathUtils.damp(oldScroll, t, 10, 2);
+	const tAdjusted = Math.min(t, -1);
 	moon.rotation.x += 0.05;
 	moon.rotation.y += 0.075;
 	moon.rotation.z += 0.05;
 
-	camera.position.x = t * -0.0002;
-	camera.position.y = t * -0.0002;
-	camera.position.z = t * -0.01;
+	camera.position.x = tAdjusted * -0.0002;
+	camera.position.y = tAdjusted * -0.0002;
+	camera.position.z = tAdjusted * -0.01;
 };
 
-window.document.addEventListener('scroll', moveCamera);
+window.document.addEventListener('scroll', () => {
+	docTop = document.body.getBoundingClientRect().top;
+	moveCamera(docTop);
+});
+
+const init = () => {
+	animate();
+	addElements();
+};
+
+init();
 
 /* window.addEventListener('resize', () => {
 	console.log('resizing!');
