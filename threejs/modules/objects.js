@@ -15,7 +15,7 @@ const moon = new THREE.Mesh(
 );
 
 const star = {
-	geometry: new THREE.SphereGeometry(0.25, 24, 24),
+	geometry: new THREE.SphereGeometry(0.06, 24, 24),
 	material: new THREE.MeshStandardMaterial({ color: 0xffffff })
 };
 
