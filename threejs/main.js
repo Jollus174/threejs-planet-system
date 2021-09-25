@@ -4,12 +4,13 @@ import './style.css';
 import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { scene } from './modules/scene';
 import { torus, moon } from './modules/objects';
 // import { torus } from './modules/torus.js';
 // import { star } from './modules/star.js';
 // import { moon } from './modules/moon';
 
-const scene = new THREE.Scene();
+// const scene = new THREE.Scene();
 
 const aspectRatio = window.innerWidth / window.innerHeight;
 const renderTarget = document.querySelector('#bg');
@@ -21,36 +22,11 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.z = 30;
-
-// const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-// const material = new THREE.MeshStandardMaterial({ color: 0xff6347 });
-// const torus = new THREE.Mesh(geometry, material);
-
-// const addStars = () => {
-// 	const [x, y, z] = Array(3)
-// 		.fill()
-// 		.map(() => THREE.MathUtils.randFloatSpread(100));
-// 	star.position.set(x, y, z);
-// 	scene.add(star);
-// };
-
-const spaceTexture = new THREE.TextureLoader().load('space.jpg');
-scene.background = spaceTexture;
-
-const addStar = () => {
-	const geometry = new THREE.SphereGeometry(0.25, 24, 24);
-	const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-	const star = new THREE.Mesh(geometry, material);
-	const [x, y, z] = Array(3)
-		.fill()
-		.map(() => THREE.MathUtils.randFloatSpread(100));
-	star.position.set(x, y, z);
-	scene.add(star);
-};
+camera.position.z = 50;
 
 const addElements = () => {
-	scene.add(torus);
+	moon.position.z = 25;
+	scene.add(torus, moon);
 
 	const pointLight = new THREE.PointLight(0xffffff);
 	pointLight.position.set(5, 5, 5);
@@ -60,25 +36,21 @@ const addElements = () => {
 	const gridHelper = new THREE.GridHelper(200, 50);
 	scene.add(pointLight, ambientLight);
 	scene.add(lightHelper, gridHelper);
-	scene.add(moon);
 
-	// Array(200)
-	// 	.fill()
-	// 	.forEach(() => {
-	// 		const [x, y, z] = Array(3)
-	// 			.fill()
-	// 			.map(() => THREE.MathUtils.randFloatSpread(100));
-	// 		star.position.set(x, y, z);
-	// 		scene.add(star);
-	// 	});
-
-	for (let i = 0; i < 200; i++) {
-		console.log('adding star');
-		addStar();
-	}
+	Array(200)
+		.fill()
+		.forEach(() => {
+			// console.log('adding star');
+			const geometry = new THREE.SphereGeometry(0.25, 24, 24);
+			const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+			const star = new THREE.Mesh(geometry, material);
+			const [x, y, z] = Array(3)
+				.fill()
+				.map(() => THREE.MathUtils.randFloatSpread(100));
+			star.position.set(x, y, z);
+			scene.add(star);
+		});
 	// Array(200).fill().forEach(addStar);
-
-	console.log(scene);
 };
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -98,6 +70,19 @@ const animate = () => {
 
 animate();
 addElements();
+
+const moveCamera = () => {
+	const t = document.body.getBoundingClientRect().top;
+	moon.rotation.x += 0.05;
+	moon.rotation.y += 0.075;
+	moon.rotation.z += 0.05;
+
+	camera.position.x = t * -0.0002;
+	camera.position.y = t * -0.0002;
+	camera.position.z = t * -0.01;
+};
+
+window.document.addEventListener('scroll', moveCamera);
 
 /* window.addEventListener('resize', () => {
 	console.log('resizing!');
