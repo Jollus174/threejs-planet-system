@@ -14,4 +14,9 @@ const moon = new THREE.Mesh(
 	})
 );
 
-export { torus, moon };
+const star = {
+	geometry: new THREE.SphereGeometry(0.25, 24, 24),
+	material: new THREE.MeshStandardMaterial({ color: 0xffffff })
+};
+
+export { torus, moon, star };

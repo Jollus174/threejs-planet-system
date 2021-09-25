@@ -5,8 +5,8 @@ import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { scene } from './modules/scene';
-import { torus, moon } from './modules/objects';
-import { star_test } from './modules/star';
+import { torus, moon, star } from './modules/objects';
+import { pointLight, ambientLight, lightHelper } from './modules/lights';
 
 const aspectRatio = window.innerWidth / window.innerHeight;
 const renderTarget = document.querySelector('#bg');
@@ -26,38 +26,23 @@ camera.position.z = 30;
 const addElements = () => {
 	moon.position.z = 30;
 	moon.position.x = -10;
-	// scene.add(torus, moon);
 	scene.add(torus, moon);
-
-	const pointLight = new THREE.PointLight(0xffffff);
-	pointLight.position.set(5, 5, 5);
-
-	const ambientLight = new THREE.AmbientLight(0xffffff);
-	const lightHelper = new THREE.PointLightHelper(pointLight);
-	const gridHelper = new THREE.GridHelper(200, 50);
-	scene.add(pointLight, ambientLight);
-	scene.add(lightHelper, gridHelper);
-
-	Array(5)
-		.fill()
-		.forEach(() => {
-			scene.add(star_test);
-		});
-
 	Array(200)
 		.fill()
 		.forEach(() => {
-			// console.log('adding star');
-			const geometry = new THREE.SphereGeometry(0.25, 24, 24);
-			const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-			const star = new THREE.Mesh(geometry, material);
+			const { geometry, material } = star;
+			const starMesh = new THREE.Mesh(geometry, material);
 			const [x, y, z] = Array(3)
 				.fill()
 				.map(() => THREE.MathUtils.randFloatSpread(100));
-			star.position.set(x, y, z);
-			scene.add(star);
+			starMesh.position.set(x, y, z);
+			scene.add(starMesh);
 		});
-	// Array(200).fill().forEach(addStar);
+
+	scene.add(pointLight, ambientLight, lightHelper);
+
+	const gridHelper = new THREE.GridHelper(200, 50);
+	scene.add(gridHelper);
 };
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -95,6 +80,7 @@ window.document.addEventListener('scroll', () => {
 const init = () => {
 	animate();
 	addElements();
+	moveCamera(docTop);
 };
 
 init();
