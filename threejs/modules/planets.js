@@ -1,4 +1,4 @@
-import { SphereGeometry, TextureLoader } from 'three';
+import { CircleGeometry, SphereGeometry, TextureLoader } from 'three';
 import textureMercury from './../img/textures/mercury.jpg';
 import textureVenus from './../img/textures/venus.jpg';
 import textureEarth from './../img/textures/earth.jpg';
@@ -69,7 +69,19 @@ const saturn = {
 	material: {
 		map: new TextureLoader().load(textureSaturn)
 	},
-	orbitRadius: 28
+	orbitRadius: 28,
+	rings: [
+		{
+			material: {
+				// geometry: new CircleGeometry(30, 90),
+				// geometry: new Lin
+				// material: {
+				// 	color: 0xffffff,
+				// 	transparent: true
+				// }
+			}
+		}
+	]
 };
 
 const uranus = {

@@ -33,7 +33,6 @@ controls.listenToKeyEvents(document);
 const clock = new THREE.Clock();
 const stars = [];
 const planets = [];
-const orbits = [];
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.08;
 
@@ -55,6 +54,9 @@ const addElements = () => {
 				...material
 			})
 		);
+
+		// TODO: get + set planet name
+
 		planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
 		planetMesh.name = 'planet';
 		planetMesh.orbitRadius = p.orbitRadius;
@@ -73,6 +75,28 @@ const addElements = () => {
 			Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
 		);
 
+		if (p.rings && Object.keys(p.rings).length) {
+			p.rings.forEach(() => {
+				console.log('has rings!');
+				planetMesh.name = 'saturn';
+
+				const ringMesh = new THREE.Line(
+					new THREE.RingGeometry(p.geometry.parameters.radius + 1, p.geometry.parameters.radius + 1, 90),
+					new THREE.MeshBasicMaterial({
+						color: 0xffffff,
+						transparent: true,
+						opacity: 0.7,
+						side: THREE.BackSide
+					})
+				);
+
+				ringMesh.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
+				planetMesh.ringMeshes = planetMesh.ringMeshes || [];
+				planetMesh.ringMeshes.push(ringMesh);
+				scene.add(ringMesh);
+			});
+		}
+
 		const orbit = new THREE.Line(
 			new THREE.RingGeometry(planetMesh.orbitRadius, planetMesh.orbitRadius, 90),
 			new THREE.MeshBasicMaterial({
@@ -84,8 +108,8 @@ const addElements = () => {
 		);
 		orbit.rotation.x = THREE.Math.degToRad(90);
 		orbit.name = 'orbit';
+		planetMesh.orbitMesh = orbit;
 		planets.push(planetMesh);
-		orbits.push(orbit);
 		scene.add(orbit, planetMesh);
 	});
 
@@ -127,6 +151,13 @@ const render = () => {
 		planet.rotation.y += 0.0125 * delta;
 		planet.orbit += planet.orbitSpeed;
 		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
+
+		if (planet.ringMeshes && planet.ringMeshes.length) {
+			planet.ringMeshes.forEach((ringMesh) => {
+				ringMesh.position.set(planet.position.x, planet.position.y, planet.position.z);
+				ringMesh.rotation.x += 0.01 * delta;
+			});
+		}
 	});
 
 	// stars.forEach((star) => {
@@ -175,5 +206,5 @@ window.addEventListener('resize', () => {
 });
 
 _orbitVisibilityCheckbox.addEventListener('change', () => {
-	orbits.forEach((orbit) => (orbit.material.opacity = setOrbitVisibility()));
+	planets.forEach((planet) => (planet.orbitMesh.material.opacity = setOrbitVisibility()));
 });
