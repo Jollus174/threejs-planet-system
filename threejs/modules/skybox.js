@@ -1,7 +1,7 @@
 'use strict';
-import * as THREE from 'three';
+import { TextureLoader, MeshBasicMaterial, BoxGeometry, Mesh, BackSide } from 'three';
 
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new TextureLoader();
 const materialPaths = [
 	'img/textures/space_ft.png',
 	'img/textures/space_bk.png',
@@ -10,13 +10,11 @@ const materialPaths = [
 	'img/textures/space_rt.png',
 	'img/textures/space_lt.png'
 ];
-const materialArray = materialPaths.map((image) => {
-	const texture = textureLoader.load(image);
-	return new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
-});
+const materialArray = materialPaths.map(
+	(image) => new MeshBasicMaterial({ map: textureLoader.load(image), side: BackSide })
+);
 
-const skyboxGeometry = new THREE.BoxGeometry(1200, 1200, 1200);
-const skybox = new THREE.Mesh(skyboxGeometry, materialArray);
+const skybox = new Mesh(new BoxGeometry(1200, 1200, 1200), materialArray);
 skybox.name = 'skybox';
 
 export { skybox };

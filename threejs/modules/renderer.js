@@ -1,7 +1,7 @@
 'use strict';
-import * as THREE from 'three';
+import { WebGLRenderer } from 'three';
 
-const renderer = new THREE.WebGLRenderer({
+const renderer = new WebGLRenderer({
 	canvas: document.querySelector('#bg'),
 	antialias: true
 });

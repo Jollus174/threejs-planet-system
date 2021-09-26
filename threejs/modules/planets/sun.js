@@ -1,20 +1,20 @@
 'use strict';
-import * as THREE from 'three';
+import { TextureLoader, Vector2, Vector3, RepeatWrapping, ShaderMaterial, Mesh, SphereGeometry } from 'three';
 
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new TextureLoader();
 const uniforms = {
 	fogDensity: { value: 0.01 },
-	fogColor: { value: new THREE.Vector3(0, 0, 0) },
+	fogColor: { value: new Vector3(0, 0, 0) },
 	time: { value: 1.0 },
-	uvScale: { value: new THREE.Vector2(3.0, 1.0) },
+	uvScale: { value: new Vector2(3.0, 1.0) },
 	texture1: { value: textureLoader.load('img/textures/cloud.png') },
 	texture2: { value: textureLoader.load('img/textures/lavatile.jpg') }
 };
 
-uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
-uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
+uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = RepeatWrapping;
+uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = RepeatWrapping;
 
-const material = new THREE.ShaderMaterial({
+const material = new ShaderMaterial({
 	uniforms,
 	vertexShader: `
 		uniform vec2 uvScale;
@@ -72,6 +72,6 @@ const material = new THREE.ShaderMaterial({
 	`
 });
 
-const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2, 40, 40), material);
+const sunMesh = new Mesh(new SphereGeometry(2, 40, 40), material);
 
 export { sunMesh as sun };
