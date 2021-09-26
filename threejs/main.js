@@ -17,7 +17,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
-import { Color } from 'three';
+import { Color, PointLightHelper } from 'three';
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
@@ -29,23 +29,26 @@ controls.maxDistance = 50;
 const clock = new THREE.Clock();
 
 const stars = [];
+const mixers = [];
 let composer;
 
 const addElements = () => {
 	moon.position.z = 30;
 	moon.position.x = -10;
 	// scene.add(torus, moon);
+
 	scene.add(sun);
 	scene.add(skybox);
-	for (let i = 0; i < 1000; i++) {
+	for (let i = 0; i < 100; i++) {
 		const { geometry, material } = star;
+		// console.log(Math.floor(Math.random() * 100));
 		const starMesh = new THREE.Mesh(
 			geometry,
 			new THREE.MeshStandardMaterial({
 				...material,
 				// opacity: Math.random()
 				opacity: 1,
-				color: new THREE.Color('hsl(160, 0%, 80%)')
+				color: new THREE.Color(`hsl(160, 0%, ${Math.floor(Math.random() * 100)}%)`)
 				// color: 0xffffff
 			})
 		);
@@ -61,8 +64,8 @@ const addElements = () => {
 	stars.forEach((star) => scene.add(star));
 
 	// scene.add(pointLight, ambientLight, lightHelper);
-	console.log(scene);
-	console.log(scene.children.filter((child) => child.name === 'skybox'));
+	// console.log(scene);
+	// console.log(scene.children.filter((child) => child.name === 'skybox'));
 	scene.add(pointLight, ambientLight);
 
 	// console.log(getRandomInt(50, 100));
@@ -74,17 +77,35 @@ var lightness = 0;
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sun.material.uniforms.time.value += 0.2 * delta;
-	moon.rotation.y += 0.0125 * delta;
+	// moon.rotation.y += 0.0125 * delta;
 	// sun.rotation.x += 0.05 * delta;
 	// sun.rotation.y += 0.0125 * delta;
 
+	// console.log(object);
+	if (mixers.length) {
+		mixers.forEach((mixer) => {
+			mixer.update(delta);
+		});
+	}
+
 	stars.forEach((star) => {
-		star.material.color = new THREE.Color(
-			`hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
-		);
+		// star.material.color = new THREE.Color(
+		// 	// `hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
+		// 	`hsl(255, 100%, ${Math.floor((lightness += 0.01))}%)`
+		// );
+
+		if (lightness >= 100) {
+			scene.remove(star);
+		}
+		// star.geometry.dispose();
+		// star.material.dispose();
+		// star.remove();
+		// stars.remove(star);
 		// star.material.opacity = getRandomInt(75, 100) / 100;
 		// star.material.color = new THREE.Color(generateStarColour());
 	});
+	// stars[0].geometry.dispose();
+	// console.log(stars[0].geometry.dispose());
 };
 
 const animate = () => {
@@ -138,7 +159,21 @@ const init = () => {
 	animate();
 	addElements();
 
-	console.log(scene);
+	window.scene = scene;
+	window.renderer = renderer;
+	console.log(window.scene);
+
+	stars.forEach((star) => {
+		const scaleKF = new THREE.VectorKeyframeTrack('.scale', [0, 1], [1, 1, 1, 2, 2, 2]);
+		const clip = new THREE.AnimationClip('Action', 1, [scaleKF]);
+		const mixer = new THREE.AnimationMixer(star);
+		const action = mixer.clipAction(clip);
+		action.setLoop(THREE.LoopPingPong);
+		action.startAt(Math.random() * -10);
+		action.play();
+		action.timeScale = 0.1;
+		mixers.push(mixer);
+	});
 };
 
 init();

@@ -12,7 +12,8 @@ const moon = new Mesh(
 );
 
 const star = {
-	geometry: new SphereGeometry(0.04, 16, 16),
+	// geometry: new SphereGeometry(0.02, 16, 16),
+	geometry: new SphereGeometry(1, 16, 16),
 	material: new MeshStandardMaterial({
 		// color: 0xffffff,
 		blending: AdditiveBlending,
