@@ -6,18 +6,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
-import { torus, moon, star } from './modules/objects';
-import { pointLight, ambientLight, lightHelper } from './modules/lights';
+import { star } from './modules/objects';
 import { sun } from './modules/planets/sun';
+import { moon } from './modules/planets/planets';
 import { skybox } from './modules/skybox';
 
+import { PointLight, AmbientLight, PointLightHelper } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
-import { Color, PointLightHelper } from 'three';
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
@@ -29,103 +29,112 @@ controls.maxDistance = 50;
 const clock = new THREE.Clock();
 
 const stars = [];
-const mixers = [];
+const planets = [];
+const orbits = [];
 let composer;
 
 const addElements = () => {
-	moon.position.z = 30;
-	moon.position.x = -10;
-	// scene.add(torus, moon);
+	// moon.position.z = 30;
+	// moon.position.x = -10;
 
 	scene.add(sun);
 	scene.add(skybox);
-	for (let i = 0; i < 100; i++) {
-		const { geometry, material } = star;
-		// console.log(Math.floor(Math.random() * 100));
-		const starMesh = new THREE.Mesh(
-			geometry,
-			new THREE.MeshStandardMaterial({
-				...material,
-				// opacity: Math.random()
-				opacity: 1,
-				color: new THREE.Color(`hsl(160, 0%, ${Math.floor(Math.random() * 100)}%)`)
-				// color: 0xffffff
-			})
-		);
-		const [x, y, z] = Array(3)
-			.fill()
-			.map(() => THREE.MathUtils.randFloatSpread(100));
-		starMesh.position.set(x, y, z);
-		stars.push(starMesh);
-		// scene.add(starMesh);
-	}
 
-	console.log(stars);
-	stars.forEach((star) => scene.add(star));
+	// let's add a bunch of moons
+	Array(5)
+		.fill()
+		.forEach(() => {
+			console.log(THREE.MathUtils.randInt(20, 100));
+			const { geometry, material } = moon;
+			let radii = 0;
+			const planetMesh = new THREE.Mesh(
+				geometry,
+				new THREE.MeshStandardMaterial({
+					...material
+				})
+			);
+			planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
+			planetMesh.name = 'planet';
 
-	// scene.add(pointLight, ambientLight, lightHelper);
-	// console.log(scene);
-	// console.log(scene.children.filter((child) => child.name === 'skybox'));
+			const size = 4 + Math.random() * 7;
+			planetMesh.orbitRadius = Math.random() * 10 + 10 + radii;
+			radii = planetMesh.orbitRadius + size;
+
+			planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
+			planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
+			planetMesh.rot = Math.random();
+			planetMesh.orbitSpeed = Math.random() * 0.004;
+			planetMesh.orbit = Math.random() * Math.PI * 2;
+
+			planetMesh.position.set(
+				Math.cos(planetMesh.orbit) * planetMesh.orbitRadius,
+				0,
+				Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
+			);
+
+			const orbit = new THREE.Line(
+				new THREE.CircleGeometry(planetMesh.orbitRadius, 90),
+				new THREE.MeshBasicMaterial({
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.08,
+					side: THREE.BackSide
+				})
+			);
+			orbit.rotation.x = THREE.Math.degToRad(90);
+			orbit.name = 'orbit';
+			// scene.add(orbit);
+			planets.push(planetMesh);
+			orbits.push(orbit);
+			scene.add(planetMesh);
+		});
+
+	Array(5000)
+		.fill()
+		.forEach(() => {
+			const { geometry, material } = star;
+			const starMesh = new THREE.Mesh(
+				geometry,
+				new THREE.MeshStandardMaterial({
+					...material,
+					opacity: 1,
+					color: new THREE.Color(`hsl(160, 0%, ${Math.floor(Math.random() * 100)}%)`)
+				})
+			);
+			const [x, y, z] = Array(3)
+				.fill()
+				.map(() => THREE.MathUtils.randFloatSpread(100));
+			starMesh.position.set(x, y, z);
+			stars.push(starMesh);
+			scene.add(starMesh);
+		});
+
+	const pointLight = new PointLight(0xffffff, 1, 4, 0);
+	pointLight.position.set(0, 3, 0);
+
+	const ambientLight = new AmbientLight(0x090909, 8);
+	// const lightHelper = new PointLightHelper(pointLight);
 	scene.add(pointLight, ambientLight);
-
-	// console.log(getRandomInt(50, 100));
 };
-
-// star twinkle: https://codepen.io/WebSonick/pen/vjmgu
-var lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sun.material.uniforms.time.value += 0.2 * delta;
-	// moon.rotation.y += 0.0125 * delta;
-	// sun.rotation.x += 0.05 * delta;
-	// sun.rotation.y += 0.0125 * delta;
 
-	// console.log(object);
-	if (mixers.length) {
-		mixers.forEach((mixer) => {
-			mixer.update(delta);
-		});
-	}
-
-	stars.forEach((star) => {
-		// star.material.color = new THREE.Color(
-		// 	// `hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
-		// 	`hsl(255, 100%, ${Math.floor((lightness += 0.01))}%)`
-		// );
-
-		if (lightness >= 100) {
-			scene.remove(star);
-		}
-		// star.geometry.dispose();
-		// star.material.dispose();
-		// star.remove();
-		// stars.remove(star);
-		// star.material.opacity = getRandomInt(75, 100) / 100;
-		// star.material.color = new THREE.Color(generateStarColour());
+	planets.forEach((planet) => {
+		planet.rotation.y += 0.0125 * delta;
+		planet.orbit += planet.orbitSpeed;
+		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
 	});
-	// stars[0].geometry.dispose();
-	// console.log(stars[0].geometry.dispose());
-};
 
-const animate = () => {
-	window.requestAnimationFrame(animate);
-
-	// controls.update();
-
-	// render == DRAW
-	// renderer.clear();
-	render();
-	// compose();
-	renderer.render(scene, camera);
-	// composer.render(0.01);
+	sun.rotation.y += 0.0125 * delta;
 };
 
 const compose = () => {
 	const renderScene = new RenderPass(scene, camera);
-	// const effectBloom = new BloomPass(1.25);
+	const effectBloom = new BloomPass(1.25);
 	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
-	// composer = new EffectComposer(renderer);
+	composer = new EffectComposer(renderer);
 
 	// const params = {
 	// 	exposure: 1,
@@ -141,20 +150,34 @@ const compose = () => {
 	// bloomPass.radius = 0;
 
 	// composer.renderToScreen = false;
-	// composer.addPass(renderScene);
+	composer.addPass(renderScene);
 	// composer.addPass(bloomPass);
 
 	// composer.addPass(renderModel);
-	// composer.addPass(effectBloom);
+	composer.addPass(effectBloom);
 	// composer.addPass(effectFilm);
 	// composer.addPass(shaderPass);
+};
+
+const animate = () => {
+	window.requestAnimationFrame(animate);
+
+	// controls.update();
+
+	// render == DRAW
+	// renderer.clear();
+	render();
+	// compose();
+	renderer.render(scene, camera);
+	// composer.render(0.01);
 };
 
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
-	camera.position.z = 5;
+	// camera.position.y = 2;
+	camera.position.z = 30;
 
 	animate();
 	addElements();
@@ -162,18 +185,6 @@ const init = () => {
 	window.scene = scene;
 	window.renderer = renderer;
 	console.log(window.scene);
-
-	stars.forEach((star) => {
-		const scaleKF = new THREE.VectorKeyframeTrack('.scale', [0, 1], [1, 1, 1, 2, 2, 2]);
-		const clip = new THREE.AnimationClip('Action', 1, [scaleKF]);
-		const mixer = new THREE.AnimationMixer(star);
-		const action = mixer.clipAction(clip);
-		action.setLoop(THREE.LoopPingPong);
-		action.startAt(Math.random() * -10);
-		action.play();
-		action.timeScale = 0.1;
-		mixers.push(mixer);
-	});
 };
 
 init();
@@ -182,4 +193,14 @@ window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
+});
+
+document.addEventListener('keydown', (e) => {
+	if (e.code === 'Space') {
+		console.log('is space!');
+		orbits.forEach((orbit) => {
+			// window.scene.remove(orbit)
+			console.log(orbit);
+		});
+	}
 });
