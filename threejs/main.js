@@ -174,22 +174,6 @@ window.addEventListener('resize', () => {
 	camera.updateProjectionMatrix();
 });
 
-document.addEventListener('keydown', (e) => {
-	switch (e.code) {
-		case 'KeyR':
-			camera.zoom += 0.2;
-			break;
-		case 'KeyF':
-			camera.zoom -= 0.2;
-			break;
-		case 'KeyV':
-			camera.zoom = 1;
-			break;
-	}
-
-	camera.updateProjectionMatrix();
-});
-
 _orbitVisibilityCheckbox.addEventListener('change', () => {
 	orbits.forEach((orbit) => (orbit.material.opacity = setOrbitVisibility()));
 });
