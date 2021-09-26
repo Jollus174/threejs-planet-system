@@ -2,7 +2,7 @@
 import { TextureLoader, Vector2, Vector3, RepeatWrapping, ShaderMaterial, Mesh, SphereGeometry } from 'three';
 
 const uniforms = {
-	fogDensity: { value: 0.01 },
+	fogDensity: { value: 0.0 },
 	fogColor: { value: new Vector3(0, 0, 0) },
 	time: { value: 1.0 },
 	uvScale: { value: new Vector2(3.0, 1.0) },

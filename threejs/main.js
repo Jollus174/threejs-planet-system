@@ -1,5 +1,4 @@
 'use strict';
-import './style.css';
 import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -8,7 +7,7 @@ import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { star } from './modules/objects';
 import { sun } from './modules/planets/sun';
-import { moon } from './modules/planets/planets';
+import { moon, mercury, venus, earth } from './modules/planets/planets';
 import { skybox } from './modules/skybox';
 
 import { PointLight, AmbientLight, PointLightHelper } from 'three';
@@ -24,13 +23,42 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.minDistance = 4;
-controls.maxDistance = 50;
+controls.maxDistance = 100;
+controls.enableKeys = true;
+controls.keys = {
+	LEFT: 'KeyA', //left arrow
+	UP: 'KeyW', // up arrow
+	RIGHT: 'KeyD', // right arrow
+	BOTTOM: 'KeyS' // down arrow
+};
+controls.listenToKeyEvents(document);
+console.log(controls);
 
 const clock = new THREE.Clock();
 
 const stars = [];
 const planets = [];
 const orbits = [];
+
+const planetsArr = [
+	{
+		mesh: mercury,
+		orbitRadius: 5
+	},
+	{
+		mesh: venus,
+		orbitRadius: 8
+	},
+	{
+		mesh: earth,
+		orbitRadius: 11
+	},
+	{
+		mesh: moon,
+		orbitRadius: 18
+	}
+];
+
 let composer;
 
 const addElements = () => {
@@ -40,56 +68,51 @@ const addElements = () => {
 	scene.add(sun);
 	scene.add(skybox);
 
-	// let's add a bunch of moons
-	Array(5)
-		.fill()
-		.forEach(() => {
-			console.log(THREE.MathUtils.randInt(20, 100));
-			const { geometry, material } = moon;
-			let radii = 0;
-			const planetMesh = new THREE.Mesh(
-				geometry,
-				new THREE.MeshStandardMaterial({
-					...material
-				})
-			);
-			planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
-			planetMesh.name = 'planet';
+	// let's add a bunch of planets
+	planetsArr.forEach((p) => {
+		const { geometry, material } = p.mesh;
+		const planetMesh = new THREE.Mesh(
+			geometry,
+			new THREE.MeshStandardMaterial({
+				...material
+			})
+		);
+		planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
+		planetMesh.name = 'planet';
+		planetMesh.orbitRadius = p.orbitRadius;
 
-			const size = 4 + Math.random() * 7;
-			planetMesh.orbitRadius = Math.random() * 10 + 10 + radii;
-			radii = planetMesh.orbitRadius + size;
+		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
+		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
+		planetMesh.rot = Math.random();
+		planetMesh.orbitSpeed = (p.orbitRadius / 75) * 0.004;
 
-			planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
-			planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-			planetMesh.rot = Math.random();
-			planetMesh.orbitSpeed = Math.random() * 0.004;
-			planetMesh.orbit = Math.random() * Math.PI * 2;
+		// this part is OK
+		planetMesh.orbit = Math.random() * Math.PI * 2;
 
-			planetMesh.position.set(
-				Math.cos(planetMesh.orbit) * planetMesh.orbitRadius,
-				0,
-				Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
-			);
+		planetMesh.position.set(
+			Math.cos(planetMesh.orbit) * planetMesh.orbitRadius,
+			0,
+			Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
+		);
 
-			const orbit = new THREE.Line(
-				new THREE.CircleGeometry(planetMesh.orbitRadius, 90),
-				new THREE.MeshBasicMaterial({
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.08,
-					side: THREE.BackSide
-				})
-			);
-			orbit.rotation.x = THREE.Math.degToRad(90);
-			orbit.name = 'orbit';
-			// scene.add(orbit);
-			planets.push(planetMesh);
-			orbits.push(orbit);
-			scene.add(planetMesh);
-		});
+		const orbit = new THREE.Line(
+			new THREE.CircleGeometry(planetMesh.orbitRadius, 90),
+			new THREE.MeshBasicMaterial({
+				color: 0xffffff,
+				transparent: true,
+				opacity: 0.08,
+				side: THREE.BackSide
+			})
+		);
+		orbit.rotation.x = THREE.Math.degToRad(90);
+		orbit.name = 'orbit';
+		// scene.add(orbit);
+		planets.push(planetMesh);
+		orbits.push(orbit);
+		scene.add(planetMesh);
+	});
 
-	Array(5000)
+	Array(3000)
 		.fill()
 		.forEach(() => {
 			const { geometry, material } = star;
@@ -112,10 +135,12 @@ const addElements = () => {
 	const pointLight = new PointLight(0xffffff, 1, 4, 0);
 	pointLight.position.set(0, 3, 0);
 
-	const ambientLight = new AmbientLight(0x090909, 8);
+	const ambientLight = new AmbientLight(0x090909, 4);
 	// const lightHelper = new PointLightHelper(pointLight);
 	scene.add(pointLight, ambientLight);
 };
+
+let lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
@@ -126,6 +151,12 @@ const render = () => {
 		planet.orbit += planet.orbitSpeed;
 		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
 	});
+
+	// stars.forEach((star) => {
+	// 	star.material.color = new THREE.Color(
+	// 		`hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
+	// 	);
+	// });
 
 	sun.rotation.y += 0.0125 * delta;
 };
@@ -162,7 +193,7 @@ const compose = () => {
 const animate = () => {
 	window.requestAnimationFrame(animate);
 
-	// controls.update();
+	controls.update();
 
 	// render == DRAW
 	// renderer.clear();
@@ -195,7 +226,8 @@ window.addEventListener('resize', () => {
 	camera.updateProjectionMatrix();
 });
 
-document.addEventListener('keydown', (e) => {
+/* document.addEventListener('keydown', (e) => {
+	console.log(e);
 	if (e.code === 'Space') {
 		console.log('is space!');
 		orbits.forEach((orbit) => {
@@ -204,3 +236,4 @@ document.addEventListener('keydown', (e) => {
 		});
 	}
 });
+ */

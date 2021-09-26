@@ -1,81 +1,60 @@
-@import url('https://use.typekit.net/jmk3xov.css');
-
 canvas {
 	position: fixed;
 	top: 0;
 	left: 0;
-}
-
-:root {
-	--dark-bg: rgba(15, 15, 15, 0.95);
-	--spacing: 350px;
-
-	font-family: brandon-grotesque, sans-serif;
-	font-weight: 400;
-	font-style: normal;
 }
 
 main {
-	/* width: 100vw; */
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	color: white;
-	z-index: 99;
 	position: absolute;
-	/* width: 100%; */
 	margin: 0px auto;
-	padding: 120px 0px;
-
-	display: grid;
-	grid-template-columns: repeat(12, 1fr);
-	display: none;
-}
-
-h1,
-h2,
-h3,
-blockquote {
-	font-family: elevon, sans-serif;
-	font-weight: 700;
-	font-style: normal;
-}
-
-canvas {
-	position: fixed;
-	top: 0;
-	left: 0;
-}
-
-header {
-	background: var(--dark-bg);
-	grid-column: 2 / span 5;
-	font-size: 2.5rem;
-	padding: 2rem;
-	margin-bottom: var(--spacing);
-}
-
-section {
-	grid-column: 2 / 8;
-	padding: 1rem;
-	background: var(--dark-bg);
-	font-size: 1.25rem;
-	line-height: 1.5;
-	margin-bottom: var(--spacing);
-}
-
-blockquote {
-	margin: 0;
 	padding: 0;
-	grid-column: 2 / span 9;
-	margin-bottom: var(--spacing);
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
 }
 
-blockquote p {
-	color: black;
-	background-color: white;
-	font-size: 4rem;
-	display: inline;
-	line-height: 1;
+table {
+	border-spacing: 0;
 }
 
-.left {
-	grid-column: 6 / 12;
+.controls {
+	pointer-events: all;
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	background: rgba(0, 0, 0, 0.6);
+	width: 105px;
+	padding: 8px;
+	border: 1px solid #fff;
+	font-size: 12px;
+}
+
+.controls div {
+	display: flex;
+	flex-flow: row nowrap;
+	padding: 4px 0;
+	flex-grow: 1;
+}
+
+.controls div span {
+	width: 50%;
+	font-size: 10px;
+}
+
+.controls div span.key {
+	width: 20px;
+}
+
+.controls .title {
+	text-align: center;
+	padding: 0 0 6px;
+	display: block;
+	border-bottom: 1px solid #fff;
+	margin: 0 -8px 6px;
+}
+
+.controls div:last-child {
+	padding-bottom: 0;
 }
