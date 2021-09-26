@@ -7,16 +7,10 @@ import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { star } from './modules/objects';
 import { sun } from './modules/planets/sun';
-import { moon, mercury, venus, earth } from './modules/planets/planets';
+import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets/planets';
 import { skybox } from './modules/skybox';
 
 import { PointLight, AmbientLight, PointLightHelper } from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
@@ -32,34 +26,15 @@ controls.keys = {
 	BOTTOM: 'KeyS' // down arrow
 };
 controls.listenToKeyEvents(document);
-console.log(controls);
 
 const clock = new THREE.Clock();
-
 const stars = [];
 const planets = [];
 const orbits = [];
+const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
+const _orbitVisibilityDefault = 0.08;
 
-const planetsArr = [
-	{
-		mesh: mercury,
-		orbitRadius: 5
-	},
-	{
-		mesh: venus,
-		orbitRadius: 8
-	},
-	{
-		mesh: earth,
-		orbitRadius: 11
-	},
-	{
-		mesh: moon,
-		orbitRadius: 18
-	}
-];
-
-let composer;
+const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
 
 const addElements = () => {
 	// moon.position.z = 30;
@@ -69,8 +44,8 @@ const addElements = () => {
 	scene.add(skybox);
 
 	// let's add a bunch of planets
-	planetsArr.forEach((p) => {
-		const { geometry, material } = p.mesh;
+	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((p) => {
+		const { geometry, material } = p;
 		const planetMesh = new THREE.Mesh(
 			geometry,
 			new THREE.MeshStandardMaterial({
@@ -84,7 +59,7 @@ const addElements = () => {
 		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetMesh.rot = Math.random();
-		planetMesh.orbitSpeed = (p.orbitRadius / 75) * 0.004;
+		planetMesh.orbitSpeed = 0.004 / p.orbitRadius;
 
 		// this part is OK
 		planetMesh.orbit = Math.random() * Math.PI * 2;
@@ -96,20 +71,19 @@ const addElements = () => {
 		);
 
 		const orbit = new THREE.Line(
-			new THREE.CircleGeometry(planetMesh.orbitRadius, 90),
+			new THREE.RingGeometry(planetMesh.orbitRadius, planetMesh.orbitRadius, 90),
 			new THREE.MeshBasicMaterial({
 				color: 0xffffff,
 				transparent: true,
-				opacity: 0.08,
+				opacity: setOrbitVisibility(),
 				side: THREE.BackSide
 			})
 		);
 		orbit.rotation.x = THREE.Math.degToRad(90);
 		orbit.name = 'orbit';
-		// scene.add(orbit);
 		planets.push(planetMesh);
 		orbits.push(orbit);
-		scene.add(planetMesh);
+		scene.add(orbit, planetMesh);
 	});
 
 	Array(3000)
@@ -161,35 +135,6 @@ const render = () => {
 	sun.rotation.y += 0.0125 * delta;
 };
 
-const compose = () => {
-	const renderScene = new RenderPass(scene, camera);
-	const effectBloom = new BloomPass(1.25);
-	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
-	composer = new EffectComposer(renderer);
-
-	// const params = {
-	// 	exposure: 1,
-	// 	bloomStrength: 5,
-	// 	bloomThreshold: 0,
-	// 	bloomRadius: 0,
-	// 	scene: "Scene with Glow"
-	// };
-
-	// const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-	// bloomPass.threshold = 0;
-	// bloomPass.strength = 5;
-	// bloomPass.radius = 0;
-
-	// composer.renderToScreen = false;
-	composer.addPass(renderScene);
-	// composer.addPass(bloomPass);
-
-	// composer.addPass(renderModel);
-	composer.addPass(effectBloom);
-	// composer.addPass(effectFilm);
-	// composer.addPass(shaderPass);
-};
-
 const animate = () => {
 	window.requestAnimationFrame(animate);
 
@@ -226,14 +171,22 @@ window.addEventListener('resize', () => {
 	camera.updateProjectionMatrix();
 });
 
-/* document.addEventListener('keydown', (e) => {
-	console.log(e);
-	if (e.code === 'Space') {
-		console.log('is space!');
-		orbits.forEach((orbit) => {
-			// window.scene.remove(orbit)
-			console.log(orbit);
-		});
+document.addEventListener('keydown', (e) => {
+	switch (e.code) {
+		case 'KeyR':
+			camera.zoom += 0.2;
+			break;
+		case 'KeyF':
+			camera.zoom -= 0.2;
+			break;
+		case 'KeyV':
+			camera.zoom = 1;
+			break;
 	}
+
+	camera.updateProjectionMatrix();
 });
- */
+
+_orbitVisibilityCheckbox.addEventListener('change', () => {
+	orbits.forEach((orbit) => (orbit.material.opacity = setOrbitVisibility()));
+});

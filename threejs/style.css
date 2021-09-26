@@ -19,21 +19,26 @@ table {
 	border-spacing: 0;
 }
 
-.controls {
+.controls-container {
 	pointer-events: all;
 	position: absolute;
 	bottom: 20px;
 	right: 20px;
+}
+
+.controls {
 	background: rgba(0, 0, 0, 0.6);
 	width: 105px;
 	padding: 8px;
 	border: 1px solid #fff;
 	font-size: 12px;
+	margin-top: 8px;
 }
 
 .controls div {
 	display: flex;
 	flex-flow: row nowrap;
+	align-items: center;
 	padding: 4px 0;
 	flex-grow: 1;
 }
@@ -57,4 +62,8 @@ table {
 
 .controls div:last-child {
 	padding-bottom: 0;
+}
+
+.controls-secondary div {
+	padding: 0;
 }
