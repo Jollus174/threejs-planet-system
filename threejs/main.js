@@ -1,4 +1,7 @@
 'use strict';
+import './reset.css';
+import './style.css';
+
 import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -6,8 +9,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { star } from './modules/objects';
-import { sun } from './modules/planets/sun';
-import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets/planets';
+import { sun } from './modules/sun';
+import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets';
 import { skybox } from './modules/skybox';
 
 import { PointLight, AmbientLight, PointLightHelper } from 'three';

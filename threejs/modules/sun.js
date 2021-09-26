@@ -1,13 +1,15 @@
 'use strict';
 import { TextureLoader, Vector2, Vector3, RepeatWrapping, ShaderMaterial, Mesh, SphereGeometry } from 'three';
+import sunTexture1 from './../img/textures/sun-texture-1.png';
+import sunTexture2 from './../img/textures/sun-texture-2.jpg';
 
 const uniforms = {
 	fogDensity: { value: 0.0 },
 	fogColor: { value: new Vector3(0, 0, 0) },
 	time: { value: 1.0 },
 	uvScale: { value: new Vector2(3.0, 1.0) },
-	texture1: { value: new TextureLoader().load('img/textures/cloud.png') },
-	texture2: { value: new TextureLoader().load('img/textures/lavatile.jpg') }
+	texture1: { value: new TextureLoader().load(sunTexture1) },
+	texture2: { value: new TextureLoader().load(sunTexture2) }
 };
 
 uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = RepeatWrapping;

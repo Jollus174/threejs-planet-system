@@ -1,15 +1,14 @@
 'use strict';
 import { TextureLoader, MeshBasicMaterial, BoxGeometry, Mesh, BackSide } from 'three';
+import spaceFt from './../img/textures/space_ft.jpg';
+import spaceBk from './../img/textures/space_bk.jpg';
+import spaceUp from './../img/textures/space_up.jpg';
+import spaceDn from './../img/textures/space_dn.jpg';
+import spaceRt from './../img/textures/space_rt.jpg';
+import spaceLt from './../img/textures/space_lt.jpg';
 
 const textureLoader = new TextureLoader();
-const materialPaths = [
-	'img/textures/space_ft.png',
-	'img/textures/space_bk.png',
-	'img/textures/space_up.png',
-	'img/textures/space_dn.png',
-	'img/textures/space_rt.png',
-	'img/textures/space_lt.png'
-];
+const materialPaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
 const materialArray = materialPaths.map(
 	(image) => new MeshBasicMaterial({ map: textureLoader.load(image), side: BackSide })
 );
