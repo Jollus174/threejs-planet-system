@@ -9,23 +9,26 @@ import { renderer } from './modules/renderer';
 import { torus, moon, star } from './modules/objects';
 import { pointLight, ambientLight, lightHelper } from './modules/lights';
 import { sun } from './modules/planets/sun';
+import { skybox } from './modules/skybox';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js';
+import { Color } from 'three';
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-// controls.enableZoom = false;
-controls.minDistance = 2;
+controls.minDistance = 4;
 controls.maxDistance = 50;
 
 const clock = new THREE.Clock();
 
-let docTop = document.body.getBoundingClientRect().top;
+const stars = [];
 let composer;
 
 const addElements = () => {
@@ -33,23 +36,40 @@ const addElements = () => {
 	moon.position.x = -10;
 	// scene.add(torus, moon);
 	scene.add(sun);
-	Array(300)
-		.fill()
-		.forEach(() => {
-			const { geometry, material } = star;
-			const starMesh = new THREE.Mesh(geometry, material);
-			const [x, y, z] = Array(3)
-				.fill()
-				.map(() => THREE.MathUtils.randFloatSpread(100));
-			starMesh.position.set(x, y, z);
-			scene.add(starMesh);
-		});
+	scene.add(skybox);
+	for (let i = 0; i < 1000; i++) {
+		const { geometry, material } = star;
+		const starMesh = new THREE.Mesh(
+			geometry,
+			new THREE.MeshStandardMaterial({
+				...material,
+				// opacity: Math.random()
+				opacity: 1,
+				color: new THREE.Color('hsl(160, 0%, 80%)')
+				// color: 0xffffff
+			})
+		);
+		const [x, y, z] = Array(3)
+			.fill()
+			.map(() => THREE.MathUtils.randFloatSpread(100));
+		starMesh.position.set(x, y, z);
+		stars.push(starMesh);
+		// scene.add(starMesh);
+	}
 
-	scene.add(pointLight, ambientLight, lightHelper);
+	console.log(stars);
+	stars.forEach((star) => scene.add(star));
 
-	// const gridHelper = new THREE.GridHelper(200, 50);
-	// scene.add(gridHelper);
+	// scene.add(pointLight, ambientLight, lightHelper);
+	console.log(scene);
+	console.log(scene.children.filter((child) => child.name === 'skybox'));
+	scene.add(pointLight, ambientLight);
+
+	// console.log(getRandomInt(50, 100));
 };
+
+// star twinkle: https://codepen.io/WebSonick/pen/vjmgu
+var lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
@@ -58,9 +78,13 @@ const render = () => {
 	// sun.rotation.x += 0.05 * delta;
 	// sun.rotation.y += 0.0125 * delta;
 
-	// torus.rotation.x += 0.01 * delta;
-	// torus.rotation.y += 0.01 * delta;
-	// torus.rotation.z += 0.01 * delta;
+	stars.forEach((star) => {
+		star.material.color = new THREE.Color(
+			`hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
+		);
+		// star.material.opacity = getRandomInt(75, 100) / 100;
+		// star.material.color = new THREE.Color(generateStarColour());
+	});
 };
 
 const animate = () => {
@@ -76,62 +100,51 @@ const animate = () => {
 	// composer.render(0.01);
 };
 
-const moveCamera = (t) => {
-	// const theDiff = THREE.MathUtils.damp(oldScroll, t, 10, 2);
-	const tAdjusted = Math.min(t, -1);
-	moon.rotation.x += 0.05;
-	moon.rotation.y += 0.075;
-	moon.rotation.z += 0.05;
-
-	camera.position.x = tAdjusted * -0.0002;
-	camera.position.y = tAdjusted * -0.0002;
-	camera.position.z = tAdjusted * -0.01;
-};
-
 const compose = () => {
-	const renderModel = new RenderPass(scene, camera);
-	const effectBloom = new BloomPass(1.25);
-	const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
-	composer = new EffectComposer(renderer);
+	const renderScene = new RenderPass(scene, camera);
+	// const effectBloom = new BloomPass(1.25);
+	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
+	// composer = new EffectComposer(renderer);
 
-	composer.addPass(renderModel);
-	composer.addPass(effectBloom);
-	composer.addPass(effectFilm);
+	// const params = {
+	// 	exposure: 1,
+	// 	bloomStrength: 5,
+	// 	bloomThreshold: 0,
+	// 	bloomRadius: 0,
+	// 	scene: "Scene with Glow"
+	// };
+
+	// const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+	// bloomPass.threshold = 0;
+	// bloomPass.strength = 5;
+	// bloomPass.radius = 0;
+
+	// composer.renderToScreen = false;
+	// composer.addPass(renderScene);
+	// composer.addPass(bloomPass);
+
+	// composer.addPass(renderModel);
+	// composer.addPass(effectBloom);
+	// composer.addPass(effectFilm);
+	// composer.addPass(shaderPass);
 };
 
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
-	// camera.position.x = -3;
-	// camera.position.z = 30;
+	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
 	camera.position.z = 5;
 
-	// compose();
 	animate();
 	addElements();
 
-	// moveCamera(docTop);
+	console.log(scene);
 };
 
 init();
 
 window.addEventListener('resize', () => {
-	// window.requestAnimationFrame(() => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-	// });
-	// TODO: possibly add a debounce
 });
-
-// document.addEventListener('wheel', (e) => {
-// 	const fov = camera.fov + e.deltaY * 0.05;
-// 	camera.fov = THREE.MathUtils.clamp(fov, 10, 75);
-// 	camera.updateProjectionMatrix();
-// });
-
-// window.document.addEventListener('scroll', () => {
-// 	docTop = document.body.getBoundingClientRect().top;
-// 	moveCamera(docTop);
-// });
