@@ -6,12 +6,14 @@ import textureMoon from './../img/textures/moon.jpg';
 import textureMars from './../img/textures/mars.jpg';
 import textureJupiter from './../img/textures/jupiter.jpg';
 import textureSaturn from './../img/textures/saturn.jpg';
+import textureSaturnRing from './../img/textures/saturn-ring-alpha.png';
 import textureUranus from './../img/textures/uranus.jpg';
 import textureNeptune from './../img/textures/neptune.jpg';
 import normal from './../img/textures/normal.jpg';
 import normalEarth from './../img/textures/normal-earth.jpg';
 
 const mercury = {
+	name: 'mercury',
 	geometry: new SphereGeometry(0.3, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureMercury),
@@ -21,6 +23,7 @@ const mercury = {
 };
 
 const venus = {
+	name: 'venus',
 	geometry: new SphereGeometry(0.8, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureVenus),
@@ -30,6 +33,7 @@ const venus = {
 };
 
 const earth = {
+	name: 'earth',
 	geometry: new SphereGeometry(1, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureEarth),
@@ -48,6 +52,7 @@ const earth = {
 };
 
 const mars = {
+	name: 'mars',
 	geometry: new SphereGeometry(0.6, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureMars),
@@ -57,6 +62,7 @@ const mars = {
 };
 
 const jupiter = {
+	name: 'jupiter',
 	geometry: new SphereGeometry(2.4, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureJupiter)
@@ -65,26 +71,27 @@ const jupiter = {
 };
 
 const saturn = {
+	name: 'saturn',
 	geometry: new SphereGeometry(2.2, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureSaturn)
 	},
-	orbitRadius: 28,
+	orbitRadius: 10,
 	rings: [
 		{
+			name: 'saturn ring',
 			material: {
-				// geometry: new CircleGeometry(30, 90),
-				// geometry: new Lin
-				// material: {
-				// 	color: 0xffffff,
-				// 	transparent: true
-				// }
+				color: 0xffffff,
+				transparent: true,
+				map: new TextureLoader().load(textureSaturnRing),
+				side: DoubleSide
 			}
 		}
 	]
 };
 
 const uranus = {
+	name: 'uranus',
 	geometry: new SphereGeometry(1.4, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureUranus)
@@ -93,6 +100,7 @@ const uranus = {
 };
 
 const neptune = {
+	name: 'neptune',
 	geometry: new SphereGeometry(1.4, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureNeptune)

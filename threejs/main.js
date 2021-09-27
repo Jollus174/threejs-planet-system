@@ -15,7 +15,7 @@ import { skybox } from './modules/skybox';
 
 import { PointLight, AmbientLight, PointLightHelper } from 'three';
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -38,6 +38,19 @@ const _orbitVisibilityDefault = 0.08;
 
 const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
 
+// custom UV map so textures can curve correctly
+const ringUVMapGeometry = (from, to) => {
+	const geometry = new THREE.RingBufferGeometry(from, to, 90);
+	const pos = geometry.attributes.position;
+	const v3 = new THREE.Vector3();
+	for (let i = 0; i < pos.count; i++) {
+		v3.fromBufferAttribute(pos, i);
+		geometry.attributes.uv.setXY(i, v3.length() < (from + to) / 2 ? 0 : 1, 1);
+	}
+
+	return geometry;
+};
+
 const addElements = () => {
 	// moon.position.z = 30;
 	// moon.position.x = -10;
@@ -46,25 +59,22 @@ const addElements = () => {
 	scene.add(skybox);
 
 	// let's add a bunch of planets
-	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((p) => {
-		const { geometry, material } = p;
+	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const planetMesh = new THREE.Mesh(
-			geometry,
+			planet.geometry,
 			new THREE.MeshStandardMaterial({
-				...material
+				...planet.material
 			})
 		);
 
-		// TODO: get + set planet name
-
+		planetMesh.name = planet.name;
 		planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
-		planetMesh.name = 'planet';
-		planetMesh.orbitRadius = p.orbitRadius;
+		planetMesh.orbitRadius = planet.orbitRadius;
 
 		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetMesh.rot = Math.random();
-		planetMesh.orbitSpeed = 0.004 / p.orbitRadius;
+		planetMesh.orbitSpeed = 0.004 / planet.orbitRadius;
 
 		// this part is OK
 		planetMesh.orbit = Math.random() * Math.PI * 2;
@@ -75,21 +85,17 @@ const addElements = () => {
 			Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
 		);
 
-		if (p.rings && Object.keys(p.rings).length) {
-			p.rings.forEach(() => {
-				console.log('has rings!');
-				planetMesh.name = 'saturn';
-
-				const ringMesh = new THREE.Line(
-					new THREE.RingGeometry(p.geometry.parameters.radius + 1, p.geometry.parameters.radius + 1, 90),
+		if (planet.rings && Object.keys(planet.rings).length) {
+			planet.rings.forEach((ring) => {
+				const ringMesh = new THREE.Mesh(
+					ringUVMapGeometry(2.4, 5),
 					new THREE.MeshBasicMaterial({
-						color: 0xffffff,
-						transparent: true,
-						opacity: 0.7,
-						side: THREE.BackSide
+						...ring.material
 					})
 				);
 
+				ringMesh.name = ring.name;
+				ringMesh.rotation.x = THREE.Math.degToRad(75);
 				ringMesh.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
 				planetMesh.ringMeshes = planetMesh.ringMeshes || [];
 				planetMesh.ringMeshes.push(ringMesh);
@@ -155,7 +161,7 @@ const render = () => {
 		if (planet.ringMeshes && planet.ringMeshes.length) {
 			planet.ringMeshes.forEach((ringMesh) => {
 				ringMesh.position.set(planet.position.x, planet.position.y, planet.position.z);
-				ringMesh.rotation.x += 0.01 * delta;
+				ringMesh.rotation.z += 0.01 * delta;
 			});
 		}
 	});
@@ -187,7 +193,8 @@ const init = () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
 	// camera.position.y = 2;
-	camera.position.z = 30;
+	camera.position.y = 8;
+	camera.position.z = 18;
 
 	animate();
 	addElements();
