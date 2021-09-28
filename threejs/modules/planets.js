@@ -1,4 +1,4 @@
-import { CircleGeometry, SphereGeometry, TextureLoader } from 'three';
+import { CircleGeometry, DoubleSide, RingBufferGeometry, RingGeometry, SphereGeometry, TextureLoader } from 'three';
 import textureMercury from './../img/textures/mercury.jpg';
 import textureVenus from './../img/textures/venus.jpg';
 import textureEarth from './../img/textures/earth.jpg';
@@ -42,7 +42,9 @@ const earth = {
 	orbitRadius: 11,
 	moons: [
 		{
-			geometry: new SphereGeometry(1, 32, 32),
+			name: 'luna',
+			geometry: new SphereGeometry(0.4, 32, 32),
+			distanceFromPlanet: 2.2,
 			material: {
 				map: new TextureLoader().load(textureMoon),
 				normalMap: new TextureLoader().load(normal)
@@ -67,7 +69,7 @@ const jupiter = {
 	material: {
 		map: new TextureLoader().load(textureJupiter)
 	},
-	orbitRadius: 20
+	orbitRadius: 22
 };
 
 const saturn = {
@@ -76,7 +78,7 @@ const saturn = {
 	material: {
 		map: new TextureLoader().load(textureSaturn)
 	},
-	orbitRadius: 10,
+	orbitRadius: 34,
 	rings: [
 		{
 			name: 'saturn ring',
@@ -96,7 +98,7 @@ const uranus = {
 	material: {
 		map: new TextureLoader().load(textureUranus)
 	},
-	orbitRadius: 35
+	orbitRadius: 43
 };
 
 const neptune = {
@@ -105,7 +107,7 @@ const neptune = {
 	material: {
 		map: new TextureLoader().load(textureNeptune)
 	},
-	orbitRadius: 45
+	orbitRadius: 53
 };
 
 export { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune };

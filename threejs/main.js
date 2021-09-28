@@ -74,7 +74,7 @@ const addElements = () => {
 		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetMesh.rot = Math.random();
-		planetMesh.orbitSpeed = 0.004 / planet.orbitRadius;
+		planetMesh.orbitSpeed = 0.009 / planet.orbitRadius;
 
 		// this part is OK
 		planetMesh.orbit = Math.random() * Math.PI * 2;
@@ -85,7 +85,44 @@ const addElements = () => {
 			Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
 		);
 
-		if (planet.rings && Object.keys(planet.rings).length) {
+		if (planet.moons && planet.moons.length) {
+			planet.moons.forEach((moon) => {
+				console.log(moon);
+				const moonMesh = new THREE.Mesh(
+					moon.geometry,
+					new THREE.MeshStandardMaterial({
+						...moon.material
+					})
+				);
+
+				moonMesh.distanceFromPlanet = moon.distanceFromPlanet;
+				moonMesh.position.x = planetMesh.position.x;
+				moonMesh.position.y = planetMesh.position.y;
+				moonMesh.position.z = planetMesh.position.z;
+
+				planetMesh.moonMeshes = planetMesh.moonMeshes || [];
+				planetMesh.moonMeshes.push(moonMesh);
+				scene.add(moonMesh);
+
+				// and to set an orbit line...
+				const moonOrbitLine = new THREE.Line(
+					new THREE.RingGeometry(moonMesh.distanceFromPlanet, moonMesh.distanceFromPlanet, 90),
+					new THREE.MeshBasicMaterial({
+						color: 0xffffff,
+						transparent: true,
+						opacity: setOrbitVisibility() / 2,
+						side: THREE.BackSide
+					})
+				);
+				moonMesh.moonOrbitLine = moonOrbitLine;
+				moonOrbitLine.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
+				moonOrbitLine.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
+				moonOrbitLine.name = `${planetMesh.name} moon orbit line`;
+				scene.add(moonOrbitLine);
+			});
+		}
+
+		if (planet.rings && planet.rings.length) {
 			planet.rings.forEach((ring) => {
 				const ringMesh = new THREE.Mesh(
 					ringUVMapGeometry(2.4, 5),
@@ -112,8 +149,8 @@ const addElements = () => {
 				side: THREE.BackSide
 			})
 		);
-		orbit.rotation.x = THREE.Math.degToRad(90);
-		orbit.name = 'orbit';
+		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
+		orbit.name = `${planetMesh.name} orbit line`;
 		planetMesh.orbitMesh = orbit;
 		planets.push(planetMesh);
 		scene.add(orbit, planetMesh);
@@ -151,12 +188,25 @@ let lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
-	sun.material.uniforms.time.value += 0.2 * delta;
+	// sun.material.uniforms.time.value += 0.2 * delta;
+	// sun.rotation.y += 0.0125 * delta;
 
 	planets.forEach((planet) => {
 		planet.rotation.y += 0.0125 * delta;
 		planet.orbit += planet.orbitSpeed;
 		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
+
+		if (planet.moonMeshes && planet.moonMeshes.length) {
+			planet.moonMeshes.forEach((moonMesh) => {
+				// planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
+				moonMesh.position.set(planet.position.x + moonMesh.distanceFromPlanet, planet.position.y, planet.position.z);
+
+				if (moonMesh.moonOrbitLine) {
+					moonMesh.moonOrbitLine.position.set(planet.position.x, planet.position.y, planet.position.z);
+					moonMesh.rotation.z -= 0.01 * delta;
+				}
+			});
+		}
 
 		if (planet.ringMeshes && planet.ringMeshes.length) {
 			planet.ringMeshes.forEach((ringMesh) => {
@@ -171,8 +221,6 @@ const render = () => {
 	// 		`hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
 	// 	);
 	// });
-
-	sun.rotation.y += 0.0125 * delta;
 };
 
 const animate = () => {
@@ -213,5 +261,10 @@ window.addEventListener('resize', () => {
 });
 
 _orbitVisibilityCheckbox.addEventListener('change', () => {
-	planets.forEach((planet) => (planet.orbitMesh.material.opacity = setOrbitVisibility()));
+	planets.forEach((planet) => {
+		planet.orbitMesh.material.opacity = setOrbitVisibility();
+		if (planet.moonMeshes && planet.moonMeshes.length) {
+			planet.moonMeshes.forEach((moon) => (moon.moonOrbitLine.material.opacity = setOrbitVisibility()));
+		}
+	});
 });
