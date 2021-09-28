@@ -44,7 +44,7 @@ const earth = {
 		{
 			name: 'luna',
 			geometry: new SphereGeometry(0.4, 32, 32),
-			distanceFromPlanet: 2.2,
+			orbitRadius: 2.2,
 			material: {
 				map: new TextureLoader().load(textureMoon),
 				normalMap: new TextureLoader().load(normal)

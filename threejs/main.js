@@ -73,10 +73,9 @@ const addElements = () => {
 
 		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-		planetMesh.rot = Math.random();
 		planetMesh.orbitSpeed = 0.009 / planet.orbitRadius;
 
-		// this part is OK
+		// sets the initial position of each planet
 		planetMesh.orbit = Math.random() * Math.PI * 2;
 
 		planetMesh.position.set(
@@ -95,7 +94,9 @@ const addElements = () => {
 					})
 				);
 
-				moonMesh.distanceFromPlanet = moon.distanceFromPlanet;
+				moonMesh.orbit = Math.random() * Math.PI * 2;
+				moonMesh.orbitRadius = moon.orbitRadius;
+				moonMesh.orbitSpeed = 0.15 / moon.orbitRadius;
 				moonMesh.position.x = planetMesh.position.x;
 				moonMesh.position.y = planetMesh.position.y;
 				moonMesh.position.z = planetMesh.position.z;
@@ -106,7 +107,7 @@ const addElements = () => {
 
 				// and to set an orbit line...
 				const moonOrbitLine = new THREE.Line(
-					new THREE.RingGeometry(moonMesh.distanceFromPlanet, moonMesh.distanceFromPlanet, 90),
+					new THREE.RingGeometry(moonMesh.orbitRadius, moonMesh.orbitRadius, 90),
 					new THREE.MeshBasicMaterial({
 						color: 0xffffff,
 						transparent: true,
@@ -192,26 +193,30 @@ const render = () => {
 	// sun.rotation.y += 0.0125 * delta;
 
 	planets.forEach((planet) => {
-		planet.rotation.y += 0.0125 * delta;
+		planet.rotation.y += planet.rotSpeed * delta;
 		planet.orbit += planet.orbitSpeed;
 		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
 
 		if (planet.moonMeshes && planet.moonMeshes.length) {
-			planet.moonMeshes.forEach((moonMesh) => {
-				// planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
-				moonMesh.position.set(planet.position.x + moonMesh.distanceFromPlanet, planet.position.y, planet.position.z);
+			planet.moonMeshes.forEach((moon) => {
+				moon.orbit -= moon.orbitSpeed * delta;
+				moon.position.set(
+					planet.position.x + Math.cos(moon.orbit) * moon.orbitRadius,
+					planet.position.y,
+					planet.position.z + Math.sin(moon.orbit) * moon.orbitRadius
+				);
 
-				if (moonMesh.moonOrbitLine) {
-					moonMesh.moonOrbitLine.position.set(planet.position.x, planet.position.y, planet.position.z);
-					moonMesh.rotation.z -= 0.01 * delta;
+				if (moon.moonOrbitLine) {
+					moon.moonOrbitLine.position.set(planet.position.x, planet.position.y, planet.position.z);
+					moon.rotation.z -= 0.01 * delta;
 				}
 			});
 		}
 
 		if (planet.ringMeshes && planet.ringMeshes.length) {
-			planet.ringMeshes.forEach((ringMesh) => {
-				ringMesh.position.set(planet.position.x, planet.position.y, planet.position.z);
-				ringMesh.rotation.z += 0.01 * delta;
+			planet.ringMeshes.forEach((ring) => {
+				ring.position.set(planet.position.x, planet.position.y, planet.position.z);
+				ring.rotation.z += 0.01 * delta;
 			});
 		}
 	});
