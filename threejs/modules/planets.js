@@ -1,4 +1,4 @@
-import { CircleGeometry, DoubleSide, RingBufferGeometry, RingGeometry, SphereGeometry, TextureLoader } from 'three';
+import { DoubleSide, SphereBufferGeometry, TextureLoader } from 'three';
 import textureMercury from './../img/textures/mercury.jpg';
 import textureVenus from './../img/textures/venus.jpg';
 import textureEarth from './../img/textures/earth.jpg';
@@ -14,7 +14,7 @@ import normalEarth from './../img/textures/normal-earth.jpg';
 
 const mercury = {
 	name: 'mercury',
-	geometry: new SphereGeometry(0.3, 32, 32),
+	geometry: new SphereBufferGeometry(0.3, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureMercury),
 		normalMap: new TextureLoader().load(normal)
@@ -24,7 +24,7 @@ const mercury = {
 
 const venus = {
 	name: 'venus',
-	geometry: new SphereGeometry(0.8, 32, 32),
+	geometry: new SphereBufferGeometry(0.8, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureVenus),
 		normalMap: new TextureLoader().load(normal)
@@ -34,7 +34,7 @@ const venus = {
 
 const earth = {
 	name: 'earth',
-	geometry: new SphereGeometry(1, 32, 32),
+	geometry: new SphereBufferGeometry(1, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureEarth),
 		normalMap: new TextureLoader().load(normalEarth)
@@ -43,7 +43,7 @@ const earth = {
 	moons: [
 		{
 			name: 'luna',
-			geometry: new SphereGeometry(0.4, 32, 32),
+			geometry: new SphereBufferGeometry(0.4, 32, 32),
 			orbitRadius: 2.2,
 			material: {
 				map: new TextureLoader().load(textureMoon),
@@ -55,7 +55,7 @@ const earth = {
 
 const mars = {
 	name: 'mars',
-	geometry: new SphereGeometry(0.6, 32, 32),
+	geometry: new SphereBufferGeometry(0.6, 32, 32),
 	material: {
 		map: new TextureLoader().load(textureMars),
 		normalMap: new TextureLoader().load(normal)
@@ -65,20 +65,22 @@ const mars = {
 
 const jupiter = {
 	name: 'jupiter',
-	geometry: new SphereGeometry(2.4, 32, 32),
+	geometry: new SphereBufferGeometry(2.4, 32, 32),
 	material: {
-		map: new TextureLoader().load(textureJupiter)
+		map: new TextureLoader().load(textureJupiter),
+		normalMap: ''
 	},
-	orbitRadius: 22
+	orbitRadius: 30
 };
 
 const saturn = {
 	name: 'saturn',
-	geometry: new SphereGeometry(2.2, 32, 32),
+	geometry: new SphereBufferGeometry(2.2, 32, 32),
 	material: {
-		map: new TextureLoader().load(textureSaturn)
+		map: new TextureLoader().load(textureSaturn),
+		normalMap: ''
 	},
-	orbitRadius: 34,
+	orbitRadius: 40,
 	rings: [
 		{
 			name: 'saturn ring',
@@ -94,20 +96,22 @@ const saturn = {
 
 const uranus = {
 	name: 'uranus',
-	geometry: new SphereGeometry(1.4, 32, 32),
+	geometry: new SphereBufferGeometry(1.4, 32, 32),
 	material: {
-		map: new TextureLoader().load(textureUranus)
+		map: new TextureLoader().load(textureUranus),
+		normalMap: ''
 	},
-	orbitRadius: 43
+	orbitRadius: 49
 };
 
 const neptune = {
 	name: 'neptune',
-	geometry: new SphereGeometry(1.4, 32, 32),
+	geometry: new SphereBufferGeometry(1.4, 32, 32),
 	material: {
-		map: new TextureLoader().load(textureNeptune)
+		map: new TextureLoader().load(textureNeptune),
+		normalMap: ''
 	},
-	orbitRadius: 53
+	orbitRadius: 59
 };
 
 export { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune };

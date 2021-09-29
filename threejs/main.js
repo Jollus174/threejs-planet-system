@@ -12,10 +12,13 @@ import { star } from './modules/objects';
 import { sun } from './modules/sun';
 import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets';
 import { skybox } from './modules/skybox';
-
-import { PointLight, AmbientLight, PointLightHelper } from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { Color } from 'three';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+let composer, outlinePass;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -23,18 +26,21 @@ controls.minDistance = 4;
 controls.maxDistance = 100;
 controls.enableKeys = true;
 controls.keys = {
-	LEFT: 'KeyA', //left arrow
-	UP: 'KeyW', // up arrow
-	RIGHT: 'KeyD', // right arrow
-	BOTTOM: 'KeyS' // down arrow
+	LEFT: 'KeyA',
+	UP: 'KeyW',
+	RIGHT: 'KeyD',
+	BOTTOM: 'KeyS'
 };
 controls.listenToKeyEvents(document);
 
+const mouse = new THREE.Vector2();
+const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const stars = [];
 const planets = [];
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
-const _orbitVisibilityDefault = 0.08;
+const _orbitVisibilityDefault = 0.06;
+let _defaultOutlineEdgeStrength = 2;
 
 const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
 
@@ -55,6 +61,8 @@ const addElements = () => {
 	// moon.position.z = 30;
 	// moon.position.x = -10;
 
+	sun.name = 'sun';
+	sun.clickable = true;
 	scene.add(sun);
 	scene.add(skybox);
 
@@ -67,7 +75,8 @@ const addElements = () => {
 			})
 		);
 
-		planetMesh.name = planet.name;
+		planetMesh.name = `${planet.name} planet`;
+		planetMesh.clickable = true;
 		planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
 		planetMesh.orbitRadius = planet.orbitRadius;
 
@@ -86,7 +95,6 @@ const addElements = () => {
 
 		if (planet.moons && planet.moons.length) {
 			planet.moons.forEach((moon) => {
-				console.log(moon);
 				const moonMesh = new THREE.Mesh(
 					moon.geometry,
 					new THREE.MeshStandardMaterial({
@@ -94,6 +102,7 @@ const addElements = () => {
 					})
 				);
 
+				moonMesh.clickable = true;
 				moonMesh.orbit = Math.random() * Math.PI * 2;
 				moonMesh.orbitRadius = moon.orbitRadius;
 				moonMesh.orbitSpeed = 0.15 / moon.orbitRadius;
@@ -177,10 +186,11 @@ const addElements = () => {
 			scene.add(starMesh);
 		});
 
-	const pointLight = new PointLight(0xffffff, 1, 4, 0);
+	// Lights
+	const pointLight = new THREE.PointLight(0xffffff, 1, 4, 0);
 	pointLight.position.set(0, 3, 0);
 
-	const ambientLight = new AmbientLight(0x090909, 4);
+	const ambientLight = new THREE.AmbientLight(0x090909, 4);
 	// const lightHelper = new PointLightHelper(pointLight);
 	scene.add(pointLight, ambientLight);
 };
@@ -234,20 +244,42 @@ const animate = () => {
 	controls.update();
 
 	// render == DRAW
-	// renderer.clear();
 	render();
-	// compose();
+
 	renderer.render(scene, camera);
-	// composer.render(0.01);
+	composer.render();
 };
+
+
 
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
 	// camera.position.y = 2;
-	camera.position.y = 8;
-	camera.position.z = 18;
+	camera.position.y = 12;
+	camera.position.z = 40;
+
+	composer = new EffectComposer(renderer);
+	const renderModel = new RenderPass(scene, camera);
+	// const effectBloom = new BloomPass(1.25);
+	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
+
+	outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+	outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
+	outlinePass.edgeGlow = 1;
+	outlinePass.edgeThickness = 1;
+	outlinePass.visibleEdgeColor = new Color(0xffffff);
+	outlinePass.hiddenEdgeColor = new Color(0x190a05);
+	// outlinePass.pulsePeriod = 5;
+	outlinePass.clear = false;
+
+	composer.addPass(renderModel);
+	// composer.addPass(effectBloom);
+	composer.addPass(outlinePass);
+	// composer.addPass(effectFilm);
+
+	window.composer = composer;
 
 	animate();
 	addElements();
@@ -263,6 +295,46 @@ window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
+});
+
+window.addEventListener('click', (e) => {
+	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+	raycaster.setFromCamera(mouse, camera);
+	const intersects = raycaster.intersectObjects(scene.children);
+	if (intersects) {
+		const objsClickable = intersects.filter((intersect) => intersect.object.clickable);
+		// only add an object if it's clickable and doesn't already exist in the clicked array
+		if (
+			objsClickable.length &&
+			outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) === -1
+		) {
+			outlinePass.selectedObjects = [];
+			outlinePass.selectedObjects.push(objsClickable[0].object);
+
+			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
+
+			console.log(objsClickable[0].object);
+			console.log(outlinePass.selectedObjects);
+
+			const theTimeout = setTimeout(() => {
+				// outlinePass.selectedObjects = [];
+				console.log('timeout set!');
+				// clearTimeout(theTimeout);
+			}, 5);
+
+			// const decreaseThickness = setInterval(() => {
+			// 	outlinePass.edgeStrength -= 1;
+
+			// 	if (outlinePass.edgeStrength === 0) {
+			// 		console.log('clear it!');
+			// 		clearInterval(decreaseThickness);
+			// 		outlinePass.selectedObjects = [];
+			// 	}
+			// }, 1);
+		}
+	}
 });
 
 _orbitVisibilityCheckbox.addEventListener('change', () => {

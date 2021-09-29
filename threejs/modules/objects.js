@@ -1,10 +1,18 @@
 'use strict';
-import { TorusGeometry, Mesh, MeshStandardMaterial, SphereGeometry, AdditiveBlending, Color } from 'three';
+import {
+	TorusGeometry,
+	Mesh,
+	MeshStandardMaterial,
+	SphereBufferGeometry,
+	AdditiveBlending,
+	Color,
+	RingGeometry
+} from 'three';
 
 const torus = new Mesh(new TorusGeometry(10, 3, 16, 100), new MeshStandardMaterial({ color: 0xff6347 }));
 
 const star = {
-	geometry: new SphereGeometry(0.015, 16, 16),
+	geometry: new SphereBufferGeometry(0.015, 16, 16),
 	material: {
 		blending: AdditiveBlending,
 		transparent: true,
@@ -13,4 +21,12 @@ const star = {
 	}
 };
 
-export { torus, star };
+const asteroidBelt = {
+	geometry: new RingGeometry(20, 23, 90),
+	material: {
+		color: new Color(0xfffffff),
+		transparent: true
+	}
+};
+
+export { torus, star, asteroidBelt };
