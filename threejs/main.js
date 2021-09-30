@@ -18,7 +18,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { Color } from 'three';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
-let composer, outlinePass;
+let composer, outlinePass, clickHoldTimeout;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -40,11 +40,12 @@ const stars = [];
 const planets = [];
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
-let _defaultOutlineEdgeStrength = 2;
+const _defaultOutlineEdgeStrength = 2;
+const _clickHoldTimer = 400;
 
 const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
 
-// custom UV map so textures can curve correctly
+// custom UV map so textures can curve correctly (looking at you, rings of Saturn)
 const ringUVMapGeometry = (from, to) => {
 	const geometry = new THREE.RingBufferGeometry(from, to, 90);
 	const pos = geometry.attributes.position;
@@ -289,29 +290,53 @@ const init = () => {
 
 init();
 
+let intersects, objsClickable, timerPassed;
+let selectedObjs = [];
+
 window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 });
 
+window.addEventListener('pointerup', () => {
+	clearTimeout(clickHoldTimeout);
+
+	// after releasing click, also release the object targeted by the camera, but only after the click timer has passed (makes for more natural UX)
+	// we don't want the object to deselect and camera to release if we're just playing with the orbit
+	if (timerPassed) {
+		const v3 = new THREE.Vector3();
+		const { x, y, z } = selectedObjs[0].position;
+		v3.set(x, y, z);
+		controls.target = v3;
+		controls.update();
+		selectedObjs = outlinePass.selectedObjects = [];
+	}
+});
+
 window.addEventListener('pointerdown', (e) => {
+	timerPassed = false;
 	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
 	raycaster.setFromCamera(mouse, camera);
-	const intersects = raycaster.intersectObjects(scene.children);
-	const objsClickable = intersects.filter((intersect) => intersect.object.clickable);
+	intersects = raycaster.intersectObjects(scene.children);
+	objsClickable = intersects.filter((intersect) => intersect.object.clickable);
 	if (intersects) {
+		clickHoldTimeout = setTimeout(() => {
+			timerPassed = true;
+			console.log('timer passed!');
+		}, _clickHoldTimer);
+
+		selectedObjs = outlinePass.selectedObjects;
+
 		// only add an object if it's clickable and doesn't already exist in the clicked array
-		if (
-			objsClickable.length &&
-			outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) === -1
-		) {
+		if (objsClickable.length && selectedObjs.map((obj) => obj.name).indexOf(objsClickable[0].object.name) === -1) {
 			const targetObj = objsClickable[0].object;
 			controls.target = targetObj.position;
 			outlinePass.selectedObjects = [];
 			outlinePass.selectedObjects.push(targetObj);
+			selectedObjs = outlinePass.selectedObjects;
 			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
 
 			// const decreaseThickness = setInterval(() => {
@@ -323,15 +348,6 @@ window.addEventListener('pointerdown', (e) => {
 			// 		outlinePass.selectedObjects = [];
 			// 	}
 			// }, 1);
-		} else if (outlinePass.selectedObjects.length) {
-			// TODO: delay the deselect. If the mouse is held down for over a second, DON'T deselect the item!
-			// if there's nothing clickable in the click, then clear the selectObjects array and stop orbit tracking the last object
-			const v3 = new THREE.Vector3();
-			const { x, y, z } = outlinePass.selectedObjects[0].position;
-			v3.set(x, y, z);
-			controls.target = v3;
-			controls.update();
-			outlinePass.selectedObjects = [];
 		}
 	}
 });
