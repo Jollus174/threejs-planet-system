@@ -250,8 +250,6 @@ const animate = () => {
 	composer.render();
 };
 
-
-
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -297,32 +295,24 @@ window.addEventListener('resize', () => {
 	camera.updateProjectionMatrix();
 });
 
-window.addEventListener('click', (e) => {
+window.addEventListener('pointerdown', (e) => {
 	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
 	raycaster.setFromCamera(mouse, camera);
 	const intersects = raycaster.intersectObjects(scene.children);
+	const objsClickable = intersects.filter((intersect) => intersect.object.clickable);
 	if (intersects) {
-		const objsClickable = intersects.filter((intersect) => intersect.object.clickable);
 		// only add an object if it's clickable and doesn't already exist in the clicked array
 		if (
 			objsClickable.length &&
 			outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) === -1
 		) {
+			const targetObj = objsClickable[0].object;
+			controls.target = targetObj.position;
 			outlinePass.selectedObjects = [];
-			outlinePass.selectedObjects.push(objsClickable[0].object);
-
+			outlinePass.selectedObjects.push(targetObj);
 			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
-
-			console.log(objsClickable[0].object);
-			console.log(outlinePass.selectedObjects);
-
-			const theTimeout = setTimeout(() => {
-				// outlinePass.selectedObjects = [];
-				console.log('timeout set!');
-				// clearTimeout(theTimeout);
-			}, 5);
 
 			// const decreaseThickness = setInterval(() => {
 			// 	outlinePass.edgeStrength -= 1;
@@ -333,6 +323,15 @@ window.addEventListener('click', (e) => {
 			// 		outlinePass.selectedObjects = [];
 			// 	}
 			// }, 1);
+		} else if (outlinePass.selectedObjects.length) {
+			// TODO: delay the deselect. If the mouse is held down for over a second, DON'T deselect the item!
+			// if there's nothing clickable in the click, then clear the selectObjects array and stop orbit tracking the last object
+			const v3 = new THREE.Vector3();
+			const { x, y, z } = outlinePass.selectedObjects[0].position;
+			v3.set(x, y, z);
+			controls.target = v3;
+			controls.update();
+			outlinePass.selectedObjects = [];
 		}
 	}
 });
