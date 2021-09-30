@@ -191,17 +191,40 @@ const addElements = () => {
 	const pointLight = new THREE.PointLight(0xffffff, 1, 4, 0);
 	pointLight.position.set(0, 3, 0);
 
+	new Array(6).fill().forEach((spotlight, i) => {
+		const settings = {
+			color: 0xffffff,
+			intensity: 0.7,
+			distance: 0,
+			angle: Math.PI / 3,
+			penumbra: 1
+		};
+		const { color, intensity, distance, angle, penumbra } = settings;
+		const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penumbra);
+		const positionAdjuster = i % 2 === 0 ? 10 : -10;
+		// const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+
+		const positions = {
+			x: i < 2 ? positionAdjuster : 0,
+			y: i >= 2 && i < 3 ? positionAdjuster : 0,
+			z: i >= 3 ? positionAdjuster : 0
+		};
+		const { x, y, z } = positions;
+		spotLight.position.set(x, y, z);
+
+		scene.add(spotLight);
+	});
+
 	const ambientLight = new THREE.AmbientLight(0x090909, 4);
 	// const lightHelper = new PointLightHelper(pointLight);
-	scene.add(pointLight, ambientLight);
+	scene.add(ambientLight);
 };
 
 let lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
-	// sun.material.uniforms.time.value += 0.2 * delta;
-	// sun.rotation.y += 0.0125 * delta;
+	sun.rotation.y += 0.0125 * delta;
 
 	planets.forEach((planet) => {
 		planet.rotation.y += planet.rotSpeed * delta;
