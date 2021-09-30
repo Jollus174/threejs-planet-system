@@ -6,6 +6,7 @@ import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { getStandardDeviation } from './modules/utils';
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { star } from './modules/objects';
@@ -41,7 +42,6 @@ const planets = [];
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
 const _defaultOutlineEdgeStrength = 2;
-const _clickHoldTimer = 400;
 
 const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
 
@@ -251,6 +251,69 @@ const animate = () => {
 	composer.render();
 };
 
+const initMousePointerOrbitEvents = () => {
+	const v3 = new THREE.Vector3();
+	let intersects = [];
+	let objsClickable = [];
+	let hasClickedSameTarget = false;
+
+	window.addEventListener('pointerdown', (e) => {
+		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+		raycaster.setFromCamera(mouse, camera);
+		intersects = raycaster.intersectObjects(scene.children);
+		objsClickable = intersects.filter((intersect) => intersect.object.clickable);
+
+		hasClickedSameTarget =
+			(objsClickable.length &&
+				outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1) ||
+			false;
+
+		// only add an object if it's clickable and doesn't already exist in the clicked array
+		if (objsClickable.length && !hasClickedSameTarget) {
+			controls.target = objsClickable[0].object.position;
+			outlinePass.selectedObjects = [];
+			outlinePass.selectedObjects.push(objsClickable[0].object);
+			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
+
+			// const decreaseThickness = setInterval(() => {
+			// 	outlinePass.edgeStrength -= 1;
+
+			// 	if (outlinePass.edgeStrength === 0) {
+			// 		console.log('clear it!');
+			// 		clearInterval(decreaseThickness);
+			// 		outlinePass.selectedObjects = [];
+			// 	}
+			// }, 1);
+		}
+	});
+
+	window.addEventListener('pointerup', (e) => {
+		// check pointer position deviation for x + y to see if we should unlock the camera from its target
+		const oldMousePos = [mouse.x, mouse.y];
+		const newMousePos = [(e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1];
+		const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
+			yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
+
+		// console.log({ xDeviation, yDeviation });
+		const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
+
+		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
+		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
+		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
+		if (!mouseHasDeviated && !hasClickedSameTarget && !objsClickable.length) {
+			if (outlinePass.selectedObjects.length) {
+				const { x, y, z } = outlinePass.selectedObjects[0].position;
+				v3.set(x, y, z);
+				controls.target = v3;
+				controls.update();
+				outlinePass.selectedObjects = [];
+			}
+		}
+	});
+};
+
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -282,6 +345,7 @@ const init = () => {
 
 	animate();
 	addElements();
+	initMousePointerOrbitEvents();
 
 	window.scene = scene;
 	window.renderer = renderer;
@@ -290,66 +354,10 @@ const init = () => {
 
 init();
 
-let intersects, objsClickable, timerPassed;
-let selectedObjs = [];
-
 window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-});
-
-window.addEventListener('pointerup', () => {
-	clearTimeout(clickHoldTimeout);
-
-	// after releasing click, also release the object targeted by the camera, but only after the click timer has passed (makes for more natural UX)
-	// we don't want the object to deselect and camera to release if we're just playing with the orbit
-	if (timerPassed) {
-		const v3 = new THREE.Vector3();
-		const { x, y, z } = selectedObjs[0].position;
-		v3.set(x, y, z);
-		controls.target = v3;
-		controls.update();
-		selectedObjs = outlinePass.selectedObjects = [];
-	}
-});
-
-window.addEventListener('pointerdown', (e) => {
-	timerPassed = false;
-	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-	raycaster.setFromCamera(mouse, camera);
-	intersects = raycaster.intersectObjects(scene.children);
-	objsClickable = intersects.filter((intersect) => intersect.object.clickable);
-	if (intersects) {
-		clickHoldTimeout = setTimeout(() => {
-			timerPassed = true;
-			console.log('timer passed!');
-		}, _clickHoldTimer);
-
-		selectedObjs = outlinePass.selectedObjects;
-
-		// only add an object if it's clickable and doesn't already exist in the clicked array
-		if (objsClickable.length && selectedObjs.map((obj) => obj.name).indexOf(objsClickable[0].object.name) === -1) {
-			const targetObj = objsClickable[0].object;
-			controls.target = targetObj.position;
-			outlinePass.selectedObjects = [];
-			outlinePass.selectedObjects.push(targetObj);
-			selectedObjs = outlinePass.selectedObjects;
-			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
-
-			// const decreaseThickness = setInterval(() => {
-			// 	outlinePass.edgeStrength -= 1;
-
-			// 	if (outlinePass.edgeStrength === 0) {
-			// 		console.log('clear it!');
-			// 		clearInterval(decreaseThickness);
-			// 		outlinePass.selectedObjects = [];
-			// 	}
-			// }, 1);
-		}
-	}
 });
 
 _orbitVisibilityCheckbox.addEventListener('change', () => {
