@@ -6,16 +6,6 @@ const torus = new THREE.Mesh(
 	new THREE.MeshStandardMaterial({ color: 0xff6347 })
 );
 
-const star = {
-	geometry: new THREE.SphereBufferGeometry(0.015, 16, 16),
-	material: {
-		blending: THREE.AdditiveBlending,
-		transparent: true,
-		emissive: new THREE.Color(0xffffff),
-		emissiveIntensity: 0.5
-	}
-};
-
 const asteroidBeltHelper = {
 	geometry: new THREE.RingGeometry(20, 23, 90),
 	material: {
@@ -54,4 +44,4 @@ const setAsteroidPosition = (count) => {
 	};
 };
 
-export { torus, star, asteroidBeltHelper, setAsteroidPosition };
+export { torus, asteroidBeltHelper, setAsteroidPosition };

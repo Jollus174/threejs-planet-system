@@ -6,10 +6,10 @@ import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { getStandardDeviation } from './modules/utils';
+import { getStandardDeviation, createCircleTexture } from './modules/utils';
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
-import { star, setAsteroidPosition } from './modules/objects';
+import { setAsteroidPosition } from './modules/objects';
 import { sun } from './modules/sun';
 import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets';
 import { skybox } from './modules/skybox';
@@ -38,7 +38,9 @@ const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const planets = [];
 const starfield = new THREE.Object3D();
+starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
+orbitCentroid.name = 'orbit centroid';
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
 const _defaultOutlineEdgeStrength = 2;
@@ -164,38 +166,54 @@ const addElements = () => {
 		scene.add(orbit, planetMesh);
 	});
 
-	Array(3000)
-		.fill()
-		.forEach(() => {
-			const { geometry, material } = star;
-			const starMesh = new THREE.Mesh(
-				geometry,
-				new THREE.MeshStandardMaterial({
-					...material,
-					opacity: 1,
-					color: new THREE.Color(`hsl(160, 0%, ${Math.floor(Math.random() * 100)}%)`)
-				})
-			);
+	const createStarfield = () => {
+		const stars = 10000;
+		const spreadAmount = 200;
+		const geometry = new THREE.BufferGeometry();
+		const positions = new Float32Array(stars * 3);
+
+		const material = {
+			size: 0.075,
+			map: createCircleTexture('#FFF', 256),
+			blending: THREE.AdditiveBlending,
+			transparent: true,
+			opacity: 0.5,
+			color: new THREE.Color(0xffffff),
+			depthWrite: false
+		};
+
+		const randFloatSpread = (x) => THREE.MathUtils.randFloatSpread(x); // to keep JS Hint happy
+		for (let i = 0; i < positions.length; i += 3) {
 			const [x, y, z] = Array(3)
 				.fill()
-				.map(() => THREE.MathUtils.randFloatSpread(100));
-			starMesh.position.set(x, y, z);
-			starfield.add(starMesh);
-		});
+				.map(() => randFloatSpread(spreadAmount));
+			positions[i] = x;
+			positions[i + 1] = y;
+			positions[i + 2] = z;
+		}
 
-	scene.add(starfield);
+		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		geometry.computeBoundingSphere();
+		const starFieldSystem = new THREE.Points(geometry, new THREE.PointsMaterial({ ...material }));
+		starfield.add(starFieldSystem);
+
+		return starfield;
+	};
+	scene.add(createStarfield());
 
 	// Asteroids
 	const addAsteroids = () => {
-		const particles = 500;
+		const particles = 10000;
 		const geometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(particles * 3);
 
 		const material = {
-			color: 0xffffff,
-			blending: THREE.AdditiveBlending,
+			size: 0.1,
+			map: createCircleTexture('#FFF', 256),
+			transparent: true,
 			opacity: 0.5,
-			size: 0.1
+			color: new THREE.Color(0xffffff),
+			depthWrite: false
 		};
 
 		for (let i = 0; i < positions.length; i += 3) {
@@ -209,12 +227,10 @@ const addElements = () => {
 		geometry.computeBoundingSphere();
 
 		const particleSystem = new THREE.Points(geometry, new THREE.PointsMaterial({ ...material }));
-		console.log(particleSystem);
 		orbitCentroid.add(particleSystem);
-
-		scene.add(orbitCentroid);
+		return orbitCentroid;
 	};
-	addAsteroids();
+	scene.add(addAsteroids());
 
 	// Lights
 	const pointLight = new THREE.PointLight(0xffffff, 1, 4, 0);
