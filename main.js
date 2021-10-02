@@ -36,8 +36,8 @@ controls.listenToKeyEvents(document);
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
-const stars = [];
 const planets = [];
+const starfield = new THREE.Object3D();
 const orbitCentroid = new THREE.Object3D();
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
@@ -180,9 +180,10 @@ const addElements = () => {
 				.fill()
 				.map(() => THREE.MathUtils.randFloatSpread(100));
 			starMesh.position.set(x, y, z);
-			stars.push(starMesh);
-			scene.add(starMesh);
+			starfield.add(starMesh);
 		});
+
+	scene.add(starfield);
 
 	// Asteroids
 	const addAsteroids = () => {
