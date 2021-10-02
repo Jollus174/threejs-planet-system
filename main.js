@@ -10,15 +10,15 @@ import { getStandardDeviation, createCircleTexture } from './modules/utils';
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { setAsteroidPosition } from './modules/objects';
-import { sun } from './modules/sun';
-import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets';
-import { skybox } from './modules/skybox';
+import { loadManager } from './modules/loadManager';
+import { sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/celestialBodies';
+import { skyboxTexturePaths } from './modules/skybox';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
-let composer, outlinePass;
+let composer, outlinePass, sunMesh;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -33,6 +33,7 @@ controls.keys = {
 };
 controls.listenToKeyEvents(document);
 
+const loader = new THREE.TextureLoader(loadManager());
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
@@ -41,6 +42,7 @@ const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
 orbitCentroid.name = 'orbit centroid';
+
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
 const _defaultOutlineEdgeStrength = 2;
@@ -61,17 +63,33 @@ const ringUVMapGeometry = (from, to) => {
 };
 
 const addElements = () => {
-	sun.name = 'sun';
-	sun.clickable = true;
-	scene.add(sun);
+	// adding space skybox
+	const skyboxMaterialArray = skyboxTexturePaths.map(
+		(image) => new THREE.MeshBasicMaterial({ map: loader.load(image), side: THREE.BackSide })
+	);
+	const skybox = new THREE.Mesh(new THREE.BoxGeometry(1200, 1200, 1200), skyboxMaterialArray);
+	skybox.name = 'skybox';
 	scene.add(skybox);
 
-	// let's add a bunch of planets
+	// adding Sun
+	sunMesh = new THREE.Mesh(
+		sun.geometry,
+		new THREE.MeshStandardMaterial({
+			...sun.material,
+			map: loader.load(sun.material.map)
+		})
+	);
+	sunMesh.name = 'sun';
+	sunMesh.clickable = true;
+	scene.add(sunMesh);
+
+	// adding a bunch of planets
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const planetMesh = new THREE.Mesh(
 			planet.geometry,
 			new THREE.MeshStandardMaterial({
-				...planet.material
+				map: loader.load(planet.material.map),
+				normal: loader.load(planet.material.normalMap)
 			})
 		);
 
@@ -84,7 +102,7 @@ const addElements = () => {
 		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetMesh.orbitSpeed = 0.009 / planet.orbitRadius;
 
-		// sets the initial position of each planet
+		// sets the initial position of each planet along its orbit
 		planetMesh.orbit = Math.random() * Math.PI * 2;
 
 		planetMesh.position.set(
@@ -98,7 +116,8 @@ const addElements = () => {
 				const moonMesh = new THREE.Mesh(
 					moon.geometry,
 					new THREE.MeshStandardMaterial({
-						...moon.material
+						map: loader.load(moon.material.map),
+						normal: loader.load(moon.material.normalMap)
 					})
 				);
 
@@ -137,7 +156,8 @@ const addElements = () => {
 				const ringMesh = new THREE.Mesh(
 					ringUVMapGeometry(2.4, 5),
 					new THREE.MeshBasicMaterial({
-						...ring.material
+						...ring.material,
+						map: loader.load(ring.material.map)
 					})
 				);
 
@@ -269,7 +289,7 @@ let lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
-	sun.rotation.y += 0.0125 * delta;
+	sunMesh.rotation.y += 0.0125 * delta;
 	orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	planets.forEach((planet) => {
@@ -411,8 +431,8 @@ const init = () => {
 
 	window.composer = composer;
 
-	animate();
 	addElements();
+	animate();
 	initMousePointerOrbitEvents();
 
 	window.scene = scene;
