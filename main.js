@@ -9,17 +9,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { getStandardDeviation } from './modules/utils';
 import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
-import { star } from './modules/objects';
+import { star, setAsteroidPosition } from './modules/objects';
 import { sun } from './modules/sun';
 import { mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/planets';
 import { skybox } from './modules/skybox';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { Color } from 'three';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
-let composer, outlinePass, clickHoldTimeout;
+let composer, outlinePass;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -39,6 +38,7 @@ const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const stars = [];
 const planets = [];
+const orbitCentroid = new THREE.Object3D();
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
 const _defaultOutlineEdgeStrength = 2;
@@ -59,9 +59,6 @@ const ringUVMapGeometry = (from, to) => {
 };
 
 const addElements = () => {
-	// moon.position.z = 30;
-	// moon.position.x = -10;
-
 	sun.name = 'sun';
 	sun.clickable = true;
 	scene.add(sun);
@@ -187,11 +184,42 @@ const addElements = () => {
 			scene.add(starMesh);
 		});
 
+	// Asteroids
+	const addAsteroids = () => {
+		const particles = 500;
+		const geometry = new THREE.BufferGeometry();
+		const positions = new Float32Array(particles * 3);
+
+		const material = {
+			color: 0xffffff,
+			blending: THREE.AdditiveBlending,
+			opacity: 0.5,
+			size: 0.1
+		};
+
+		for (let i = 0; i < positions.length; i += 3) {
+			const { x, y, z } = setAsteroidPosition(i);
+			positions[i] = x;
+			positions[i + 2] = y;
+			positions[i + 3] = z;
+		}
+
+		geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		geometry.computeBoundingSphere();
+
+		const particleSystem = new THREE.Points(geometry, new THREE.PointsMaterial({ ...material }));
+		console.log(particleSystem);
+		orbitCentroid.add(particleSystem);
+
+		scene.add(orbitCentroid);
+	};
+	addAsteroids();
+
 	// Lights
 	const pointLight = new THREE.PointLight(0xffffff, 1, 4, 0);
 	pointLight.position.set(0, 3, 0);
 
-	new Array(6).fill().forEach((spotlight, i) => {
+	for (let i = 0; i < 5; i++) {
 		const settings = {
 			color: 0xffffff,
 			intensity: 0.7,
@@ -213,7 +241,7 @@ const addElements = () => {
 		spotLight.position.set(x, y, z);
 
 		scene.add(spotLight);
-	});
+	}
 
 	const ambientLight = new THREE.AmbientLight(0x090909, 4);
 	// const lightHelper = new PointLightHelper(pointLight);
@@ -225,6 +253,7 @@ let lightness = 0;
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sun.rotation.y += 0.0125 * delta;
+	orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	planets.forEach((planet) => {
 		planet.rotation.y += planet.rotSpeed * delta;
@@ -298,7 +327,6 @@ const initMousePointerOrbitEvents = () => {
 			controls.target = objsClickable[0].object.position;
 			outlinePass.selectedObjects = [];
 			outlinePass.selectedObjects.push(objsClickable[0].object);
-			outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
 
 			// const decreaseThickness = setInterval(() => {
 			// 	outlinePass.edgeStrength -= 1;
@@ -354,8 +382,8 @@ const init = () => {
 	outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
 	outlinePass.edgeGlow = 1;
 	outlinePass.edgeThickness = 1;
-	outlinePass.visibleEdgeColor = new Color(0xffffff);
-	outlinePass.hiddenEdgeColor = new Color(0x190a05);
+	outlinePass.visibleEdgeColor = new THREE.Color(0xffffff);
+	outlinePass.hiddenEdgeColor = new THREE.Color(0x190a05);
 	// outlinePass.pulsePeriod = 5;
 	outlinePass.clear = false;
 

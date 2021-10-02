@@ -1,32 +1,57 @@
 'use strict';
-import {
-	TorusGeometry,
-	Mesh,
-	MeshStandardMaterial,
-	SphereBufferGeometry,
-	AdditiveBlending,
-	Color,
-	RingGeometry
-} from 'three';
+import * as THREE from 'three';
 
-const torus = new Mesh(new TorusGeometry(10, 3, 16, 100), new MeshStandardMaterial({ color: 0xff6347 }));
+const torus = new THREE.Mesh(
+	new THREE.TorusGeometry(10, 3, 16, 100),
+	new THREE.MeshStandardMaterial({ color: 0xff6347 })
+);
 
 const star = {
-	geometry: new SphereBufferGeometry(0.015, 16, 16),
+	geometry: new THREE.SphereBufferGeometry(0.015, 16, 16),
 	material: {
-		blending: AdditiveBlending,
+		blending: THREE.AdditiveBlending,
 		transparent: true,
-		emissive: new Color(0xffffff),
+		emissive: new THREE.Color(0xffffff),
 		emissiveIntensity: 0.5
 	}
 };
 
-const asteroidBelt = {
-	geometry: new RingGeometry(20, 23, 90),
+const asteroidBeltHelper = {
+	geometry: new THREE.RingGeometry(20, 23, 90),
 	material: {
-		color: new Color(0xfffffff),
+		color: new THREE.Color(0xfffffff),
 		transparent: true
 	}
 };
 
-export { torus, star, asteroidBelt };
+const setAsteroidPosition = (count) => {
+	const odd = count % 2;
+	const distanceFromParentMin = 2;
+	const distanceFromParentMax = 6;
+	const distanceFromParentMedian = () => Number.parseFloat((distanceFromParentMin + distanceFromParentMax) / 2);
+	const orbitScale = 12;
+	const orbitRadian = 2000;
+	const distance = count % 3 ? distanceFromParentMax : odd ? distanceFromParentMedian() : distanceFromParentMin;
+	let d = distance * orbitScale;
+
+	d = d + count / count.toFixed(0).length;
+
+	const randomNumber = THREE.MathUtils.randInt(1, 3) * Math.random(); // controls spread
+	const randomOffset = odd ? randomNumber * -1 : randomNumber;
+
+	// const amplitude = d + randomOffset * (2 + Math.random());
+	const amplitude = 21 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
+	const theta = count + 1 * Math.random() * THREE.MathUtils.degToRad(orbitRadian);
+
+	const posX = amplitude * Math.cos(theta);
+	const posY = amplitude * Math.sin(theta);
+	const posZ = THREE.MathUtils.randInt(1, 700);
+
+	return {
+		x: posX,
+		y: posY,
+		z: odd ? posZ * -1 : posZ
+	};
+};
+
+export { torus, star, asteroidBeltHelper, setAsteroidPosition };
