@@ -1,3 +1,7 @@
+:root {
+	--progress-amount: 0%;
+}
+
 body {
 	background-color: #000;
 }
@@ -13,11 +17,67 @@ main {
 	pointer-events: none;
 }
 
+@keyframes spinner-loading {
+	to {
+		transform: rotate(1turn);
+	}
+}
+
 canvas[id='bg'] {
 	position: fixed;
 	top: 0;
 	left: 0;
+}
+
+.loading canvas[id='bg'] {
 	visibility: hidden;
+}
+
+.loaded canvas[id='bg'] {
+	visibility: visible;
+}
+
+.loading-spinner-container {
+	background-color: #000;
+	position: fixed;
+	z-index: 10;
+	width: 100%;
+	height: 100%;
+	display: grid;
+	place-content: center;
+}
+
+.loaded .loading-spinner-container {
+	display: none;
+}
+
+.loading-spinner {
+	display: flex;
+	justify-content: center;
+}
+
+.progress-bar {
+	width: 180px;
+	height: 22px;
+	border: 2px solid #fff;
+	position: relative;
+	margin: 30px 0;
+}
+
+[id='bar'] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #fff;
+	width: var(--progress-amount, 0%);
+	height: 100%;
+}
+
+.loading-spinner svg {
+	width: 4.4rem;
+	height: 4.4rem;
+	animation: spinner-loading 0.5s linear infinite;
+	fill: #fff;
 }
 
 table {

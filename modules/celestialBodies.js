@@ -12,6 +12,7 @@ import textureUranus from './../img/textures/uranus.jpg';
 import textureNeptune from './../img/textures/neptune.jpg';
 import normal from './../img/textures/normal.jpg';
 import normalEarth from './../img/textures/normal-earth.jpg';
+import normalGassy from './../img/textures/normal-gassy.jpg';
 
 const sun = {
 	name: 'sun',
@@ -75,20 +76,20 @@ const mars = {
 const jupiter = {
 	name: 'jupiter',
 	orbitRadius: 30,
-	geometry: new SphereBufferGeometry(2.4, 32, 32),
+	geometry: new SphereBufferGeometry(2.4, 64, 64),
 	material: {
 		map: textureJupiter,
-		normalMap: ''
+		normalMap: normalGassy
 	}
 };
 
 const saturn = {
 	name: 'saturn',
 	orbitRadius: 40,
-	geometry: new SphereBufferGeometry(2.2, 32, 32),
+	geometry: new SphereBufferGeometry(2.2, 64, 64),
 	material: {
 		map: textureSaturn,
-		normalMap: ''
+		normalMap: normalGassy
 	},
 	rings: [
 		{
@@ -106,20 +107,20 @@ const saturn = {
 const uranus = {
 	name: 'uranus',
 	orbitRadius: 49,
-	geometry: new SphereBufferGeometry(1.4, 32, 32),
+	geometry: new SphereBufferGeometry(1.4, 64, 64),
 	material: {
 		map: textureUranus,
-		normalMap: ''
+		normalMap: normalGassy
 	}
 };
 
 const neptune = {
 	name: 'neptune',
 	orbitRadius: 59,
-	geometry: new SphereBufferGeometry(1.4, 32, 32),
+	geometry: new SphereBufferGeometry(1.4, 64, 64),
 	material: {
 		map: textureNeptune,
-		normalMap: ''
+		normalMap: normalGassy
 	}
 };
 

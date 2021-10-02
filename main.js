@@ -75,7 +75,6 @@ const addElements = () => {
 	sunMesh = new THREE.Mesh(
 		sun.geometry,
 		new THREE.MeshStandardMaterial({
-			...sun.material,
 			map: loader.load(sun.material.map)
 		})
 	);
@@ -89,7 +88,7 @@ const addElements = () => {
 			planet.geometry,
 			new THREE.MeshStandardMaterial({
 				map: loader.load(planet.material.map),
-				normal: loader.load(planet.material.normalMap)
+				normalMap: loader.load(planet.material.normalMap)
 			})
 		);
 
@@ -117,7 +116,7 @@ const addElements = () => {
 					moon.geometry,
 					new THREE.MeshStandardMaterial({
 						map: loader.load(moon.material.map),
-						normal: loader.load(moon.material.normalMap)
+						normalMap: loader.load(moon.material.normalMap)
 					})
 				);
 
@@ -252,14 +251,22 @@ const addElements = () => {
 	};
 	scene.add(addAsteroids());
 
-	// Lights
-	const pointLight = new THREE.PointLight(0xffffff, 1, 4, 0);
-	pointLight.position.set(0, 3, 0);
+	// Lighting
+	// point lights
+	for (let i = 0; i < 2; i++) {
+		const pointLight = new THREE.PointLight(0xffffff, 0.5, 100);
+		// const lightHelper = new THREE.PointLightHelper(pointLight);
+		const positionAdjuster = i % 2 === 0 ? 20 : -20;
+		pointLight.position.set(0, positionAdjuster, 0);
+		scene.add(pointLight);
+		// scene.add(lightHelper);
+	}
 
+	// spot lights
 	for (let i = 0; i < 5; i++) {
 		const settings = {
 			color: 0xffffff,
-			intensity: 0.7,
+			intensity: 0.5,
 			distance: 0,
 			angle: Math.PI / 3,
 			penumbra: 1
@@ -280,12 +287,10 @@ const addElements = () => {
 		scene.add(spotLight);
 	}
 
-	const ambientLight = new THREE.AmbientLight(0x090909, 4);
-	// const lightHelper = new PointLightHelper(pointLight);
+	// ambient light
+	const ambientLight = new THREE.AmbientLight(0x090909, 10);
 	scene.add(ambientLight);
 };
-
-let lightness = 0;
 
 const render = () => {
 	const delta = 5 * clock.getDelta();
@@ -320,12 +325,6 @@ const render = () => {
 			});
 		}
 	});
-
-	// stars.forEach((star) => {
-	// 	star.material.color = new THREE.Color(
-	// 		`hsl(255, 100%, ${lightness >= 100 ? (lightness = 0) : Math.ceil((lightness += 0.1))}%)`
-	// 	);
-	// });
 };
 
 const animate = () => {
