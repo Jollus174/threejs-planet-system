@@ -75,8 +75,16 @@ const addElements = () => {
 	// adding Sun
 	sunMesh = new THREE.Mesh(
 		sun.geometry,
-		new THREE.MeshStandardMaterial({
-			map: loader.load(sun.material.map)
+		new THREE.ShaderMaterial({
+			vertexShader: earth.material.vertexShader,
+			fragmentShader: earth.material.fragmentShader,
+			extensions: '#extension GL_OES_standard_derivatives : enable',
+			side: THREE.DoubleSide,
+			uniforms: {
+				time: { value: 0 },
+				resolution: { value: new THREE.Vector4() },
+				globeTexture: { value: loader.load(sun.material.map) }
+			}
 		})
 	);
 	sunMesh.name = 'sun';
@@ -331,6 +339,7 @@ const addElements = () => {
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sunMesh.rotation.y += 0.0125 * delta;
+	sunMesh.material.uniforms.time.value += delta;
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	planets.forEach((planetGroup) => {
