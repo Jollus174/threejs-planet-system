@@ -22,6 +22,7 @@ let composer, outlinePass, sunMesh;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.dampingFactor = 0.05;
 controls.minDistance = 4;
 controls.maxDistance = 100;
 controls.enableKeys = true;

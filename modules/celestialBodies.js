@@ -10,8 +10,12 @@ import textureSaturn from './../img/textures/saturn.jpg';
 import textureSaturnRing from './../img/textures/saturn-ring-alpha.png';
 import textureUranus from './../img/textures/uranus.jpg';
 import textureNeptune from './../img/textures/neptune.jpg';
-import normal from './../img/textures/normal.jpg';
+// import normal from './../img/textures/normal.jpg';
+import normalMercury from './../img/textures/normal-mercury.jpg';
+import normalVenus from './../img/textures/normal-venus.jpg';
 import normalEarth from './../img/textures/normal-earth.jpg';
+import normalMoon from './../img/textures/normal-moon.jpg';
+import normalMars from './../img/textures/normal-mars.jpg';
 import normalGassy from './../img/textures/normal-gassy.jpg';
 
 const sun = {
@@ -28,7 +32,7 @@ const mercury = {
 	geometry: new SphereBufferGeometry(0.3, 32, 32),
 	material: {
 		map: textureMercury,
-		normalMap: normal
+		normalMap: normalMercury
 	}
 };
 
@@ -38,7 +42,7 @@ const venus = {
 	geometry: new SphereBufferGeometry(0.8, 32, 32),
 	material: {
 		map: textureVenus,
-		normalMap: normal
+		normalMap: normalVenus
 	}
 };
 
@@ -57,7 +61,7 @@ const earth = {
 			geometry: new SphereBufferGeometry(0.4, 32, 32),
 			material: {
 				map: textureMoon,
-				normalMap: normal
+				normalMap: normalMoon
 			}
 		}
 	]
@@ -69,7 +73,7 @@ const mars = {
 	geometry: new SphereBufferGeometry(0.6, 32, 32),
 	material: {
 		map: textureMars,
-		normalMap: normal
+		normalMap: normalMars
 	}
 };
 
