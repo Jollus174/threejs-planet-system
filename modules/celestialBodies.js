@@ -13,6 +13,10 @@ import textureNeptune from './../img/textures/neptune.jpg';
 import normal from './../img/textures/normal.jpg';
 import normalEarth from './../img/textures/normal-earth.jpg';
 import normalGassy from './../img/textures/normal-gassy.jpg';
+import earthFragmentShader from './../shaders/earthFragment.glsl';
+import earthVertexShader from './../shaders/earthVertex.glsl';
+import earthAtmosphereFragmentShader from './../shaders/earthAtmosphereFragment.glsl';
+import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl';
 
 const sun = {
 	name: 'sun',
@@ -47,8 +51,18 @@ const earth = {
 	orbitRadius: 11,
 	geometry: new SphereBufferGeometry(1, 32, 32),
 	material: {
+		vertexShader: earthVertexShader,
+		fragmentShader: earthFragmentShader,
 		map: textureEarth,
 		normalMap: normalEarth
+	},
+	atmosphere: {
+		name: 'earth atmosphere',
+		geometry: new SphereBufferGeometry(1.03, 64, 64),
+		material: {
+			vertexShader: earthAtmosphereVertexShader,
+			fragmentShader: earthAtmosphereFragmentShader
+		}
 	},
 	moons: [
 		{

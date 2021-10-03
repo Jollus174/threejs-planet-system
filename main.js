@@ -16,6 +16,7 @@ import { skyboxTexturePaths } from './modules/skybox';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { Object3D, SphereBufferGeometry } from 'three';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
 let composer, outlinePass, sunMesh;
@@ -86,13 +87,38 @@ const addElements = () => {
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const planetObj = new Object3D();
 
-		const planetMesh = new THREE.Mesh(
-			planet.geometry,
-			new THREE.MeshStandardMaterial({
-				map: loader.load(planet.material.map),
-				normalMap: loader.load(planet.material.normalMap)
-			})
-		);
+		const { geometry, material } = planet;
+		const { map, normalMap, vertexShader, fragmentShader } = material;
+		// may be using a standard material, or shader material
+		let materialProperties;
+		if (vertexShader && fragmentShader) {
+			materialProperties = new THREE.ShaderMaterial({
+				vertexShader,
+				fragmentShader,
+				uniforms: { globeTexture: { value: loader.load(map) } }
+			});
+		} else {
+			materialProperties = new THREE.MeshStandardMaterial({ map: loader.load(map), normalMap: loader.load(normalMap) });
+		}
+
+		const planetMesh = new THREE.Mesh(geometry, materialProperties);
+		planetObj.add(planetMesh);
+
+		if (planet.atmosphere) {
+			const { atmosphere } = planet;
+			const { vertexShader, fragmentShader } = atmosphere.material;
+			const atmosphereMesh = new THREE.Mesh(
+				atmosphere.geometry,
+				new THREE.ShaderMaterial({
+					vertexShader,
+					fragmentShader,
+					blending: THREE.AdditiveBlending,
+					side: THREE.BackSide
+				})
+			);
+			atmosphereMesh.name = atmosphere.name;
+			planetObj.add(atmosphereMesh);
+		}
 
 		planetMesh.name = `${planet.name} planet`;
 		planetObj.name = `${planet.name} group`;
@@ -222,7 +248,7 @@ const addElements = () => {
 
 	// Asteroids
 	const addAsteroids = () => {
-		const particles = 10000;
+		const particles = 2000;
 		const geometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(particles * 3);
 
@@ -295,7 +321,7 @@ const addElements = () => {
 const render = () => {
 	const delta = 5 * clock.getDelta();
 	sunMesh.rotation.y += 0.0125 * delta;
-	orbitCentroid.rotation.y -= 0.000425 * delta;
+	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	planets.forEach((planet) => {
 		planet.rotation.y += planet.rotSpeed * delta;
