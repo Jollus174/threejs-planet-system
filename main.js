@@ -76,8 +76,8 @@ const addElements = () => {
 	sunMesh = new THREE.Mesh(
 		sun.geometry,
 		new THREE.ShaderMaterial({
-			vertexShader: earth.material.vertexShader,
-			fragmentShader: earth.material.fragmentShader,
+			vertexShader: sun.material.vertexShader,
+			fragmentShader: sun.material.fragmentShader,
 			extensions: '#extension GL_OES_standard_derivatives : enable',
 			side: THREE.DoubleSide,
 			uniforms: {
