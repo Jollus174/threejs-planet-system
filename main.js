@@ -84,7 +84,7 @@ const addElements = () => {
 
 	// adding a bunch of planets
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
-		const planetObj = new Object3D();
+		const planetObj = new THREE.Object3D();
 
 		const planetMesh = new THREE.Mesh(
 			planet.geometry,
@@ -103,6 +103,8 @@ const addElements = () => {
 		planetObj.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetObj.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetObj.orbitSpeed = 0.009 / planetObj.orbitRadius;
+
+		planetObj.add(planetMesh);
 
 		// sets the initial position of each planet along its orbit
 		planetObj.orbit = Math.random() * Math.PI * 2;
@@ -297,22 +299,26 @@ const render = () => {
 	sunMesh.rotation.y += 0.0125 * delta;
 	orbitCentroid.rotation.y -= 0.000425 * delta;
 
-	planets.forEach((planet) => {
-		planet.rotation.y += planet.rotSpeed * delta;
-		planet.orbit += planet.orbitSpeed;
-		planet.position.set(Math.cos(planet.orbit) * planet.orbitRadius, 0, Math.sin(planet.orbit) * planet.orbitRadius);
+	planets.forEach((planetGroup) => {
+		planetGroup.rotation.y += planetGroup.rotSpeed * delta;
+		planetGroup.orbit += planetGroup.orbitSpeed;
+		planetGroup.position.set(
+			Math.cos(planetGroup.orbit) * planetGroup.orbitRadius,
+			0,
+			Math.sin(planetGroup.orbit) * planetGroup.orbitRadius
+		);
 
-		if (planet.moonMeshes && planet.moonMeshes.length) {
-			planet.moonMeshes.forEach((moon) => {
+		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
+			planetGroup.moonMeshes.forEach((moon) => {
 				moon.orbit -= moon.orbitSpeed * delta;
 				moon.position.set(Math.cos(moon.orbit) * moon.orbitRadius, 0, Math.sin(moon.orbit) * moon.orbitRadius);
 				moon.rotation.z -= 0.01 * delta;
 			});
 		}
 
-		if (planet.ringMeshes && planet.ringMeshes.length) {
-			planet.ringMeshes.forEach((ring) => {
-				ring.position.set(planet.position.x, planet.position.y, planet.position.z);
+		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
+			planetGroup.ringMeshes.forEach((ring) => {
+				ring.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
 				ring.rotation.z += 0.01 * delta;
 			});
 		}
