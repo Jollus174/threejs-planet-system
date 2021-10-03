@@ -84,6 +84,8 @@ const addElements = () => {
 
 	// adding a bunch of planets
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+		const planetObj = new Object3D();
+
 		const planetMesh = new THREE.Mesh(
 			planet.geometry,
 			new THREE.MeshStandardMaterial({
@@ -93,21 +95,22 @@ const addElements = () => {
 		);
 
 		planetMesh.name = `${planet.name} planet`;
+		planetObj.name = `${planet.name} group`;
 		planetMesh.clickable = true;
-		planetMesh.rotation.y = THREE.MathUtils.randFloatSpread(360);
-		planetMesh.orbitRadius = planet.orbitRadius;
+		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
+		planetObj.orbitRadius = planet.orbitRadius;
 
-		planetMesh.rotSpeed = 0.005 + Math.random() * 0.01;
-		planetMesh.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-		planetMesh.orbitSpeed = 0.009 / planet.orbitRadius;
+		planetObj.rotSpeed = 0.005 + Math.random() * 0.01;
+		planetObj.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
+		planetObj.orbitSpeed = 0.009 / planetObj.orbitRadius;
 
 		// sets the initial position of each planet along its orbit
-		planetMesh.orbit = Math.random() * Math.PI * 2;
+		planetObj.orbit = Math.random() * Math.PI * 2;
 
-		planetMesh.position.set(
-			Math.cos(planetMesh.orbit) * planetMesh.orbitRadius,
+		planetObj.position.set(
+			Math.cos(planetObj.orbit) * planetObj.orbitRadius,
 			0,
-			Math.sin(planetMesh.orbit) * planetMesh.orbitRadius
+			Math.sin(planetObj.orbit) * planetObj.orbitRadius
 		);
 
 		if (planet.moons && planet.moons.length) {
@@ -124,13 +127,10 @@ const addElements = () => {
 				moonMesh.orbit = Math.random() * Math.PI * 2;
 				moonMesh.orbitRadius = moon.orbitRadius;
 				moonMesh.orbitSpeed = 0.15 / moon.orbitRadius;
-				moonMesh.position.x = planetMesh.position.x;
-				moonMesh.position.y = planetMesh.position.y;
-				moonMesh.position.z = planetMesh.position.z;
 
-				planetMesh.moonMeshes = planetMesh.moonMeshes || [];
-				planetMesh.moonMeshes.push(moonMesh);
-				scene.add(moonMesh);
+				planetObj.moonMeshes = planetObj.moonMeshes || [];
+				planetObj.moonMeshes.push(moonMesh);
+				planetObj.add(moonMesh);
 
 				// and to set an orbit line...
 				const moonOrbitLine = new THREE.Line(
@@ -143,10 +143,9 @@ const addElements = () => {
 					})
 				);
 				moonMesh.moonOrbitLine = moonOrbitLine;
-				moonOrbitLine.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
 				moonOrbitLine.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
 				moonOrbitLine.name = `${planetMesh.name} moon orbit line`;
-				scene.add(moonOrbitLine);
+				planetObj.add(moonOrbitLine);
 			});
 		}
 
@@ -165,12 +164,12 @@ const addElements = () => {
 				ringMesh.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
 				planetMesh.ringMeshes = planetMesh.ringMeshes || [];
 				planetMesh.ringMeshes.push(ringMesh);
-				scene.add(ringMesh);
+				planetObj.add(ringMesh);
 			});
 		}
 
 		const orbit = new THREE.Line(
-			new THREE.RingGeometry(planetMesh.orbitRadius, planetMesh.orbitRadius, 90),
+			new THREE.RingGeometry(planetObj.orbitRadius, planetObj.orbitRadius, 90),
 			new THREE.MeshBasicMaterial({
 				color: 0xffffff,
 				transparent: true,
@@ -181,8 +180,9 @@ const addElements = () => {
 		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
 		orbit.name = `${planetMesh.name} orbit line`;
 		planetMesh.orbitMesh = orbit;
-		planets.push(planetMesh);
-		scene.add(orbit, planetMesh);
+		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
+		planets.push(planetObj);
+		scene.add(orbit, planetObj);
 	});
 
 	const createStarfield = () => {
@@ -305,16 +305,8 @@ const render = () => {
 		if (planet.moonMeshes && planet.moonMeshes.length) {
 			planet.moonMeshes.forEach((moon) => {
 				moon.orbit -= moon.orbitSpeed * delta;
-				moon.position.set(
-					planet.position.x + Math.cos(moon.orbit) * moon.orbitRadius,
-					planet.position.y,
-					planet.position.z + Math.sin(moon.orbit) * moon.orbitRadius
-				);
-
-				if (moon.moonOrbitLine) {
-					moon.moonOrbitLine.position.set(planet.position.x, planet.position.y, planet.position.z);
-					moon.rotation.z -= 0.01 * delta;
-				}
+				moon.position.set(Math.cos(moon.orbit) * moon.orbitRadius, 0, Math.sin(moon.orbit) * moon.orbitRadius);
+				moon.rotation.z -= 0.01 * delta;
 			});
 		}
 
@@ -350,7 +342,7 @@ const initMousePointerOrbitEvents = () => {
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
-		intersects = raycaster.intersectObjects(scene.children);
+		intersects = raycaster.intersectObjects(scene.children, true);
 		objsClickable = intersects.filter((intersect) => intersect.object.clickable);
 
 		hasClickedSameTarget =
@@ -360,7 +352,7 @@ const initMousePointerOrbitEvents = () => {
 
 		// only add an object if it's clickable and doesn't already exist in the clicked array
 		if (objsClickable.length && !hasClickedSameTarget) {
-			controls.target = objsClickable[0].object.position;
+			controls.target = objsClickable[0].object.parent.position;
 			outlinePass.selectedObjects = [];
 			outlinePass.selectedObjects.push(objsClickable[0].object);
 
@@ -391,7 +383,7 @@ const initMousePointerOrbitEvents = () => {
 		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
 		if (!mouseHasDeviated && !hasClickedSameTarget && !objsClickable.length) {
 			if (outlinePass.selectedObjects.length) {
-				const { x, y, z } = outlinePass.selectedObjects[0].position;
+				const { x, y, z } = outlinePass.selectedObjects[0].parent.position;
 				v3.set(x, y, z);
 				controls.target = v3;
 				controls.update();
