@@ -138,12 +138,22 @@ return 49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
 
 }
 
+float fbm(vec4 p) {
+  float sum = 0.;
+  float amp = 1.;
+  float scale = 1.;
+  for (int i = 0; i < 6; i++) {
+    sum += snoise(p*scale) * amp;
+    p.w += 100.; // offseting by time
+    amp *= 0.9;
+    scale *= 2.;
+  }
+  return sum;
+}
+
 void main() {
-  float noisy = snoise(vec4(vUv*10., 1., time/2.));
-  // float intensity = .03 - dot(vertexNormal, vec3(0.0, 0.0, 0.75 ));
-  // vec3 atmosphere = vec3(1, 0.6, 0.2) * pow(intensity, 1.8);
-  // gl_FragColor = vec4(atmosphere + texture2D(globeTexture, vUv).xyz, 1.0);
-  gl_FragColor = vec4(vUv,0.0,1.);
-  gl_FragColor = vec4(vPosition,1.);
-  // gl_FragColor = vec4(noisy);
+  vec4 p = vec4(vPosition*3., time*0.05);
+  // float noisy = snoise(vec4(vPosition*3., time*0.05));
+  float noisy = fbm(p);
+  gl_FragColor = vec4(noisy);
 }
