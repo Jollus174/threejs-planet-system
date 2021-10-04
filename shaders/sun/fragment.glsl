@@ -35,9 +35,10 @@ void main() {
   float brightness = supersun() * 4. + 1.;
 
   float fres = Fresnel(eyeVector, vNormal);
+  brightness += fres*2.;
 
   vec3 col = brightnesstoColor(brightness);
   gl_FragColor = vec4(col, 1.);
-  gl_FragColor = vec4(fres);
+  // gl_FragColor = vec4(fres);
   // gl_FragColor = vec4(vLayer1, 1.); // will rotate gradient around y-axis
 }

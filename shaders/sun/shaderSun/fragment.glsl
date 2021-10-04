@@ -147,13 +147,17 @@ float fbm(vec4 p) {
     p.w += 100.; // offseting by time
     amp *= 0.9;
     scale *= 2.;
-  }
+  } 
   return sum;
 }
 
 void main() {
-  vec4 p = vec4(vPosition*3., time*0.05);
+  vec4 p = vec4(vPosition*3., time*0.005); // can adjust vPosition to tinker with the amount of noise generated
   // float noisy = snoise(vec4(vPosition*3., time*0.05));
   float noisy = fbm(p);
+
+  vec4 p1 = vec4(vPosition*2., time*0.05); // adjusts noise evolution
+  float spots = max(snoise(p1),0.);
   gl_FragColor = vec4(noisy);
+  gl_FragColor *= mix(1.,spots,0.7);
 }

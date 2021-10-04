@@ -18,7 +18,7 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
-let composer, outlinePass, sunMesh;
+let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere, scene1;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -42,6 +42,7 @@ const planets = [];
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
+let cubeRenderTarget1, cubeCamera1, sunMeshPerlin;
 orbitCentroid.name = 'orbit centroid';
 
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
@@ -64,32 +65,82 @@ const ringUVMapGeometry = (from, to) => {
 };
 
 const addElements = () => {
-	// adding space skybox
+	scene1 = new THREE.Scene();
+
+	// start: Skybox
 	const skyboxMaterialArray = skyboxTexturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: loader.load(image), side: THREE.BackSide })
 	);
 	const skybox = new THREE.Mesh(new THREE.BoxGeometry(1200, 1200, 1200), skyboxMaterialArray);
 	skybox.name = 'skybox';
 	scene.add(skybox);
+	// end: Skybox
 
-	// adding Sun
-	sunMesh = new THREE.Mesh(
-		sun.geometry,
-		new THREE.ShaderMaterial({
-			vertexShader: sun.material.vertexShader,
-			fragmentShader: sun.material.fragmentShader,
-			extensions: '#extension GL_OES_standard_derivatives : enable',
-			side: THREE.DoubleSide,
-			uniforms: {
-				time: { value: 0 },
-				resolution: { value: new THREE.Vector4() },
-				globeTexture: { value: loader.load(sun.material.map) }
-			}
-		})
-	);
+	// start: Sun Mesh (with standard material)
+	sunMaterial = new THREE.ShaderMaterial({
+		vertexShader: sun.material.vertexShader,
+		fragmentShader: sun.material.fragmentShader,
+		extensions: '#extension GL_OES_standard_derivatives : enable',
+		side: THREE.DoubleSide,
+		uniforms: {
+			time: { value: 0 },
+			resolution: { value: new THREE.Vector4() },
+			globeTexture: { value: loader.load(sun.material.map) },
+			uPerlin: { value: null }
+		}
+	});
+
+	sunMesh = new THREE.Mesh(sun.geometry, sunMaterial);
 	sunMesh.name = 'sun';
 	sunMesh.clickable = true;
 	scene.add(sunMesh);
+	// end: Sun Mesh
+
+	// start: Special Sun Texture (with special perlin noise material)
+	// Using a new camera to capture a texture for better layering
+	// Will avoid computational overload from rendering noise upon noise upon noise
+	cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(256, {
+		format: THREE.RGBFormat,
+		generateMipmaps: true,
+		minFilter: THREE.LinearMipMapLinearFilter,
+		encoding: THREE.RGBEncoding // temporary - to prevent the material's shader from recompiling every frame
+	});
+	cubeCamera1 = new THREE.CubeCamera(1, 1000, cubeRenderTarget1);
+
+	sunMaterialPerlin = new THREE.ShaderMaterial({
+		vertexShader: sun.specialSunShader.vertexShader,
+		fragmentShader: sun.specialSunShader.fragmentShader,
+		side: THREE.DoubleSide,
+		uniforms: {
+			time: { value: 0 },
+			resolution: { value: new THREE.Vector4() }
+		}
+	});
+
+	sunMeshPerlin = new THREE.Mesh(sun.geometry, sunMaterialPerlin);
+	scene1.add(sunMeshPerlin);
+	// end: Special Sun Texture
+
+	// start: Sun Atmosphere
+	const { atmosphere } = sun;
+	sunAtmosphere = new THREE.Mesh(
+		atmosphere.geometry,
+		new THREE.ShaderMaterial({
+			vertexShader: atmosphere.material.vertexShader,
+			fragmentShader: atmosphere.material.fragmentShader,
+			side: THREE.BackSide,
+			transparent: true,
+			opacity: 0.5,
+			uniforms: {
+				time: { value: 0 },
+				resolution: { value: new THREE.Vector4() },
+				uPerlin: { value: null }
+			}
+		})
+	);
+	sunAtmosphere.name = atmosphere.name;
+	scene.add(sunAtmosphere);
+	// end: Sun Atmosphere
 
 	// adding a bunch of planets
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
@@ -342,6 +393,10 @@ const render = () => {
 	sunMesh.material.uniforms.time.value += delta;
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
+	// updating sun shader material
+	cubeCamera1.update(renderer, scene1);
+	// perlin.envMap = cubeRenderTarget1.texture;
+
 	planets.forEach((planetGroup) => {
 		planetGroup.rotation.y += planetGroup.rotSpeed * delta;
 		planetGroup.orbit += planetGroup.orbitSpeed;
@@ -371,13 +426,10 @@ const render = () => {
 const animate = () => {
 	window.requestAnimationFrame(animate);
 
-	controls.update();
-
 	// render == DRAW
 	render();
 
-	renderer.render(scene, camera);
-	composer.render();
+	// composer.render();
 };
 
 const initMousePointerOrbitEvents = () => {

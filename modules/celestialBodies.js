@@ -17,8 +17,12 @@ import normalEarth from './../img/textures/normal-earth.jpg';
 import normalMoon from './../img/textures/normal-moon.jpg';
 import normalMars from './../img/textures/normal-mars.jpg';
 import normalGassy from './../img/textures/normal-gassy.jpg';
-import sunFragmentShader from './../shaders/sunFragment.glsl';
-import sunVertexShader from './../shaders/sunVertex.glsl';
+import sunFragment from './../shaders/sun/fragment.glsl';
+import sunVertex from './../shaders/sun/vertex.glsl';
+import sunSpecialFragment from './../shaders/sun/shaderSun/fragment.glsl';
+import sunSpecialVertex from './../shaders/sun/shaderSun/vertex.glsl';
+import sunAtmosphereFragment from './../shaders/sun/shaderAtmosphere/fragment.glsl';
+import sunAtmosphereVertex from './../shaders/sun/shaderAtmosphere/vertex.glsl';
 import earthFragmentShader from './../shaders/earthFragment.glsl';
 import earthVertexShader from './../shaders/earthVertex.glsl';
 import earthAtmosphereFragmentShader from './../shaders/earthAtmosphereFragment.glsl';
@@ -26,11 +30,23 @@ import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl
 
 const sun = {
 	name: 'sun',
-	geometry: new SphereBufferGeometry(2, 40, 40),
+	geometry: new SphereBufferGeometry(2, 32, 32),
 	material: {
 		map: textureSun,
-		vertexShader: sunVertexShader,
-		fragmentShader: sunFragmentShader
+		vertexShader: sunVertex,
+		fragmentShader: sunFragment
+	},
+	specialSunShader: {
+		vertexShader: sunSpecialVertex,
+		fragmentShader: sunSpecialFragment
+	},
+	atmosphere: {
+		name: 'sun atmosphere',
+		geometry: new SphereBufferGeometry(2.2, 64, 64),
+		material: {
+			vertexShader: sunAtmosphereVertex,
+			fragmentShader: sunAtmosphereFragment
+		}
 	}
 };
 

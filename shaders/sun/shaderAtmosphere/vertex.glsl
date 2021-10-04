@@ -22,24 +22,26 @@ void main() {
   vec4 worldPosition = modelMatrix * vec4(position, 1.0);
   eyeVector = normalize(worldPosition.xyz - cameraPosition);
 
-  float t = time*0.01;
+  float t = time*0.005;
   mat2 rot = rotate(t);
 
   vec3 p0 = position;
   p0.yz = rot*p0.yz; // rotating around x-axis
   vLayer0 = p0;
 
+  mat2 rot1 = rotate(t + 10.);
   vec3 p1 = position;
-  p1.xz = rot*p1.xz; // rotating around y (note missing y)
+  p1.xz = rot1*p1.xz; // rotating around y (note missing y)
   vLayer1 = p1;
 
+  mat2 rot2 = rotate(t + 30.);
   vec3 p2 = position;
-  p2.xy = rot*p2.xy; // rotating around z
+  p2.xy = rot2*p2.xy; // rotating around z
   vLayer2 = p2;
 
   vUv = uv;
   vPosition = position;
-  // vertexNormal = normal;
-  vertexNormal = normalize(normalMatrix * normal);
+  vertexNormal = normal;
+  // vertexNormal = normalize(normalMatrix * normal);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
