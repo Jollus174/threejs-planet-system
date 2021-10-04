@@ -122,38 +122,29 @@ const addElements = () => {
 	// end: Special Sun Texture
 
 	// start: Sun Atmosphere
-	const { atmosphere } = sun;
-	sunAtmosphere = new THREE.Mesh(
-		atmosphere.geometry,
-		new THREE.ShaderMaterial({
-			vertexShader: atmosphere.material.vertexShader,
-			fragmentShader: atmosphere.material.fragmentShader,
-			side: THREE.BackSide,
-			transparent: true,
-			opacity: 0.5,
-			uniforms: {
-				time: { value: 0 },
-				resolution: { value: new THREE.Vector4() },
-				uPerlin: { value: null }
-			}
-		})
-	);
-	sunAtmosphere.name = atmosphere.name;
-	scene.add(sunAtmosphere);
+	// const { atmosphere } = sun;
+	// sunAtmosphere = new THREE.Mesh(
+	// 	atmosphere.geometry,
+	// 	new THREE.ShaderMaterial({
+	// 		vertexShader: atmosphere.material.vertexShader,
+	// 		fragmentShader: atmosphere.material.fragmentShader,
+	// 		side: THREE.BackSide,
+	// 		transparent: true,
+	// 		opacity: 0.5,
+	// 		uniforms: {
+	// 			time: { value: 0 },
+	// 			resolution: { value: new THREE.Vector4() },
+	// 			uPerlin: { value: null }
+	// 		}
+	// 	})
+	// );
+	// sunAtmosphere.name = atmosphere.name;
+	// scene.add(sunAtmosphere);
 	// end: Sun Atmosphere
 
 	// adding a bunch of planets
 	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const planetObj = new THREE.Object3D();
-
-		// const planetMesh = new THREE.Mesh(
-		// 	planet.geometry,
-		// 	new THREE.MeshStandardMaterial({
-		// 		map: loader.load(planet.material.map),
-		// 		normalMap: loader.load(planet.material.normalMap)
-		// 	})
-		// );
-
 		const { geometry, material } = planet;
 		const { map, normalMap, vertexShader, fragmentShader } = material;
 		// may be using a standard material, or shader material
@@ -165,7 +156,11 @@ const addElements = () => {
 				uniforms: { globeTexture: { value: loader.load(map) } }
 			});
 		} else {
-			materialProperties = new THREE.MeshStandardMaterial({ map: loader.load(map), normalMap: loader.load(normalMap) });
+			materialProperties = new THREE.MeshStandardMaterial({
+				map: loader.load(map),
+				normalMap: loader.load(normalMap),
+				wireframe: false
+			});
 		}
 
 		const planetMesh = new THREE.Mesh(geometry, materialProperties);
@@ -388,6 +383,10 @@ const addElements = () => {
 };
 
 const render = () => {
+	// sunAtmosphere.lookAt(camera.position); // is a big shit on its own
+	// sunAtmosphere.quaternion.copy(camera.quaternion);
+	controls.update();
+	renderer.render(scene, camera);
 	const delta = 5 * clock.getDelta();
 	sunMesh.rotation.y += 0.0125 * delta;
 	sunMesh.material.uniforms.time.value += delta;
@@ -429,7 +428,7 @@ const animate = () => {
 	// render == DRAW
 	render();
 
-	// composer.render();
+	composer.render();
 };
 
 const initMousePointerOrbitEvents = () => {

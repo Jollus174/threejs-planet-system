@@ -18,21 +18,11 @@ vec3 brightnesstoColor(float b) {
   return (vec3(b, b*b, b*b*b*b)/0.25)*0.6;
 }
 
-float supersun() {
-  float sum = 0.;
-  sum += textureCube(uPerlin, vLayer0).r;
-  sum += textureCube(uPerlin, vLayer1).r;
-  sum += textureCube(uPerlin, vLayer2).r;
-  sum *= 0.33;
-  return sum;
-}
-
 void main() {
   float radial = 1. - vPosition.z;
   radial *= radial * radial;
+  float brightness = 1. * radial*0.5;
 
-  float brightness = 1. * radial*0.83;
-
-  gl_FragColor.rgb = brightnesstoColor(brightness)*radial;
-  gl_FragColor.a = radial;
+  float intensity = pow(0.65 - dot(vertexNormal, vec3(0, 0, 1.0)), 2.0);
+  gl_FragColor = vec4(brightnesstoColor(brightness), 1.0) * intensity;
 }
