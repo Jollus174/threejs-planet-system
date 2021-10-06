@@ -437,13 +437,38 @@ const initMousePointerOrbitEvents = () => {
 	let objsClickable = [];
 	let hasClickedSameTarget = false;
 
-	window.addEventListener('pointerdown', (e) => {
+
+	const returnClickableTarget = (e) => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
 		intersects = raycaster.intersectObjects(scene.children, true);
 		objsClickable = intersects.filter((intersect) => intersect.object.clickable);
+
+		return objsClickable || [];
+	};
+
+	window.addEventListener('dblclick', (e) => {
+		const objsClickable = returnClickableTarget(e);
+
+		// timeline.pause();
+		timeline.pause();
+		timeline.kill();
+		ticker.remove(log);
+
+		hasClickedSameTarget =
+			(objsClickable.length &&
+				outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1) ||
+			false;
+
+		if (objsClickable.length && hasClickedSameTarget) {
+			console.log('shift it!');
+		}
+	});
+
+	window.addEventListener('pointerdown', (e) => {
+		const objsClickable = returnClickableTarget(e);
 
 		hasClickedSameTarget =
 			(objsClickable.length &&
@@ -529,6 +554,39 @@ const init = () => {
 	window.scene = scene;
 	window.renderer = renderer;
 	console.log(window.scene);
+
+	setInterval(() => {
+		// camera.lookAt(new THREE.Vector3(60, 20, 20));
+		// controls.target = new THREE.Vector3(10, 0, 0);
+		console.log('switchit!');
+
+		const x = Math.random() * 100;
+		const y = Math.random() * 100;
+		const z = Math.random() * 100;
+
+		timeline = gsap.timeline();
+		timeline.to(
+			controls.target,
+			{
+				x,
+				y,
+				z,
+				duration: 1,
+				ease: 'ease',
+				// on: () => {
+				// THREE.Quaternion.slerp(startQuaternion, endQuaternion, camera.quaternion, time.t);
+				// console.log('transitioning');
+				// },
+				onComplete: () => {
+					console.log('complete!');
+					// timeline.kill();
+					// ticker.remove(log);
+					controls.update();
+				}
+			},
+			0
+		);
+	}, 2000);
 };
 
 init();
