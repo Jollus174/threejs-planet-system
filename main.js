@@ -19,6 +19,9 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere, scene1;
+let delta;
+let targetObject;
+let cameraEasingincrementer = 0.01;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -93,7 +96,10 @@ const addElements = () => {
 	sunMesh = new THREE.Mesh(sun.geometry, sunMaterial);
 	sunMesh.name = 'sun';
 	sunMesh.clickable = true;
-	scene.add(sunMesh);
+	const sunObj = new THREE.Object3D();
+	sunObj.add(sunMesh);
+	sunObj.name = 'sun group';
+	scene.add(sunObj);
 	// end: Sun Mesh
 
 	// start: Special Sun Texture (with special perlin noise material)
@@ -392,6 +398,28 @@ const render = () => {
 	sunMesh.material.uniforms.time.value += delta;
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
+	if (targetObject) {
+		cameraEasingincrementer += 0.0035;
+		const movementChecks = {
+			x: {
+				moveCamera: (controls.target.x -= (controls.target.x - targetObject.position.x) / 10),
+				moveStop: targetObject.position.x - controls.target.x < 2 && -2 <= targetObject.position.x - controls.target.x
+			},
+			y: {
+				moveCamera: (controls.target.y -= (controls.target.y - targetObject.position.y) / 10),
+				moveStop: targetObject.position.y - controls.target.y < 2 && -2 <= targetObject.position.y - controls.target.y
+			},
+			z: {
+				moveCamera: (controls.target.z -= (controls.target.z - targetObject.position.z) / 10),
+				moveStop: targetObject.position.z - controls.target.z < 2 && -2 <= targetObject.position.z - controls.target.z
+			}
+		};
+
+		if (!movementChecks.x.moveStop) controls.target.x = movementChecks.x.moveCamera;
+		if (!movementChecks.y.moveStop) controls.target.y = movementChecks.y.moveCamera;
+		if (!movementChecks.z.moveStop) controls.target.z = movementChecks.z.moveCamera;
+	}
+
 	// updating sun shader material
 	cubeCamera1.update(renderer, scene1);
 	// perlin.envMap = cubeRenderTarget1.texture;
@@ -404,7 +432,6 @@ const render = () => {
 			0,
 			Math.sin(planetGroup.orbit) * planetGroup.orbitRadius
 		);
-
 		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
 			planetGroup.moonMeshes.forEach((moon) => {
 				moon.orbit -= moon.orbitSpeed * delta;
@@ -412,7 +439,6 @@ const render = () => {
 				moon.rotation.z -= 0.01 * delta;
 			});
 		}
-
 		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
 			planetGroup.ringMeshes.forEach((ring) => {
 				ring.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
@@ -451,12 +477,6 @@ const initMousePointerOrbitEvents = () => {
 
 	window.addEventListener('dblclick', (e) => {
 		const objsClickable = returnClickableTarget(e);
-
-		// timeline.pause();
-		timeline.pause();
-		timeline.kill();
-		ticker.remove(log);
-
 		hasClickedSameTarget =
 			(objsClickable.length &&
 				outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1) ||
@@ -477,7 +497,11 @@ const initMousePointerOrbitEvents = () => {
 
 		// only add an object if it's clickable and doesn't already exist in the clicked array
 		if (objsClickable.length && !hasClickedSameTarget) {
-			controls.target = objsClickable[0].object.parent.position;
+			const targetObj =
+				objsClickable[0].object.parent.type !== 'Scene' ? objsClickable[0].object.parent : objsClickable[0].object;
+			targetObject = targetObj;
+			controls.update();
+
 			outlinePass.selectedObjects = [];
 			outlinePass.selectedObjects.push(objsClickable[0].object);
 
@@ -554,39 +578,6 @@ const init = () => {
 	window.scene = scene;
 	window.renderer = renderer;
 	console.log(window.scene);
-
-	setInterval(() => {
-		// camera.lookAt(new THREE.Vector3(60, 20, 20));
-		// controls.target = new THREE.Vector3(10, 0, 0);
-		console.log('switchit!');
-
-		const x = Math.random() * 100;
-		const y = Math.random() * 100;
-		const z = Math.random() * 100;
-
-		timeline = gsap.timeline();
-		timeline.to(
-			controls.target,
-			{
-				x,
-				y,
-				z,
-				duration: 1,
-				ease: 'ease',
-				// on: () => {
-				// THREE.Quaternion.slerp(startQuaternion, endQuaternion, camera.quaternion, time.t);
-				// console.log('transitioning');
-				// },
-				onComplete: () => {
-					console.log('complete!');
-					// timeline.kill();
-					// ticker.remove(log);
-					controls.update();
-				}
-			},
-			0
-		);
-	}, 2000);
 };
 
 init();
