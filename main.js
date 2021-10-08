@@ -18,12 +18,14 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+window.camera = camera;
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere, scene1;
 let delta;
 let targetObject;
 let cameraEasingincrementer = 0.01;
 
 const controls = new OrbitControls(camera, renderer.domElement);
+window.controls = controls;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.minDistance = 4;
@@ -149,22 +151,25 @@ const addElements = () => {
 	// end: Sun Atmosphere
 
 	// adding a bunch of planets
-	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+	// [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+	[earth, mars, jupiter].forEach((planet) => {
 		const planetObj = new THREE.Object3D();
 		const { geometry, material } = planet;
-		const { map, normalMap, vertexShader, fragmentShader } = material;
+		const { map, normal, vertexShader, fragmentShader } = material;
 		// may be using a standard material, or shader material
 		let materialProperties;
+		const textureMap = map ? loader.load(map) : null;
+		const normalMap = normal ? loader.load(normal) : null;
 		if (vertexShader && fragmentShader) {
 			materialProperties = new THREE.ShaderMaterial({
 				vertexShader,
 				fragmentShader,
-				uniforms: { globeTexture: { value: loader.load(map) } }
+				uniforms: { globeTexture: { value: textureMap } }
 			});
 		} else {
 			materialProperties = new THREE.MeshStandardMaterial({
-				map: loader.load(map),
-				normalMap: loader.load(normalMap),
+				map: textureMap,
+				normalMap: normalMap,
 				wireframe: false
 			});
 		}
@@ -314,7 +319,7 @@ const addElements = () => {
 
 		return starfield;
 	};
-	scene.add(createStarfield());
+	// scene.add(createStarfield());
 
 	// Asteroids
 	const addAsteroids = () => {
@@ -345,7 +350,7 @@ const addElements = () => {
 		orbitCentroid.add(particleSystem);
 		return orbitCentroid;
 	};
-	scene.add(addAsteroids());
+	// scene.add(addAsteroids());
 
 	// Lighting
 	// point lights
@@ -389,13 +394,14 @@ const addElements = () => {
 };
 
 const render = () => {
-	// sunAtmosphere.lookAt(camera.position); // is a big shit on its own
+	// sunAtmosphere.lookAt(camera.position); // is a bit shit on its own
 	// sunAtmosphere.quaternion.copy(camera.quaternion);
 	controls.update();
 	renderer.render(scene, camera);
-	const delta = 5 * clock.getDelta();
-	sunMesh.rotation.y += 0.0125 * delta;
-	sunMesh.material.uniforms.time.value += delta;
+	delta = 5 * clock.getDelta();
+	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget1.texture;
+	sunMaterial.uniforms.time.value += delta;
+	sunMaterialPerlin.uniforms.time.value += delta;
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	if (targetObject) {
@@ -462,7 +468,6 @@ const initMousePointerOrbitEvents = () => {
 	let intersects = [];
 	let objsClickable = [];
 	let hasClickedSameTarget = false;
-
 
 	const returnClickableTarget = (e) => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -549,6 +554,7 @@ const init = () => {
 	// camera.position.y = 2;
 	camera.position.y = 12;
 	camera.position.z = 40;
+	// camera.position.z = 6;
 
 	composer = new EffectComposer(renderer);
 	const renderModel = new RenderPass(scene, camera);

@@ -56,7 +56,7 @@ const mercury = {
 	geometry: new SphereBufferGeometry(0.3, 32, 32),
 	material: {
 		map: textureMercury,
-		normalMap: normalMercury
+		normal: normalMercury
 	}
 };
 
@@ -66,7 +66,7 @@ const venus = {
 	geometry: new SphereBufferGeometry(0.8, 32, 32),
 	material: {
 		map: textureVenus,
-		normalMap: normalVenus
+		normal: normalVenus
 	}
 };
 
@@ -78,7 +78,7 @@ const earth = {
 		vertexShader: earthVertexShader,
 		fragmentShader: earthFragmentShader,
 		map: textureEarth,
-		normalMap: normalEarth
+		normal: normalEarth
 	},
 	atmosphere: {
 		name: 'earth atmosphere',
@@ -95,7 +95,7 @@ const earth = {
 			geometry: new SphereBufferGeometry(0.4, 32, 32),
 			material: {
 				map: textureMoon,
-				normalMap: normalMoon
+				normal: normalMoon
 			}
 		}
 	]
@@ -107,7 +107,7 @@ const mars = {
 	geometry: new SphereBufferGeometry(0.6, 32, 32),
 	material: {
 		map: textureMars,
-		normalMap: normalMars
+		normal: normalMars
 	}
 };
 
@@ -116,8 +116,7 @@ const jupiter = {
 	orbitRadius: 30,
 	geometry: new SphereBufferGeometry(2.4, 64, 64),
 	material: {
-		map: textureJupiter,
-		normalMap: normalGassy
+		map: textureJupiter
 	}
 };
 
@@ -126,8 +125,7 @@ const saturn = {
 	orbitRadius: 40,
 	geometry: new SphereBufferGeometry(2.2, 64, 64),
 	material: {
-		map: textureSaturn,
-		normalMap: normalGassy
+		map: textureSaturn
 	},
 	rings: [
 		{
@@ -147,8 +145,7 @@ const uranus = {
 	orbitRadius: 49,
 	geometry: new SphereBufferGeometry(1.4, 64, 64),
 	material: {
-		map: textureUranus,
-		normalMap: normalGassy
+		map: textureUranus
 	}
 };
 
@@ -157,8 +154,7 @@ const neptune = {
 	orbitRadius: 59,
 	geometry: new SphereBufferGeometry(1.4, 64, 64),
 	material: {
-		map: textureNeptune,
-		normalMap: normalGassy
+		map: textureNeptune
 	}
 };
 
