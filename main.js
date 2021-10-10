@@ -132,29 +132,8 @@ const addElements = () => {
 	scene1.add(sunMeshPerlin);
 	// end: Special Sun Texture
 
-	// start: Sun Atmosphere
-	// const { atmosphere } = sun;
-	// sunAtmosphere = new THREE.Mesh(
-	// 	atmosphere.geometry,
-	// 	new THREE.ShaderMaterial({
-	// 		vertexShader: atmosphere.material.vertexShader,
-	// 		fragmentShader: atmosphere.material.fragmentShader,
-	// 		side: THREE.BackSide,
-	// 		transparent: true,
-	// 		opacity: 0.5,
-	// 		uniforms: {
-	// 			time: { value: 0 },
-	// 			resolution: { value: new THREE.Vector4() },
-	// 			uPerlin: { value: null }
-	// 		}
-	// 	})
-	// );
-	// sunAtmosphere.name = atmosphere.name;
-	// scene.add(sunAtmosphere);
-	// end: Sun Atmosphere
-
 	// adding a bunch of planets
-	// [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const planetObj = new THREE.Object3D();
 		const { size, segments, material } = planet;
 		const { map, normal, vertexShader, fragmentShader } = material;
@@ -201,6 +180,7 @@ const addElements = () => {
 		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
 		planetObj.orbitRadius = planet.orbitRadius;
 
+		// TODO: put this in .data
 		planetObj.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetObj.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetObj.orbitSpeed = 0.009 / planetObj.orbitRadius;
@@ -254,7 +234,7 @@ const addElements = () => {
 					})
 				);
 				labelLines.push(labelLine);
-				moonObj.add(labelLine);
+				// moonObj.add(labelLine);
 
 				// and to set an orbit line...
 				const moonOrbitLine = new THREE.Line(
@@ -317,7 +297,7 @@ const addElements = () => {
 		);
 
 		labelLines.push(labelLine);
-		planetObj.add(labelLine);
+		// planetObj.add(labelLine);
 
 		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
 		planets.push(planetObj);
@@ -327,16 +307,16 @@ const addElements = () => {
 
 	const createStarfield = () => {
 		const stars = 10000;
-		const spreadAmount = 200;
+		const spreadAmount = 2000;
 		const geometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(stars * 3);
 
 		const material = {
-			size: 0.075,
+			size: 1,
 			map: createCircleTexture('#FFF', 256),
 			blending: THREE.AdditiveBlending,
 			transparent: true,
-			opacity: 0.5,
+			opacity: 0.4,
 			color: new THREE.Color(0xffffff),
 			depthWrite: false
 		};
@@ -358,7 +338,7 @@ const addElements = () => {
 
 		return starfield;
 	};
-	// scene.add(createStarfield());
+	scene.add(createStarfield());
 
 	// Asteroids
 	const addAsteroids = () => {
@@ -389,7 +369,7 @@ const addElements = () => {
 		orbitCentroid.add(particleSystem);
 		return orbitCentroid;
 	};
-	// scene.add(addAsteroids());
+	scene.add(addAsteroids());
 
 	// Lighting
 	// point lights
@@ -470,7 +450,6 @@ const render = () => {
 		if (!movementChecks.z.moveStop) controls.target.z = movementChecks.z.moveCamera;
 
 		if (movementChecks.x.moveStop && movementChecks.y.moveStop && movementChecks.z.moveStop) {
-			controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
 			easeToTarget = false;
 		}
 	}
@@ -562,16 +541,6 @@ const initMousePointerOrbitEvents = () => {
 
 			controls.update();
 			addSelectedObject(objsClickable[0].object);
-
-			// const decreaseThickness = setInterval(() => {
-			// 	outlinePass.edgeStrength -= 1;
-
-			// 	if (outlinePass.edgeStrength === 0) {
-			// 		console.log('clear it!');
-			// 		clearInterval(decreaseThickness);
-			// 		outlinePass.selectedObjects = [];
-			// 	}
-			// }, 1);
 		}
 	});
 
@@ -620,9 +589,7 @@ const init = () => {
 	outlinePass.clear = false;
 
 	composer.addPass(renderModel);
-	// composer.addPass(effectBloom);
 	composer.addPass(outlinePass);
-	// composer.addPass(effectFilm);
 
 	window.composer = composer;
 

@@ -109,7 +109,7 @@ const earth = {
 
 const mars = {
 	name: 'mars',
-	orbitRadius: 60,
+	orbitRadius: 65,
 	size: 0.6,
 	segments: 32,
 	labelColour: '#dae0e0',
@@ -121,7 +121,7 @@ const mars = {
 
 const jupiter = {
 	name: 'jupiter',
-	orbitRadius: 102,
+	orbitRadius: 130,
 	size: 2.4,
 	segments: 64,
 	labelColour: '#e0ab79',
@@ -132,7 +132,7 @@ const jupiter = {
 
 const saturn = {
 	name: 'saturn',
-	orbitRadius: 150,
+	orbitRadius: 170,
 	size: 2.2,
 	segments: 64,
 	labelColour: '#ffe577',
@@ -154,7 +154,7 @@ const saturn = {
 
 const uranus = {
 	name: 'uranus',
-	orbitRadius: 190,
+	orbitRadius: 210,
 	size: 1.4,
 	segments: 64,
 	labelColour: '#c8ecef',
@@ -165,7 +165,7 @@ const uranus = {
 
 const neptune = {
 	name: 'neptune',
-	orbitRadius: 240,
+	orbitRadius: 260,
 	size: 1.4,
 	segments: 64,
 	labelColour: '#3b54d2',

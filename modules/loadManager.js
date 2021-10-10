@@ -10,8 +10,8 @@ const loadManager = () => {
 
 	manager.onLoad = () => {
 		// console.log('Loading complete!');
-		// document.querySelector('body').classList.remove('loading');
-		// document.querySelector('body').classList.add('loaded');
+		document.querySelector('body').classList.remove('loading');
+		document.querySelector('body').classList.add('loaded');
 	};
 
 	manager.onProgress = (url, itemsLoaded, itemsTotal) => {

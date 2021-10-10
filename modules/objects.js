@@ -21,16 +21,16 @@ const setAsteroidPosition = (count) => {
 
 	d = d + count / count.toFixed(0).length;
 
-	const randomNumber = THREE.MathUtils.randInt(1, 3) * Math.random(); // controls spread
+	const randomNumber = THREE.MathUtils.randInt(1, 8) * Math.random(); // controls spread
 	const randomOffset = odd ? randomNumber * -1 : randomNumber;
 
 	// const amplitude = d + randomOffset * (2 + Math.random());
-	const amplitude = 21 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
+	const amplitude = 92 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
 	const theta = count + 1 * Math.random() * THREE.MathUtils.degToRad(orbitRadian);
 
 	const posX = amplitude * Math.cos(theta);
 	const posY = amplitude * Math.sin(theta);
-	const posZ = THREE.MathUtils.randInt(1, 700);
+	const posZ = THREE.MathUtils.randInt(1, 1500);
 
 	return {
 		x: posX,
