@@ -372,10 +372,7 @@ const addElements = () => {
 // returns a value that we should iterate over
 // chuck this in the render() function for it to work
 const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
-	// from = controls.target.x;
-	// to = targetObject.position.x;
-	// targetObject.position.x - controls.target.x < 0.01 && -0.01 <= targetObject.position.x - controls.target.x
-	return (from - to) / incrementer;
+	return (to - from) / incrementer;
 };
 
 const render = () => {
@@ -391,14 +388,14 @@ const render = () => {
 		let outerRadius = labelLine.geometry.parameters.outerRadius;
 		const { origInnerRadius, origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
 		if (labelLine.data.planetIsTargeted) {
-			if (outerRadius < 10) {
-				outerRadius += 1;
+			if (outerRadius < 3) {
+				outerRadius += easeTo({ from: outerRadius, to: 3 });
 				labelLine.geometry.dispose(); // running this seems pointless
 				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
 			}
 		} else {
 			if (innerRadius > origInnerRadius || outerRadius > origOuterRadius) {
-				outerRadius -= 1;
+				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius, iterator: 50 });
 				labelLine.geometry.dispose();
 				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
 			}
@@ -409,9 +406,9 @@ const render = () => {
 		const easeX = easeTo({ from: controls.target.x, to: targetObject.position.x });
 		const easeY = easeTo({ from: controls.target.y, to: targetObject.position.y });
 		const easeZ = easeTo({ from: controls.target.z, to: targetObject.position.z });
-		if (easeX) controls.target.x -= easeX;
-		if (easeY) controls.target.y -= easeY;
-		if (easeZ) controls.target.z -= easeZ;
+		if (easeX) controls.target.x += easeX;
+		if (easeY) controls.target.y += easeY;
+		if (easeZ) controls.target.z += easeZ;
 
 		if (!easeX && !easeY && !easeZ) {
 			easeToTarget = false;
@@ -477,14 +474,6 @@ const initMousePointerOrbitEvents = () => {
 		outlinePass.selectedObjects = [];
 		outlinePass.selectedObjects.push(obj);
 	};
-
-	// window.addEventListener('dblclick', (e) => {
-	// 	const objsClickable = returnClickableTarget(e);
-
-	// 	if (objsClickable.length) {
-	// 		console.log('shift it!');
-	// 	}
-	// });
 
 	window.addEventListener('pointerdown', (e) => {
 		const objsClickable = returnClickableTarget(e);
