@@ -22,7 +22,6 @@ window.camera = camera;
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere, scene1;
 let delta;
 let targetObject;
-let cameraEasingincrementer = 0.01;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 window.controls = controls;
@@ -131,6 +130,7 @@ const addElements = () => {
 		planetObj.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetObj.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetObj.orbitSpeed = 0.009 / planetObj.orbitRadius;
+		planetObj.data = planetObj.data || [];
 
 		planetObj.add(planetMesh);
 
@@ -233,18 +233,28 @@ const addElements = () => {
 		orbit.name = `${planetMesh.name} orbit line`;
 		planetMesh.orbitMesh = orbit;
 
-		const labelLine = new THREE.Line(
-			new THREE.RingGeometry(planet.size + 0.25, planet.size + 0.25, 90),
+		const labelGeometry = {
+			origInnerRadius: planet.size + 0.25,
+			origOuterRadius: planet.size + 0.25,
+			origSegments: 90
+		};
+		const labelLine = new THREE.Mesh(
+			new THREE.RingGeometry(labelGeometry.origInnerRadius, labelGeometry.origOuterRadius, labelGeometry.origSegments),
 			new THREE.MeshBasicMaterial({
 				color: planet.labelColour,
 				transparent: true,
-				opacity: 0.15,
-				side: THREE.BackSide
+				opacity: 1,
+				side: THREE.FrontSide
 			})
 		);
-
+		labelLine.data = labelLine.data || [];
+		labelLine.data.labelGeometryOriginal = labelGeometry;
+		labelLine.name = `${planetMesh.name} group label line`;
+		labelLine.data.planetIsTargeted = false;
 		labelLines.push(labelLine);
-		// planetObj.add(labelLine);
+
+		planetObj.labelLine = labelLine;
+		planetObj.add(labelLine);
 
 		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
 		planets.push(planetObj);
@@ -359,42 +369,54 @@ const addElements = () => {
 	scene.add(ambientLight);
 };
 
+// returns a value that we should iterate over
+// chuck this in the render() function for it to work
+const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
+	// from = controls.target.x;
+	// to = targetObject.position.x;
+	// targetObject.position.x - controls.target.x < 0.01 && -0.01 <= targetObject.position.x - controls.target.x
+	return (from - to) / incrementer;
+};
+
 const render = () => {
-	// sunAtmosphere.lookAt(camera.position); // is a bit shit on its own
-	// sunAtmosphere.quaternion.copy(camera.quaternion);
 	controls.update();
 	renderer.render(scene, camera);
 	delta = 5 * clock.getDelta();
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
-	labelLines.forEach((line) => line.lookAt(camera.position));
+	labelLines.forEach((labelLine) => {
+		labelLine.lookAt(camera.position);
 
-	if (easeToTarget && Object.keys(targetObject).length) {
-		cameraEasingincrementer += 0.0035;
-		const movementChecks = {
-			x: {
-				moveCamera: (controls.target.x -= (controls.target.x - targetObject.position.x) / 10),
-				moveStop:
-					targetObject.position.x - controls.target.x < 0.01 && -0.01 <= targetObject.position.x - controls.target.x
-			},
-			y: {
-				moveCamera: (controls.target.y -= (controls.target.y - targetObject.position.y) / 10),
-				moveStop:
-					targetObject.position.y - controls.target.y < 0.01 && -0.01 <= targetObject.position.y - controls.target.y
-			},
-			z: {
-				moveCamera: (controls.target.z -= (controls.target.z - targetObject.position.z) / 10),
-				moveStop:
-					targetObject.position.z - controls.target.z < 0.01 && -0.01 <= targetObject.position.z - controls.target.z
+		let innerRadius = labelLine.geometry.parameters.innerRadius;
+		let outerRadius = labelLine.geometry.parameters.outerRadius;
+		const { origInnerRadius, origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
+		if (labelLine.data.planetIsTargeted) {
+			if (outerRadius < 10) {
+				outerRadius += 1;
+				labelLine.geometry.dispose(); // running this seems pointless
+				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
 			}
-		};
+		} else {
+			if (innerRadius > origInnerRadius || outerRadius > origOuterRadius) {
+				outerRadius -= 1;
+				labelLine.geometry.dispose();
+				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
+			}
+		}
+	});
 
-		if (!movementChecks.x.moveStop) controls.target.x = movementChecks.x.moveCamera;
-		if (!movementChecks.y.moveStop) controls.target.y = movementChecks.y.moveCamera;
-		if (!movementChecks.z.moveStop) controls.target.z = movementChecks.z.moveCamera;
+	if (easeToTarget && targetObject && Object.keys(targetObject).length) {
+		const easeX = easeTo({ from: controls.target.x, to: targetObject.position.x });
+		const easeY = easeTo({ from: controls.target.y, to: targetObject.position.y });
+		const easeZ = easeTo({ from: controls.target.z, to: targetObject.position.z });
+		if (easeX) controls.target.x -= easeX;
+		if (easeY) controls.target.y -= easeY;
+		if (easeZ) controls.target.z -= easeZ;
 
-		if (movementChecks.x.moveStop && movementChecks.y.moveStop && movementChecks.z.moveStop) {
+		if (!easeX && !easeY && !easeZ) {
 			easeToTarget = false;
+			// this line causes the sun to lock itself to the camera and then move around with it. Very strange
+			// 	controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
 		}
 	}
 
@@ -427,12 +449,10 @@ const render = () => {
 };
 
 const animate = () => {
-	window.requestAnimationFrame(animate);
-
-	// render == DRAW
 	render();
-
 	composer.render();
+
+	window.requestAnimationFrame(animate);
 };
 
 const initMousePointerOrbitEvents = () => {
@@ -474,8 +494,10 @@ const initMousePointerOrbitEvents = () => {
 			// Note that we're selecting the PARENT 3D Object here, not the clicked mesh
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
 			if (objsClickable[0].object.parent.type !== 'Scene') {
-				// this needs to be a new var!
 				targetObject = objsClickable[0].object.parent;
+				// TODO: still need to set one for Mr. Sun
+				labelLines.forEach((labelLine) => (labelLine.data.planetIsTargeted = false));
+				targetObject.labelLine.data.planetIsTargeted = true;
 				easeToTarget = true;
 			}
 
@@ -497,12 +519,16 @@ const initMousePointerOrbitEvents = () => {
 		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
 		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
 		if (!mouseHasDeviated && !objsClickable.length && !hasClickedSameTarget && outlinePass.selectedObjects.length) {
-			const { x, y, z } = outlinePass.selectedObjects[0].parent.position;
+			// creating new instance of controls xyz so it doesn't keep tracking an object
+			const newTarget = { ...controls.target };
+			const { x, y, z } = newTarget;
+
 			// To make camera stop following
 			easeToTarget = false;
 			controls.target.set(x, y, z);
 			controls.update();
 			outlinePass.selectedObjects = [];
+			labelLines.forEach((labelLine) => (labelLine.data.planetIsTargeted = false));
 		}
 	});
 };
