@@ -29,7 +29,7 @@ import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl
 
 const sun = {
 	name: 'sun',
-	geometry: new SphereBufferGeometry(8, 64, 64),
+	geometry: new SphereBufferGeometry(8, 32, 32),
 	material: {
 		map: textureSun,
 		vertexShader: sunVertex,

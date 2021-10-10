@@ -90,7 +90,7 @@ const addElements = () => {
 		map: loader.load(sun.material.map),
 		emissive: '#FFF',
 		emissiveMap: loader.load(sun.material.map),
-		emissiveIntensity: 0.8,
+		emissiveIntensity: 0.6,
 		side: THREE.DoubleSide
 	});
 
