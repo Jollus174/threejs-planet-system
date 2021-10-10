@@ -29,7 +29,7 @@ window.controls = controls;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.minDistance = 10;
-controls.maxDistance = 2000;
+controls.maxDistance = 650;
 controls.enableKeys = true;
 controls.keys = {
 	LEFT: 'KeyA',
@@ -254,12 +254,12 @@ const addElements = () => {
 
 	const createStarfield = () => {
 		const stars = 10000;
-		const spreadAmount = 2000;
+		const spreadAmount = 1500;
 		const geometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(stars * 3);
 
 		const material = {
-			size: 0.05,
+			size: 0.5,
 			map: createCircleTexture('#FFF', 256),
 			blending: THREE.AdditiveBlending,
 			transparent: true,
