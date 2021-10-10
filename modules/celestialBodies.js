@@ -16,7 +16,6 @@ import normalVenus from './../img/textures/normal-venus.jpg';
 import normalEarth from './../img/textures/normal-earth.jpg';
 import normalMoon from './../img/textures/normal-moon.jpg';
 import normalMars from './../img/textures/normal-mars.jpg';
-import normalGassy from './../img/textures/normal-gassy.jpg';
 import sunFragment from './../shaders/sun/fragment.glsl';
 import sunVertex from './../shaders/sun/vertex.glsl';
 import sunSpecialFragment from './../shaders/sun/shaderSun/fragment.glsl';
@@ -30,7 +29,7 @@ import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl
 
 const sun = {
 	name: 'sun',
-	geometry: new SphereBufferGeometry(2, 32, 32),
+	geometry: new SphereBufferGeometry(8, 64, 64),
 	material: {
 		map: textureSun,
 		vertexShader: sunVertex,
@@ -52,8 +51,10 @@ const sun = {
 
 const mercury = {
 	name: 'mercury',
-	orbitRadius: 5,
-	geometry: new SphereBufferGeometry(0.3, 32, 32),
+	orbitRadius: 20,
+	size: 0.3,
+	segments: 32,
+	labelColour: '#b78668',
 	material: {
 		map: textureMercury,
 		normal: normalMercury
@@ -62,8 +63,10 @@ const mercury = {
 
 const venus = {
 	name: 'venus',
-	orbitRadius: 8,
-	geometry: new SphereBufferGeometry(0.8, 32, 32),
+	orbitRadius: 34,
+	size: 0.8,
+	segments: 32,
+	labelColour: '#f3b3b3',
 	material: {
 		map: textureVenus,
 		normal: normalVenus
@@ -72,30 +75,33 @@ const venus = {
 
 const earth = {
 	name: 'earth',
-	orbitRadius: 11,
-	geometry: new SphereBufferGeometry(1, 32, 32),
+	orbitRadius: 48,
+	size: 1,
+	segments: 32,
+	labelColour: '#6dcbe7',
 	material: {
-		vertexShader: earthVertexShader,
-		fragmentShader: earthFragmentShader,
+		// vertexShader: earthVertexShader,
+		// fragmentShader: earthFragmentShader,
 		map: textureEarth,
 		normal: normalEarth
 	},
-	atmosphere: {
-		name: 'earth atmosphere',
-		geometry: new SphereBufferGeometry(1.03, 64, 64),
-		material: {
-			vertexShader: earthAtmosphereVertexShader,
-			fragmentShader: earthAtmosphereFragmentShader
-		}
-	},
+	// atmosphere: {
+	// 	name: 'earth atmosphere',
+	// 	material: {
+	// 		vertexShader: earthAtmosphereVertexShader,
+	// 		fragmentShader: earthAtmosphereFragmentShader
+	// 	}
+	// },
 	moons: [
 		{
-			name: 'luna',
+			name: 'moon luna',
 			orbitRadius: 2.2,
-			geometry: new SphereBufferGeometry(0.4, 32, 32),
+			size: 0.4,
+			segments: 32,
+			labelColour: '#dae0e0',
 			material: {
-				map: textureMoon,
-				normal: normalMoon
+				map: textureMoon
+				// normal: normalMoon
 			}
 		}
 	]
@@ -103,8 +109,10 @@ const earth = {
 
 const mars = {
 	name: 'mars',
-	orbitRadius: 15,
-	geometry: new SphereBufferGeometry(0.6, 32, 32),
+	orbitRadius: 60,
+	size: 0.6,
+	segments: 32,
+	labelColour: '#dae0e0',
 	material: {
 		map: textureMars,
 		normal: normalMars
@@ -113,8 +121,10 @@ const mars = {
 
 const jupiter = {
 	name: 'jupiter',
-	orbitRadius: 30,
-	geometry: new SphereBufferGeometry(2.4, 64, 64),
+	orbitRadius: 102,
+	size: 2.4,
+	segments: 64,
+	labelColour: '#e0ab79',
 	material: {
 		map: textureJupiter
 	}
@@ -122,8 +132,10 @@ const jupiter = {
 
 const saturn = {
 	name: 'saturn',
-	orbitRadius: 40,
-	geometry: new SphereBufferGeometry(2.2, 64, 64),
+	orbitRadius: 150,
+	size: 2.2,
+	segments: 64,
+	labelColour: '#ffe577',
 	material: {
 		map: textureSaturn
 	},
@@ -142,8 +154,10 @@ const saturn = {
 
 const uranus = {
 	name: 'uranus',
-	orbitRadius: 49,
-	geometry: new SphereBufferGeometry(1.4, 64, 64),
+	orbitRadius: 190,
+	size: 1.4,
+	segments: 64,
+	labelColour: '#c8ecef',
 	material: {
 		map: textureUranus
 	}
@@ -151,8 +165,10 @@ const uranus = {
 
 const neptune = {
 	name: 'neptune',
-	orbitRadius: 59,
-	geometry: new SphereBufferGeometry(1.4, 64, 64),
+	orbitRadius: 240,
+	size: 1.4,
+	segments: 64,
+	labelColour: '#3b54d2',
 	material: {
 		map: textureNeptune
 	}

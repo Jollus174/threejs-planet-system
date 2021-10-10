@@ -1,11 +1,6 @@
 'use strict';
 import * as THREE from 'three';
 
-const torus = new THREE.Mesh(
-	new THREE.TorusGeometry(10, 3, 16, 100),
-	new THREE.MeshStandardMaterial({ color: 0xff6347 })
-);
-
 const asteroidBeltHelper = {
 	geometry: new THREE.RingGeometry(20, 23, 90),
 	material: {
@@ -44,4 +39,4 @@ const setAsteroidPosition = (count) => {
 	};
 };
 
-export { torus, asteroidBeltHelper, setAsteroidPosition };
+export { asteroidBeltHelper, setAsteroidPosition };

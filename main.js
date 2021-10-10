@@ -28,8 +28,8 @@ const controls = new OrbitControls(camera, renderer.domElement);
 window.controls = controls;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.minDistance = 4;
-controls.maxDistance = 100;
+controls.minDistance = 10;
+controls.maxDistance = 2000;
 controls.enableKeys = true;
 controls.keys = {
 	LEFT: 'KeyA',
@@ -43,11 +43,14 @@ const loader = new THREE.TextureLoader(loadManager());
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
-const planets = [];
+const planets = [],
+	orbitLines = [],
+	labelLines = [];
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
 let cubeRenderTarget1, cubeCamera1, sunMeshPerlin;
+let easeToTarget = false;
 orbitCentroid.name = 'orbit centroid';
 
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
@@ -76,7 +79,7 @@ const addElements = () => {
 	const skyboxMaterialArray = skyboxTexturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: loader.load(image), side: THREE.BackSide })
 	);
-	const skybox = new THREE.Mesh(new THREE.BoxGeometry(1200, 1200, 1200), skyboxMaterialArray);
+	const skybox = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), skyboxMaterialArray);
 	skybox.name = 'skybox';
 	scene.add(skybox);
 	// end: Skybox
@@ -152,9 +155,8 @@ const addElements = () => {
 
 	// adding a bunch of planets
 	// [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
-	[earth, mars, jupiter].forEach((planet) => {
 		const planetObj = new THREE.Object3D();
-		const { geometry, material } = planet;
+		const { size, segments, material } = planet;
 		const { map, normal, vertexShader, fragmentShader } = material;
 		// may be using a standard material, or shader material
 		let materialProperties;
@@ -174,7 +176,7 @@ const addElements = () => {
 			});
 		}
 
-		const planetMesh = new THREE.Mesh(geometry, materialProperties);
+		const planetMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(size, segments, segments), materialProperties);
 		planetObj.add(planetMesh);
 
 		if (planet.atmosphere) {
@@ -216,22 +218,43 @@ const addElements = () => {
 
 		if (planet.moons && planet.moons.length) {
 			planet.moons.forEach((moon) => {
+				const { size, segments, material } = moon;
+				const moonObj = new THREE.Object3D();
 				const moonMesh = new THREE.Mesh(
-					moon.geometry,
+					new THREE.SphereBufferGeometry(size, segments, segments),
 					new THREE.MeshStandardMaterial({
-						map: loader.load(moon.material.map),
-						normalMap: loader.load(moon.material.normalMap)
+						map: loader.load(material.map),
+						normalMap: loader.load(material.normalMap)
 					})
 				);
 
+				// each moon group to be in separate group away from planet, or else the OrbitControls targeting will screw up!!
 				moonMesh.clickable = true;
-				moonMesh.orbit = Math.random() * Math.PI * 2;
-				moonMesh.orbitRadius = moon.orbitRadius;
-				moonMesh.orbitSpeed = 0.15 / moon.orbitRadius;
+				moonObj.orbit = Math.random() * Math.PI * 2;
+				moonObj.orbitRadius = moon.orbitRadius;
+				moonObj.orbitSpeed = 0.05 / moon.orbitRadius;
+
+				moonObj.position.set(planetObj.position.x, planetObj.position.y, planetObj.position.z);
+
+				moonMesh.name = `${moon.name} moon`;
+				moonObj.name = `${moon.name} group`;
 
 				planetObj.moonMeshes = planetObj.moonMeshes || [];
-				planetObj.moonMeshes.push(moonMesh);
-				planetObj.add(moonMesh);
+				planetObj.moonMeshes.push(moonObj);
+				moonObj.add(moonMesh);
+				scene.add(moonObj);
+
+				const labelLine = new THREE.Line(
+					new THREE.RingGeometry(moon.size + 0.25, moon.size + 0.25, 90),
+					new THREE.MeshBasicMaterial({
+						color: moon.labelColour,
+						transparent: true,
+						opacity: 0.15,
+						side: THREE.BackSide
+					})
+				);
+				labelLines.push(labelLine);
+				moonObj.add(labelLine);
 
 				// and to set an orbit line...
 				const moonOrbitLine = new THREE.Line(
@@ -243,9 +266,10 @@ const addElements = () => {
 						side: THREE.BackSide
 					})
 				);
-				moonMesh.moonOrbitLine = moonOrbitLine;
+				moonObj.moonOrbitLine = moonOrbitLine;
 				moonOrbitLine.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
 				moonOrbitLine.name = `${planetMesh.name} moon orbit line`;
+				orbitLines.push(moonOrbitLine);
 				planetObj.add(moonOrbitLine);
 			});
 		}
@@ -281,8 +305,23 @@ const addElements = () => {
 		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
 		orbit.name = `${planetMesh.name} orbit line`;
 		planetMesh.orbitMesh = orbit;
+
+		const labelLine = new THREE.Line(
+			new THREE.RingGeometry(planet.size + 0.25, planet.size + 0.25, 90),
+			new THREE.MeshBasicMaterial({
+				color: planet.labelColour,
+				transparent: true,
+				opacity: 0.15,
+				side: THREE.BackSide
+			})
+		);
+
+		labelLines.push(labelLine);
+		planetObj.add(labelLine);
+
 		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
 		planets.push(planetObj);
+		orbitLines.push(orbit);
 		scene.add(orbit, planetObj);
 	});
 
@@ -404,26 +443,36 @@ const render = () => {
 	sunMaterialPerlin.uniforms.time.value += delta;
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
-	if (targetObject) {
+	labelLines.forEach((line) => line.lookAt(camera.position));
+
+	if (easeToTarget && Object.keys(targetObject).length) {
 		cameraEasingincrementer += 0.0035;
 		const movementChecks = {
 			x: {
 				moveCamera: (controls.target.x -= (controls.target.x - targetObject.position.x) / 10),
-				moveStop: targetObject.position.x - controls.target.x < 2 && -2 <= targetObject.position.x - controls.target.x
+				moveStop:
+					targetObject.position.x - controls.target.x < 0.01 && -0.01 <= targetObject.position.x - controls.target.x
 			},
 			y: {
 				moveCamera: (controls.target.y -= (controls.target.y - targetObject.position.y) / 10),
-				moveStop: targetObject.position.y - controls.target.y < 2 && -2 <= targetObject.position.y - controls.target.y
+				moveStop:
+					targetObject.position.y - controls.target.y < 0.01 && -0.01 <= targetObject.position.y - controls.target.y
 			},
 			z: {
 				moveCamera: (controls.target.z -= (controls.target.z - targetObject.position.z) / 10),
-				moveStop: targetObject.position.z - controls.target.z < 2 && -2 <= targetObject.position.z - controls.target.z
+				moveStop:
+					targetObject.position.z - controls.target.z < 0.01 && -0.01 <= targetObject.position.z - controls.target.z
 			}
 		};
 
 		if (!movementChecks.x.moveStop) controls.target.x = movementChecks.x.moveCamera;
 		if (!movementChecks.y.moveStop) controls.target.y = movementChecks.y.moveCamera;
 		if (!movementChecks.z.moveStop) controls.target.z = movementChecks.z.moveCamera;
+
+		if (movementChecks.x.moveStop && movementChecks.y.moveStop && movementChecks.z.moveStop) {
+			controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
+			easeToTarget = false;
+		}
 	}
 
 	// updating sun shader material
@@ -439,10 +488,14 @@ const render = () => {
 			Math.sin(planetGroup.orbit) * planetGroup.orbitRadius
 		);
 		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
-			planetGroup.moonMeshes.forEach((moon) => {
-				moon.orbit -= moon.orbitSpeed * delta;
-				moon.position.set(Math.cos(moon.orbit) * moon.orbitRadius, 0, Math.sin(moon.orbit) * moon.orbitRadius);
-				moon.rotation.z -= 0.01 * delta;
+			planetGroup.moonMeshes.forEach((moonGroup) => {
+				moonGroup.orbit -= moonGroup.orbitSpeed * delta;
+				moonGroup.position.set(
+					planetGroup.position.x + Math.cos(moonGroup.orbit) * moonGroup.orbitRadius,
+					0,
+					planetGroup.position.z + Math.sin(moonGroup.orbit) * moonGroup.orbitRadius
+				);
+				moonGroup.rotation.z -= 0.01 * delta;
 			});
 		}
 		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
@@ -464,10 +517,12 @@ const animate = () => {
 };
 
 const initMousePointerOrbitEvents = () => {
-	const v3 = new THREE.Vector3();
 	let intersects = [];
 	let objsClickable = [];
-	let hasClickedSameTarget = false;
+
+	const hasClickedSameTarget =
+		objsClickable.length &&
+		outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1;
 
 	const returnClickableTarget = (e) => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -476,39 +531,37 @@ const initMousePointerOrbitEvents = () => {
 		raycaster.setFromCamera(mouse, camera);
 		intersects = raycaster.intersectObjects(scene.children, true);
 		objsClickable = intersects.filter((intersect) => intersect.object.clickable);
-
 		return objsClickable || [];
 	};
 
-	window.addEventListener('dblclick', (e) => {
-		const objsClickable = returnClickableTarget(e);
-		hasClickedSameTarget =
-			(objsClickable.length &&
-				outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1) ||
-			false;
+	const addSelectedObject = (obj) => {
+		outlinePass.selectedObjects = [];
+		outlinePass.selectedObjects.push(obj);
+	};
 
-		if (objsClickable.length && hasClickedSameTarget) {
-			console.log('shift it!');
-		}
-	});
+	// window.addEventListener('dblclick', (e) => {
+	// 	const objsClickable = returnClickableTarget(e);
+
+	// 	if (objsClickable.length) {
+	// 		console.log('shift it!');
+	// 	}
+	// });
 
 	window.addEventListener('pointerdown', (e) => {
 		const objsClickable = returnClickableTarget(e);
 
-		hasClickedSameTarget =
-			(objsClickable.length &&
-				outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1) ||
-			false;
-
 		// only add an object if it's clickable and doesn't already exist in the clicked array
 		if (objsClickable.length && !hasClickedSameTarget) {
-			const targetObj =
-				objsClickable[0].object.parent.type !== 'Scene' ? objsClickable[0].object.parent : objsClickable[0].object;
-			targetObject = targetObj;
-			controls.update();
+			// Note that we're selecting the PARENT 3D Object here, not the clicked mesh
+			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
+			if (objsClickable[0].object.parent.type !== 'Scene') {
+				// this needs to be a new var!
+				targetObject = objsClickable[0].object.parent;
+				easeToTarget = true;
+			}
 
-			outlinePass.selectedObjects = [];
-			outlinePass.selectedObjects.push(objsClickable[0].object);
+			controls.update();
+			addSelectedObject(objsClickable[0].object);
 
 			// const decreaseThickness = setInterval(() => {
 			// 	outlinePass.edgeStrength -= 1;
@@ -529,20 +582,18 @@ const initMousePointerOrbitEvents = () => {
 		const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
 			yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
 
-		// console.log({ xDeviation, yDeviation });
 		const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
 
 		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
 		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
 		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
-		if (!mouseHasDeviated && !hasClickedSameTarget && !objsClickable.length) {
-			if (outlinePass.selectedObjects.length) {
-				const { x, y, z } = outlinePass.selectedObjects[0].parent.position;
-				v3.set(x, y, z);
-				controls.target = v3;
-				controls.update();
-				outlinePass.selectedObjects = [];
-			}
+		if (!mouseHasDeviated && !objsClickable.length && !hasClickedSameTarget && outlinePass.selectedObjects.length) {
+			const { x, y, z } = outlinePass.selectedObjects[0].parent.position;
+			// To make camera stop following
+			easeToTarget = false;
+			controls.target.set(x, y, z);
+			controls.update();
+			outlinePass.selectedObjects = [];
 		}
 	});
 };
@@ -551,10 +602,8 @@ const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
-	// camera.position.y = 2;
-	camera.position.y = 12;
-	camera.position.z = 40;
-	// camera.position.z = 6;
+	camera.position.y = 32;
+	camera.position.z = 100;
 
 	composer = new EffectComposer(renderer);
 	const renderModel = new RenderPass(scene, camera);
@@ -595,10 +644,7 @@ window.addEventListener('resize', () => {
 });
 
 _orbitVisibilityCheckbox.addEventListener('change', () => {
-	planets.forEach((planet) => {
-		planet.orbitMesh.material.opacity = setOrbitVisibility();
-		if (planet.moonMeshes && planet.moonMeshes.length) {
-			planet.moonMeshes.forEach((moon) => (moon.moonOrbitLine.material.opacity = setOrbitVisibility()));
-		}
+	orbitLines.forEach((orbitLine) => {
+		orbitLine.material.opacity = setOrbitVisibility();
 	});
 });
