@@ -83,64 +83,94 @@ const addElements = () => {
 	scene.add(skybox);
 	// end: Skybox
 
-	// start: Sun Mesh (with standard material)
-	// TODO: switch this from Shader to Standard depending on mobile vs desktop
-	sunMaterial = new THREE.MeshStandardMaterial({
-		map: loader.load(sun.material.map),
-		emissive: '#FFF',
-		emissiveMap: loader.load(sun.material.map),
-		emissiveIntensity: 0.6,
-		side: THREE.DoubleSide
-	});
-
-	sunMesh = new THREE.Mesh(sun.geometry, sunMaterial);
-	sunMesh.name = 'sun';
-	sunMesh.clickable = true;
-	const sunObj = new THREE.Object3D();
-	sunObj.add(sunMesh);
-	sunObj.name = 'sun group';
-	scene.add(sunObj);
-	// end: Sun Mesh
-
 	// adding a bunch of planets
-	[mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+	[sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
+		const createLabelLine = (mesh, group) => {
+			const labelGeometry = {
+				origInnerRadius: mesh.size + 0.25,
+				origOuterRadius: mesh.size + 0.25,
+				origSegments: 90
+			};
+			const labelLine = new THREE.Mesh(
+				new THREE.RingGeometry(
+					labelGeometry.origInnerRadius,
+					labelGeometry.origOuterRadius,
+					labelGeometry.origSegments
+				),
+				new THREE.MeshBasicMaterial({
+					color: mesh.labelColour,
+					transparent: true,
+					opacity: 1,
+					side: THREE.FrontSide
+				})
+			);
+			labelLine.data = labelLine.data || [];
+			labelLine.data.labelGeometryOriginal = labelGeometry;
+			labelLine.name = `${mesh.name} group label line`;
+			labelLine.data.planetIsTargeted = false;
+			labelLines.push(labelLine);
+
+			group.labelLine = labelLine;
+			group.add(labelLine);
+		};
+
+		const createOrbitLine = (mesh, group, planetObj) => {
+			const orbit = new THREE.Line(
+				new THREE.RingGeometry(group.data.orbitRadius, group.data.orbitRadius, 90),
+				new THREE.MeshBasicMaterial({
+					color: 0xffffff,
+					transparent: true,
+					opacity: setOrbitVisibility(),
+					side: THREE.BackSide
+				})
+			);
+			orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
+			orbit.name = `${mesh.name} orbit line`;
+			orbitLines.push(orbit);
+			scene.add(orbit);
+
+			if (planetObj) planetObj.add(orbit);
+		};
+
 		const planetObj = new THREE.Object3D();
 		const { size, segments, material } = planet;
-		const { map, normal } = material;
-		const textureMap = map ? loader.load(map) : null;
-		const normalMap = normal ? loader.load(normal) : null;
+		material.map = material.map ? loader.load(material.map) : null;
+		material.normalMap = material.normalMap ? loader.load(material.normalMap) : null;
+		material.emissiveMap = material.emissiveMap ? loader.load(material.emissiveMap) : null;
 
 		const planetMesh = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(size, segments, segments),
 			new THREE.MeshStandardMaterial({
-				map: textureMap,
-				normalMap: normalMap,
+				...material,
 				wireframe: false
 			})
 		);
+		planetObj.data = planetObj.data || [];
+		planetMesh.data = planetMesh.data || [];
+
 		planetObj.add(planetMesh);
 
 		planetMesh.name = `${planet.name} planet`;
 		planetObj.name = `${planet.name} group`;
-		planetMesh.clickable = true;
-		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
-		planetObj.orbitRadius = planet.orbitRadius;
+		planetMesh.data.clickable = true;
 
-		// TODO: put this in .data
-		planetObj.rotSpeed = 0.005 + Math.random() * 0.01;
-		planetObj.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-		planetObj.orbitSpeed = 0.009 / planetObj.orbitRadius;
 		planetObj.data = planetObj.data || [];
+		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
+		planetObj.data.orbitRadius = planet.orbitRadius;
+
+		planetObj.data.rotSpeed = 0.005 + Math.random() * 0.01;
+		planetObj.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
+		planetObj.data.orbitSpeed = 0.009 / planetObj.data.orbitRadius;
 
 		planetObj.add(planetMesh);
 
 		// sets the initial position of each planet along its orbit
-		planetObj.orbit = Math.random() * Math.PI * 2;
+		planetObj.data.orbit = Math.random() * Math.PI * 2;
 
 		planetObj.position.set(
-			Math.cos(planetObj.orbit) * planetObj.orbitRadius,
+			Math.cos(planetObj.data.orbit) * planetObj.data.orbitRadius,
 			0,
-			Math.sin(planetObj.orbit) * planetObj.orbitRadius
+			Math.sin(planetObj.data.orbit) * planetObj.data.orbitRadius
 		);
 
 		if (planet.moons && planet.moons.length) {
@@ -156,48 +186,23 @@ const addElements = () => {
 				);
 
 				// each moon group to be in separate group away from planet, or else the OrbitControls targeting will screw up!!
-				moonMesh.clickable = true;
-				moonObj.orbit = Math.random() * Math.PI * 2;
-				moonObj.orbitRadius = moon.orbitRadius;
-				moonObj.orbitSpeed = 0.05 / moon.orbitRadius;
+				moonMesh.data = moonMesh.data || [];
+				moonObj.data = moonObj.data || [];
 
+				moonMesh.data.clickable = true;
+				moonObj.data.orbit = Math.random() * Math.PI * 2;
+				moonObj.data.orbitRadius = moon.orbitRadius;
+				moonObj.data.orbitSpeed = 0.05 / moon.orbitRadius;
 				moonObj.position.set(planetObj.position.x, planetObj.position.y, planetObj.position.z);
-
 				moonMesh.name = `${moon.name} moon`;
 				moonObj.name = `${moon.name} group`;
-
 				planetObj.moonMeshes = planetObj.moonMeshes || [];
 				planetObj.moonMeshes.push(moonObj);
 				moonObj.add(moonMesh);
 				scene.add(moonObj);
 
-				const labelLine = new THREE.Line(
-					new THREE.RingGeometry(moon.size + 0.25, moon.size + 0.25, 90),
-					new THREE.MeshBasicMaterial({
-						color: moon.labelColour,
-						transparent: true,
-						opacity: 0.15,
-						side: THREE.BackSide
-					})
-				);
-				labelLines.push(labelLine);
-				// moonObj.add(labelLine);
-
-				// and to set an orbit line...
-				const moonOrbitLine = new THREE.Line(
-					new THREE.RingGeometry(moonMesh.orbitRadius, moonMesh.orbitRadius, 90),
-					new THREE.MeshBasicMaterial({
-						color: 0xffffff,
-						transparent: true,
-						opacity: setOrbitVisibility() / 2,
-						side: THREE.BackSide
-					})
-				);
-				moonObj.moonOrbitLine = moonOrbitLine;
-				moonOrbitLine.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
-				moonOrbitLine.name = `${planetMesh.name} moon orbit line`;
-				orbitLines.push(moonOrbitLine);
-				planetObj.add(moonOrbitLine);
+				createLabelLine(moon, moonObj);
+				createOrbitLine(moon, moonObj, planetObj);
 			});
 		}
 
@@ -220,46 +225,12 @@ const addElements = () => {
 			});
 		}
 
-		const orbit = new THREE.Line(
-			new THREE.RingGeometry(planetObj.orbitRadius, planetObj.orbitRadius, 90),
-			new THREE.MeshBasicMaterial({
-				color: 0xffffff,
-				transparent: true,
-				opacity: setOrbitVisibility(),
-				side: THREE.BackSide
-			})
-		);
-		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
-		orbit.name = `${planetMesh.name} orbit line`;
-		planetMesh.orbitMesh = orbit;
-
-		const labelGeometry = {
-			origInnerRadius: planet.size + 0.25,
-			origOuterRadius: planet.size + 0.25,
-			origSegments: 90
-		};
-		const labelLine = new THREE.Mesh(
-			new THREE.RingGeometry(labelGeometry.origInnerRadius, labelGeometry.origOuterRadius, labelGeometry.origSegments),
-			new THREE.MeshBasicMaterial({
-				color: planet.labelColour,
-				transparent: true,
-				opacity: 1,
-				side: THREE.FrontSide
-			})
-		);
-		labelLine.data = labelLine.data || [];
-		labelLine.data.labelGeometryOriginal = labelGeometry;
-		labelLine.name = `${planetMesh.name} group label line`;
-		labelLine.data.planetIsTargeted = false;
-		labelLines.push(labelLine);
-
-		planetObj.labelLine = labelLine;
-		planetObj.add(labelLine);
+		createLabelLine(planet, planetObj);
+		createOrbitLine(planet, planetObj);
 
 		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
 		planets.push(planetObj);
-		orbitLines.push(orbit);
-		scene.add(orbit, planetObj);
+		scene.add(planetObj);
 	});
 
 	const createStarfield = () => {
@@ -418,24 +389,26 @@ const render = () => {
 	}
 
 	planets.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.rotSpeed * delta;
-		planetGroup.orbit += planetGroup.orbitSpeed;
+		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
 		planetGroup.position.set(
-			Math.cos(planetGroup.orbit) * planetGroup.orbitRadius,
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
 			0,
-			Math.sin(planetGroup.orbit) * planetGroup.orbitRadius
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
 		);
+
 		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
 			planetGroup.moonMeshes.forEach((moonGroup) => {
-				moonGroup.orbit -= moonGroup.orbitSpeed * delta;
+				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
 				moonGroup.position.set(
-					planetGroup.position.x + Math.cos(moonGroup.orbit) * moonGroup.orbitRadius,
+					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
 					0,
-					planetGroup.position.z + Math.sin(moonGroup.orbit) * moonGroup.orbitRadius
+					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
 				);
 				moonGroup.rotation.z -= 0.01 * delta;
 			});
 		}
+
 		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
 			planetGroup.ringMeshes.forEach((ring) => {
 				ring.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
@@ -466,7 +439,9 @@ const initMousePointerOrbitEvents = () => {
 
 		raycaster.setFromCamera(mouse, camera);
 		intersects = raycaster.intersectObjects(scene.children, true);
-		objsClickable = intersects.filter((intersect) => intersect.object.clickable);
+		objsClickable = intersects.filter(
+			(intersect) => intersect.object && intersect.object.data && intersect.object.data.clickable
+		);
 		return objsClickable || [];
 	};
 
@@ -530,7 +505,7 @@ const init = () => {
 	camera.position.z = 100;
 
 	composer = new EffectComposer(renderer);
-	const renderModel = new RenderPass(scene, camera);
+	// const renderModel = new RenderPass(scene, camera);
 	// const effectBloom = new BloomPass(1.25);
 	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
 
@@ -543,8 +518,8 @@ const init = () => {
 	// outlinePass.pulsePeriod = 5;
 	outlinePass.clear = false;
 
-	composer.addPass(renderModel);
-	composer.addPass(outlinePass);
+	// composer.addPass(renderModel);
+	// composer.addPass(outlinePass);
 
 	window.composer = composer;
 

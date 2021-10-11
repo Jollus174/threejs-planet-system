@@ -29,23 +29,23 @@ import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl
 
 const sun = {
 	name: 'sun',
-	geometry: new SphereBufferGeometry(8, 32, 32),
+	orbitRadius: 0.001,
+	size: 8,
+	segments: 32,
+	labelColour: 'red',
 	material: {
 		map: textureSun,
-		vertexShader: sunVertex,
-		fragmentShader: sunFragment
+		normalMap: null,
+		emissive: '#FFF',
+		emissiveMap: textureSun,
+		emissiveIntensity: 0.6,
+		side: DoubleSide
+		// vertexShader: sunVertex,
+		// fragmentShader: sunFragment
 	},
 	specialSunShader: {
 		vertexShader: sunSpecialVertex,
 		fragmentShader: sunSpecialFragment
-	},
-	atmosphere: {
-		name: 'sun atmosphere',
-		geometry: new SphereBufferGeometry(2.2, 64, 64),
-		material: {
-			vertexShader: sunAtmosphereVertex,
-			fragmentShader: sunAtmosphereFragment
-		}
 	}
 };
 
@@ -57,7 +57,7 @@ const mercury = {
 	labelColour: '#b78668',
 	material: {
 		map: textureMercury,
-		normal: normalMercury
+		normalMap: normalMercury
 	}
 };
 
@@ -69,7 +69,7 @@ const venus = {
 	labelColour: '#f3b3b3',
 	material: {
 		map: textureVenus,
-		normal: normalVenus
+		normalMap: normalVenus
 	}
 };
 
@@ -83,7 +83,7 @@ const earth = {
 		// vertexShader: earthVertexShader,
 		// fragmentShader: earthFragmentShader,
 		map: textureEarth,
-		normal: normalEarth
+		normalMap: normalEarth
 	},
 	// atmosphere: {
 	// 	name: 'earth atmosphere',
@@ -101,7 +101,7 @@ const earth = {
 			labelColour: '#dae0e0',
 			material: {
 				map: textureMoon
-				// normal: normalMoon
+				// normalMap: normalMoon
 			}
 		}
 	]
@@ -115,7 +115,7 @@ const mars = {
 	labelColour: '#dae0e0',
 	material: {
 		map: textureMars,
-		normal: normalMars
+		normalMap: normalMars
 	}
 };
 
