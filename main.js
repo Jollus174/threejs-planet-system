@@ -85,28 +85,35 @@ const addElements = () => {
 
 	// adding a bunch of planets
 	[sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
-		const createLabelLine = (mesh, group) => {
+		const createLabelLine = (item, group) => {
+			console.log(item.size);
 			const labelGeometry = {
-				origInnerRadius: mesh.size + 0.25,
-				origOuterRadius: mesh.size + 0.25,
+				origInnerRadius: item.size + 0.25,
+				origOuterRadius: item.size + 0.25,
 				origSegments: 90
 			};
 			const labelLine = new THREE.Mesh(
 				new THREE.RingGeometry(
 					labelGeometry.origInnerRadius,
 					labelGeometry.origOuterRadius,
-					labelGeometry.origSegments
+					labelGeometry.origSegments,
+					1,
+					labelGeometry.origThetaStart,
+					labelGeometry.origThetaLength
 				),
 				new THREE.MeshBasicMaterial({
-					color: mesh.labelColour,
+					color: item.labelColour,
 					transparent: true,
-					opacity: 1,
-					side: THREE.FrontSide
+					opacity: 0.8,
+					blending: THREE.AdditiveBlending,
+					side: THREE.FrontSide,
+					depthTest: false,
+					depthWrite: false
 				})
 			);
+			labelLine.name = `${item.name} group label line`;
 			labelLine.data = labelLine.data || [];
 			labelLine.data.labelGeometryOriginal = labelGeometry;
-			labelLine.name = `${mesh.name} group label line`;
 			labelLine.data.planetIsTargeted = false;
 			labelLines.push(labelLine);
 
@@ -145,33 +152,27 @@ const addElements = () => {
 				wireframe: false
 			})
 		);
-		planetObj.data = planetObj.data || [];
-		planetMesh.data = planetMesh.data || [];
-
 		planetObj.add(planetMesh);
 
-		planetMesh.name = `${planet.name} planet`;
 		planetObj.name = `${planet.name} group`;
-		planetMesh.data.clickable = true;
-
 		planetObj.data = planetObj.data || [];
-		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
+		planetObj.data = planetObj.data || [];
 		planetObj.data.orbitRadius = planet.orbitRadius;
-
 		planetObj.data.rotSpeed = 0.005 + Math.random() * 0.01;
 		planetObj.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetObj.data.orbitSpeed = 0.009 / planetObj.data.orbitRadius;
-
-		planetObj.add(planetMesh);
-
-		// sets the initial position of each planet along its orbit
-		planetObj.data.orbit = Math.random() * Math.PI * 2;
-
+		planetObj.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
+		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
 		planetObj.position.set(
 			Math.cos(planetObj.data.orbit) * planetObj.data.orbitRadius,
 			0,
 			Math.sin(planetObj.data.orbit) * planetObj.data.orbitRadius
 		);
+
+		planetMesh.name = `${planet.name} planet`;
+		planetMesh.data = planetMesh.data || [];
+		planetMesh.data.clickable = true;
+		planetMesh.size = planet.size;
 
 		if (planet.moons && planet.moons.length) {
 			planet.moons.forEach((moon) => {
@@ -186,18 +187,20 @@ const addElements = () => {
 				);
 
 				// each moon group to be in separate group away from planet, or else the OrbitControls targeting will screw up!!
-				moonMesh.data = moonMesh.data || [];
+				moonObj.name = `${moon.name} group`;
 				moonObj.data = moonObj.data || [];
-
-				moonMesh.data.clickable = true;
 				moonObj.data.orbit = Math.random() * Math.PI * 2;
 				moonObj.data.orbitRadius = moon.orbitRadius;
 				moonObj.data.orbitSpeed = 0.05 / moon.orbitRadius;
 				moonObj.position.set(planetObj.position.x, planetObj.position.y, planetObj.position.z);
-				moonMesh.name = `${moon.name} moon`;
-				moonObj.name = `${moon.name} group`;
 				planetObj.moonMeshes = planetObj.moonMeshes || [];
 				planetObj.moonMeshes.push(moonObj);
+
+				moonMesh.name = `${moon.name} moon`;
+				moonMesh.data = moonMesh.data || [];
+				moonMesh.data.size = moon.size;
+				moonMesh.data.clickable = true;
+
 				moonObj.add(moonMesh);
 				scene.add(moonObj);
 
@@ -357,16 +360,26 @@ const render = () => {
 
 		let innerRadius = labelLine.geometry.parameters.innerRadius;
 		let outerRadius = labelLine.geometry.parameters.outerRadius;
-		const { origInnerRadius, origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
+		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
+
+		let regenerate = false;
 		if (labelLine.data.planetIsTargeted) {
-			if (outerRadius < 3) {
-				outerRadius += easeTo({ from: outerRadius, to: 3 });
-				labelLine.geometry.dispose(); // running this seems pointless
+			if (outerRadius < origOuterRadius + 0.25) {
+				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius + 0.25, incrementer: 15 });
+				regenerate = true;
+			}
+			if (regenerate) {
+				labelLine.geometry.dispose(); // running this is recommended but seems pointless
 				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
 			}
 		} else {
-			if (innerRadius > origInnerRadius || outerRadius > origOuterRadius) {
-				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius, iterator: 50 });
+			if (outerRadius > origOuterRadius) {
+				// will interpolate linearly
+				outerRadius += easeTo({ from: outerRadius + 0.5, to: origOuterRadius, incrementer: 50 });
+				regenerate = true;
+			}
+
+			if (regenerate) {
 				labelLine.geometry.dispose();
 				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
 			}

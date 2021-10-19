@@ -32,7 +32,7 @@ const sun = {
 	orbitRadius: 0.001,
 	size: 8,
 	segments: 32,
-	labelColour: 'red',
+	labelColour: '#ffb01f',
 	material: {
 		map: textureSun,
 		normalMap: null,
