@@ -121,7 +121,7 @@ const addElements = () => {
 			group.add(labelLine);
 		};
 
-		const createOrbitLine = (mesh, group, planetObj) => {
+		const createOrbitLine = (mesh, group, planetGroup) => {
 			const orbit = new THREE.Line(
 				new THREE.RingGeometry(group.data.orbitRadius, group.data.orbitRadius, 90),
 				new THREE.MeshBasicMaterial({
@@ -136,10 +136,10 @@ const addElements = () => {
 			orbitLines.push(orbit);
 			scene.add(orbit);
 
-			if (planetObj) planetObj.add(orbit);
+			if (planetGroup) planetGroup.add(orbit);
 		};
 
-		const planetObj = new THREE.Object3D();
+		const planetGroup = new THREE.Group();
 		const { size, segments, material } = planet;
 		material.map = material.map ? loader.load(material.map) : null;
 		material.normalMap = material.normalMap ? loader.load(material.normalMap) : null;
@@ -152,21 +152,21 @@ const addElements = () => {
 				wireframe: false
 			})
 		);
-		planetObj.add(planetMesh);
+		planetGroup.add(planetMesh);
 
-		planetObj.name = `${planet.name} group`;
-		planetObj.data = planetObj.data || [];
-		planetObj.data = planetObj.data || [];
-		planetObj.data.orbitRadius = planet.orbitRadius;
-		planetObj.data.rotSpeed = 0.005 + Math.random() * 0.01;
-		planetObj.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-		planetObj.data.orbitSpeed = 0.009 / planetObj.data.orbitRadius;
-		planetObj.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
-		planetObj.rotation.y = THREE.MathUtils.randFloatSpread(360);
-		planetObj.position.set(
-			Math.cos(planetObj.data.orbit) * planetObj.data.orbitRadius,
+		planetGroup.name = `${planet.name} group`;
+		planetGroup.data = planetGroup.data || [];
+		planetGroup.data = planetGroup.data || [];
+		planetGroup.data.orbitRadius = planet.orbitRadius;
+		planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;
+		planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
+		planetGroup.data.orbitSpeed = 0.009 / planetGroup.data.orbitRadius;
+		planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
+		planetGroup.rotation.y = THREE.MathUtils.randFloatSpread(360);
+		planetGroup.position.set(
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
 			0,
-			Math.sin(planetObj.data.orbit) * planetObj.data.orbitRadius
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
 		);
 
 		planetMesh.name = `${planet.name} planet`;
@@ -177,7 +177,7 @@ const addElements = () => {
 		if (planet.moons && planet.moons.length) {
 			planet.moons.forEach((moon) => {
 				const { size, segments, material } = moon;
-				const moonObj = new THREE.Object3D();
+				const moonGroup = new THREE.Group();
 				const moonMesh = new THREE.Mesh(
 					new THREE.SphereBufferGeometry(size, segments, segments),
 					new THREE.MeshStandardMaterial({
@@ -187,25 +187,25 @@ const addElements = () => {
 				);
 
 				// each moon group to be in separate group away from planet, or else the OrbitControls targeting will screw up!!
-				moonObj.name = `${moon.name} group`;
-				moonObj.data = moonObj.data || [];
-				moonObj.data.orbit = Math.random() * Math.PI * 2;
-				moonObj.data.orbitRadius = moon.orbitRadius;
-				moonObj.data.orbitSpeed = 0.05 / moon.orbitRadius;
-				moonObj.position.set(planetObj.position.x, planetObj.position.y, planetObj.position.z);
-				planetObj.moonMeshes = planetObj.moonMeshes || [];
-				planetObj.moonMeshes.push(moonObj);
+				moonGroup.name = `${moon.name} group`;
+				moonGroup.data = moonGroup.data || [];
+				moonGroup.data.orbit = Math.random() * Math.PI * 2;
+				moonGroup.data.orbitRadius = moon.orbitRadius;
+				moonGroup.data.orbitSpeed = 0.05 / moon.orbitRadius;
+				moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
+				planetGroup.moonMeshes = planetGroup.moonMeshes || [];
+				planetGroup.moonMeshes.push(moonGroup);
 
 				moonMesh.name = `${moon.name} moon`;
 				moonMesh.data = moonMesh.data || [];
 				moonMesh.data.size = moon.size;
 				moonMesh.data.clickable = true;
 
-				moonObj.add(moonMesh);
-				scene.add(moonObj);
+				moonGroup.add(moonMesh);
+				scene.add(moonGroup);
 
-				createLabelLine(moon, moonObj);
-				createOrbitLine(moon, moonObj, planetObj);
+				createLabelLine(moon, moonGroup);
+				createOrbitLine(moon, moonGroup, planetGroup);
 			});
 		}
 
@@ -224,16 +224,16 @@ const addElements = () => {
 				ringMesh.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
 				planetMesh.ringMeshes = planetMesh.ringMeshes || [];
 				planetMesh.ringMeshes.push(ringMesh);
-				planetObj.add(ringMesh);
+				planetGroup.add(ringMesh);
 			});
 		}
 
-		createLabelLine(planet, planetObj);
-		createOrbitLine(planet, planetObj);
+		createLabelLine(planet, planetGroup);
+		createOrbitLine(planet, planetGroup);
 
-		// planetObj.add(orbit); // can't do this, the rings will wrap around planet rather than sun
-		planets.push(planetObj);
-		scene.add(planetObj);
+		// planetGroup.add(orbit); // can't do this, the rings will wrap around planet rather than sun
+		planets.push(planetGroup);
+		scene.add(planetGroup);
 	});
 
 	const createStarfield = () => {
