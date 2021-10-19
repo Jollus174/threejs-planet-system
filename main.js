@@ -7,7 +7,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { getStandardDeviation, createCircleTexture } from './modules/utils';
-import { scene } from './modules/scene';
 import { renderer } from './modules/renderer';
 import { setAsteroidPosition } from './modules/objects';
 import { loadManager } from './modules/loadManager';
@@ -18,8 +17,9 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+const scene = new THREE.Scene();
 window.camera = camera;
-let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere, scene1;
+let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere;
 let delta;
 let targetObject;
 
@@ -39,12 +39,25 @@ controls.keys = {
 controls.listenToKeyEvents(document);
 
 const loader = new THREE.TextureLoader(loadManager());
+const fontLoader = new THREE.FontLoader(loadManager());
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const planets = [],
 	orbitLines = [],
 	labelLines = [];
+
+const fontSettings = {
+	bevelEnabled: false,
+	fontName: 'ode_to_idle_gaming',
+	fontWeight: 'regular',
+	height: 0.1,
+	size: 4,
+	curveSegments: 4,
+	bevelThickness: 2,
+	bevelSize: 1.5
+};
+
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
@@ -86,7 +99,6 @@ const addElements = () => {
 	// adding a bunch of planets
 	[sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const createLabelLine = (item, group) => {
-			console.log(item.size);
 			const labelGeometry = {
 				origInnerRadius: item.size + 0.25,
 				origOuterRadius: item.size + 0.25,
@@ -119,6 +131,34 @@ const addElements = () => {
 
 			group.labelLine = labelLine;
 			group.add(labelLine);
+		};
+
+		const createText = async (item, group) => {
+			const fontGroup = new THREE.Group();
+			if (!item.name) return;
+
+			fontLoader.load(`fonts/${fontSettings.fontName}_${fontSettings.fontWeight}.typeface.json`, (font) => {
+				const { size, height, curveSegments, bevelThickness, bevelSize, bevelEnabled } = fontSettings;
+				const textGeo = new THREE.TextGeometry(item.name, {
+					font,
+					size,
+					height,
+					curveSegments,
+					bevelThickness,
+					bevelSize,
+					bevelEnabled
+				});
+				textGeo.computeBoundingBox(); // for aligning the text
+
+				const textMesh = new THREE.Mesh(textGeo, [
+					new THREE.MeshPhongMaterial({ color: item.labelColour, emissive: item.labelColour, emissiveIntensity: 1 }), // front
+					new THREE.MeshPhongMaterial({ color: item.labelColour, emissive: item.labelColour, emissiveIntensity: 1 }) // side
+				]);
+
+				fontGroup.add(textMesh);
+				group.text = fontGroup;
+				group.add(fontGroup);
+			});
 		};
 
 		const createOrbitLine = (mesh, group, planetGroup) => {
@@ -155,7 +195,6 @@ const addElements = () => {
 		planetGroup.add(planetMesh);
 
 		planetGroup.name = `${planet.name} group`;
-		planetGroup.data = planetGroup.data || [];
 		planetGroup.data = planetGroup.data || [];
 		planetGroup.data.orbitRadius = planet.orbitRadius;
 		planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;

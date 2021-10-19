@@ -112,7 +112,7 @@ const mars = {
 	orbitRadius: 65,
 	size: 0.6,
 	segments: 32,
-	labelColour: '#dae0e0',
+	labelColour: '#fe9657',
 	material: {
 		map: textureMars,
 		normalMap: normalMars
