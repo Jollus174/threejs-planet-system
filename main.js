@@ -6,7 +6,7 @@ import * as THREE from 'three';
 // TODO: Check out the examples!
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { getStandardDeviation, createCircleTexture } from './modules/utils';
+import { getStandardDeviation, createCircleTexture, numberWithCommas } from './modules/utils';
 import { renderer } from './modules/renderer';
 import { setAsteroidPosition } from './modules/objects';
 import { loadManager } from './modules/loadManager';
@@ -45,18 +45,8 @@ const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const planets = [],
 	orbitLines = [],
-	labelLines = [];
-
-const fontSettings = {
-	bevelEnabled: false,
-	fontName: 'ode_to_idle_gaming',
-	fontWeight: 'regular',
-	height: 0.1,
-	size: 4,
-	curveSegments: 4,
-	bevelThickness: 2,
-	bevelSize: 1.5
-};
+	labelLines = [],
+	textGroups = [];
 
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
@@ -85,8 +75,6 @@ const ringUVMapGeometry = (from, to) => {
 };
 
 const addElements = () => {
-	scene1 = new THREE.Scene();
-
 	// start: Skybox
 	const skyboxMaterialArray = skyboxTexturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: loader.load(image), side: THREE.BackSide })
@@ -100,8 +88,8 @@ const addElements = () => {
 	[sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const createLabelLine = (item, group) => {
 			const labelGeometry = {
-				origInnerRadius: item.size + 0.25,
-				origOuterRadius: item.size + 0.25,
+				origInnerRadius: item.size + 0.15,
+				origOuterRadius: item.size + 0.15,
 				origSegments: 90
 			};
 			const labelLine = new THREE.Mesh(
@@ -137,26 +125,74 @@ const addElements = () => {
 			const fontGroup = new THREE.Group();
 			if (!item.name) return;
 
-			fontLoader.load(`fonts/${fontSettings.fontName}_${fontSettings.fontWeight}.typeface.json`, (font) => {
-				const { size, height, curveSegments, bevelThickness, bevelSize, bevelEnabled } = fontSettings;
-				const textGeo = new THREE.TextGeometry(item.name, {
+			fontLoader.load(`fonts/ode_to_idle_gaming_regular.typeface.json`, (font) => {
+				const fontSettings = {
+					bevelEnabled: false,
+					curveSegments: 4,
+					bevelThickness: 2,
+					bevelSize: 1.5
+				};
+
+				const titleGeo = new THREE.TextGeometry(item.name, {
 					font,
-					size,
-					height,
-					curveSegments,
-					bevelThickness,
-					bevelSize,
-					bevelEnabled
+					size: 0.5,
+					height: 0.05,
+					...fontSettings
 				});
-				textGeo.computeBoundingBox(); // for aligning the text
+				titleGeo.computeBoundingBox(); // for aligning the text
 
-				const textMesh = new THREE.Mesh(textGeo, [
-					new THREE.MeshPhongMaterial({ color: item.labelColour, emissive: item.labelColour, emissiveIntensity: 1 }), // front
-					new THREE.MeshPhongMaterial({ color: item.labelColour, emissive: item.labelColour, emissiveIntensity: 1 }) // side
-				]);
+				const createTextMesh = (geo, color) => {
+					return new THREE.Mesh(geo, [
+						new THREE.MeshBasicMaterial({
+							color,
+							side: THREE.FrontSide,
+							depthTest: false,
+							depthWrite: false
+						}), // front
+						new THREE.MeshBasicMaterial({
+							color
+						}) // side
+					]);
+				};
 
-				fontGroup.add(textMesh);
+				const titleMesh = createTextMesh(titleGeo, item.labelColour);
+
+				const stats = item.stats || {};
+				const { distanceToSun, diameter, spinTime, orbitTime, gravity } = stats;
+
+				const textArray = [
+					`Distance to Sun: ${numberWithCommas(distanceToSun)} km`,
+					`Diameter: ${diameter} km`,
+					`Spin Time: ${spinTime} Days`,
+					`Orbit Time: ${orbitTime} Days`,
+					`Gravity: ${gravity} G`
+				];
+
+				const diameterGeo = new THREE.TextGeometry(textArray.join('\n'), {
+					font,
+					size: 0.15,
+					height: 0.05,
+					...fontSettings
+				});
+
+				const diameterMesh = createTextMesh(diameterGeo, 0xffffff);
+				fontGroup.add(diameterMesh);
+
+				// const centreOffset = -0.5 * (titleGeo.boundingBox.max.x - titleGeo.boundingBox.min.x);
+				const rightOffset = titleGeo.boundingBox.min.x;
+				const arbitraryExtraValue = 0.25;
+				fontGroup.position.x = rightOffset; // will CENTRE the group, to use as a foundation for positioning other elements
+				titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.size - arbitraryExtraValue; // will align text to the LEFT of the planet
+				titleMesh.position.y = 0 - titleGeo.boundingBox.min.y + item.size + arbitraryExtraValue * 1.25; // will align text to TOP of planet
+				titleMesh.name = `${item.name} title`;
+
+				diameterMesh.position.y = titleMesh.position.y + 0.505;
+				diameterMesh.position.x += item.size + arbitraryExtraValue;
+
+				fontGroup.add(titleMesh);
+
 				group.text = fontGroup;
+				textGroups.push(fontGroup);
 				group.add(fontGroup);
 			});
 		};
@@ -269,6 +305,7 @@ const addElements = () => {
 
 		createLabelLine(planet, planetGroup);
 		createOrbitLine(planet, planetGroup);
+		createText(planet, planetGroup);
 
 		// planetGroup.add(orbit); // can't do this, the rings will wrap around planet rather than sun
 		planets.push(planetGroup);
@@ -424,6 +461,8 @@ const render = () => {
 			}
 		}
 	});
+
+	textGroups.forEach((textGroup) => textGroup.lookAt(camera.position));
 
 	if (easeToTarget && targetObject && Object.keys(targetObject).length) {
 		const easeX = easeTo({ from: controls.target.x, to: targetObject.position.x });

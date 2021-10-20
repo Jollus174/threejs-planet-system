@@ -33,6 +33,9 @@ const sun = {
 	size: 8,
 	segments: 32,
 	labelColour: '#ffb01f',
+	stats: {
+		diameter: 1391980
+	},
 	material: {
 		map: textureSun,
 		normalMap: null,
@@ -55,6 +58,13 @@ const mercury = {
 	size: 0.3,
 	segments: 32,
 	labelColour: '#b78668',
+	stats: {
+		distanceToSun: 57900000,
+		diameter: 4878,
+		spinTime: 59,
+		orbitTime: 88,
+		gravity: 0.38
+	},
 	material: {
 		map: textureMercury,
 		normalMap: normalMercury
@@ -67,6 +77,13 @@ const venus = {
 	size: 0.8,
 	segments: 32,
 	labelColour: '#f3b3b3',
+	stats: {
+		distanceToSun: 108160000,
+		diameter: 12104,
+		spinTime: 243,
+		orbitTime: 224,
+		gravity: 0.9
+	},
 	material: {
 		map: textureVenus,
 		normalMap: normalVenus
@@ -79,6 +96,13 @@ const earth = {
 	size: 1,
 	segments: 32,
 	labelColour: '#6dcbe7',
+	stats: {
+		distanceToSun: 149600000,
+		diameter: 12756,
+		spinTime: 1,
+		orbitTime: 365.25,
+		gravity: 1
+	},
 	material: {
 		// vertexShader: earthVertexShader,
 		// fragmentShader: earthFragmentShader,
@@ -113,6 +137,13 @@ const mars = {
 	size: 0.6,
 	segments: 32,
 	labelColour: '#fe9657',
+	stats: {
+		distanceToSun: 227936640,
+		diameter: 6794,
+		spinTime: 1.0257,
+		orbitTime: 687,
+		gravity: 0.38
+	},
 	material: {
 		map: textureMars,
 		normalMap: normalMars
@@ -125,6 +156,13 @@ const jupiter = {
 	size: 2.4,
 	segments: 64,
 	labelColour: '#e0ab79',
+	stats: {
+		distanceToSun: 778369000,
+		diameter: 142984,
+		spinTime: 0.4132,
+		orbitTime: 11.86,
+		gravity: 2.64
+	},
 	material: {
 		map: textureJupiter
 	}
@@ -136,6 +174,13 @@ const saturn = {
 	size: 2.2,
 	segments: 64,
 	labelColour: '#ffe577',
+	stats: {
+		distanceToSun: 14278034000,
+		diameter: 120536,
+		spinTime: 0.4438,
+		orbitTime: 29,
+		gravity: 1.11
+	},
 	material: {
 		map: textureSaturn
 	},
@@ -157,6 +202,13 @@ const uranus = {
 	orbitRadius: 210,
 	size: 1.4,
 	segments: 64,
+	stats: {
+		distanceToSun: 2870658186,
+		diameter: 51118,
+		spinTime: 0.718,
+		orbitTime: 84,
+		gravity: 1.11
+	},
 	labelColour: '#c8ecef',
 	material: {
 		map: textureUranus
@@ -168,6 +220,13 @@ const neptune = {
 	orbitRadius: 260,
 	size: 1.4,
 	segments: 64,
+	stats: {
+		distanceToSun: 4496976000,
+		diameter: 49532,
+		spinTime: 0.6715,
+		orbitTime: 164.8,
+		gravity: 1.21
+	},
 	labelColour: '#3b54d2',
 	material: {
 		map: textureNeptune

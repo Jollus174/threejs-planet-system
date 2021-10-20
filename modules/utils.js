@@ -28,4 +28,9 @@ const createCircleTexture = (color, size) => {
 	return texture;
 };
 
-export { getStandardDeviation, createCircleTexture };
+const numberWithCommas = (n) => {
+	if (!n) return;
+	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export { getStandardDeviation, createCircleTexture, numberWithCommas };
