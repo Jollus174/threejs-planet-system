@@ -121,19 +121,40 @@ const addElements = () => {
 			group.add(labelLine);
 		};
 
-		const createText = async (item, group) => {
+		const createText = (item, group) => {
 			const fontGroup = new THREE.Group();
 			if (!item.name) return;
 
-			fontLoader.load(`fonts/ode_to_idle_gaming_regular.typeface.json`, (font) => {
-				const fontSettings = {
-					bevelEnabled: false,
-					curveSegments: 4,
-					bevelThickness: 2,
-					bevelSize: 1.5
-				};
+			const createTextMesh = (geo, color) => {
+				const textMesh = new THREE.Mesh(geo, [
+					new THREE.MeshBasicMaterial({
+						color,
+						side: THREE.FrontSide,
+						depthTest: false,
+						depthWrite: false
+					}), // front
+					new THREE.MeshBasicMaterial({
+						color
+					}) // side
+				]);
 
-				const titleGeo = new THREE.TextGeometry(item.name, {
+				textMesh.renderOrder = 999;
+				textMesh.material.depthTest = false;
+				textMesh.material.depthWrite = false;
+
+				return textMesh;
+			};
+
+			const fontSettings = {
+				bevelEnabled: false,
+				curveSegments: 4,
+				bevelThickness: 2,
+				bevelSize: 1.5
+			};
+
+			fontLoader.load(`fonts/futura-lt_book.json`, (font) => {
+				// am only including the uppercase glyphs for this
+				const titleGeo = new THREE.TextGeometry(item.name.toUpperCase(), {
 					font,
 					size: 0.5,
 					height: 0.05,
@@ -141,58 +162,57 @@ const addElements = () => {
 				});
 				titleGeo.computeBoundingBox(); // for aligning the text
 
-				const createTextMesh = (geo, color) => {
-					return new THREE.Mesh(geo, [
-						new THREE.MeshBasicMaterial({
-							color,
-							side: THREE.FrontSide,
-							depthTest: false,
-							depthWrite: false
-						}), // front
-						new THREE.MeshBasicMaterial({
-							color
-						}) // side
-					]);
-				};
-
 				const titleMesh = createTextMesh(titleGeo, item.labelColour);
 
-				const stats = item.stats || {};
-				const { distanceToSun, diameter, spinTime, orbitTime, gravity } = stats;
-
-				const textArray = [
-					`Distance to Sun: ${numberWithCommas(distanceToSun)} km`,
-					`Diameter: ${diameter} km`,
-					`Spin Time: ${spinTime} Days`,
-					`Orbit Time: ${orbitTime} Days`,
-					`Gravity: ${gravity} G`
-				];
-
-				const diameterGeo = new THREE.TextGeometry(textArray.join('\n'), {
-					font,
-					size: 0.15,
-					height: 0.05,
-					...fontSettings
-				});
-
-				const diameterMesh = createTextMesh(diameterGeo, 0xffffff);
-				fontGroup.add(diameterMesh);
-
-				// const centreOffset = -0.5 * (titleGeo.boundingBox.max.x - titleGeo.boundingBox.min.x);
+				const centreOffsetY = -0.5 * (titleGeo.boundingBox.max.y - titleGeo.boundingBox.min.y);
 				const rightOffset = titleGeo.boundingBox.min.x;
-				const arbitraryExtraValue = 0.25;
+				const arbitraryExtraValue = 1;
 				fontGroup.position.x = rightOffset; // will CENTRE the group, to use as a foundation for positioning other elements
 				titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.size - arbitraryExtraValue; // will align text to the LEFT of the planet
-				titleMesh.position.y = 0 - titleGeo.boundingBox.min.y + item.size + arbitraryExtraValue * 1.25; // will align text to TOP of planet
+				titleMesh.position.y = centreOffsetY;
 				titleMesh.name = `${item.name} title`;
-
-				diameterMesh.position.y = titleMesh.position.y + 0.505;
-				diameterMesh.position.x += item.size + arbitraryExtraValue;
 
 				fontGroup.add(titleMesh);
 
 				group.text = fontGroup;
 				textGroups.push(fontGroup);
+
+				fontLoader.load(`fonts/sylfaen_regular.json`, (font) => {
+					const stats = item.stats || {};
+					const { distanceToSun, diameter, spinTime, orbitTime, gravity } = stats;
+
+					const textArray = [];
+					const textValues = [
+						distanceToSun ? `Distance to Sun: ${numberWithCommas(distanceToSun)} km` : null,
+						diameter ? `Diameter: ${diameter} km` : null,
+						spinTime ? `Spin Time: ${spinTime} Days` : null,
+						orbitTime ? `Orbit Time: ${orbitTime} Days` : null,
+						gravity ? `Gravity: ${gravity} G` : null
+					];
+					textValues.forEach((val) => {
+						if (val !== null) {
+							textArray.push(val);
+						}
+					});
+
+					const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
+						font,
+						size: 0.15,
+						height: 0.01,
+						...fontSettings
+					});
+					descGeo.computeBoundingBox(); // for aligning the text
+
+					const descMesh = createTextMesh(descGeo, 0xffffff);
+
+					const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
+					const arbitraryExtraValue = 1;
+					descMesh.position.x = item.size + arbitraryExtraValue; // will align text to the LEFT of the planet
+					descMesh.position.y = 0 - centreOffsetY - 0.13; // this value seems to correct the v-alignment, not sure why
+					descMesh.name = `${item.name} desc`;
+					fontGroup.add(descMesh);
+				});
+
 				group.add(fontGroup);
 			});
 		};
