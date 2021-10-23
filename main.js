@@ -464,7 +464,7 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 
 const render = () => {
 	delta = 5 * clock.getDelta();
-	// orbitCentroid.rotation.y -= 0.000425 * delta;
+	orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	labelLines.forEach((labelLine) => {
 		labelLine.lookAt(camera.position);
@@ -549,6 +549,13 @@ const render = () => {
 	};
 
 	planets.forEach((planetGroup) => {
+		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
+		planetGroup.position.set(
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
+			0,
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
+		);
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 		if (planetGroup.text) {
 			planetGroup.text.children.forEach((text) => {
@@ -559,12 +566,6 @@ const render = () => {
 		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
 			planetGroup.moonMeshes.forEach((moonGroup) => {
 				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
-				if (moonGroup.text) {
-					moonGroup.text.children.forEach((text) => {
-						fadeTextOpacity(moonGroup, text);
-					});
-				}
-
 				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
 				moonGroup.position.set(
 					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
@@ -572,6 +573,11 @@ const render = () => {
 					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
 				);
 				moonGroup.rotation.z -= 0.01 * delta;
+				if (moonGroup.text) {
+					moonGroup.text.children.forEach((text) => {
+						fadeTextOpacity(moonGroup, text);
+					});
+				}
 			});
 		}
 
@@ -619,6 +625,7 @@ const initMousePointerOrbitEvents = () => {
 
 		// only add an object if it's clickable and doesn't already exist in the clicked array
 		if (objsClickable.length && !hasClickedSameTarget()) {
+			zoomToTarget = false;
 			// Note that we're selecting the PARENT 3D Object here, not the clicked mesh
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
 			if (objsClickable[0].object.parent.type !== 'Scene') {

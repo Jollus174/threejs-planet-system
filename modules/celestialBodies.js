@@ -28,7 +28,7 @@ import earthAtmosphereFragmentShader from './../shaders/earthAtmosphereFragment.
 import earthAtmosphereVertexShader from './../shaders/earthAtmosphereVertex.glsl';
 
 const sun = {
-	name: 'sun',
+	name: 'the sun',
 	orbitRadius: 0.001,
 	size: 8,
 	segments: 32,
