@@ -16,7 +16,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 10000);
 const scene = new THREE.Scene();
 window.camera = camera;
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere;
@@ -58,15 +58,17 @@ let easeToTarget = false;
 let zoomToTarget = false;
 
 const dollySpeedMax = 0.95;
-const dollySpeedMin = 0.99;
+const dollySpeedMin = 0.999;
 
 orbitCentroid.name = 'orbit centroid';
 
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
 const _orbitVisibilityDefault = 0.06;
-const _defaultOutlineEdgeStrength = 2;
+
+const textOpacityDefault = 0;
 
 const setOrbitVisibility = () => (_orbitVisibilityCheckbox.checked ? _orbitVisibilityDefault : 0);
+const calculatePlanetDistance = (planet) => camera.position.distanceTo(planet.position);
 
 // custom UV map so textures can curve correctly (looking at you, rings of Saturn)
 const ringUVMapGeometry = (from, to) => {
@@ -138,16 +140,18 @@ const addElements = () => {
 						color,
 						side: THREE.FrontSide,
 						depthTest: false,
-						depthWrite: false
+						depthWrite: false,
+						opacity: textOpacityDefault,
+						transparent: true
 					}), // front
 					new THREE.MeshBasicMaterial({
-						color
+						color,
+						opacity: textOpacityDefault,
+						transparent: true
 					}) // side
 				]);
 
 				textMesh.renderOrder = 999;
-				textMesh.material.depthTest = false;
-				textMesh.material.depthWrite = false;
 
 				return textMesh;
 			};
@@ -191,9 +195,9 @@ const addElements = () => {
 					const textArray = [];
 					const textValues = [
 						distanceToSun ? `Distance to Sun: ${numberWithCommas(distanceToSun)} km` : null,
-						diameter ? `Diameter: ${diameter} km` : null,
+						diameter ? `Diameter: ${numberWithCommas(diameter)} km` : null,
 						spinTime ? `Spin Time: ${spinTime} Days` : null,
-						orbitTime ? `Orbit Time: ${orbitTime} Days` : null,
+						orbitTime ? `Orbit Time: ${numberWithCommas(orbitTime)} Days` : null,
 						gravity ? `Gravity: ${gravity} G` : null
 					];
 					textValues.forEach((val) => {
@@ -211,6 +215,7 @@ const addElements = () => {
 					descGeo.computeBoundingBox(); // for aligning the text
 
 					const descMesh = createTextMesh(descGeo, 0xffffff);
+					descMesh.scale.set(planet.statsScale, planet.statsScale, planet.statsScale);
 
 					const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
 					const arbitraryExtraValue = 1;
@@ -264,12 +269,14 @@ const addElements = () => {
 		planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 		planetGroup.data.orbitSpeed = 0.009 / planetGroup.data.orbitRadius;
 		planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
+		planetGroup.data.zoomTo = planet.zoomTo;
 		planetGroup.rotation.y = THREE.MathUtils.randFloatSpread(360);
 		planetGroup.position.set(
 			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
 			0,
 			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
 		);
+		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
 		planetMesh.name = `${planet.name} planet`;
 		planetMesh.data = planetMesh.data || [];
@@ -341,8 +348,8 @@ const addElements = () => {
 	});
 
 	const createStarfield = () => {
-		const stars = 10000;
-		const spreadAmount = 1500;
+		const stars = 18000;
+		const spreadAmount = 900;
 		const geometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(stars * 3);
 
@@ -454,8 +461,6 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 };
 
 const render = () => {
-	controls.update();
-	renderer.render(scene, camera);
 	delta = 5 * clock.getDelta();
 	// orbitCentroid.rotation.y -= 0.000425 * delta;
 
@@ -511,7 +516,7 @@ const render = () => {
 		const objZoomTo = outlinePass.selectedObjects[0].data.zoomTo || 0;
 
 		const distanceToTarget = controls.getDistance();
-		const distCalc = Math.max(10.5, objZoomTo);
+		const distCalc = Math.max(10, objZoomTo);
 
 		if (distanceToTarget > distCalc) {
 			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
@@ -523,6 +528,42 @@ const render = () => {
 		}
 	}
 
+	planets.forEach((planetGroup) => {
+		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
+		planetGroup.position.set(
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
+			0,
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
+		);
+
+		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
+		if (planetGroup.text) {
+			planetGroup.text.children.forEach((text) => {
+				if (planetGroup.data.cameraDistance < planetGroup.data.zoomTo + 4) {
+					text.material.forEach((m) => {
+						m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
+					});
+				} else {
+					text.material.forEach((m) => {
+						m.opacity = m.opacity > textOpacityDefault ? (m.opacity -= 0.05) : 0;
+					});
+				}
+			});
+		}
+
+		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
+			planetGroup.moonMeshes.forEach((moonGroup) => {
+				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
+				moonGroup.position.set(
+					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+					0,
+					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+				);
+				moonGroup.rotation.z -= 0.01 * delta;
+			});
+		}
+
 		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
 			planetGroup.ringMeshes.forEach((ring) => {
 				ring.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
@@ -530,6 +571,9 @@ const render = () => {
 			});
 		}
 	});
+
+	controls.update();
+	renderer.render(scene, camera);
 };
 
 const animate = () => {
@@ -568,7 +612,6 @@ const initMousePointerOrbitEvents = () => {
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
 			if (objsClickable[0].object.parent.type !== 'Scene') {
 				targetObject = objsClickable[0].object.parent;
-				// TODO: still need to set one for Mr. Sun
 				labelLines.forEach((labelLine) => (labelLine.data.planetIsTargeted = false));
 				targetObject.labelLine.data.planetIsTargeted = true;
 				easeToTarget = true;

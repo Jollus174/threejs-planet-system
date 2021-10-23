@@ -34,6 +34,7 @@ const sun = {
 	segments: 32,
 	labelColour: '#ffb01f',
 	zoomTo: 26,
+	statsScale: 2.2,
 	stats: {
 		diameter: 1391980
 	},
@@ -60,6 +61,7 @@ const mercury = {
 	segments: 32,
 	zoomTo: 10,
 	labelColour: '#b78668',
+	statsScale: 1,
 	stats: {
 		distanceToSun: 57900000,
 		diameter: 4878,
@@ -79,7 +81,8 @@ const venus = {
 	size: 0.8,
 	segments: 32,
 	labelColour: '#f3b3b3',
-	zoomTo: 12,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 108160000,
 		diameter: 12104,
@@ -99,7 +102,8 @@ const earth = {
 	size: 1,
 	segments: 32,
 	labelColour: '#6dcbe7',
-	zoomTo: 12,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 149600000,
 		diameter: 12756,
@@ -142,7 +146,8 @@ const mars = {
 	size: 0.6,
 	segments: 32,
 	labelColour: '#fe9657',
-	zoomTo: 11,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 227936640,
 		diameter: 6794,
@@ -162,7 +167,8 @@ const jupiter = {
 	size: 2.4,
 	segments: 64,
 	labelColour: '#e0ab79',
-	zoomTo: 13.5,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 778369000,
 		diameter: 142984,
@@ -181,7 +187,8 @@ const saturn = {
 	size: 2.2,
 	segments: 64,
 	labelColour: '#ffe577',
-	zoomTo: 13.4,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 14278034000,
 		diameter: 120536,
@@ -210,7 +217,8 @@ const uranus = {
 	orbitRadius: 210,
 	size: 1.4,
 	segments: 64,
-	zoomTo: 12.34,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 2870658186,
 		diameter: 51118,
@@ -229,7 +237,8 @@ const neptune = {
 	orbitRadius: 260,
 	size: 1.4,
 	segments: 64,
-	zoomTo: 12.34,
+	zoomTo: 10,
+	statsScale: 1,
 	stats: {
 		distanceToSun: 4496976000,
 		diameter: 49532,
