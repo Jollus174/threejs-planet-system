@@ -45,8 +45,6 @@ const sun = {
 		emissiveMap: textureSun,
 		emissiveIntensity: 0.6,
 		side: DoubleSide
-		// vertexShader: sunVertex,
-		// fragmentShader: sunFragment
 	},
 	specialSunShader: {
 		vertexShader: sunSpecialVertex,
@@ -112,26 +110,24 @@ const earth = {
 		gravity: 1
 	},
 	material: {
-		// vertexShader: earthVertexShader,
-		// fragmentShader: earthFragmentShader,
 		map: textureEarth,
 		normalMap: normalEarth
 	},
-	// atmosphere: {
-	// 	name: 'earth atmosphere',
-	// 	material: {
-	// 		vertexShader: earthAtmosphereVertexShader,
-	// 		fragmentShader: earthAtmosphereFragmentShader
-	// 	}
-	// },
 	moons: [
 		{
-			name: 'moon luna',
+			name: 'Luna',
 			orbitRadius: 2.2,
 			size: 0.4,
 			segments: 32,
 			labelColour: '#dae0e0',
-			zoomTo: 11,
+			zoomTo: 10,
+			statsScale: 1,
+			stats: {
+				diameter: 3478.8,
+				spinTime: 27,
+				orbitTime: 27,
+				gravity: 0.1654
+			},
 			material: {
 				map: textureMoon
 				// normalMap: normalMoon

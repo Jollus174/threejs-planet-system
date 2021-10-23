@@ -201,9 +201,7 @@ const addElements = () => {
 						gravity ? `Gravity: ${gravity} G` : null
 					];
 					textValues.forEach((val) => {
-						if (val !== null) {
-							textArray.push(val);
-						}
+						if (val !== null) textArray.push(val);
 					});
 
 					const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
@@ -223,6 +221,7 @@ const addElements = () => {
 					descMesh.position.y = 0 - centreOffsetY - 0.13; // this value seems to correct the v-alignment, not sure why
 					descMesh.name = `${item.name} desc`;
 					fontGroup.add(descMesh);
+					fontGroup.name = `${item.name} text group`;
 				});
 
 				group.add(fontGroup);
@@ -302,6 +301,8 @@ const addElements = () => {
 				moonGroup.data.orbit = Math.random() * Math.PI * 2;
 				moonGroup.data.orbitRadius = moon.orbitRadius;
 				moonGroup.data.orbitSpeed = 0.05 / moon.orbitRadius;
+				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
+				moonGroup.data.zoomTo = moon.zoomTo;
 				moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
 				planetGroup.moonMeshes = planetGroup.moonMeshes || [];
 				planetGroup.moonMeshes.push(moonGroup);
@@ -311,11 +312,12 @@ const addElements = () => {
 				moonMesh.data.size = moon.size;
 				moonMesh.data.clickable = true;
 
-				moonGroup.add(moonMesh);
-				scene.add(moonGroup);
-
+				createText(moon, moonGroup);
 				createLabelLine(moon, moonGroup);
 				createOrbitLine(moon, moonGroup, planetGroup);
+
+				moonGroup.add(moonMesh);
+				scene.add(moonGroup);
 			});
 		}
 
@@ -528,32 +530,41 @@ const render = () => {
 		}
 	}
 
-	planets.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		planetGroup.position.set(
-			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-			0,
-			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		);
+	const fadeTextOpacity = (group, text) => {
+		if (
+			outlinePass &&
+			outlinePass.selectedObjects &&
+			outlinePass.selectedObjects.length &&
+			outlinePass.selectedObjects[0].parent.name === group.name &&
+			group.data.cameraDistance < group.data.zoomTo + 4
+		) {
+			text.material.forEach((m) => {
+				m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
+			});
+		} else {
+			text.material.forEach((m) => {
+				m.opacity = m.opacity > textOpacityDefault ? (m.opacity -= 0.05) : 0;
+			});
+		}
+	};
 
+	planets.forEach((planetGroup) => {
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 		if (planetGroup.text) {
 			planetGroup.text.children.forEach((text) => {
-				if (planetGroup.data.cameraDistance < planetGroup.data.zoomTo + 4) {
-					text.material.forEach((m) => {
-						m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
-					});
-				} else {
-					text.material.forEach((m) => {
-						m.opacity = m.opacity > textOpacityDefault ? (m.opacity -= 0.05) : 0;
-					});
-				}
+				fadeTextOpacity(planetGroup, text);
 			});
 		}
 
 		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
 			planetGroup.moonMeshes.forEach((moonGroup) => {
+				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
+				if (moonGroup.text) {
+					moonGroup.text.children.forEach((text) => {
+						fadeTextOpacity(moonGroup, text);
+					});
+				}
+
 				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
 				moonGroup.position.set(
 					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
