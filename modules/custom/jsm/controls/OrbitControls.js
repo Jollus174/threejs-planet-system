@@ -76,7 +76,14 @@ class OrbitControls extends EventDispatcher {
 		this.autoRotateSpeed = 2.0; // 30 seconds per orbit when fps is 60
 
 		// The four arrow keys
-		this.keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' };
+		this.keys = {
+			LEFT: 'ArrowLeft',
+			UP: 'ArrowUp',
+			RIGHT: 'ArrowRight',
+			BOTTOM: 'ArrowDown',
+			IN: 'KeyR',
+			OUT: 'KeyF'
+		};
 
 		// Mouse buttons
 		this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
@@ -131,6 +138,34 @@ class OrbitControls extends EventDispatcher {
 
 			state = STATE.NONE;
 		};
+
+		this.dollyOut = function (dollyScale) {
+			if (scope.object.isPerspectiveCamera) {
+				scale /= dollyScale;
+			} else if (scope.object.isOrthographicCamera) {
+				scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom * dollyScale));
+				scope.object.updateProjectionMatrix();
+				zoomChanged = true;
+			} else {
+				console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.');
+				scope.enableZoom = false;
+			}
+		};
+
+		this.dollyIn = function (dollyScale) {
+			if (scope.object.isPerspectiveCamera) {
+				scale *= dollyScale;
+			} else if (scope.object.isOrthographicCamera) {
+				scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / dollyScale));
+				scope.object.updateProjectionMatrix();
+				zoomChanged = true;
+			} else {
+				console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.');
+				scope.enableZoom = false;
+			}
+		};
+
+		const _global = this;
 
 		// this method is exposed, but perhaps it would be better if we can make it private...
 		this.update = (function () {
@@ -392,32 +427,6 @@ class OrbitControls extends EventDispatcher {
 			};
 		})();
 
-		function dollyOut(dollyScale) {
-			if (scope.object.isPerspectiveCamera) {
-				scale /= dollyScale;
-			} else if (scope.object.isOrthographicCamera) {
-				scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom * dollyScale));
-				scope.object.updateProjectionMatrix();
-				zoomChanged = true;
-			} else {
-				console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.');
-				scope.enableZoom = false;
-			}
-		}
-
-		function dollyIn(dollyScale) {
-			if (scope.object.isPerspectiveCamera) {
-				scale *= dollyScale;
-			} else if (scope.object.isOrthographicCamera) {
-				scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / dollyScale));
-				scope.object.updateProjectionMatrix();
-				zoomChanged = true;
-			} else {
-				console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.');
-				scope.enableZoom = false;
-			}
-		}
-
 		//
 		// event callbacks - update the object state
 		//
@@ -456,9 +465,9 @@ class OrbitControls extends EventDispatcher {
 			dollyDelta.subVectors(dollyEnd, dollyStart);
 
 			if (dollyDelta.y > 0) {
-				dollyOut(getZoomScale());
+				_global.dollyOut(getZoomScale());
 			} else if (dollyDelta.y < 0) {
-				dollyIn(getZoomScale());
+				_global.dollyIn(getZoomScale());
 			}
 
 			dollyStart.copy(dollyEnd);
@@ -484,9 +493,9 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseWheel(event) {
 			if (event.deltaY < 0) {
-				dollyIn(getZoomScale());
+				_global.dollyIn(getZoomScale());
 			} else if (event.deltaY > 0) {
-				dollyOut(getZoomScale());
+				_global.dollyOut(getZoomScale());
 			}
 
 			scope.update();
@@ -513,6 +522,16 @@ class OrbitControls extends EventDispatcher {
 
 				case scope.keys.RIGHT:
 					pan(-scope.keyPanSpeed, 0);
+					needsUpdate = true;
+					break;
+
+				case scope.keys.IN:
+					_global.dollyIn(getZoomScale());
+					needsUpdate = true;
+					break;
+
+				case scope.keys.OUT:
+					_global.dollyOut(getZoomScale());
 					needsUpdate = true;
 					break;
 			}
@@ -622,7 +641,7 @@ class OrbitControls extends EventDispatcher {
 
 			dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, scope.zoomSpeed));
 
-			dollyOut(dollyDelta.y);
+			_global.dollyOut(dollyDelta.y);
 
 			dollyStart.copy(dollyEnd);
 		}

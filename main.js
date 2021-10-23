@@ -3,8 +3,8 @@ import './reset.css';
 import './style.css';
 
 import * as THREE from 'three';
-// TODO: Check out the examples!
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// custom OrbitControls so can expose the dollyIn() and dollyOut() functions
+import { OrbitControls } from './modules/custom/jsm/controls/OrbitControls';
 
 import { getStandardDeviation, createCircleTexture, numberWithCommas } from './modules/utils';
 import { renderer } from './modules/renderer';
@@ -34,7 +34,9 @@ controls.keys = {
 	LEFT: 'KeyA',
 	UP: 'KeyW',
 	RIGHT: 'KeyD',
-	BOTTOM: 'KeyS'
+	BOTTOM: 'KeyS',
+	IN: 'KeyR',
+	OUT: 'KeyF'
 };
 controls.listenToKeyEvents(document);
 
@@ -53,6 +55,11 @@ starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
 let cubeRenderTarget1, cubeCamera1, sunMeshPerlin;
 let easeToTarget = false;
+let zoomToTarget = false;
+
+const dollySpeedMax = 0.95;
+const dollySpeedMin = 0.99;
+
 orbitCentroid.name = 'orbit centroid';
 
 const _orbitVisibilityCheckbox = document.querySelector('#orbit-lines');
@@ -266,6 +273,7 @@ const addElements = () => {
 
 		planetMesh.name = `${planet.name} planet`;
 		planetMesh.data = planetMesh.data || [];
+		planetMesh.data.zoomTo = planet.zoomTo;
 		planetMesh.data.clickable = true;
 		planetMesh.size = planet.size;
 
@@ -499,26 +507,21 @@ const render = () => {
 		}
 	}
 
-	planets.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		planetGroup.position.set(
-			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-			0,
-			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		);
+	if (zoomToTarget && outlinePass.selectedObjects.length) {
+		const objZoomTo = outlinePass.selectedObjects[0].data.zoomTo || 0;
 
-		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
-			planetGroup.moonMeshes.forEach((moonGroup) => {
-				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
-				moonGroup.position.set(
-					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-					0,
-					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-				);
-				moonGroup.rotation.z -= 0.01 * delta;
-			});
+		const distanceToTarget = controls.getDistance();
+		const distCalc = Math.max(10.5, objZoomTo);
+
+		if (distanceToTarget > distCalc) {
+			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+			const amountToIncrease = (dollySpeedMin - dollySpeedMax) * amountComplete;
+			const dollySpeed = Math.min(dollySpeedMax + amountToIncrease, dollySpeedMin);
+			controls.dollyIn(dollySpeed);
+		} else {
+			zoomToTarget = false;
 		}
+	}
 
 		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
 			planetGroup.ringMeshes.forEach((ring) => {
@@ -540,7 +543,7 @@ const initMousePointerOrbitEvents = () => {
 	let intersects = [];
 	let objsClickable = [];
 
-	const hasClickedSameTarget =
+	const hasClickedSameTarget = () =>
 		objsClickable.length &&
 		outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1;
 
@@ -556,16 +559,11 @@ const initMousePointerOrbitEvents = () => {
 		return objsClickable || [];
 	};
 
-	const addSelectedObject = (obj) => {
-		outlinePass.selectedObjects = [];
-		outlinePass.selectedObjects.push(obj);
-	};
-
 	window.addEventListener('pointerdown', (e) => {
 		const objsClickable = returnClickableTarget(e);
 
 		// only add an object if it's clickable and doesn't already exist in the clicked array
-		if (objsClickable.length && !hasClickedSameTarget) {
+		if (objsClickable.length && !hasClickedSameTarget()) {
 			// Note that we're selecting the PARENT 3D Object here, not the clicked mesh
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
 			if (objsClickable[0].object.parent.type !== 'Scene') {
@@ -577,11 +575,24 @@ const initMousePointerOrbitEvents = () => {
 			}
 
 			controls.update();
-			addSelectedObject(objsClickable[0].object);
+			// add selected object
+			outlinePass.selectedObjects = [];
+			outlinePass.selectedObjects.push(objsClickable[0].object);
 		}
 	});
 
+	window.addEventListener('dblclick', (e) => {
+		const objsClickable = returnClickableTarget(e);
+		zoomToTarget = objsClickable.length && hasClickedSameTarget();
+	});
+
+	window.addEventListener('wheel', () => {
+		zoomToTarget = false;
+	});
+
 	window.addEventListener('pointerup', (e) => {
+		if (!objsClickable.length || !hasClickedSameTarget()) zoomToTarget = false;
+
 		// check pointer position deviation for x + y to see if we should unlock the camera from its target
 		const oldMousePos = [mouse.x, mouse.y];
 		const newMousePos = [(e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1];
@@ -593,7 +604,7 @@ const initMousePointerOrbitEvents = () => {
 		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
 		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
 		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
-		if (!mouseHasDeviated && !objsClickable.length && !hasClickedSameTarget && outlinePass.selectedObjects.length) {
+		if (!mouseHasDeviated && !objsClickable.length && !hasClickedSameTarget() && outlinePass.selectedObjects.length) {
 			// creating new instance of controls xyz so it doesn't keep tracking an object
 			const newTarget = { ...controls.target };
 			const { x, y, z } = newTarget;
@@ -621,13 +632,13 @@ const init = () => {
 	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
 
 	outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-	outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
-	outlinePass.edgeGlow = 1;
-	outlinePass.edgeThickness = 1;
-	outlinePass.visibleEdgeColor = new THREE.Color(0xffffff);
-	outlinePass.hiddenEdgeColor = new THREE.Color(0x190a05);
+	// outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
+	// outlinePass.edgeGlow = 1;
+	// outlinePass.edgeThickness = 1;
+	// outlinePass.visibleEdgeColor = new THREE.Color(0xffffff);
+	// outlinePass.hiddenEdgeColor = new THREE.Color(0x190a05);
 	// outlinePass.pulsePeriod = 5;
-	outlinePass.clear = false;
+	// outlinePass.clear = false;
 
 	// composer.addPass(renderModel);
 	// composer.addPass(outlinePass);
