@@ -33,4 +33,9 @@ const numberWithCommas = (n) => {
 	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-export { getStandardDeviation, createCircleTexture, numberWithCommas };
+const getBreakpoint = window
+	.getComputedStyle(document.querySelector('body'), '::before')
+	.getPropertyValue('content')
+	.replace(/["']/g, '');
+
+export { getStandardDeviation, createCircleTexture, numberWithCommas, getBreakpoint };

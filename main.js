@@ -6,7 +6,7 @@ import * as THREE from 'three';
 // custom OrbitControls so can expose the dollyIn() and dollyOut() functions
 import { OrbitControls } from './modules/custom/jsm/controls/OrbitControls';
 
-import { getStandardDeviation, createCircleTexture, numberWithCommas } from './modules/utils';
+import { getStandardDeviation, createCircleTexture, numberWithCommas, getBreakpoint } from './modules/utils';
 import { renderer } from './modules/renderer';
 import { setAsteroidPosition } from './modules/objects';
 import { loadManager } from './modules/loadManager';
@@ -50,6 +50,7 @@ const planets = [],
 	labelLines = [],
 	textGroups = [];
 
+const isDesktop = ['screen-lg', 'screen-xl'].indexOf(getBreakpoint) !== -1;
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
@@ -518,7 +519,7 @@ const render = () => {
 		const objZoomTo = outlinePass.selectedObjects[0].data.zoomTo || 0;
 
 		const distanceToTarget = controls.getDistance();
-		const distCalc = Math.max(10, objZoomTo);
+		const distCalc = Math.max(10, objZoomTo + (isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
 
 		if (distanceToTarget > distCalc) {
 			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
@@ -536,7 +537,7 @@ const render = () => {
 			outlinePass.selectedObjects &&
 			outlinePass.selectedObjects.length &&
 			outlinePass.selectedObjects[0].parent.name === group.name &&
-			group.data.cameraDistance < group.data.zoomTo + 4
+			group.data.cameraDistance < group.data.zoomTo + 14
 		) {
 			text.material.forEach((m) => {
 				m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
