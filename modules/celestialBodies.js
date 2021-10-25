@@ -197,7 +197,6 @@ const saturn = {
 	},
 	rings: [
 		{
-			name: 'saturn ring',
 			material: {
 				color: 0xffffff,
 				transparent: true,

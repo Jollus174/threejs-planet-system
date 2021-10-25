@@ -21,7 +21,6 @@ const scene = new THREE.Scene();
 window.camera = camera;
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere;
 let delta;
-let targetObject;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 window.controls = controls;
@@ -35,8 +34,8 @@ controls.keys = {
 	UP: 'KeyW',
 	RIGHT: 'KeyD',
 	BOTTOM: 'KeyS',
-	IN: 'KeyR',
-	OUT: 'KeyF'
+	IN: 'KeyF',
+	OUT: 'KeyV'
 };
 controls.listenToKeyEvents(document);
 
@@ -54,9 +53,12 @@ const isDesktop = ['screen-lg', 'screen-xl'].indexOf(getBreakpoint) !== -1;
 const starfield = new THREE.Object3D();
 starfield.name = 'starfield';
 const orbitCentroid = new THREE.Object3D();
+orbitCentroid.name = 'orbit centroid';
+
 let cubeRenderTarget1, cubeCamera1, sunMeshPerlin;
 let easeToTarget = false;
 let zoomToTarget = false;
+let clickedGroup;
 
 const dollySpeedMax = 0.95;
 const dollySpeedMin = 0.999;
@@ -103,7 +105,7 @@ const addElements = () => {
 				origSegments: 90
 			};
 			const labelLine = new THREE.Mesh(
-				new THREE.RingGeometry(
+				new THREE.RingBufferGeometry(
 					labelGeometry.origInnerRadius,
 					labelGeometry.origOuterRadius,
 					labelGeometry.origSegments,
@@ -129,11 +131,27 @@ const addElements = () => {
 
 			group.labelLine = labelLine;
 			group.add(labelLine);
+			labelLines.push(labelLine);
+		};
+
+		const createClickTarget = (item, group) => {
+			const clickTarget = new THREE.Mesh(
+				new THREE.SphereBufferGeometry(item.size + 0.5, 10, 10),
+				new THREE.MeshBasicMaterial({
+					side: THREE.FrontSide,
+					transparent: true,
+					opacity: 0,
+					wireframe: true
+				})
+			);
+
+			clickTarget.name = `${item.name} click target`;
+			group.add(clickTarget);
 		};
 
 		const createText = (item, group) => {
-			const fontGroup = new THREE.Group();
 			if (!item.name) return;
+			const fontGroup = new THREE.Group();
 
 			const createTextMesh = (geo, color) => {
 				const textMesh = new THREE.Mesh(geo, [
@@ -151,8 +169,6 @@ const addElements = () => {
 						transparent: true
 					}) // side
 				]);
-
-				textMesh.renderOrder = 999;
 
 				return textMesh;
 			};
@@ -186,7 +202,6 @@ const addElements = () => {
 
 				fontGroup.add(titleMesh);
 
-				group.text = fontGroup;
 				textGroups.push(fontGroup);
 
 				fontLoader.load(`fonts/sylfaen_regular.json`, (font) => {
@@ -197,7 +212,7 @@ const addElements = () => {
 					const textValues = [
 						distanceToSun ? `Distance to Sun: ${numberWithCommas(distanceToSun)} km` : null,
 						diameter ? `Diameter: ${numberWithCommas(diameter)} km` : null,
-						spinTime ? `Spin Time: ${spinTime} Days` : null,
+						spinTime ? `Spin Time: ${numberWithCommas(spinTime)} Days` : null,
 						orbitTime ? `Orbit Time: ${numberWithCommas(orbitTime)} Days` : null,
 						gravity ? `Gravity: ${gravity} G` : null
 					];
@@ -214,7 +229,7 @@ const addElements = () => {
 					descGeo.computeBoundingBox(); // for aligning the text
 
 					const descMesh = createTextMesh(descGeo, 0xffffff);
-					descMesh.scale.set(planet.statsScale, planet.statsScale, planet.statsScale);
+					descMesh.scale.set(item.statsScale, item.statsScale, item.statsScale);
 
 					const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
 					const arbitraryExtraValue = 1;
@@ -222,11 +237,11 @@ const addElements = () => {
 					descMesh.position.y = 0 - centreOffsetY - 0.13; // this value seems to correct the v-alignment, not sure why
 					descMesh.name = `${item.name} desc`;
 					fontGroup.add(descMesh);
-					fontGroup.name = `${item.name} text group`;
 				});
-
-				group.add(fontGroup);
 			});
+
+			fontGroup.name = `${item.name} text group`;
+			group.add(fontGroup);
 		};
 
 		const createOrbitLine = (mesh, group, planetGroup) => {
@@ -278,10 +293,8 @@ const addElements = () => {
 		);
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
-		planetMesh.name = `${planet.name} planet`;
+		planetMesh.name = `${planet.name} mesh`;
 		planetMesh.data = planetMesh.data || [];
-		planetMesh.data.zoomTo = planet.zoomTo;
-		planetMesh.data.clickable = true;
 		planetMesh.size = planet.size;
 
 		if (planet.moons && planet.moons.length) {
@@ -297,7 +310,7 @@ const addElements = () => {
 				);
 
 				// each moon group to be in separate group away from planet, or else the OrbitControls targeting will screw up!!
-				moonGroup.name = `${moon.name} group`;
+				moonGroup.name = `${moon.name} moon group`;
 				moonGroup.data = moonGroup.data || [];
 				moonGroup.data.orbit = Math.random() * Math.PI * 2;
 				moonGroup.data.orbitRadius = moon.orbitRadius;
@@ -305,25 +318,26 @@ const addElements = () => {
 				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
 				moonGroup.data.zoomTo = moon.zoomTo;
 				moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
-				planetGroup.moonMeshes = planetGroup.moonMeshes || [];
-				planetGroup.moonMeshes.push(moonGroup);
 
 				moonMesh.name = `${moon.name} moon`;
 				moonMesh.data = moonMesh.data || [];
 				moonMesh.data.size = moon.size;
 				moonMesh.data.clickable = true;
 
+				createClickTarget(moon, moonGroup);
 				createText(moon, moonGroup);
 				createLabelLine(moon, moonGroup);
 				createOrbitLine(moon, moonGroup, planetGroup);
 
 				moonGroup.add(moonMesh);
+				planetGroup.moons = planetGroup.moons || [];
+				planetGroup.moons.push(moonGroup);
 				scene.add(moonGroup);
 			});
 		}
 
 		if (planet.rings && planet.rings.length) {
-			planet.rings.forEach((ring) => {
+			planet.rings.forEach((ring, i) => {
 				const ringMesh = new THREE.Mesh(
 					ringUVMapGeometry(2.4, 5),
 					new THREE.MeshBasicMaterial({
@@ -332,7 +346,7 @@ const addElements = () => {
 					})
 				);
 
-				ringMesh.name = ring.name;
+				ringMesh.name = `${planet.name} ring ${i}`;
 				ringMesh.rotation.x = THREE.Math.degToRad(75);
 				ringMesh.position.set(planetMesh.position.x, planetMesh.position.y, planetMesh.position.z);
 				planetMesh.ringMeshes = planetMesh.ringMeshes || [];
@@ -341,6 +355,7 @@ const addElements = () => {
 			});
 		}
 
+		createClickTarget(planet, planetGroup);
 		createLabelLine(planet, planetGroup);
 		createOrbitLine(planet, planetGroup);
 		createText(planet, planetGroup);
@@ -463,6 +478,18 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 	return (to - from) / incrementer;
 };
 
+const fadeTextOpacity = (group, text) => {
+	if (clickedGroup && clickedGroup.name === group.name && group.data.cameraDistance < group.data.zoomTo + 14) {
+		text.material.forEach((m) => {
+			m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
+		});
+	} else {
+		text.material.forEach((m) => {
+			m.opacity = m.opacity > textOpacityDefault ? (m.opacity -= 0.05) : 0;
+		});
+	}
+};
+
 const render = () => {
 	delta = 5 * clock.getDelta();
 	orbitCentroid.rotation.y -= 0.000425 * delta;
@@ -475,7 +502,7 @@ const render = () => {
 		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
 
 		let regenerate = false;
-		if (labelLine.data.planetIsTargeted) {
+		if (clickedGroup && labelLine.parent.name === clickedGroup.name) {
 			if (outerRadius < origOuterRadius + 0.25) {
 				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius + 0.25, incrementer: 15 });
 				regenerate = true;
@@ -498,12 +525,56 @@ const render = () => {
 		}
 	});
 
-	textGroups.forEach((textGroup) => textGroup.lookAt(camera.position));
+	planets.forEach((planetGroup) => {
+		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
+		planetGroup.position.set(
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
+			0,
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
+		);
+		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
-	if (easeToTarget && targetObject && Object.keys(targetObject).length) {
-		const easeX = easeTo({ from: controls.target.x, to: targetObject.position.x });
-		const easeY = easeTo({ from: controls.target.y, to: targetObject.position.y });
-		const easeZ = easeTo({ from: controls.target.z, to: targetObject.position.z });
+		if (planetGroup.moons) {
+			planetGroup.moons.forEach((moonGroup) => {
+				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
+				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
+				moonGroup.position.set(
+					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+					planetGroup.position.y + 0,
+					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+				);
+				moonGroup.rotation.z -= 0.01 * delta;
+
+				const textGroup = moonGroup.children.filter((item) => item.name.includes('text group'))[0];
+				textGroup.lookAt(camera.position);
+				textGroup.children.forEach((text) => {
+					fadeTextOpacity(moonGroup, text);
+				});
+			});
+		}
+
+		planetGroup.children.forEach((child) => {
+			if (child.name.includes('ring')) {
+				const ring = child;
+				ring.rotation.z += 0.01 * delta;
+			}
+
+			// causes multiple loops
+			if (child.name.includes('text group')) {
+				const textGroup = child;
+				textGroup.lookAt(camera.position);
+				textGroup.children.forEach((text) => {
+					fadeTextOpacity(planetGroup, text);
+				});
+			}
+		});
+	});
+
+	if (clickedGroup && easeToTarget) {
+		const easeX = easeTo({ from: controls.target.x, to: clickedGroup.position.x });
+		const easeY = easeTo({ from: controls.target.y, to: clickedGroup.position.y });
+		const easeZ = easeTo({ from: controls.target.z, to: clickedGroup.position.z });
 		if (easeX) controls.target.x += easeX;
 		if (easeY) controls.target.y += easeY;
 		if (easeZ) controls.target.z += easeZ;
@@ -511,13 +582,12 @@ const render = () => {
 		if (!easeX && !easeY && !easeZ) {
 			easeToTarget = false;
 			// this line causes the sun to lock itself to the camera and then move around with it. Very strange
-			// 	controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
+			// controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
 		}
 	}
 
-	if (zoomToTarget && outlinePass.selectedObjects.length) {
-		const objZoomTo = outlinePass.selectedObjects[0].data.zoomTo || 0;
-
+	if (clickedGroup && zoomToTarget) {
+		const objZoomTo = clickedGroup.data.zoomTo || 0;
 		const distanceToTarget = controls.getDistance();
 		const distCalc = Math.max(10, objZoomTo + (isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
 
@@ -531,73 +601,12 @@ const render = () => {
 		}
 	}
 
-	const fadeTextOpacity = (group, text) => {
-		if (
-			outlinePass &&
-			outlinePass.selectedObjects &&
-			outlinePass.selectedObjects.length &&
-			outlinePass.selectedObjects[0].parent.name === group.name &&
-			group.data.cameraDistance < group.data.zoomTo + 14
-		) {
-			text.material.forEach((m) => {
-				m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
-			});
-		} else {
-			text.material.forEach((m) => {
-				m.opacity = m.opacity > textOpacityDefault ? (m.opacity -= 0.05) : 0;
-			});
-		}
-	};
-
-	planets.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		planetGroup.position.set(
-			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-			0,
-			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		);
-		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
-		if (planetGroup.text) {
-			planetGroup.text.children.forEach((text) => {
-				fadeTextOpacity(planetGroup, text);
-			});
-		}
-
-		if (planetGroup.moonMeshes && planetGroup.moonMeshes.length) {
-			planetGroup.moonMeshes.forEach((moonGroup) => {
-				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
-				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
-				moonGroup.position.set(
-					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-					0,
-					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-				);
-				moonGroup.rotation.z -= 0.01 * delta;
-				if (moonGroup.text) {
-					moonGroup.text.children.forEach((text) => {
-						fadeTextOpacity(moonGroup, text);
-					});
-				}
-			});
-		}
-
-		if (planetGroup.ringMeshes && planetGroup.ringMeshes.length) {
-			planetGroup.ringMeshes.forEach((ring) => {
-				ring.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
-				ring.rotation.z += 0.01 * delta;
-			});
-		}
-	});
-
 	controls.update();
 	renderer.render(scene, camera);
 };
 
 const animate = () => {
 	render();
-	composer.render();
-
 	window.requestAnimationFrame(animate);
 };
 
@@ -605,47 +614,50 @@ const initMousePointerOrbitEvents = () => {
 	let intersects = [];
 	let objsClickable = [];
 
-	const hasClickedSameTarget = () =>
-		objsClickable.length &&
-		outlinePass.selectedObjects.map((obj) => obj.name).indexOf(objsClickable[0].object.name) !== -1;
-
-	const returnClickableTarget = (e) => {
+	const returnClickedGroup = (e) => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
 		intersects = raycaster.intersectObjects(scene.children, true);
 		objsClickable = intersects.filter(
-			(intersect) => intersect.object && intersect.object.data && intersect.object.data.clickable
+			(intersect) => intersect.object && intersect.object.name.includes('click target')
 		);
-		return objsClickable || [];
+
+		const findParentGroup = (obj) => {
+			let objParent = obj.parent;
+			if (!objParent) return null;
+			if (objParent.type === 'Group') return objParent;
+			objParent = objParent.parent;
+			if (objParent.type === 'Group') return objParent;
+			objParent = objParent.parent;
+			if (objParent.type === 'Group') return objParent;
+
+			return null;
+		};
+
+		objsClickable = objsClickable.length && objsClickable[0].object ? findParentGroup(objsClickable[0].object) : null;
+
+		return objsClickable;
 	};
 
+	const hasClickedSameTarget = (e) =>
+		clickedGroup && returnClickedGroup(e) && clickedGroup.name === returnClickedGroup(e).name;
+
 	window.addEventListener('pointerdown', (e) => {
-		const objsClickable = returnClickableTarget(e);
+		clickedGroup = returnClickedGroup(e);
 
-		// only add an object if it's clickable and doesn't already exist in the clicked array
-		if (objsClickable.length && !hasClickedSameTarget()) {
+		if (clickedGroup) {
 			zoomToTarget = false;
-			// Note that we're selecting the PARENT 3D Object here, not the clicked mesh
+			// Note that we're selecting the GROUP here
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-			if (objsClickable[0].object.parent.type !== 'Scene') {
-				targetObject = objsClickable[0].object.parent;
-				labelLines.forEach((labelLine) => (labelLine.data.planetIsTargeted = false));
-				targetObject.labelLine.data.planetIsTargeted = true;
-				easeToTarget = true;
-			}
-
+			easeToTarget = true;
 			controls.update();
-			// add selected object
-			outlinePass.selectedObjects = [];
-			outlinePass.selectedObjects.push(objsClickable[0].object);
 		}
 	});
 
 	window.addEventListener('dblclick', (e) => {
-		const objsClickable = returnClickableTarget(e);
-		zoomToTarget = objsClickable.length && hasClickedSameTarget();
+		zoomToTarget = hasClickedSameTarget(e);
 	});
 
 	window.addEventListener('wheel', () => {
@@ -653,7 +665,7 @@ const initMousePointerOrbitEvents = () => {
 	});
 
 	window.addEventListener('pointerup', (e) => {
-		if (!objsClickable.length || !hasClickedSameTarget()) zoomToTarget = false;
+		if (!clickedGroup || !hasClickedSameTarget(e)) zoomToTarget = false;
 
 		// check pointer position deviation for x + y to see if we should unlock the camera from its target
 		const oldMousePos = [mouse.x, mouse.y];
@@ -666,7 +678,7 @@ const initMousePointerOrbitEvents = () => {
 		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
 		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
 		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
-		if (!mouseHasDeviated && !objsClickable.length && !hasClickedSameTarget() && outlinePass.selectedObjects.length) {
+		if (!mouseHasDeviated && !clickedGroup && !hasClickedSameTarget(e)) {
 			// creating new instance of controls xyz so it doesn't keep tracking an object
 			const newTarget = { ...controls.target };
 			const { x, y, z } = newTarget;
@@ -675,8 +687,7 @@ const initMousePointerOrbitEvents = () => {
 			easeToTarget = false;
 			controls.target.set(x, y, z);
 			controls.update();
-			outlinePass.selectedObjects = [];
-			labelLines.forEach((labelLine) => (labelLine.data.planetIsTargeted = false));
+			clickedGroup = null;
 		}
 	});
 };
@@ -684,35 +695,14 @@ const initMousePointerOrbitEvents = () => {
 const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	// renderer.outputEncoding = THREE.sRGBEncoding; // lights it up!
 	camera.position.y = 32;
 	camera.position.z = 100;
-
-	composer = new EffectComposer(renderer);
-	// const renderModel = new RenderPass(scene, camera);
-	// const effectBloom = new BloomPass(1.25);
-	// const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
-
-	outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-	// outlinePass.edgeStrength = _defaultOutlineEdgeStrength;
-	// outlinePass.edgeGlow = 1;
-	// outlinePass.edgeThickness = 1;
-	// outlinePass.visibleEdgeColor = new THREE.Color(0xffffff);
-	// outlinePass.hiddenEdgeColor = new THREE.Color(0x190a05);
-	// outlinePass.pulsePeriod = 5;
-	// outlinePass.clear = false;
-
-	// composer.addPass(renderModel);
-	// composer.addPass(outlinePass);
-
-	window.composer = composer;
 
 	addElements();
 	animate();
 	initMousePointerOrbitEvents();
 
 	window.scene = scene;
-	window.renderer = renderer;
 	console.log(window.scene);
 };
 
