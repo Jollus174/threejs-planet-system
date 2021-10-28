@@ -6,8 +6,13 @@ import * as THREE from 'three';
 // custom OrbitControls so can expose the dollyIn() and dollyOut() functions
 import { OrbitControls } from './modules/custom/jsm/controls/OrbitControls';
 
-import { getStandardDeviation, createCircleTexture, numberWithCommas, getBreakpoint } from './modules/utils';
-import { renderer } from './modules/renderer';
+import {
+	getStandardDeviation,
+	createCircleTexture,
+	createCircleFromPoints,
+	numberWithCommas,
+	getBreakpoint
+} from './modules/utils';
 import { setAsteroidPosition } from './modules/objects';
 import { loadManager } from './modules/loadManager';
 import { sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './modules/celestialBodies';
@@ -21,6 +26,12 @@ const scene = new THREE.Scene();
 window.camera = camera;
 let composer, outlinePass, sunMesh, sunMaterial, sunMaterialPerlin, sunAtmosphere;
 let delta;
+
+const domTarget = document.querySelector('#bg');
+const renderer = new THREE.WebGLRenderer({
+	canvas: domTarget,
+	antialias: true
+});
 
 const controls = new OrbitControls(camera, renderer.domElement);
 window.controls = controls;
@@ -45,8 +56,10 @@ const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const clock = new THREE.Clock();
 const planets = [],
+	planetGroups = [],
 	orbitLines = [],
 	labelLines = [],
+	targetLines = [],
 	textGroups = [];
 
 const isDesktop = ['screen-lg', 'screen-xl'].indexOf(getBreakpoint) !== -1;
@@ -59,6 +72,15 @@ let cubeRenderTarget1, cubeCamera1, sunMeshPerlin;
 let easeToTarget = false;
 let zoomToTarget = false;
 let clickedGroup;
+let hoveredGroups = []; // hoverGroups items will delete themselves once their timers hit 0
+let mouseHasMoved = false;
+let mouseClicked = false;
+let mouseHeld = false;
+window.mouseHeld = mouseHeld;
+const mouseHoverTimeoutDefault = 600; // for queueing up planet hovers
+const mouseClickTimoutDefault = 500; // for determining whether it's a click mouse press or a held one
+let mouseClickTimeout = mouseClickTimoutDefault;
+let mouseHoverTarget = null;
 
 const dollySpeedMax = 0.95;
 const dollySpeedMin = 0.999;
@@ -99,9 +121,11 @@ const addElements = () => {
 	// adding a bunch of planets
 	[sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune].forEach((planet) => {
 		const createLabelLine = (item, group) => {
+			if (!item.includeLabelLine) return;
+
 			const labelGeometry = {
-				origInnerRadius: item.size + 0.15,
-				origOuterRadius: item.size + 0.15,
+				origInnerRadius: item.size * 1.01 + 0.1 + 0.1,
+				origOuterRadius: item.size * 1.01 + 0.1 + 0.1,
 				origSegments: 90
 			};
 			const labelLine = new THREE.Mesh(
@@ -136,7 +160,7 @@ const addElements = () => {
 
 		const createClickTarget = (item, group) => {
 			const clickTarget = new THREE.Mesh(
-				new THREE.SphereBufferGeometry(item.size + 0.5, 10, 10),
+				new THREE.SphereBufferGeometry(isDesktop ? item.size + 0.5 : Math.min(item.size * 5, 8), 10, 10),
 				new THREE.MeshBasicMaterial({
 					side: THREE.FrontSide,
 					transparent: true,
@@ -150,7 +174,8 @@ const addElements = () => {
 		};
 
 		const createText = (item, group) => {
-			if (!item.name) return;
+			if (!item.textColour) return;
+
 			const fontGroup = new THREE.Group();
 
 			const createTextMesh = (geo, color) => {
@@ -169,6 +194,8 @@ const addElements = () => {
 						transparent: true
 					}) // side
 				]);
+
+				textMesh.renderOrder = 999; // will force text to always render on top, even on weird stuff (like Saturn's rings)
 
 				return textMesh;
 			};
@@ -190,7 +217,7 @@ const addElements = () => {
 				});
 				titleGeo.computeBoundingBox(); // for aligning the text
 
-				const titleMesh = createTextMesh(titleGeo, item.labelColour);
+				const titleMesh = createTextMesh(titleGeo, item.textColour);
 
 				const centreOffsetY = -0.5 * (titleGeo.boundingBox.max.y - titleGeo.boundingBox.min.y);
 				const rightOffset = titleGeo.boundingBox.min.x;
@@ -244,14 +271,28 @@ const addElements = () => {
 			group.add(fontGroup);
 		};
 
+		const createTargetLine = (item, group) => {
+			if (!item.includeTargetLine) return;
+
+			// the 1.01 helps offset larger bodies like Jupiter
+			const targetLineProps = createCircleFromPoints(item.size * 1.01 + 0.1);
+			const { geometry, material } = targetLineProps;
+
+			const targetLine = new THREE.Points(geometry, material);
+			targetLine.renderOrder = 999;
+			targetLine.name = `${item.name} target line`;
+			targetLines.push(targetLine);
+			group.targetLine = targetLine;
+			group.add(targetLine);
+		};
+
 		const createOrbitLine = (mesh, group, planetGroup) => {
 			const orbit = new THREE.Line(
-				new THREE.RingGeometry(group.data.orbitRadius, group.data.orbitRadius, 90),
-				new THREE.MeshBasicMaterial({
+				new THREE.RingBufferGeometry(group.data.orbitRadius, group.data.orbitRadius, 90),
+				new THREE.LineBasicMaterial({
 					color: 0xffffff,
 					transparent: true,
-					opacity: setOrbitVisibility(),
-					side: THREE.BackSide
+					opacity: setOrbitVisibility()
 				})
 			);
 			orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
@@ -292,6 +333,7 @@ const addElements = () => {
 			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
 		);
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
+		planetGroups.push(planetGroup);
 
 		planetMesh.name = `${planet.name} mesh`;
 		planetMesh.data = planetMesh.data || [];
@@ -357,6 +399,7 @@ const addElements = () => {
 
 		createClickTarget(planet, planetGroup);
 		createLabelLine(planet, planetGroup);
+		createTargetLine(planet, planetGroup);
 		createOrbitLine(planet, planetGroup);
 		createText(planet, planetGroup);
 
@@ -478,6 +521,29 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 	return (to - from) / incrementer;
 };
 
+// not sure how memory efficient it is to run this every frame
+const returnHoveredGroup = () => {
+	raycaster.setFromCamera(mouse, camera);
+	const intersects = raycaster.intersectObjects(scene.children, true);
+	let objsClickable = intersects.filter(
+		(intersect) => intersect.object && intersect.object.name.includes('click target')
+	);
+
+	const findParentGroup = (obj) => {
+		let objParent = obj.parent;
+		if (!objParent) return null;
+		if (objParent.type === 'Group') return objParent;
+		objParent = objParent.parent;
+		if (objParent.type === 'Group') return objParent;
+		objParent = objParent.parent;
+		if (objParent.type === 'Group') return objParent;
+
+		return null;
+	};
+
+	return objsClickable.length && objsClickable[0].object ? findParentGroup(objsClickable[0].object) : null;
+};
+
 const fadeTextOpacity = (group, text) => {
 	if (clickedGroup && clickedGroup.name === group.name && group.data.cameraDistance < group.data.zoomTo + 14) {
 		text.material.forEach((m) => {
@@ -490,39 +556,112 @@ const fadeTextOpacity = (group, text) => {
 	}
 };
 
+const fadeTargetLineOpacity = (group, targetLine) => {
+	let m = targetLine.material;
+	if (clickedGroup && clickedGroup.name === group.name) {
+		m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
+	} else {
+		m.opacity = m.opacity > 0 ? (m.opacity -= 0.05) : 0;
+	}
+};
+
+const initMousePointerOrbitEvents = () => {
+	let mouseClickLocation; // for passing to the pointerup event for mouse deviation calculations
+
+	const hasClickedSameTarget = () =>
+		clickedGroup && returnHoveredGroup() && returnHoveredGroup().name && clickedGroup.name;
+
+	window.addEventListener('mousemove', (e) => {
+		mouseHasMoved = true;
+		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+		if (mouseHoverTarget !== null) {
+			mouseHoverTarget.hoverTimeout = mouseHoverTimeoutDefault; // start a new timer on the obj
+			// checking to see if hoveredGroups already contains target
+			if (hoveredGroups.filter((group) => group.name === mouseHoverTarget.name).length === 0) {
+				hoveredGroups.push(mouseHoverTarget);
+			}
+		}
+	});
+
+	window.addEventListener('pointerdown', (e) => {
+		mouseClicked = true;
+		mouseClickTimeout = mouseClickTimoutDefault;
+		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+		mouseClickLocation = [mouse.x, mouse.y];
+	});
+
+	window.addEventListener('wheel', () => {
+		zoomToTarget = false;
+	});
+
+	window.addEventListener('pointerup', (e) => {
+		mouseClicked = false;
+
+		// check pointer position deviation for x + y to see if we should unlock the camera from its target
+		const oldMousePos = [mouseClickLocation[0], mouseClickLocation[1]];
+		const newMousePos = [(e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1];
+		const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
+			yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
+
+		const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
+		if (mouseHasDeviated || mouseHeld) return;
+
+		clickedGroup = returnHoveredGroup();
+		if (clickedGroup) {
+			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
+			easeToTarget = true;
+			zoomToTarget = true;
+			controls.update();
+			}
+
+		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
+		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
+		if (!mouseHasDeviated && !mouseHeld && !clickedGroup && !hasClickedSameTarget()) {
+			// creating new instance of controls xyz so it doesn't keep tracking an object
+			const newTarget = { ...controls.target };
+			const { x, y, z } = newTarget;
+
+			// To make camera stop following
+			easeToTarget = false;
+			controls.target.set(x, y, z);
+			controls.update();
+			clickedGroup = null;
+			}
+	});
+};
+
 const render = () => {
+	mouseHoverTarget = mouseHasMoved ? returnHoveredGroup() : mouseHoverTarget;
+	if (mouseClicked) {
+		mouseClickTimeout -= 60;
+		mouseHeld = mouseClickTimeout <= 0 ? mouseHeld : false;
+		} else {
+		mouseClickTimeout = mouseClickTimoutDefault;
+			}
+
+	if (mouseHoverTarget !== null) {
+		domTarget.classList.add('object-hovered');
+		mouseHoverTarget.hoverTimeout = mouseHoverTimeoutDefault; // start a new timer on the obj
+		// checking to see if hoveredGroups already contains target
+		if (hoveredGroups.filter((g) => g.name === mouseHoverTarget.name).length === 0) {
+			hoveredGroups.push(mouseHoverTarget);
+			}
+	} else {
+		domTarget.classList.remove('object-hovered');
+		}
+
 	delta = 5 * clock.getDelta();
 	orbitCentroid.rotation.y -= 0.000425 * delta;
 
 	labelLines.forEach((labelLine) => {
 		labelLine.lookAt(camera.position);
+	});
 
-		let innerRadius = labelLine.geometry.parameters.innerRadius;
-		let outerRadius = labelLine.geometry.parameters.outerRadius;
-		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
-
-		let regenerate = false;
-		if (clickedGroup && labelLine.parent.name === clickedGroup.name) {
-			if (outerRadius < origOuterRadius + 0.25) {
-				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius + 0.25, incrementer: 15 });
-				regenerate = true;
-			}
-			if (regenerate) {
-				labelLine.geometry.dispose(); // running this is recommended but seems pointless
-				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
-			}
-		} else {
-			if (outerRadius > origOuterRadius) {
-				// will interpolate linearly
-				outerRadius += easeTo({ from: outerRadius + 0.5, to: origOuterRadius, incrementer: 50 });
-				regenerate = true;
-			}
-
-			if (regenerate) {
-				labelLine.geometry.dispose();
-				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
-			}
-		}
+	hoveredGroups.forEach((group, i, arr) => {
+		if (!mouseHoverTarget || mouseHoverTarget.name !== group.name) group.hoverTimeout -= 60;
+		if (group.hoverTimeout <= 0) arr.splice(i, 1); // remove item from array when timeout hits 0
 	});
 
 	planets.forEach((planetGroup) => {
@@ -555,6 +694,41 @@ const render = () => {
 		}
 
 		planetGroup.children.forEach((child) => {
+			if (child.name.includes('label line')) {
+				const labelLine = child;
+
+				let innerRadius = labelLine.geometry.parameters.innerRadius;
+				let outerRadius = labelLine.geometry.parameters.outerRadius;
+				const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
+				let regenerate = false;
+				if (hoveredGroups.filter((g) => g.name === planetGroup.name).length) {
+					if (outerRadius < origOuterRadius + 0.075) {
+						outerRadius += easeTo({ from: outerRadius, to: origOuterRadius + 0.075, incrementer: 15 });
+						regenerate = true;
+					}
+					if (regenerate) {
+						labelLine.geometry.dispose(); // running this is recommended but seems pointless
+						labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
+					}
+				} else {
+					if (outerRadius > origOuterRadius) {
+						// will interpolate linearly
+						outerRadius += easeTo({ from: outerRadius + 0.5, to: origOuterRadius, incrementer: 50 });
+						regenerate = true;
+					}
+					if (regenerate) {
+						labelLine.geometry.dispose();
+						labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
+					}
+				}
+			}
+
+			if (child.name.includes('target line')) {
+				const targetLine = child;
+				targetLine.lookAt(camera.position);
+				fadeTargetLineOpacity(planetGroup, targetLine);
+			}
+
 			if (child.name.includes('ring')) {
 				const ring = child;
 				ring.rotation.z += 0.01 * delta;
@@ -596,8 +770,6 @@ const render = () => {
 			const amountToIncrease = (dollySpeedMin - dollySpeedMax) * amountComplete;
 			const dollySpeed = Math.min(dollySpeedMax + amountToIncrease, dollySpeedMin);
 			controls.dollyIn(dollySpeed);
-		} else {
-			zoomToTarget = false;
 		}
 	}
 
@@ -608,88 +780,6 @@ const render = () => {
 const animate = () => {
 	render();
 	window.requestAnimationFrame(animate);
-};
-
-const initMousePointerOrbitEvents = () => {
-	let intersects = [];
-	let objsClickable = [];
-
-	const returnClickedGroup = (e) => {
-		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-		raycaster.setFromCamera(mouse, camera);
-		intersects = raycaster.intersectObjects(scene.children, true);
-		objsClickable = intersects.filter(
-			(intersect) => intersect.object && intersect.object.name.includes('click target')
-		);
-
-		const findParentGroup = (obj) => {
-			let objParent = obj.parent;
-			if (!objParent) return null;
-			if (objParent.type === 'Group') return objParent;
-			objParent = objParent.parent;
-			if (objParent.type === 'Group') return objParent;
-			objParent = objParent.parent;
-			if (objParent.type === 'Group') return objParent;
-
-			return null;
-		};
-
-		objsClickable = objsClickable.length && objsClickable[0].object ? findParentGroup(objsClickable[0].object) : null;
-
-		return objsClickable;
-	};
-
-	const hasClickedSameTarget = (e) =>
-		clickedGroup && returnClickedGroup(e) && clickedGroup.name === returnClickedGroup(e).name;
-
-	window.addEventListener('pointerdown', (e) => {
-		clickedGroup = returnClickedGroup(e);
-
-		if (clickedGroup) {
-			zoomToTarget = false;
-			// Note that we're selecting the GROUP here
-			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-			easeToTarget = true;
-			controls.update();
-		}
-	});
-
-	window.addEventListener('dblclick', (e) => {
-		zoomToTarget = hasClickedSameTarget(e);
-	});
-
-	window.addEventListener('wheel', () => {
-		zoomToTarget = false;
-	});
-
-	window.addEventListener('pointerup', (e) => {
-		if (!clickedGroup || !hasClickedSameTarget(e)) zoomToTarget = false;
-
-		// check pointer position deviation for x + y to see if we should unlock the camera from its target
-		const oldMousePos = [mouse.x, mouse.y];
-		const newMousePos = [(e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1];
-		const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
-			yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
-
-		const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
-
-		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
-		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
-		// console.log({ mouseHasDeviated, timerPassed, hasClickedSameTarget, selectedObjects: outlinePass.selectedObjects });
-		if (!mouseHasDeviated && !clickedGroup && !hasClickedSameTarget(e)) {
-			// creating new instance of controls xyz so it doesn't keep tracking an object
-			const newTarget = { ...controls.target };
-			const { x, y, z } = newTarget;
-
-			// To make camera stop following
-			easeToTarget = false;
-			controls.target.set(x, y, z);
-			controls.update();
-			clickedGroup = null;
-		}
-	});
 };
 
 const init = () => {

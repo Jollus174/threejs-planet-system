@@ -30,6 +30,10 @@ canvas[id='bg'] {
 	visibility: visible;
 }
 
+.object-hovered {
+	cursor: pointer;
+}
+
 /* .loading canvas[id='bg'] {
 	visibility: hidden;
 }

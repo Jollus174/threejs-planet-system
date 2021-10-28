@@ -33,7 +33,10 @@ const sun = {
 	size: 8,
 	segments: 32,
 	labelColour: '#ffb01f',
+	textColour: '#ffb01f',
 	zoomTo: 26,
+	includeLabelLine: false,
+	includeTargetLine: false,
 	statsScale: 2.2,
 	stats: {
 		diameter: 1391980
@@ -59,6 +62,9 @@ const mercury = {
 	segments: 32,
 	zoomTo: 10,
 	labelColour: '#b78668',
+	textColour: '#b78668',
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 57900000,
@@ -79,7 +85,10 @@ const venus = {
 	size: 0.8,
 	segments: 32,
 	labelColour: '#f3b3b3',
+	textColour: '#f3b3b3',
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 108160000,
@@ -100,7 +109,10 @@ const earth = {
 	size: 1,
 	segments: 32,
 	labelColour: '#6dcbe7',
+	textColour: '#6dcbe7',
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 149600000,
@@ -120,7 +132,10 @@ const earth = {
 			size: 0.4,
 			segments: 32,
 			labelColour: '#dae0e0',
+			textColour: '#dae0e0',
 			zoomTo: 10,
+			includeLabelLine: true,
+			includeTargetLine: true,
 			statsScale: 1,
 			stats: {
 				diameter: 3478.8,
@@ -142,7 +157,10 @@ const mars = {
 	size: 0.6,
 	segments: 32,
 	labelColour: '#fe9657',
+	textColour: '#fe9657',
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 227936640,
@@ -163,7 +181,10 @@ const jupiter = {
 	size: 2.4,
 	segments: 64,
 	labelColour: '#e0ab79',
+	textColour: '#e0ab79',
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 778369000,
@@ -183,7 +204,10 @@ const saturn = {
 	size: 2.2,
 	segments: 64,
 	labelColour: '#ffe577',
+	textColour: '#ffe577',
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 14278034000,
@@ -213,6 +237,8 @@ const uranus = {
 	size: 1.4,
 	segments: 64,
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 2870658186,
@@ -222,6 +248,7 @@ const uranus = {
 		gravity: 1.11
 	},
 	labelColour: '#c8ecef',
+	textColour: '#c8ecef',
 	material: {
 		map: textureUranus
 	}
@@ -233,6 +260,8 @@ const neptune = {
 	size: 1.4,
 	segments: 64,
 	zoomTo: 10,
+	includeLabelLine: true,
+	includeTargetLine: true,
 	statsScale: 1,
 	stats: {
 		distanceToSun: 4496976000,
@@ -242,6 +271,7 @@ const neptune = {
 		gravity: 1.21
 	},
 	labelColour: '#3b54d2',
+	textColour: '#3b54d2',
 	material: {
 		map: textureNeptune
 	}

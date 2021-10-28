@@ -1,5 +1,5 @@
 'use strict';
-import { Texture } from 'three';
+import { Texture, BufferGeometry, Vector3, PointsMaterial } from 'three';
 
 // get deviation between a set of values stored in an array
 const getStandardDeviation = (array) => {
@@ -28,6 +28,30 @@ const createCircleTexture = (color, size) => {
 	return texture;
 };
 
+const createCircleFromPoints = (radius) => {
+	const points = [];
+
+	for (let i = 0; i <= 360; i++) {
+		points.push(new Vector3(Math.sin(i * (Math.PI / 180)) * radius, Math.cos(i * (Math.PI / 180)) * radius, 0));
+	}
+
+	const geometry = new BufferGeometry().setFromPoints(points);
+
+	const lineProps = {
+		geometry,
+		material: new PointsMaterial({
+			color: 0xffffff,
+			transparent: true,
+			opacity: 0.05,
+			size: 0.025,
+			depthTest: false,
+			depthWrite: false
+		})
+	};
+
+	return lineProps;
+};
+
 const numberWithCommas = (n) => {
 	if (!n) return;
 	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -38,4 +62,4 @@ const getBreakpoint = window
 	.getPropertyValue('content')
 	.replace(/["']/g, '');
 
-export { getStandardDeviation, createCircleTexture, numberWithCommas, getBreakpoint };
+export { getStandardDeviation, createCircleTexture, createCircleFromPoints, numberWithCommas, getBreakpoint };
