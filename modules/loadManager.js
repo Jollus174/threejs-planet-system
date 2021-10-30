@@ -1,5 +1,5 @@
 'use strict';
-import { LoadingManager } from 'three';
+import { LoadingManager, TextureLoader, FontLoader } from 'three';
 
 const loadManager = () => {
 	const manager = new LoadingManager();
@@ -22,4 +22,8 @@ const loadManager = () => {
 	return manager;
 };
 
-export { loadManager };
+const textureLoader = new TextureLoader(loadManager());
+
+const fontLoader = new FontLoader(loadManager());
+
+export { loadManager, textureLoader, fontLoader };

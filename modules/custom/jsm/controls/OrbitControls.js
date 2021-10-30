@@ -1,4 +1,7 @@
+// not my file, I'm just making small edits
+/* jshint ignore:start */
 import { EventDispatcher, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 } from 'three';
+import { state as stateDefault } from '../../../state';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -1042,3 +1045,4 @@ class MapControls extends OrbitControls {
 }
 
 export { OrbitControls, MapControls };
+/* jshint ignore:end */
