@@ -39,6 +39,12 @@ const buildMoon = (moonData, planetGroup) => {
 
 	moonGroup.orbitLine = orbitLine.build(moonData);
 
+	moonGroup.position.set(
+		planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+		planetGroup.position.y + 0,
+		planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+	);
+
 	moonMesh.name = `${moonData.name} moon mesh`;
 
 	moonGroup.add(moonMesh);

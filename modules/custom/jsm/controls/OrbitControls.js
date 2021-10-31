@@ -834,6 +834,8 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function onMouseWheel(event) {
+			stateDefault.mouseState._zoomToTarget = false;
+
 			if (scope.enabled === false || scope.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE))
 				return;
 
@@ -854,6 +856,7 @@ class OrbitControls extends EventDispatcher {
 
 		function onTouchStart(event) {
 			trackPointer(event);
+			stateDefault.mouseState._zoomToTarget = false;
 
 			switch (pointers.length) {
 				case 1:

@@ -64,14 +64,16 @@ const render = () => {
 		state.controls.update();
 	}
 
+	text.renderLoop(state.bodies._sun);
+
 	state.bodies._planetGroups.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		planetGroup.position.set(
-			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-			0,
-			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		);
+		// planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		// planetGroup.data.orbit += planetGroup.data.orbitSpeed;
+		// planetGroup.position.set(
+		// 	Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
+		// 	0,
+		// 	Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
+		// );
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
 		text.renderLoop(planetGroup);
@@ -81,16 +83,16 @@ const render = () => {
 
 		if (planetGroup.moons) {
 			planetGroup.moons.forEach((moonGroup) => {
+				// moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
+
+				// moonGroup.position.set(
+				// 	planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+				// 	planetGroup.position.y + 0,
+				// 	planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+				// );
+
+				// moonGroup.rotation.z -= 0.01 * delta;
 				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
-				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
-
-				moonGroup.position.set(
-					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-					planetGroup.position.y + 0,
-					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-				);
-
-				moonGroup.rotation.z -= 0.01 * delta;
 
 				text.renderLoop(moonGroup);
 				labelLine.renderLoop(moonGroup);
@@ -117,7 +119,7 @@ const render = () => {
 	if (state.mouseState._clickedGroup && state.mouseState._zoomToTarget) {
 		const objZoomTo = state.mouseState._clickedGroup.data.zoomTo || 0;
 		const distanceToTarget = state.controls.getDistance();
-		const distCalc = Math.max(10, objZoomTo + (state.isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
+		const distCalc = Math.max(5, objZoomTo + (state.isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
 
 		if (distanceToTarget > distCalc) {
 			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
@@ -127,6 +129,14 @@ const render = () => {
 				settings.controls._dollySpeedMin
 			);
 			state.controls.dollyIn(settings.controls._dollySpeed);
+		} else if (distanceToTarget + 0.1 < distCalc) {
+			const amountComplete = distanceToTarget / distCalc; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
+			settings.controls._dollySpeed = Math.min(
+				settings.controls._dollySpeedMax + amountToIncrease,
+				settings.controls._dollySpeedMin
+			);
+			state.controls.dollyOut(settings.controls._dollySpeed);
 		}
 	}
 
@@ -143,16 +153,28 @@ const init = () => {
 	state.skybox = skybox(skyboxTexturePaths);
 	state.bodies._starField = starField();
 	state.bodies._asteroidBelt = asteroidBelt();
-	state.bodies._sun = planet(sunData);
 	state.bodies._planetGroups = [];
 	state.bodies._labelLines = [];
 	state.bodies._targetlines = [];
 	state.bodies._orbitLines = [];
 	state.bodies._textGroups = [];
+	state.bodies._navigable = [];
+
+	const sunBuild = planet(sunData);
+	state.bodies._sun = sunBuild;
+	state.bodies._targetLines.push(sunBuild.targetLine);
+	console.log(sunBuild.textGroup);
+	state.bodies._textGroups.push(sunBuild.textGroup);
+	state.bodies._navigable.push(state.bodies._sun);
+
 	planetData.forEach((pData) => {
 		const planetBuild = planet(pData);
+		state.bodies._navigable.push(planetBuild);
 		state.bodies._planetGroups.push(planetBuild);
-		if (planetBuild.moons) state.bodies._moonGroups.push(planetBuild.moons);
+		if (planetBuild.moons) {
+			state.bodies._moonGroups.push(planetBuild.moons);
+			state.bodies._navigable.push(...planetBuild.moons);
+		}
 		state.bodies._labelLines.push(planetBuild.labelLine);
 		state.bodies._targetLines.push(planetBuild.targetLine);
 		state.bodies._orbitLines.push(planetBuild.orbitLine);
@@ -202,5 +224,41 @@ window.addEventListener('resize', () => {
 });
 
 settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
-	state.orbitLines.forEach((orbitLine) => (orbitLine.material.opacity = setOrbitVisibility()));
+	state.bodies._orbitLines.forEach((orbitLine) => (orbitLine.material.visible = setOrbitVisibility()));
+});
+
+document.addEventListener('keydown', (e) => {
+	if (e.code === 'KeyZ' || e.code === 'KeyC') {
+		const navigableLength = state.bodies._navigable.length;
+		state.mouseState._zoomToTarget = true;
+		if (e.code === 'KeyZ') {
+			if (!state.mouseState._clickedGroup) {
+				state.mouseState._clickedGroup = state.bodies._navigable[navigableLength - 1];
+				return;
+			}
+
+			const targetName = state.mouseState._clickedGroup.name;
+			const targetIndex = state.bodies._navigable.findIndex((planetGroup) => planetGroup.name === targetName);
+			const prevTarget =
+				targetIndex - 1 < 0 ? state.bodies._navigable[navigableLength - 1] : state.bodies._navigable[targetIndex - 1];
+			state.mouseState._clickedGroup = prevTarget;
+		}
+
+		if (e.code === 'KeyC') {
+			// going to next planet. In final implementation need to go through moons first
+			// will either be the next planet or the first one (or the sun, hmmm)
+			if (!state.mouseState._clickedGroup) {
+				state.mouseState._clickedGroup = state.bodies._planetGroups[1]; // start off with a planet instead of sun since more interesting
+				return;
+			}
+
+			const targetName = state.mouseState._clickedGroup.name;
+			const targetIndex = state.bodies._navigable.findIndex((planetGroup) => planetGroup.name === targetName);
+			const nextTarget =
+				state.bodies._planetGroups.length === targetIndex + 1
+					? state.bodies._navigable[0]
+					: state.bodies._navigable[targetIndex + 1];
+			state.mouseState._clickedGroup = nextTarget;
+		}
+	}
 });

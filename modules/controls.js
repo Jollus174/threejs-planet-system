@@ -7,9 +7,11 @@ import { renderer } from './renderer';
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.minDistance = 10;
+controls.minDistance = 5;
 controls.maxDistance = 650;
 controls.enableKeys = true;
+controls.minPolarAngle = 0.5;
+controls.maxPolarAngle = 2.5;
 controls.keys = {
 	LEFT: 'KeyA',
 	UP: 'KeyW',

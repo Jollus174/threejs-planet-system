@@ -7,9 +7,11 @@ import textureMoon from './../../img/textures/moon.jpg';
 import textureMars from './../../img/textures/mars.jpg';
 import textureJupiter from './../../img/textures/jupiter.jpg';
 import textureSaturn from './../../img/textures/saturn.jpg';
-import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
 import textureUranus from './../../img/textures/uranus.jpg';
 import textureNeptune from './../../img/textures/neptune.jpg';
+
+import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
+import textureRing from './../../img/textures/texture-ring.jpg';
 
 import normalMercury from './../../img/textures/normal-mercury.jpg';
 import normalVenus from './../../img/textures/normal-venus.jpg';
@@ -125,13 +127,14 @@ const planetData = [
 		},
 		moons: [
 			{
+				// TODO: reduce text size of moons... implement text sizing within the data
 				name: 'Luna',
 				orbitRadius: 2.2,
 				size: 0.4,
 				segments: 32,
 				labelColour: '#dae0e0',
 				textColour: '#dae0e0',
-				zoomTo: 10,
+				zoomTo: 5,
 				includeOrbitLine: true,
 				includeLabelLine: true,
 				includeTargetLine: true,
@@ -194,7 +197,21 @@ const planetData = [
 		},
 		material: {
 			map: textureJupiter
-		}
+		},
+		rings: [
+			{
+				start: 2.7,
+				end: 4.2,
+				angle: 85,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureSaturnRing,
+					side: DoubleSide
+				}
+			}
+		]
 	},
 	{
 		name: 'saturn',
@@ -220,6 +237,9 @@ const planetData = [
 		},
 		rings: [
 			{
+				start: 2.4,
+				end: 5,
+				angle: 75,
 				material: {
 					color: 0xffffff,
 					transparent: true,
@@ -250,7 +270,33 @@ const planetData = [
 		textColour: '#c8ecef',
 		material: {
 			map: textureUranus
-		}
+		},
+		rings: [
+			{
+				start: 2.0,
+				end: 2.2,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.05,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.25,
+				end: 2.4,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureRing,
+					side: DoubleSide
+				}
+			}
+		]
 	},
 	{
 		name: 'neptune',
@@ -273,7 +319,57 @@ const planetData = [
 		textColour: '#3b54d2',
 		material: {
 			map: textureNeptune
-		}
+		},
+		rings: [
+			{
+				start: 2.0,
+				end: 2.05,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.05,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.08,
+				end: 2.11,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.05,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.17,
+				end: 2.4,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.45,
+				end: 2.5,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureRing,
+					side: DoubleSide
+				}
+			}
+		]
 	}
 ];
 

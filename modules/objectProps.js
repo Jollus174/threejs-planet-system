@@ -7,10 +7,7 @@ import { checkIfDesktop, easeTo, fadeTextOpacity, fadeTargetLineOpacity } from '
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 
 const setOrbitVisibility = () => {
-	let { _orbitLinesVisible } = state.orbitLines;
-	const { _orbitVisibilityCheckbox, _orbitVisibilityDefault } = settings.orbitLines;
-	_orbitLinesVisible = _orbitVisibilityCheckbox.checked;
-	return _orbitLinesVisible ? _orbitVisibilityDefault : 0;
+	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
 };
 
 const text = {
@@ -185,7 +182,7 @@ const rings = {
 		const ringsArr = [];
 		item.rings.forEach((ring, i) => {
 			const ringMesh = new THREE.Mesh(
-				ringUVMapGeometry(2.4, 5),
+				ringUVMapGeometry(ring.start, ring.end),
 				new THREE.MeshBasicMaterial({
 					...ring.material,
 					map: textureLoader.load(ring.material.map)
@@ -193,6 +190,7 @@ const rings = {
 			);
 
 			ringMesh.name = `${item.name} ring ${i}`;
+			ringMesh.rotation.x = THREE.Math.degToRad(ring.angle);
 			ringsArr.push(ringMesh);
 		});
 
@@ -203,7 +201,6 @@ const rings = {
 		const rings = planetGroup.rings;
 		rings.forEach((ring) => {
 			ring.rotation.z += 0.01;
-			ring.rotation.x = THREE.Math.degToRad(75);
 		});
 	}
 };
@@ -238,7 +235,8 @@ const orbitLine = {
 			new THREE.LineBasicMaterial({
 				color: 0xffffff,
 				transparent: true,
-				opacity: setOrbitVisibility()
+				opacity: 0.1,
+				visible: setOrbitVisibility()
 			})
 		);
 		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
@@ -250,8 +248,9 @@ const orbitLine = {
 
 const clickTarget = {
 	build: (item) => {
+		// TODO: shrink this down on mobile when the camera is close
 		const clickTargetMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(checkIfDesktop() ? item.size : Math.min(item.size * 5, 8), 10, 10),
+			new THREE.SphereBufferGeometry(checkIfDesktop() ? item.size + 0.5 : Math.min(item.size * 5, 8), 10, 10),
 			new THREE.MeshBasicMaterial({
 				side: THREE.FrontSide,
 				visible: false, // this should allow it to be picked up by Raycaster, whilst being invisible

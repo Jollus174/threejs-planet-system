@@ -17,8 +17,7 @@ const settings = {
 		}
 	},
 	orbitLines: {
-		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines'),
-		_orbitVisibilityDefault: 0.06
+		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
 	},
 	domTarget: document.querySelector('#bg')
 };

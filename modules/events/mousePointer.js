@@ -30,13 +30,14 @@ const returnHoveredGroup = () => {
 	return objsClickable.length && objsClickable[0].object ? findParentGroup(objsClickable[0].object) : null;
 };
 
-const initMousePointerEvents = () => {
-	const hasClickedSameTarget = () =>
-		state.mouseState._clickedGroup &&
-		returnHoveredGroup() &&
-		returnHoveredGroup().name &&
-		state.mouseState._clickedGroup.name;
+const hasClickedSameTarget = () =>
+	state.mouseState._clickedGroup &&
+	returnHoveredGroup() &&
+	returnHoveredGroup().name &&
+	state.mouseState._clickedGroup.name &&
+	returnHoveredGroup().name === state.mouseState._clickedGroup.name;
 
+const initMousePointerEvents = () => {
 	window.addEventListener('mousemove', (e) => {
 		state.mouseState._mouseHasMoved = true;
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -49,10 +50,6 @@ const initMousePointerEvents = () => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 		state.mouseState._mouseClickLocation = [mouse.x, mouse.y];
-	});
-
-	window.addEventListener('wheel', () => {
-		state.mouseState._zoomToTarget = false;
 	});
 
 	window.addEventListener('pointerup', () => {
