@@ -137,7 +137,7 @@ const labelLine = {
 			})
 		);
 		labelLine.name = `${item.name} group label line`;
-		labelLine.data = labelLine.data || [];
+		labelLine.data = labelLine.data || {};
 		labelLine.data.labelGeometryOriginal = labelGeometry;
 		labelLine.data.planetIsTargeted = false;
 
@@ -248,9 +248,11 @@ const orbitLine = {
 
 const clickTarget = {
 	build: (item) => {
-		// TODO: shrink this down on mobile when the camera is close
+		const clickTargetSizeMobile = Math.min(item.size * 5, 8),
+			clickTargetSizeDesktop = item.size + 0.5;
+
 		const clickTargetMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(checkIfDesktop() ? item.size + 0.5 : Math.min(item.size * 5, 8), 10, 10),
+			new THREE.SphereBufferGeometry(checkIfDesktop() ? clickTargetSizeDesktop : clickTargetSizeMobile, 10, 10),
 			new THREE.MeshBasicMaterial({
 				side: THREE.FrontSide,
 				visible: false, // this should allow it to be picked up by Raycaster, whilst being invisible
@@ -259,8 +261,38 @@ const clickTarget = {
 		);
 
 		clickTargetMesh.name = `${item.name} click target`;
+		clickTargetMesh.data = clickTargetMesh.data || {};
+		clickTargetMesh.data.clickTargetSizeMobile = clickTargetSizeMobile;
+		clickTargetMesh.data.clickTargetSizeDesktop = clickTargetSizeDesktop;
 
 		return clickTargetMesh;
+	},
+
+	renderLoop: (planetGroup) => {
+		if (!planetGroup || !planetGroup.clickTarget) return;
+		if (planetGroup.data.cameraDistance - planetGroup.data.zoomTo < 30) {
+			// making sure the geometry is only redrawn once to save performance
+			if (planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.data.size) {
+				planetGroup.clickTarget.geometry.dispose();
+				planetGroup.clickTarget.geometry = new THREE.SphereBufferGeometry(planetGroup.data.size, 10, 10);
+			}
+		} else {
+			if (
+				(state.isDesktop &&
+					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeDesktop) ||
+				(!state.isDesktop &&
+					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeMobile)
+			) {
+				planetGroup.clickTarget.geometry.dispose();
+				planetGroup.clickTarget.geometry = new THREE.SphereBufferGeometry(
+					state.isDesktop
+						? planetGroup.clickTarget.data.clickTargetSizeDesktop
+						: planetGroup.clickTarget.data.clickTargetSizeMobile,
+					10,
+					10
+				);
+			}
+		}
 	}
 };
 

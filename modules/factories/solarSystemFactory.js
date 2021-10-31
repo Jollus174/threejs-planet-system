@@ -17,7 +17,8 @@ const buildMoon = (moonData, planetGroup) => {
 
 	const moonGroup = new THREE.Group();
 	moonGroup.name = `${moonData.name} moon group`;
-	moonGroup.data = moonGroup.data || [];
+	moonGroup.data = moonGroup.data || {};
+	moonGroup.data.size = moonData.size;
 	moonGroup.data.orbit = Math.random() * Math.PI * 2;
 	moonGroup.data.orbitRadius = moonData.orbitRadius;
 	moonGroup.data.orbitSpeed = 0.05 / moonData.orbitRadius;
@@ -86,7 +87,8 @@ const planet = (planetData) => {
 	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
 
 	planetGroup.name = `${planetData.name} group`;
-	planetGroup.data = planetGroup.data || [];
+	planetGroup.data = planetData.data || {};
+	planetGroup.data.size = planetData.size;
 	planetGroup.data.orbitRadius = planetData.orbitRadius;
 	planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;
 	planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
@@ -102,8 +104,8 @@ const planet = (planetData) => {
 	planetGroup.data.cameraDistance = null; // to set in the render loop
 
 	planetMesh.name = `${planetData.name} mesh`;
-	planetMesh.data = planetMesh.data || [];
-	planetMesh.size = planetData.size;
+	planetMesh.data = planetMesh.data || {};
+	planetMesh.data.size = planetData.size;
 
 	if (planetData.moons && planetData.moons.length) {
 		planetData.moons.forEach((moon) => {

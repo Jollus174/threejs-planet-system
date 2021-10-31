@@ -8,7 +8,7 @@ import { settings } from './modules/settings';
 import { renderer } from './modules/renderer';
 import { easeTo, calculatePlanetDistance, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { setOrbitVisibility, targetLine, labelLine, text, rings } from './modules/objectProps';
+import { setOrbitVisibility, targetLine, labelLine, clickTarget, text, rings } from './modules/objectProps';
 import { skyboxTexturePaths, sunData, planetData } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField, planet } from './modules/factories/solarSystemFactory';
 import { returnHoveredGroup, initMousePointerEvents } from './modules/events/mousePointer';
@@ -75,6 +75,7 @@ const render = () => {
 		// );
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
+		clickTarget.renderLoop(planetGroup);
 		text.renderLoop(planetGroup);
 		labelLine.renderLoop(planetGroup);
 		targetLine.renderLoop(planetGroup);
@@ -93,6 +94,7 @@ const render = () => {
 				// moonGroup.rotation.z -= 0.01 * delta;
 				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
 
+				clickTarget.renderLoop(moonGroup);
 				text.renderLoop(moonGroup);
 				labelLine.renderLoop(moonGroup);
 				targetLine.renderLoop(moonGroup);
@@ -147,7 +149,6 @@ const init = () => {
 	const sunBuild = planet(sunData);
 	state.bodies._sun = sunBuild;
 	state.bodies._targetLines.push(sunBuild.targetLine);
-	console.log(sunBuild.textGroup);
 	state.bodies._textGroups.push(sunBuild.textGroup);
 	state.bodies._navigable.push(state.bodies._sun);
 
