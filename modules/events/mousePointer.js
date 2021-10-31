@@ -67,8 +67,7 @@ const initMousePointerEvents = () => {
 		state.mouseState._clickedGroup = returnHoveredGroup();
 		if (state.mouseState._clickedGroup) {
 			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-			state.mouseState._easeToTarget = true;
-			state.mouseState._zoomToTarget = true;
+			state.cameraState._zoomToTarget = true;
 			state.controls.update();
 		}
 
@@ -85,7 +84,6 @@ const initMousePointerEvents = () => {
 			const { x, y, z } = newTarget;
 
 			// To make camera stop following
-			state.mouseState._easeToTarget = false;
 			state.controls.target.set(x, y, z);
 			state.controls.update();
 			state.mouseState._clickedGroup = null;

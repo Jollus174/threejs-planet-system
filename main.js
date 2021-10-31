@@ -60,7 +60,6 @@ const render = () => {
 
 	if (state.mouseState._clickedGroup) {
 		// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-		state.mouseState._easeToTarget = true;
 		state.controls.update();
 	}
 
@@ -101,22 +100,13 @@ const render = () => {
 		}
 	});
 
-	if (state.mouseState._clickedGroup && state.mouseState._easeToTarget) {
-		const easeX = easeTo({ from: state.controls.target.x, to: state.mouseState._clickedGroup.position.x });
-		const easeY = easeTo({ from: state.controls.target.y, to: state.mouseState._clickedGroup.position.y });
-		const easeZ = easeTo({ from: state.controls.target.z, to: state.mouseState._clickedGroup.position.z });
-		if (easeX) state.controls.target.x += easeX;
-		if (easeY) state.controls.target.y += easeY;
-		if (easeZ) state.controls.target.z += easeZ;
-
-		if (!easeX && !easeY && !easeZ) {
-			state.mouseState._easeToTarget = false;
-			// this line causes the sun to lock itself to the camera and then move around with it. Very strange
-			// controls.target = targetObject.position; // this will make sure the camera is locked to the target and will persist after easing
-		}
+	if (state.mouseState._clickedGroup) {
+		state.controls.target.x += easeTo({ from: state.controls.target.x, to: state.mouseState._clickedGroup.position.x });
+		state.controls.target.y += easeTo({ from: state.controls.target.y, to: state.mouseState._clickedGroup.position.y });
+		state.controls.target.z += easeTo({ from: state.controls.target.z, to: state.mouseState._clickedGroup.position.z });
 	}
 
-	if (state.mouseState._clickedGroup && state.mouseState._zoomToTarget) {
+	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
 		const objZoomTo = state.mouseState._clickedGroup.data.zoomTo || 0;
 		const distanceToTarget = state.controls.getDistance();
 		const distCalc = Math.max(5, objZoomTo + (state.isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
@@ -124,19 +114,19 @@ const render = () => {
 		if (distanceToTarget > distCalc) {
 			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
-			settings.controls._dollySpeed = Math.min(
+			state.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
 				settings.controls._dollySpeedMin
 			);
-			state.controls.dollyIn(settings.controls._dollySpeed);
+			state.controls.dollyIn(state.cameraState._dollySpeed);
 		} else if (distanceToTarget + 0.1 < distCalc) {
 			const amountComplete = distanceToTarget / distCalc; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
-			settings.controls._dollySpeed = Math.min(
+			state.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
 				settings.controls._dollySpeedMin
 			);
-			state.controls.dollyOut(settings.controls._dollySpeed);
+			state.controls.dollyOut(state.cameraState._dollySpeed);
 		}
 	}
 
@@ -153,12 +143,6 @@ const init = () => {
 	state.skybox = skybox(skyboxTexturePaths);
 	state.bodies._starField = starField();
 	state.bodies._asteroidBelt = asteroidBelt();
-	state.bodies._planetGroups = [];
-	state.bodies._labelLines = [];
-	state.bodies._targetlines = [];
-	state.bodies._orbitLines = [];
-	state.bodies._textGroups = [];
-	state.bodies._navigable = [];
 
 	const sunBuild = planet(sunData);
 	state.bodies._sun = sunBuild;
@@ -230,7 +214,7 @@ settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
 document.addEventListener('keydown', (e) => {
 	if (e.code === 'KeyZ' || e.code === 'KeyC') {
 		const navigableLength = state.bodies._navigable.length;
-		state.mouseState._zoomToTarget = true;
+		state.cameraState._zoomToTarget = true;
 		if (e.code === 'KeyZ') {
 			if (!state.mouseState._clickedGroup) {
 				state.mouseState._clickedGroup = state.bodies._navigable[navigableLength - 1];

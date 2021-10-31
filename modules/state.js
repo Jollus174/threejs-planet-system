@@ -7,7 +7,6 @@ const state = {
 	controls,
 	camera,
 	cameraState: {
-		_easeToTarget: false,
 		_zoomToTarget: false,
 		_dollySpeed: null
 	},
@@ -22,6 +21,7 @@ const state = {
 		_clickedGroup: null,
 		_hoveredGroups: []
 	},
+	skybox: null,
 	bodies: {
 		_sun: null,
 		_starField: null,
@@ -31,12 +31,17 @@ const state = {
 		_orbitLines: [],
 		_labelLines: [],
 		_targetLines: [],
-		_textGroups: []
+		_textGroups: [],
+		_navigable: []
 	},
 	orbitLines: {
 		_orbitLinesVisible: true
 	},
-	lights: {},
+	lights: {
+		_pointLights: null,
+		_spotLights: null,
+		_ambientLights: null
+	},
 	isDesktop: false
 };
 
