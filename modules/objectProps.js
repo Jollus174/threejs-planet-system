@@ -28,8 +28,11 @@ const text = {
 				}), // front
 				new THREE.MeshBasicMaterial({
 					color,
+					side: THREE.FrontSide,
 					opacity: _textOpacityDefault,
-					transparent: true
+					transparent: true,
+					depthTest: false,
+					depthWrite: false
 				}) // side
 			]);
 
