@@ -13,7 +13,8 @@ const settings = {
 			bevelEnabled: false,
 			curveSegments: 4,
 			bevelThickness: 2,
-			bevelSize: 1.5
+			bevelSize: 1.5,
+			height: 0.001
 		}
 	},
 	orbitLines: {

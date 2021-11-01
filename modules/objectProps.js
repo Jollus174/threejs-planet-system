@@ -82,7 +82,6 @@ const text = {
 				const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
 					font,
 					size: 0.15,
-					height: 0.01,
 					..._fontSettings
 				});
 				descGeo.computeBoundingBox(); // for aligning the text
