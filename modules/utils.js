@@ -50,6 +50,7 @@ const createCircleFromPoints = (radius) => {
 			depthWrite: false
 		})
 	};
+	lineProps.renderOrder = 997;
 
 	return lineProps;
 };
@@ -102,7 +103,7 @@ const fadeTargetLineOpacity = (group, targetLine) => {
 
 const numberWithCommas = (n) => {
 	if (!n) return;
-	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	return n.toLocaleString();
 };
 
 const getBreakpoint = () =>

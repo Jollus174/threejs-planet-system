@@ -45,7 +45,7 @@ const text = {
 			// am only including the uppercase glyphs for this
 			const titleGeo = new THREE.TextGeometry(item.name.toUpperCase(), {
 				font,
-				size: 0.5,
+				size: item.titleFontSize,
 				height: 0.05,
 				..._fontSettings
 			});
@@ -55,7 +55,7 @@ const text = {
 
 			const centreOffsetY = -0.5 * (titleGeo.boundingBox.max.y - titleGeo.boundingBox.min.y);
 			const rightOffset = titleGeo.boundingBox.min.x;
-			const arbitraryExtraValue = 1;
+			const arbitraryExtraValue = item.spaceBetweenText;
 			fontGroup.position.x = rightOffset; // will CENTRE the group, to use as a foundation for positioning other elements
 			titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.size - arbitraryExtraValue; // will align text to the LEFT of the planet
 			titleMesh.position.y = centreOffsetY;
@@ -65,11 +65,12 @@ const text = {
 
 			fontLoader.load(`fonts/sylfaen_regular.json`, (font) => {
 				const stats = item.stats || {};
-				const { distanceToSun, diameter, spinTime, orbitTime, gravity } = stats;
+				const { distanceToSun, diameter, spinTime, orbitTime, gravity, distanceFromPlanet } = stats;
 
 				const textArray = [];
 				const textValues = [
 					distanceToSun ? `Distance to Sun: ${numberWithCommas(distanceToSun)} km` : null,
+					distanceFromPlanet ? `Distance from ${item.parentName}: ${numberWithCommas(distanceFromPlanet)} km` : null,
 					diameter ? `Diameter: ${numberWithCommas(diameter)} km` : null,
 					spinTime ? `Spin Time: ${numberWithCommas(spinTime)} Days` : null,
 					orbitTime ? `Orbit Time: ${numberWithCommas(orbitTime)} Days` : null,
@@ -81,16 +82,16 @@ const text = {
 
 				const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
 					font,
-					size: 0.15,
+					size: item.statsFontSize,
 					..._fontSettings
 				});
 				descGeo.computeBoundingBox(); // for aligning the text
 
 				const descMesh = createTextMesh(descGeo, 0xffffff);
-				descMesh.scale.set(item.statsScale, item.statsScale, item.statsScale);
+				// descMesh.scale.set(item.statsScale, item.statsScale, item.statsScale); // sorry Sun, we're doing this the proper way
 
 				const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
-				const arbitraryExtraValue = 1;
+				const arbitraryExtraValue = item.spaceBetweenText;
 				descMesh.position.x = item.size + arbitraryExtraValue; // will align text to the LEFT of the planet
 				descMesh.position.y = 0 - centreOffsetY - 0.13; // this value seems to correct the v-alignment, not sure why
 				descMesh.name = `${item.name} desc`;
@@ -133,15 +134,16 @@ const labelLine = {
 				transparent: true,
 				opacity: 0.8,
 				blending: THREE.AdditiveBlending,
-				side: THREE.FrontSide,
-				depthTest: false,
-				depthWrite: false
+				side: THREE.FrontSide
+				// depthTest: false,
+				// depthWrite: false
 			})
 		);
 		labelLine.name = `${item.name} group label line`;
 		labelLine.data = labelLine.data || {};
 		labelLine.data.labelGeometryOriginal = labelGeometry;
 		labelLine.data.planetIsTargeted = false;
+		// labelLine.renderOrder = 998;
 
 		return labelLine;
 	},

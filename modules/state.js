@@ -38,9 +38,9 @@ const state = {
 		_orbitLinesVisible: true
 	},
 	lights: {
-		_pointLights: null,
-		_spotLights: null,
-		_ambientLights: null
+		_pointLights: [],
+		_spotLights: [],
+		_ambientLights: []
 	},
 	isDesktop: false
 };

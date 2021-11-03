@@ -5,10 +5,9 @@ const pointLights = (addHelper) => {
 	const pointLights = [],
 		pointLightHelpers = [];
 
-	for (let i = 0; i < 2; i++) {
-		const pointLight = new PointLight(0xffffff, 0.5, 100);
-		const positionAdjuster = i % 2 === 0 ? 20 : -20;
-		pointLight.position.set(0, positionAdjuster, 0);
+	for (let i = 0; i < 1; i++) {
+		const pointLight = new PointLight(0xffffff, 0.8, 0);
+		pointLight.position.set(0, 0, 0);
 		pointLights.push(pointLight);
 
 		if (addHelper) pointLightHelpers.push(new PointLightHelper(pointLight));
@@ -50,7 +49,7 @@ const spotLights = (addHelper) => {
 
 const ambientLights = () => {
 	const ambientLights = [];
-	ambientLights.push(new AmbientLight(0x090909, 10));
+	ambientLights.push(new AmbientLight(0x090909, 8));
 
 	return [ambientLights];
 };

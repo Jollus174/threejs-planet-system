@@ -1,32 +1,27 @@
 'use strict';
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
+import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { text, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
+import { Color } from 'three';
 
 // Making sure to build the moon + planet based off the data that's passed in
-const buildMoon = (moonData, planetGroup) => {
+const buildMoon = async (moonData, planetGroup) => {
 	const { size, segments, material } = moonData;
-	const moonMesh = new THREE.Mesh(
-		new THREE.SphereBufferGeometry(size, segments, segments),
-		new THREE.MeshStandardMaterial({
-			map: textureLoader.load(material.map),
-			normalMap: textureLoader.load(material.normalMap)
-		})
-	);
 
 	const moonGroup = new THREE.Group();
 	moonGroup.name = `${moonData.name} moon group`;
 	moonGroup.data = moonGroup.data || {};
+	moonGroup.data.id = moonData.id;
 	moonGroup.data.size = moonData.size;
 	moonGroup.data.orbit = Math.random() * Math.PI * 2;
 	moonGroup.data.orbitRadius = moonData.orbitRadius;
 	moonGroup.data.orbitSpeed = 0.05 / moonData.orbitRadius;
-	// moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
 	moonGroup.data.zoomTo = moonData.zoomTo;
 	moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
 
-	moonGroup.textGroup = text.build(moonData);
+	moonGroup.textGroup = text.build(moonData, planetGroup);
 	if (moonGroup.textGroup) moonGroup.add(moonGroup.textGroup);
 
 	moonGroup.labelLine = labelLine.build(moonData);
@@ -46,22 +41,44 @@ const buildMoon = (moonData, planetGroup) => {
 		planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
 	);
 
-	moonMesh.name = `${moonData.name} moon mesh`;
+	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
+	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
+	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
+	material.emissive = material.emissive ? new Color(material.emissive) : null;
 
-	moonGroup.add(moonMesh);
+	if (!moonData.modelPath) {
+		const moonMesh = new THREE.Mesh(
+			new THREE.SphereBufferGeometry(size, segments, segments),
+			new THREE.MeshStandardMaterial(material)
+		);
+
+		moonMesh.name = `${moonData.name} moon mesh`;
+		moonGroup.add(moonMesh);
+	} else {
+		// if it's a custom model...
+		const loader = new GLTFLoader();
+		const moonObjectGLTF = await loader.loadAsync(moonData.modelPath);
+		const moonObj = moonObjectGLTF.scene.children[0];
+		moonObj.material.emissive = material.emissive;
+		moonObj.material.emissiveIntensity = material.emissiveIntensity;
+
+		// TODO: temp
+		moonObj.scale.set(moonData.modelScale, moonData.modelScale, moonData.modelScale);
+		moonGroup.add(moonObj);
+	}
 
 	return moonGroup;
 };
 
-const planet = (planetData) => {
+const buildPlanet = async (planetData) => {
 	const { size, segments, material } = planetData;
+	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
+	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
+	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
+
 	const planetMesh = new THREE.Mesh(
 		new THREE.SphereBufferGeometry(size, segments, segments),
-		new THREE.MeshStandardMaterial({
-			map: textureLoader.load(material.map),
-			normalMap: textureLoader.load(material.normalMap),
-			wireframe: false
-		})
+		new THREE.MeshStandardMaterial(material)
 	);
 
 	// create group first, label gets added here
@@ -88,6 +105,7 @@ const planet = (planetData) => {
 
 	planetGroup.name = `${planetData.name} group`;
 	planetGroup.data = planetData.data || {};
+	planetGroup.data.id = planetData.id;
 	planetGroup.data.size = planetData.size;
 	planetGroup.data.orbitRadius = planetData.orbitRadius;
 	planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;
@@ -108,12 +126,8 @@ const planet = (planetData) => {
 	planetMesh.data.size = planetData.size;
 
 	if (planetData.moons && planetData.moons.length) {
-		planetData.moons.forEach((moon) => {
-			const builtMoon = buildMoon(moon, planetGroup);
-			// planetGroup.add(builtMoon); // do NOT do this, it'll mess up the positional data
-			planetGroup.moons = planetGroup.moons || [];
-			planetGroup.moons.push(builtMoon);
-		});
+		planetGroup.moonData = planetData.moons; // storing the data here so can access outside the loop
+		planetGroup.moons = [];
 	}
 
 	return planetGroup;
@@ -181,7 +195,7 @@ const skybox = (texturePaths) => {
 	const skyboxMaterialArray = texturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
 	);
-	const skybox = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), skyboxMaterialArray);
+	const skybox = new THREE.Mesh(new THREE.BoxBufferGeometry(10000, 10000, 10000), skyboxMaterialArray);
 	skybox.name = 'skybox';
 
 	return skybox;
@@ -197,7 +211,7 @@ const starField = () => {
 	const positions = new Float32Array(stars * 3);
 
 	const material = {
-		size: 0.5,
+		size: 0.25,
 		map: createCircleTexture('#FFF', 256),
 		blending: THREE.AdditiveBlending,
 		transparent: true,
@@ -224,4 +238,4 @@ const starField = () => {
 	return starfieldObj;
 };
 
-export { skybox, starField, asteroidBelt, planet, buildMoon };
+export { skybox, starField, asteroidBelt, buildPlanet, buildMoon };

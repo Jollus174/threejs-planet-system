@@ -13,6 +13,8 @@ import textureNeptune from './../../img/textures/neptune.jpg';
 import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
 import textureRing from './../../img/textures/texture-ring.jpg';
 
+// import modelDeimos from './../../img/models/deimos.glb';
+
 import normalMercury from './../../img/textures/normal-mercury.jpg';
 import normalVenus from './../../img/textures/normal-venus.jpg';
 import normalEarth from './../../img/textures/normal-earth.jpg';
@@ -28,7 +30,11 @@ import spaceLt from './../../img/textures/space_lt.jpg';
 
 const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
 
+let isLive = false; // HA HAHA this is so shit
+const domainPath = isLive ? 'https://joeldoesdigital.com/web-experiments/planet-system/' : './../../img/';
+
 const sunData = {
+	id: 0,
 	name: 'the sun',
 	orbitRadius: 0.001,
 	size: 8,
@@ -39,7 +45,9 @@ const sunData = {
 	includeOrbitLine: false,
 	includeLabelLine: false,
 	includeTargetLine: false,
-	statsScale: 2.2,
+	spaceBetweenText: 1,
+	titleFontSize: 1.2,
+	statsFontSize: 0.33,
 	stats: {
 		diameter: 1391980
 	},
@@ -48,14 +56,15 @@ const sunData = {
 		normalMap: null,
 		emissive: '#FFF',
 		emissiveMap: textureSun,
-		emissiveIntensity: 0.6,
+		emissiveIntensity: 0.8,
 		side: DoubleSide
 	}
 };
 
 const planetData = [
 	{
-		name: 'mercury',
+		id: 1,
+		name: 'Mercury',
 		orbitRadius: 20,
 		size: 0.3,
 		segments: 32,
@@ -65,7 +74,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 57900000,
 			diameter: 4878,
@@ -79,7 +90,8 @@ const planetData = [
 		}
 	},
 	{
-		name: 'venus',
+		id: 2,
+		name: 'Venus',
 		orbitRadius: 34,
 		size: 0.8,
 		segments: 32,
@@ -89,7 +101,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 108160000,
 			diameter: 12104,
@@ -103,7 +117,8 @@ const planetData = [
 		}
 	},
 	{
-		name: 'earth',
+		id: 3,
+		name: 'Earth',
 		orbitRadius: 48,
 		size: 1,
 		segments: 32,
@@ -113,7 +128,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 149600000,
 			diameter: 12756,
@@ -127,8 +144,9 @@ const planetData = [
 		},
 		moons: [
 			{
-				// TODO: reduce text size of moons... implement text sizing within the data
+				id: 4,
 				name: 'Luna',
+				parentName: 'Earth',
 				orbitRadius: 2.2,
 				size: 0.4,
 				segments: 32,
@@ -138,8 +156,11 @@ const planetData = [
 				includeOrbitLine: true,
 				includeLabelLine: true,
 				includeTargetLine: true,
-				statsScale: 1,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
 				stats: {
+					distanceFromPlanet: 384400,
 					diameter: 3478.8,
 					spinTime: 27,
 					orbitTime: 27,
@@ -153,7 +174,8 @@ const planetData = [
 		]
 	},
 	{
-		name: 'mars',
+		id: 5,
+		name: 'Mars',
 		orbitRadius: 65,
 		size: 0.6,
 		segments: 32,
@@ -163,7 +185,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 227936640,
 			diameter: 6794,
@@ -174,10 +198,73 @@ const planetData = [
 		material: {
 			map: textureMars,
 			normalMap: normalMars
-		}
+		},
+		moons: [
+			{
+				id: 6,
+				name: 'Phobos',
+				parentName: 'Mars',
+				orbitRadius: 1.8,
+				size: 0.2,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: 5,
+				modelPath: `${domainPath}models/phobos.glb`,
+				modelScale: 0.025,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
+				stats: {
+					distanceFromPlanet: 9380,
+					diameter: 22.5,
+					spinTime: 0.3191,
+					orbitTime: 0.3191,
+					gravity: 0.006
+				},
+				material: {
+					emissive: '#FFF',
+					emissiveIntensity: 0.02
+				}
+			},
+			{
+				id: 7,
+				name: 'Deimos',
+				parentName: 'Mars',
+				orbitRadius: 3,
+				size: 0.2,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: 5,
+				modelPath: `${domainPath}models/deimos.glb`,
+				modelScale: 0.05,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
+				stats: {
+					distanceFromPlanet: 23460,
+					diameter: 12.4,
+					spinTime: 1.26244,
+					orbitTime: 1.26244,
+					gravity: 0.003
+				},
+				material: {
+					emissive: '#FFF',
+					emissiveIntensity: 0.05
+				}
+			}
+		]
 	},
 	{
-		name: 'jupiter',
+		id: 8,
+		name: 'Jupiter',
 		orbitRadius: 130,
 		size: 2.4,
 		segments: 64,
@@ -187,7 +274,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 778369000,
 			diameter: 142984,
@@ -214,7 +303,8 @@ const planetData = [
 		]
 	},
 	{
-		name: 'saturn',
+		id: 9,
+		name: 'Saturn',
 		orbitRadius: 170,
 		size: 2.2,
 		segments: 64,
@@ -224,7 +314,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 14278034000,
 			diameter: 120536,
@@ -250,7 +342,8 @@ const planetData = [
 		]
 	},
 	{
-		name: 'uranus',
+		id: 10,
+		name: 'Uranus',
 		orbitRadius: 210,
 		size: 1.4,
 		segments: 64,
@@ -258,7 +351,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 2870658186,
 			diameter: 51118,
@@ -299,7 +394,8 @@ const planetData = [
 		]
 	},
 	{
-		name: 'neptune',
+		id: 11,
+		name: 'Neptune',
 		orbitRadius: 260,
 		size: 1.4,
 		segments: 64,
@@ -307,7 +403,9 @@ const planetData = [
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
-		statsScale: 1,
+		spaceBetweenText: 1,
+		titleFontSize: 0.5,
+		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 4496976000,
 			diameter: 49532,

@@ -1,8 +1,8 @@
 'use strict';
-import { LoadingManager, TextureLoader, FontLoader } from 'three';
+import { DefaultLoadingManager, TextureLoader, FontLoader } from 'three';
 
 const loadManager = () => {
-	const manager = new LoadingManager();
+	const manager = DefaultLoadingManager;
 	const loadingProgressBar = document.querySelector('#bar');
 	manager.onStart = (url, itemsLoaded, itemsTotal) => {
 		// console.log(`Started loading file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
@@ -23,7 +23,6 @@ const loadManager = () => {
 };
 
 const textureLoader = new TextureLoader(loadManager());
-
 const fontLoader = new FontLoader(loadManager());
 
 export { loadManager, textureLoader, fontLoader };

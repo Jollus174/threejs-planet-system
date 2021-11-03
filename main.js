@@ -10,7 +10,7 @@ import { easeTo, calculatePlanetDistance, checkIfDesktop } from './modules/utils
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility, targetLine, labelLine, clickTarget, text, rings } from './modules/objectProps';
 import { skyboxTexturePaths, sunData, planetData } from './modules/data/solarSystem';
-import { asteroidBelt, skybox, starField, planet } from './modules/factories/solarSystemFactory';
+import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
 import { returnHoveredGroup, initMousePointerEvents } from './modules/events/mousePointer';
 import { scene } from './modules/scene';
 
@@ -66,13 +66,13 @@ const render = () => {
 	text.renderLoop(state.bodies._sun);
 
 	state.bodies._planetGroups.forEach((planetGroup) => {
-		// planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		// planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		// planetGroup.position.set(
-		// 	Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-		// 	0,
-		// 	Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		// );
+		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
+		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
+		planetGroup.position.set(
+			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
+			0,
+			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
+		);
 		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
 
 		clickTarget.renderLoop(planetGroup);
@@ -83,21 +83,23 @@ const render = () => {
 
 		if (planetGroup.moons) {
 			planetGroup.moons.forEach((moonGroup) => {
-				// moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
+				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
 
-				// moonGroup.position.set(
-				// 	planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-				// 	planetGroup.position.y + 0,
-				// 	planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-				// );
+				moonGroup.position.set(
+					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+					planetGroup.position.y + 0,
+					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+				);
 
-				// moonGroup.rotation.z -= 0.01 * delta;
-				moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
+				moonGroup.rotation.z -= 0.01 * delta;
+				if (moonGroup && moonGroup.data) {
+					moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
 
-				clickTarget.renderLoop(moonGroup);
-				text.renderLoop(moonGroup);
-				labelLine.renderLoop(moonGroup);
-				targetLine.renderLoop(moonGroup);
+					clickTarget.renderLoop(moonGroup);
+					text.renderLoop(moonGroup);
+					labelLine.renderLoop(moonGroup);
+					targetLine.renderLoop(moonGroup);
+				}
 			});
 		}
 	});
@@ -146,57 +148,77 @@ const init = () => {
 	state.bodies._starField = starField();
 	state.bodies._asteroidBelt = asteroidBelt();
 
-	const sunBuild = planet(sunData);
-	state.bodies._sun = sunBuild;
-	state.bodies._targetLines.push(sunBuild.targetLine);
-	state.bodies._textGroups.push(sunBuild.textGroup);
-	state.bodies._navigable.push(state.bodies._sun);
+	state.scene.add(state.skybox, state.bodies._starField, state.bodies._asteroidBelt);
 
-	planetData.forEach((pData) => {
-		const planetBuild = planet(pData);
-		state.bodies._navigable.push(planetBuild);
-		state.bodies._planetGroups.push(planetBuild);
-		if (planetBuild.moons) {
-			state.bodies._moonGroups.push(planetBuild.moons);
-			state.bodies._navigable.push(...planetBuild.moons);
-		}
-		state.bodies._labelLines.push(planetBuild.labelLine);
-		state.bodies._targetLines.push(planetBuild.targetLine);
-		state.bodies._orbitLines.push(planetBuild.orbitLine);
-		state.bodies._textGroups.push(planetBuild.textGroup);
+	buildPlanet(sunData).then((sunGroup) => {
+		state.bodies._sun = sunGroup;
+		state.bodies._textGroups.push(sunGroup.textGroup);
+		state.bodies._labelLines.push(sunGroup.labelLine);
+		state.bodies._targetLines.push(sunGroup.targetLine);
+		state.bodies._navigable.push(sunGroup);
+		state.scene.add(sunGroup);
 	});
 
-	state.scene.add(state.skybox, state.bodies._starField, state.bodies._asteroidBelt, state.bodies._sun);
-	state.bodies._planetGroups.forEach((planetGroup) => {
-		state.scene.add(planetGroup);
-		if (planetGroup.moons) planetGroup.moons.forEach((moon) => state.scene.add(moon)); // only seems to add to scene when included in here
-	});
-	state.bodies._orbitLines.forEach((orbitLine) => state.scene.add(orbitLine));
+	const planetPromises = planetData.map((pData) => buildPlanet(pData));
+	Promise.all(planetPromises).then((planetGroups) => {
+		planetGroups.forEach((planetGroup) => {
+			state.bodies._planetGroups.push(planetGroup);
 
-	renderer.setPixelRatio(window.devicePixelRatio);
-	renderer.setSize(window.innerWidth, window.innerHeight);
+			if (planetGroup.orbitLine) {
+				state.bodies._orbitLines.push(planetGroup.orbitLine);
+				state.scene.add(planetGroup.orbitLine);
+			}
 
-	state.camera.position.y = 32;
-	state.camera.position.z = 100;
+			if (planetGroup.moons) {
+				const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
 
-	state.isDesktop = checkIfDesktop();
+				Promise.all(moonPromises).then((moonGroups) => {
+					moonGroups.forEach((moonGroup) => {
+						planetGroup.moons.push(moonGroup);
+						state.bodies._orbitLines.push(moonGroup.orbitLine);
+						planetGroup.add(moonGroup.orbitLine);
+						state.scene.add(moonGroup);
+						state.bodies._moonGroups.push(moonGroup);
+						state.bodies._navigable.push(moonGroup);
+						state.bodies._textGroups.push(moonGroup.textGroup);
+						state.bodies._labelLines.push(moonGroup.labelLine);
+						state.bodies._targetLines.push(moonGroup.targetLine);
+					});
+				});
+			}
 
-	// adding lights to state
-	state.lights._pointLights = pointLights();
-	state.lights._spotLights = spotLights();
-	state.lights._ambientLights = ambientLights();
-
-	// add all lights at once because I cbf doing them individually
-	const lightTypeKeys = Object.keys(state.lights);
-	lightTypeKeys.forEach((lightType) => {
-		state.lights[lightType].forEach((lightObjsArr) => {
-			lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+			state.bodies._navigable.push(planetGroup);
+			state.bodies._textGroups.push(planetGroup.textGroup);
+			state.bodies._labelLines.push(planetGroup.labelLine);
+			state.bodies._targetLines.push(planetGroup.targetLine);
+			state.scene.add(planetGroup);
 		});
+
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		state.camera.position.y = 32;
+		state.camera.position.z = 100;
+
+		state.isDesktop = checkIfDesktop();
+
+		// adding lights to state
+		state.lights._pointLights = pointLights();
+		// state.lights._spotLights = spotLights();
+		state.lights._ambientLights = ambientLights();
+
+		// add all lights at once because I cbf doing them individually
+		const lightTypeKeys = Object.keys(state.lights);
+		lightTypeKeys.forEach((lightType) => {
+			state.lights[lightType].forEach((lightObjsArr) => {
+				lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+			});
+		});
+
+		initMousePointerEvents();
+
+		animate();
 	});
-
-	initMousePointerEvents();
-
-	animate();
 };
 
 init();
@@ -213,37 +235,30 @@ settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
 });
 
 document.addEventListener('keydown', (e) => {
+	const getIndexById = (targetId) => state.bodies._navigable.findIndex((item) => item.data.id === targetId);
 	if (e.code === 'KeyZ' || e.code === 'KeyC') {
 		const navigableLength = state.bodies._navigable.length;
+		const currentId =
+			state.mouseState._clickedGroup &&
+			state.mouseState._clickedGroup.data &&
+			state.mouseState._clickedGroup.data.id !== undefined
+				? state.mouseState._clickedGroup.data.id
+				: null;
 		state.cameraState._zoomToTarget = true;
-		if (e.code === 'KeyZ') {
-			if (!state.mouseState._clickedGroup) {
-				state.mouseState._clickedGroup = state.bodies._navigable[navigableLength - 1];
-				return;
-			}
 
-			const targetName = state.mouseState._clickedGroup.name;
-			const targetIndex = state.bodies._navigable.findIndex((planetGroup) => planetGroup.name === targetName);
-			const prevTarget =
-				targetIndex - 1 < 0 ? state.bodies._navigable[navigableLength - 1] : state.bodies._navigable[targetIndex - 1];
-			state.mouseState._clickedGroup = prevTarget;
+		if (currentId === null) {
+			state.mouseState._clickedGroup = state.bodies._navigable[getIndexById(1)]; // if no clicked group, start off with a planet instead of the sun to make it more interesting
+			return;
+		}
+
+		if (e.code === 'KeyZ') {
+			const targetIndex = currentId - 1 > -1 ? getIndexById(currentId - 1) : getIndexById(navigableLength - 1);
+			state.mouseState._clickedGroup = state.bodies._navigable[targetIndex];
 		}
 
 		if (e.code === 'KeyC') {
-			// going to next planet. In final implementation need to go through moons first
-			// will either be the next planet or the first one (or the sun, hmmm)
-			if (!state.mouseState._clickedGroup) {
-				state.mouseState._clickedGroup = state.bodies._planetGroups[1]; // start off with a planet instead of sun since more interesting
-				return;
-			}
-
-			const targetName = state.mouseState._clickedGroup.name;
-			const targetIndex = state.bodies._navigable.findIndex((planetGroup) => planetGroup.name === targetName);
-			const nextTarget =
-				state.bodies._planetGroups.length === targetIndex + 1
-					? state.bodies._navigable[0]
-					: state.bodies._navigable[targetIndex + 1];
-			state.mouseState._clickedGroup = nextTarget;
+			const targetIndex = currentId < navigableLength - 1 ? getIndexById(currentId + 1) : getIndexById(0);
+			state.mouseState._clickedGroup = state.bodies._navigable[targetIndex];
 		}
 	}
 });
