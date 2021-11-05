@@ -45,7 +45,7 @@ const createCircleFromPoints = (radius) => {
 			color: 0xffffff,
 			transparent: true,
 			opacity: 0.05,
-			size: 0.025,
+			size: radius * 0.01,
 			depthTest: false,
 			depthWrite: false
 		})
@@ -78,7 +78,12 @@ const fadeTextOpacity = (group, text) => {
 	const { _clickedGroup } = state.mouseState;
 	const { _textOpacityDefault } = settings.text;
 
-	if (_clickedGroup && _clickedGroup.name === group.name && group.data.cameraDistance < group.data.zoomTo + 14) {
+	if (
+		_clickedGroup &&
+		_clickedGroup.name === group.name &&
+		group.data.cameraDistance < group.data.zoomTo + 14 &&
+		group.data.cameraDistance > group.data.zoomTo - 1
+	) {
 		text.material.forEach((m) => {
 			m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
 		});

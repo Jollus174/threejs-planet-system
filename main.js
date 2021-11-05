@@ -244,21 +244,21 @@ document.addEventListener('keydown', (e) => {
 			state.mouseState._clickedGroup.data.id !== undefined
 				? state.mouseState._clickedGroup.data.id
 				: null;
-		state.cameraState._zoomToTarget = true;
 
 		if (currentId === null) {
-			state.mouseState._clickedGroup = state.bodies._navigable[getIndexById(1)]; // if no clicked group, start off with a planet instead of the sun to make it more interesting
+			updateClickedGroup(state.bodies._navigable[getIndexById(1)]); // if no clicked group, start off with a planet instead of the sun to make it more interesting
 			return;
 		}
 
 		if (e.code === 'KeyZ') {
 			const targetIndex = currentId - 1 > -1 ? getIndexById(currentId - 1) : getIndexById(navigableLength - 1);
-			state.mouseState._clickedGroup = state.bodies._navigable[targetIndex];
+			updateClickedGroup(state.bodies._navigable[targetIndex]);
+			state.cameraState._rotateToTarget = true;
 		}
 
 		if (e.code === 'KeyC') {
 			const targetIndex = currentId < navigableLength - 1 ? getIndexById(currentId + 1) : getIndexById(0);
-			state.mouseState._clickedGroup = state.bodies._navigable[targetIndex];
+			updateClickedGroup(state.bodies._navigable[targetIndex]);
 		}
 	}
 });

@@ -5,7 +5,10 @@ import textureVenus from './../../img/textures/venus.jpg';
 import textureEarth from './../../img/textures/earth.jpg';
 import textureMoon from './../../img/textures/moon.jpg';
 import textureMars from './../../img/textures/mars.jpg';
+
 import textureJupiter from './../../img/textures/jupiter.jpg';
+import textureIo from './../../img/textures/io.jpg';
+
 import textureSaturn from './../../img/textures/saturn.jpg';
 import textureUranus from './../../img/textures/uranus.jpg';
 import textureNeptune from './../../img/textures/neptune.jpg';
@@ -68,7 +71,7 @@ const planetData = [
 		orbitRadius: 20,
 		size: 0.3,
 		segments: 32,
-		zoomTo: 10,
+		zoomTo: null,
 		labelColour: '#b78668',
 		textColour: '#b78668',
 		includeOrbitLine: true,
@@ -97,7 +100,7 @@ const planetData = [
 		segments: 32,
 		labelColour: '#f3b3b3',
 		textColour: '#f3b3b3',
-		zoomTo: 10,
+		zoomTo: null,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -124,7 +127,7 @@ const planetData = [
 		segments: 32,
 		labelColour: '#6dcbe7',
 		textColour: '#6dcbe7',
-		zoomTo: 10,
+		zoomTo: null,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -152,7 +155,7 @@ const planetData = [
 				segments: 32,
 				labelColour: '#dae0e0',
 				textColour: '#dae0e0',
-				zoomTo: 5,
+				zoomTo: null,
 				includeOrbitLine: true,
 				includeLabelLine: true,
 				includeTargetLine: true,
@@ -181,7 +184,7 @@ const planetData = [
 		segments: 32,
 		labelColour: '#fe9657',
 		textColour: '#fe9657',
-		zoomTo: 10,
+		zoomTo: null,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -205,13 +208,13 @@ const planetData = [
 				name: 'Phobos',
 				parentName: 'Mars',
 				orbitRadius: 1.8,
-				size: 0.2,
+				size: 0.03,
 				segments: 32,
 				labelColour: '#8c8c8b',
 				textColour: '#8c8c8b',
-				zoomTo: 5,
+				zoomTo: null,
 				modelPath: `${domainPath}models/phobos.glb`,
-				modelScale: 0.025,
+				modelScale: 0.002,
 				includeOrbitLine: true,
 				includeLabelLine: true,
 				includeTargetLine: true,
@@ -235,13 +238,13 @@ const planetData = [
 				name: 'Deimos',
 				parentName: 'Mars',
 				orbitRadius: 3,
-				size: 0.2,
+				size: 0.016,
 				segments: 32,
 				labelColour: '#8c8c8b',
 				textColour: '#8c8c8b',
-				zoomTo: 5,
+				zoomTo: null,
 				modelPath: `${domainPath}models/deimos.glb`,
-				modelScale: 0.05,
+				modelScale: 0.002,
 				includeOrbitLine: true,
 				includeLabelLine: true,
 				includeTargetLine: true,
@@ -265,12 +268,12 @@ const planetData = [
 	{
 		id: 8,
 		name: 'Jupiter',
-		orbitRadius: 130,
+		orbitRadius: 160,
 		size: 2.4,
 		segments: 64,
 		labelColour: '#e0ab79',
 		textColour: '#e0ab79',
-		zoomTo: 10,
+		zoomTo: 20,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -287,6 +290,34 @@ const planetData = [
 		material: {
 			map: textureJupiter
 		},
+		moons: [
+			{
+				id: 7,
+				name: 'Io',
+				parentName: 'Jupiter',
+				orbitRadius: 3,
+				size: 0.016,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: null,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				titleFontSize: null,
+				statsFontSize: null,
+				stats: {
+					distanceFromPlanet: 422000,
+					diameter: 3643,
+					spinTime: 1.77,
+					orbitTime: 1.77,
+					gravity: 0.183
+				},
+				material: {
+					map: textureIo
+				}
+			}
+		],
 		rings: [
 			{
 				start: 2.7,
@@ -305,12 +336,12 @@ const planetData = [
 	{
 		id: 9,
 		name: 'Saturn',
-		orbitRadius: 170,
+		orbitRadius: 204,
 		size: 2.2,
 		segments: 64,
 		labelColour: '#ffe577',
 		textColour: '#ffe577',
-		zoomTo: 10,
+		zoomTo: 20,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -344,10 +375,10 @@ const planetData = [
 	{
 		id: 10,
 		name: 'Uranus',
-		orbitRadius: 210,
+		orbitRadius: 260,
 		size: 1.4,
 		segments: 64,
-		zoomTo: 10,
+		zoomTo: 15,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -396,10 +427,10 @@ const planetData = [
 	{
 		id: 11,
 		name: 'Neptune',
-		orbitRadius: 260,
+		orbitRadius: 310,
 		size: 1.4,
 		segments: 64,
-		zoomTo: 10,
+		zoomTo: 15,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,

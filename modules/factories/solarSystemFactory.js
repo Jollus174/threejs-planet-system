@@ -18,7 +18,7 @@ const buildMoon = async (moonData, planetGroup) => {
 	moonGroup.data.orbit = Math.random() * Math.PI * 2;
 	moonGroup.data.orbitRadius = moonData.orbitRadius;
 	moonGroup.data.orbitSpeed = 0.05 / moonData.orbitRadius;
-	moonGroup.data.zoomTo = moonData.zoomTo;
+	moonGroup.data.zoomTo = moonData.zoomTo || moonData.size * 10;
 	moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
 
 	moonGroup.textGroup = text.build(moonData, planetGroup);
@@ -112,7 +112,7 @@ const buildPlanet = async (planetData) => {
 	planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
 	planetGroup.data.orbitSpeed = 0.009 / planetGroup.data.orbitRadius;
 	planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
-	planetGroup.data.zoomTo = planetData.zoomTo;
+	planetGroup.data.zoomTo = planetData.zoomTo || planetData.size * 10;
 	planetGroup.rotation.y = THREE.MathUtils.randFloatSpread(360);
 	planetGroup.position.set(
 		Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
@@ -134,7 +134,7 @@ const buildPlanet = async (planetData) => {
 };
 
 const asteroidBelt = () => {
-	const particles = 2000;
+	const particles = 4000;
 	const geometry = new THREE.BufferGeometry();
 	const positions = new Float32Array(particles * 3);
 
@@ -159,11 +159,11 @@ const asteroidBelt = () => {
 
 		d = d + count / count.toFixed(0).length;
 
-		const randomNumber = THREE.MathUtils.randInt(1, 8) * Math.random(); // controls spread
+		const randomNumber = THREE.MathUtils.randInt(1, 30) * Math.random(); // controls spread
 		const randomOffset = odd ? randomNumber * -1 : randomNumber;
 
 		// const amplitude = d + randomOffset * (2 + Math.random());
-		const amplitude = 96 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
+		const amplitude = 114 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
 		const theta = count + 1 * Math.random() * THREE.MathUtils.degToRad(orbitRadian);
 
 		const posX = amplitude * Math.cos(theta);

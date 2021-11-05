@@ -45,8 +45,7 @@ const text = {
 			// am only including the uppercase glyphs for this
 			const titleGeo = new THREE.TextGeometry(item.name.toUpperCase(), {
 				font,
-				size: item.titleFontSize,
-				height: 0.05,
+				size: item.size * 0.5,
 				..._fontSettings
 			});
 			titleGeo.computeBoundingBox(); // for aligning the text
@@ -55,9 +54,8 @@ const text = {
 
 			const centreOffsetY = -0.5 * (titleGeo.boundingBox.max.y - titleGeo.boundingBox.min.y);
 			const rightOffset = titleGeo.boundingBox.min.x;
-			const arbitraryExtraValue = item.spaceBetweenText;
 			fontGroup.position.x = rightOffset; // will CENTRE the group, to use as a foundation for positioning other elements
-			titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.size - arbitraryExtraValue; // will align text to the LEFT of the planet
+			titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.size * 2; // will align text to the LEFT of the planet
 			titleMesh.position.y = centreOffsetY;
 			titleMesh.name = `${item.name} title`;
 
@@ -82,7 +80,7 @@ const text = {
 
 				const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
 					font,
-					size: item.statsFontSize,
+					size: item.size * 0.2,
 					..._fontSettings
 				});
 				descGeo.computeBoundingBox(); // for aligning the text
@@ -91,9 +89,8 @@ const text = {
 				// descMesh.scale.set(item.statsScale, item.statsScale, item.statsScale); // sorry Sun, we're doing this the proper way
 
 				const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
-				const arbitraryExtraValue = item.spaceBetweenText;
-				descMesh.position.x = item.size + arbitraryExtraValue; // will align text to the LEFT of the planet
-				descMesh.position.y = 0 - centreOffsetY - 0.13; // this value seems to correct the v-alignment, not sure why
+				descMesh.position.x = item.size * 2; // will align text to the LEFT of the planet
+				descMesh.position.y = 0 - centreOffsetY - item.size / 10; // this value seems to correct the v-alignment, not sure why
 				descMesh.name = `${item.name} desc`;
 				fontGroup.add(descMesh);
 			});
@@ -116,8 +113,8 @@ const labelLine = {
 		if (!item.includeLabelLine) return;
 
 		const labelGeometry = {
-			origInnerRadius: item.size * 1.01 + 0.1 + 0.1,
-			origOuterRadius: item.size * 1.01 + 0.1 + 0.1,
+			origInnerRadius: item.size * 1.01,
+			origOuterRadius: item.size * 1.01,
 			origSegments: 90
 		};
 		const labelLine = new THREE.Mesh(
@@ -157,9 +154,12 @@ const labelLine = {
 		let outerRadius = labelLine.geometry.parameters.outerRadius;
 		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
 		let regenerate = false;
-		if (state.mouseState._hoveredGroups.some((g) => g.name === planetGroup.name)) {
-			if (outerRadius < origOuterRadius + 0.075) {
-				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius + 0.075, incrementer: 15 });
+		if (
+			state.mouseState._hoveredGroups.length &&
+			state.mouseState._hoveredGroups.some((g) => g.name === planetGroup.name)
+		) {
+			if (outerRadius < origOuterRadius * 1.1) {
+				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius * 1.1, incrementer: 15 });
 				regenerate = true;
 			}
 			if (regenerate) {
@@ -169,7 +169,7 @@ const labelLine = {
 		} else {
 			if (outerRadius > origOuterRadius) {
 				// will interpolate linearly
-				outerRadius += easeTo({ from: outerRadius + 0.5, to: origOuterRadius, incrementer: 50 });
+				outerRadius += easeTo({ from: outerRadius * 1.1, to: origOuterRadius, incrementer: 15 });
 				regenerate = true;
 			}
 			if (regenerate) {
@@ -213,7 +213,7 @@ const targetLine = {
 	build: (item) => {
 		if (!item.includeTargetLine) return;
 		// the 1.01 helps offset larger bodies like Jupiter
-		const targetLineProps = createCircleFromPoints(item.size * 1.01 + 0.1);
+		const targetLineProps = createCircleFromPoints(item.size * 1.2);
 		const { geometry, material } = targetLineProps;
 
 		const targetLine = new THREE.Points(geometry, material);
@@ -252,15 +252,17 @@ const orbitLine = {
 
 const clickTarget = {
 	build: (item) => {
-		const clickTargetSizeMobile = Math.min(item.size * 5, 8),
-			clickTargetSizeDesktop = item.size + 0.5;
+		const clickTargetSizeMobile = Math.min(item.size * 50, 8),
+			clickTargetSizeDesktop = Math.min(item.size * 50, item.size + 0.5);
 
 		const clickTargetMesh = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(checkIfDesktop() ? clickTargetSizeDesktop : clickTargetSizeMobile, 10, 10),
 			new THREE.MeshBasicMaterial({
 				side: THREE.FrontSide,
 				visible: false, // this should allow it to be picked up by Raycaster, whilst being invisible
-				wireframe: true
+				wireframe: true,
+				transparent: true,
+				opacity: 0.2
 			})
 		);
 
@@ -274,7 +276,7 @@ const clickTarget = {
 
 	renderLoop: (planetGroup) => {
 		if (!planetGroup || !planetGroup.clickTarget) return;
-		if (planetGroup.data.cameraDistance - planetGroup.data.zoomTo < 30) {
+		if (planetGroup.data.cameraDistance - planetGroup.data.zoomTo < Math.min(30, planetGroup.data.size * 40)) {
 			// making sure the geometry is only redrawn once to save performance
 			if (planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.data.size) {
 				planetGroup.clickTarget.geometry.dispose();

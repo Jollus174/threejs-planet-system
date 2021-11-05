@@ -834,8 +834,6 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function onMouseWheel(event) {
-			stateDefault.cameraState._zoomToTarget = false;
-
 			if (scope.enabled === false || scope.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE))
 				return;
 

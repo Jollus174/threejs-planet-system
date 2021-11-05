@@ -7,7 +7,7 @@ import { renderer } from './renderer';
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.minDistance = 5;
+controls.minDistance = 0.1;
 controls.maxDistance = 650;
 controls.enableKeys = true;
 controls.minPolarAngle = 0.5;

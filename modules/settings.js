@@ -4,7 +4,7 @@ const settings = {
 		_dollySpeedMin: 0.999
 	},
 	mouse: {
-		_mouseHoverTimeoutDefault: 30, // for queueing up planet hovers
+		_mouseHoverTimeoutDefault: 5, // for queueing up planet hovers
 		_mouseClickTimeoutDefault: 500 // for determining whether it's a click mouse press or a held one
 	},
 	text: {
@@ -14,7 +14,7 @@ const settings = {
 			curveSegments: 4,
 			bevelThickness: 2,
 			bevelSize: 1.5,
-			height: 0.001
+			height: 0
 		}
 	},
 	orbitLines: {

@@ -8,7 +8,9 @@ const state = {
 	camera,
 	cameraState: {
 		_zoomToTarget: false,
-		_dollySpeed: null
+		_dollySpeed: null,
+		_rotateToTarget: false,
+		_rotateCameraYTo: null
 	},
 	mouseState: {
 		_mouseHasMoved: false,

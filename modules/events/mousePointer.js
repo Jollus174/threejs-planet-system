@@ -37,11 +37,28 @@ const hasClickedSameTarget = () =>
 	state.mouseState._clickedGroup.name &&
 	returnHoveredGroup().name === state.mouseState._clickedGroup.name;
 
+const updateClickedGroup = (clickedGroup) => {
+	state.mouseState._clickedGroup = clickedGroup;
+
+	if (!clickedGroup) return;
+
+	state.cameraState._zoomToTarget = true;
+	controls.minDistance = state.mouseState._clickedGroup.data.size;
+
+	if (!hasClickedSameTarget()) {
+		state.cameraState._rotateCameraYTo = state.mouseState._clickedGroup.position.y + 1.5;
+	}
+};
+
 const initMousePointerEvents = () => {
 	window.addEventListener('mousemove', (e) => {
 		state.mouseState._mouseHasMoved = true;
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+		state.mouseState._mouseHoverTarget = state.mouseState._mouseHasMoved
+			? returnHoveredGroup()
+			: state.mouseState._mouseHoverTarget;
 	});
 
 	window.addEventListener('pointerdown', (e) => {
@@ -50,6 +67,10 @@ const initMousePointerEvents = () => {
 		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 		state.mouseState._mouseClickLocation = [mouse.x, mouse.y];
+	});
+
+	window.addEventListener('wheel', () => {
+		state.cameraState._zoomToTarget = false;
 	});
 
 	window.addEventListener('pointerup', () => {
@@ -64,12 +85,7 @@ const initMousePointerEvents = () => {
 		const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
 		if (mouseHasDeviated || state.mouseState._mouseHeld) return;
 
-		state.mouseState._clickedGroup = returnHoveredGroup();
-		if (state.mouseState._clickedGroup) {
-			// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-			state.cameraState._zoomToTarget = true;
-			state.controls.update();
-		}
+		updateClickedGroup(returnHoveredGroup());
 
 		// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
 		// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
@@ -91,4 +107,4 @@ const initMousePointerEvents = () => {
 	});
 };
 
-export { returnHoveredGroup, initMousePointerEvents };
+export { returnHoveredGroup, initMousePointerEvents, updateClickedGroup };
