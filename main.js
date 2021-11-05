@@ -11,7 +11,7 @@ import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility, targetLine, labelLine, clickTarget, text, rings } from './modules/objectProps';
 import { skyboxTexturePaths, sunData, planetData } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
-import { returnHoveredGroup, initMousePointerEvents } from './modules/events/mousePointer';
+import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
 import { scene } from './modules/scene';
 
 window.state = state;
