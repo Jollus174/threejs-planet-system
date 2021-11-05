@@ -2,6 +2,7 @@
 import { Raycaster, Vector2 } from 'three';
 import { state } from '../state';
 import { settings } from '../settings';
+import { controls } from '../controls';
 import { getStandardDeviation } from './../utils';
 
 const { _mouseClickTimeoutDefault } = settings.mouse;

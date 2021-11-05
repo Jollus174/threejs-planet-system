@@ -111,9 +111,9 @@ const render = () => {
 	}
 
 	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
-		const objZoomTo = state.mouseState._clickedGroup.data.zoomTo || 0;
+		const objZoomTo = state.mouseState._clickedGroup.data.zoomTo;
 		const distanceToTarget = state.controls.getDistance();
-		const distCalc = Math.max(5, objZoomTo + (state.isDesktop ? 0 : 8)); // zoom out further on mobile due to smaller width
+		const distCalc = objZoomTo; // zoom out further on mobile due to smaller width
 
 		if (distanceToTarget > distCalc) {
 			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
