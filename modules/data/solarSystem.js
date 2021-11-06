@@ -38,13 +38,13 @@ const domainPath = isLive ? 'https://joeldoesdigital.com/web-experiments/planet-
 
 const sunData = {
 	id: 0,
-	name: 'the sun',
+	name: 'Sun',
 	orbitRadius: 0.001,
 	diameter: 1392680,
 	segments: 32,
 	labelColour: '#ffb01f',
 	textColour: '#ffb01f',
-	zoomTo: 26,
+	zoomTo: null,
 	includeOrbitLine: false,
 	includeLabelLine: false,
 	includeTargetLine: false,
@@ -144,37 +144,37 @@ const planetData = [
 		material: {
 			map: textureEarth,
 			normalMap: normalEarth
-		}
-		// moons: [
-		// 	{
-		// 		id: 4,
-		// 		name: 'Luna',
-		// 		parentName: 'Earth',
-		// 		orbitRadius: 2.2,
-		// 		size: 0.4,
-		// 		segments: 32,
-		// 		labelColour: '#dae0e0',
-		// 		textColour: '#dae0e0',
-		// 		zoomTo: null,
-		// 		includeOrbitLine: true,
-		// 		includeLabelLine: true,
-		// 		includeTargetLine: true,
-		// 		spaceBetweenText: 0.5,
-		// 		titleFontSize: 0.3,
-		// 		statsFontSize: 0.085,
-		// 		stats: {
-		// 			distanceFromPlanet: 384400,
-		// 			diameter: 3478.8,
-		// 			spinTime: 27,
-		// 			orbitTime: 27,
-		// 			gravity: 0.1654
-		// 		},
-		// 		material: {
-		// 			map: textureMoon,
-		// 			normalMap: normalMoon
-		// 		}
-		// 	}
-		// ]
+		},
+		moons: [
+			{
+				id: 4,
+				name: 'Luna',
+				parentName: 'Earth',
+				orbitRadius: 384400,
+				diameter: 3474.8,
+				segments: 32,
+				labelColour: '#dae0e0',
+				textColour: '#dae0e0',
+				zoomTo: null,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
+				stats: {
+					distanceFromPlanet: 384400,
+					diameter: 3478.8,
+					spinTime: 27,
+					orbitTime: 27,
+					gravity: 0.1654
+				},
+				material: {
+					map: textureMoon,
+					normalMap: normalMoon
+				}
+			}
+		]
 	},
 	{
 		id: 5,
@@ -201,79 +201,79 @@ const planetData = [
 		material: {
 			map: textureMars,
 			normalMap: normalMars
-		}
-		// moons: [
-		// 	{
-		// 		id: 6,
-		// 		name: 'Phobos',
-		// 		parentName: 'Mars',
-		// 		orbitRadius: 1.8,
-		// 		size: 0.03,
-		// 		segments: 32,
-		// 		labelColour: '#8c8c8b',
-		// 		textColour: '#8c8c8b',
-		// 		zoomTo: null,
-		// 		modelPath: `${domainPath}models/phobos.glb`,
-		// 		modelScale: 0.002,
-		// 		includeOrbitLine: true,
-		// 		includeLabelLine: true,
-		// 		includeTargetLine: true,
-		// 		spaceBetweenText: 0.5,
-		// 		titleFontSize: 0.3,
-		// 		statsFontSize: 0.085,
-		// 		stats: {
-		// 			distanceFromPlanet: 9380,
-		// 			diameter: 22.5,
-		// 			spinTime: 0.3191,
-		// 			orbitTime: 0.3191,
-		// 			gravity: 0.006
-		// 		},
-		// 		material: {
-		// 			emissive: '#FFF',
-		// 			emissiveIntensity: 0.02
-		// 		}
-		// 	},
-		// 	{
-		// 		id: 7,
-		// 		name: 'Deimos',
-		// 		parentName: 'Mars',
-		// 		orbitRadius: 3,
-		// 		size: 0.016,
-		// 		segments: 32,
-		// 		labelColour: '#8c8c8b',
-		// 		textColour: '#8c8c8b',
-		// 		zoomTo: null,
-		// 		modelPath: `${domainPath}models/deimos.glb`,
-		// 		modelScale: 0.002,
-		// 		includeOrbitLine: true,
-		// 		includeLabelLine: true,
-		// 		includeTargetLine: true,
-		// 		spaceBetweenText: 0.5,
-		// 		titleFontSize: 0.3,
-		// 		statsFontSize: 0.085,
-		// 		stats: {
-		// 			distanceFromPlanet: 23460,
-		// 			diameter: 12.4,
-		// 			spinTime: 1.26244,
-		// 			orbitTime: 1.26244,
-		// 			gravity: 0.003
-		// 		},
-		// 		material: {
-		// 			emissive: '#FFF',
-		// 			emissiveIntensity: 0.05
-		// 		}
-		// 	}
-		// ]
+		},
+		moons: [
+			{
+				id: 6,
+				name: 'Phobos',
+				parentName: 'Mars',
+				orbitRadius: 9380,
+				diameter: 22.5,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: null,
+				modelPath: `${domainPath}models/phobos.glb`,
+				modelScale: 0.002,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
+				stats: {
+					distanceFromPlanet: 9380,
+					diameter: 22.5,
+					spinTime: 0.3191,
+					orbitTime: 0.3191,
+					gravity: 0.006
+				},
+				material: {
+					emissive: '#FFF',
+					emissiveIntensity: 0.02
+				}
+			},
+			{
+				id: 7,
+				name: 'Deimos',
+				parentName: 'Mars',
+				orbitRadius: 23436,
+				diameter: 12.4,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: null,
+				modelPath: `${domainPath}models/deimos.glb`,
+				modelScale: 0.002,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				spaceBetweenText: 0.5,
+				titleFontSize: 0.3,
+				statsFontSize: 0.085,
+				stats: {
+					distanceFromPlanet: 23436,
+					diameter: 12.4,
+					spinTime: 1.26244,
+					orbitTime: 1.26244,
+					gravity: 0.003
+				},
+				material: {
+					emissive: '#FFF',
+					emissiveIntensity: 0.05
+				}
+			}
+		]
 	},
 	{
 		id: 8,
 		name: 'Jupiter',
 		orbitRadius: 749140000,
-		diameter: 69911,
+		diameter: 139820,
 		segments: 64,
 		labelColour: '#e0ab79',
 		textColour: '#e0ab79',
-		zoomTo: 20,
+		// zoomTo: 20,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -282,66 +282,66 @@ const planetData = [
 		statsFontSize: 0.15,
 		stats: {
 			distanceToSun: 778369000,
-			diameter: 69911,
+			diameter: 139820,
 			spinTime: 0.4132,
 			orbitTime: 11.86,
 			gravity: 2.64
 		},
 		material: {
 			map: textureJupiter
-		}
-		// moons: [
-		// 	{
-		// 		id: 7,
-		// 		name: 'Io',
-		// 		parentName: 'Jupiter',
-		// 		orbitRadius: 3,
-		// 		size: 0.016,
-		// 		segments: 32,
-		// 		labelColour: '#8c8c8b',
-		// 		textColour: '#8c8c8b',
-		// 		zoomTo: null,
-		// 		includeOrbitLine: true,
-		// 		includeLabelLine: true,
-		// 		includeTargetLine: true,
-		// 		titleFontSize: null,
-		// 		statsFontSize: null,
-		// 		stats: {
-		// 			distanceFromPlanet: 422000,
-		// 			diameter: 3643,
-		// 			spinTime: 1.77,
-		// 			orbitTime: 1.77,
-		// 			gravity: 0.183
-		// 		},
-		// 		material: {
-		// 			map: textureIo
-		// 		}
-		// 	}
-		// ],
-		// rings: [
-		// 	{
-		// 		start: 2.7,
-		// 		end: 4.2,
-		// 		angle: 85,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.1,
-		// 			map: textureSaturnRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	}
-		// ]
+		},
+		moons: [
+			{
+				id: 9,
+				name: 'Io',
+				parentName: 'Jupiter',
+				orbitRadius: 422000,
+				diameter: 3643,
+				segments: 32,
+				labelColour: '#8c8c8b',
+				textColour: '#8c8c8b',
+				zoomTo: null,
+				includeOrbitLine: true,
+				includeLabelLine: true,
+				includeTargetLine: true,
+				titleFontSize: null,
+				statsFontSize: null,
+				stats: {
+					distanceFromPlanet: 422000,
+					diameter: 3643,
+					spinTime: 1.77,
+					orbitTime: 1.77,
+					gravity: 0.183
+				},
+				material: {
+					map: textureIo
+				}
+			}
+		],
+		rings: [
+			{
+				start: 2.7,
+				end: 4.2,
+				angle: 85,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureSaturnRing,
+					side: DoubleSide
+				}
+			}
+		]
 	},
 	{
-		id: 9,
+		id: 10,
 		name: 'Saturn',
 		orbitRadius: 1483200000,
 		diameter: 116460,
 		segments: 64,
 		labelColour: '#ffe577',
 		textColour: '#ffe577',
-		zoomTo: 20,
+		// zoomTo: 20,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -373,12 +373,12 @@ const planetData = [
 		]
 	},
 	{
-		id: 10,
+		id: 11,
 		name: 'Uranus',
 		orbitRadius: 2951658186,
 		diameter: 50724,
 		segments: 64,
-		zoomTo: 15,
+		// zoomTo: 15,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -425,12 +425,12 @@ const planetData = [
 		// ]
 	},
 	{
-		id: 11,
+		id: 12,
 		name: 'Neptune',
 		orbitRadius: 4474960000,
 		diameter: 24622,
 		segments: 64,
-		zoomTo: 15,
+		// zoomTo: 15,
 		includeOrbitLine: true,
 		includeLabelLine: true,
 		includeTargetLine: true,
@@ -448,57 +448,57 @@ const planetData = [
 		textColour: '#3b54d2',
 		material: {
 			map: textureNeptune
-		}
-		// rings: [
-		// 	{
-		// 		start: 2.0,
-		// 		end: 2.05,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.05,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	},
-		// 	{
-		// 		start: 2.08,
-		// 		end: 2.11,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.05,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	},
-		// 	{
-		// 		start: 2.17,
-		// 		end: 2.4,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.1,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	},
-		// 	{
-		// 		start: 2.45,
-		// 		end: 2.5,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.1,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	}
-		// ]
+		},
+		rings: [
+			{
+				start: 2.0,
+				end: 2.05,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.05,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.08,
+				end: 2.11,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.05,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.17,
+				end: 2.4,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureRing,
+					side: DoubleSide
+				}
+			},
+			{
+				start: 2.45,
+				end: 2.5,
+				angle: 87,
+				material: {
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.1,
+					map: textureRing,
+					side: DoubleSide
+				}
+			}
+		]
 	}
 ];
 

@@ -152,7 +152,9 @@ const init = () => {
 	state.bodies._starField = starField();
 	state.bodies._asteroidBelt = asteroidBelt();
 
-	state.scene.add(state.skybox, state.bodies._starField, state.bodies._asteroidBelt);
+	state.scene.add(state.skybox);
+	// state.scene.add(state.bodies._starField);
+	// state.scene.add(state.bodies._asteroidBelt);
 
 	buildPlanet(sunData).then((sunGroup) => {
 		state.bodies._sun = sunGroup;
@@ -173,37 +175,30 @@ const init = () => {
 				state.scene.add(planetGroup.orbitLine);
 			}
 
-			// 		if (planetGroup.moons) {
-			// 			const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
+			if (planetGroup.moons) {
+				const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
 
-			// 			Promise.all(moonPromises).then((moonGroups) => {
-			// 				moonGroups.forEach((moonGroup) => {
-			// 					planetGroup.moons.push(moonGroup);
-			// 					state.bodies._orbitLines.push(moonGroup.orbitLine);
-			// 					planetGroup.add(moonGroup.orbitLine);
-			// 					state.scene.add(moonGroup);
-			// 					state.bodies._moonGroups.push(moonGroup);
-			// 					state.bodies._navigable.push(moonGroup);
-			// 					state.bodies._textGroups.push(moonGroup.textGroup);
-			// 					state.bodies._labelLines.push(moonGroup.labelLine);
-			// 					state.bodies._targetLines.push(moonGroup.targetLine);
-			// 				});
-			// 			});
-			// 		}
+				Promise.all(moonPromises).then((moonGroups) => {
+					moonGroups.forEach((moonGroup) => {
+						planetGroup.moons.push(moonGroup);
+						state.bodies._orbitLines.push(moonGroup.orbitLine);
+						planetGroup.add(moonGroup.orbitLine);
+						state.scene.add(moonGroup);
+						state.bodies._moonGroups.push(moonGroup);
+						state.bodies._navigable.push(moonGroup);
+						state.bodies._textGroups.push(moonGroup.textGroup);
+						state.bodies._labelLines.push(moonGroup.labelLine);
+						state.bodies._targetLines.push(moonGroup.targetLine);
+					});
+				});
+			}
 
 			state.bodies._navigable.push(planetGroup);
+			state.bodies._textLabels.push(planetGroup.textLabel);
 			state.bodies._textGroups.push(planetGroup.textGroup);
 			state.bodies._labelLines.push(planetGroup.labelLine);
 			state.bodies._targetLines.push(planetGroup.targetLine);
 			state.scene.add(planetGroup);
-
-			const planetDiv = document.createElement('div');
-			planetDiv.className = 'label';
-			planetDiv.textContent = planetGroup.data.name;
-			const planetLabel = new CSS2DObject(planetDiv);
-			planetLabel.position.set(0, 0, 0);
-			console.log(planetLabel);
-			planetGroup.add(planetLabel);
 		});
 	});
 
@@ -225,7 +220,7 @@ const init = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
-	document.body.appendChild(labelRenderer.domElement);
+	document.querySelector('main').prepend(labelRenderer.domElement);
 	labelRenderer.render(state.scene, state.camera);
 
 	state.camera.position.y = 10000000;
@@ -239,6 +234,7 @@ init();
 
 window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	labelRenderer.setSize(window.innerWidth, window.innerHeight);
 	state.camera.aspect = window.innerWidth / window.innerHeight;
 	state.camera.updateProjectionMatrix();
 	state.isDesktop = checkIfDesktop();

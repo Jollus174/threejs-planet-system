@@ -14,7 +14,6 @@ main {
 	padding: 0;
 	width: 100%;
 	height: 100%;
-	pointer-events: none;
 }
 
 @keyframes spinner-loading {
@@ -173,4 +172,32 @@ body::before {
 	body::before {
 		content: 'screen-xl';
 	}
+}
+
+.label {
+	border: 1px solid white;
+	color: rgb(216, 216, 216);
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	font-size: 16px;
+	background: transparent;
+
+	font-family: sans-serif;
+	cursor: pointer;
+	opacity: 0.7;
+	white-space: nowrap;
+	text-align: left;
+	transition: opacity 0.2s ease;
+	position: relative;
+}
+
+.label span {
+	position: absolute;
+	left: 20px;
+	top: 10px;
+}
+
+.label:hover {
+	opacity: 1;
 }

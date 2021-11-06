@@ -5,6 +5,7 @@ import { state } from './state';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTextOpacity, fadeTargetLineOpacity } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
+import { CSS2DObject } from 'three/examples/jsm/renderers/css2drenderer';
 
 const setOrbitVisibility = () => {
 	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
@@ -105,6 +106,25 @@ const text = {
 		if (!planetGroup || !planetGroup.textGroup) return;
 		planetGroup.textGroup.lookAt(state.camera.position);
 		planetGroup.textGroup.children.forEach((text) => fadeTextOpacity(planetGroup, text));
+	}
+};
+
+const textLabel = {
+	build: (itemGroup) => {
+		const labelDiv = document.createElement('div');
+		labelDiv.className = 'label';
+		labelDiv.style.borderColor = itemGroup.data.labelColour;
+		labelDiv.innerHTML = `<span>${itemGroup.data.name}</span>`;
+		const groupLabel = new CSS2DObject(labelDiv);
+		groupLabel.position.set(0, 0, 0);
+
+		labelDiv.addEventListener('pointerdown', () => {
+			console.log('pointer down');
+			state.cameraState._zoomToTarget = true;
+			state.mouseState._clickedGroup = itemGroup;
+		});
+
+		return groupLabel;
 	}
 };
 
@@ -234,8 +254,11 @@ const targetLine = {
 const orbitLine = {
 	build: (item) => {
 		if (!item.includeOrbitLine) return;
+		let vertexCount = 720;
+		if (item.name === 'Uranus') vertexCount = 1600;
+		if (item.name === 'Neptune') vertexCount = 2400;
 		const orbit = new THREE.Line(
-			new THREE.RingBufferGeometry(item.orbitRadius, item.orbitRadius, 180),
+			new THREE.RingBufferGeometry(item.orbitRadius, item.orbitRadius, vertexCount), // starts to go wrong at Uranus
 			new THREE.LineBasicMaterial({
 				color: 0xffffff,
 				transparent: true,
@@ -302,4 +325,4 @@ const clickTarget = {
 	}
 };
 
-export { setOrbitVisibility, text, labelLine, targetLine, rings, orbitLine, clickTarget };
+export { setOrbitVisibility, textLabel, text, labelLine, targetLine, rings, orbitLine, clickTarget };

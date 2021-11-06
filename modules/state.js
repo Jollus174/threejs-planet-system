@@ -34,6 +34,7 @@ const state = {
 		_labelLines: [],
 		_targetLines: [],
 		_textGroups: [],
+		_textLabels: [],
 		_navigable: []
 	},
 	orbitLines: {

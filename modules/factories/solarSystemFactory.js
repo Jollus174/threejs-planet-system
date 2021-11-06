@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
-import { text, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
+import { textLabel, text, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
 import { Color } from 'three';
 
@@ -77,31 +77,8 @@ const buildPlanet = async (planetData) => {
 	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
 	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
 
-	const planetMesh = new THREE.Mesh(
-		new THREE.SphereBufferGeometry(diameter, segments, segments),
-		new THREE.MeshStandardMaterial(material)
-	);
-
 	// create group first, label gets added here
 	const planetGroup = new THREE.Group();
-	planetGroup.add(planetMesh);
-
-	planetGroup.textGroup = text.build(planetData);
-	if (planetGroup.textGroup) planetGroup.add(planetGroup.textGroup);
-
-	planetGroup.labelLine = labelLine.build(planetData);
-	if (planetGroup.labelLine) planetGroup.add(planetGroup.labelLine);
-
-	planetGroup.targetLine = targetLine.build(planetData);
-	if (planetGroup.targetLine) planetGroup.add(planetGroup.targetLine);
-
-	planetGroup.clickTarget = clickTarget.build(planetData);
-	if (planetGroup.clickTarget) planetGroup.add(planetGroup.clickTarget);
-
-	planetGroup.rings = rings.build(planetData);
-	if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
-
-	planetGroup.orbitLine = orbitLine.build(planetData);
 	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
 
 	planetGroup.data = planetData.data || {};
@@ -123,9 +100,34 @@ const buildPlanet = async (planetData) => {
 	);
 	planetGroup.data.cameraDistance = null; // to set in the render loop
 
+	planetGroup.textLabel = textLabel.build(planetGroup);
+	planetGroup.add(planetGroup.textLabel);
+
+	planetGroup.textGroup = text.build(planetGroup);
+	if (planetGroup.textGroup) planetGroup.add(planetGroup.textGroup);
+
+	planetGroup.labelLine = labelLine.build(planetData);
+	if (planetGroup.labelLine) planetGroup.add(planetGroup.labelLine);
+
+	planetGroup.targetLine = targetLine.build(planetData);
+	if (planetGroup.targetLine) planetGroup.add(planetGroup.targetLine);
+
+	planetGroup.clickTarget = clickTarget.build(planetData);
+	if (planetGroup.clickTarget) planetGroup.add(planetGroup.clickTarget);
+
+	planetGroup.rings = rings.build(planetData);
+	if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
+
+	planetGroup.orbitLine = orbitLine.build(planetData);
+
+	const planetMesh = new THREE.Mesh(
+		new THREE.SphereBufferGeometry(diameter, segments, segments),
+		new THREE.MeshStandardMaterial(material)
+	);
 	planetMesh.name = `${planetData.name} mesh`;
 	planetMesh.data = planetMesh.data || {};
 	planetMesh.data.diameter = planetData.diameter;
+	planetGroup.add(planetMesh);
 
 	if (planetData.moons && planetData.moons.length) {
 		planetGroup.moonData = planetData.moons; // storing the data here so can access outside the loop
@@ -198,7 +200,7 @@ const skybox = (texturePaths) => {
 		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
 	);
 	const skybox = new THREE.Mesh(
-		new THREE.BoxBufferGeometry(10000000000, 10000000000, 10000000000),
+		new THREE.BoxBufferGeometry(100000000000, 100000000000, 100000000000),
 		skyboxMaterialArray
 	);
 	skybox.name = 'skybox';
