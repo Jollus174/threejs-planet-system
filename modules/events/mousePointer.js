@@ -44,7 +44,7 @@ const updateClickedGroup = (clickedGroup) => {
 	if (!clickedGroup) return;
 
 	state.cameraState._zoomToTarget = true;
-	controls.minDistance = state.mouseState._clickedGroup.data.size;
+	controls.minDistance = state.mouseState._clickedGroup.data.diameter;
 
 	if (!hasClickedSameTarget()) {
 		state.cameraState._rotateCameraYTo = state.mouseState._clickedGroup.position.y + 1.5;

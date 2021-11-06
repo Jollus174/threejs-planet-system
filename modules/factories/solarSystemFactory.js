@@ -8,17 +8,18 @@ import { Color } from 'three';
 
 // Making sure to build the moon + planet based off the data that's passed in
 const buildMoon = async (moonData, planetGroup) => {
-	const { size, segments, material } = moonData;
+	const { diameter, segments, material } = moonData;
 
 	const moonGroup = new THREE.Group();
-	moonGroup.name = `${moonData.name} moon group`;
 	moonGroup.data = moonGroup.data || {};
 	moonGroup.data.id = moonData.id;
-	moonGroup.data.size = moonData.size;
+	moonGroup.data.diameter = moonData.diameter;
 	moonGroup.data.orbit = Math.random() * Math.PI * 2;
 	moonGroup.data.orbitRadius = moonData.orbitRadius;
-	moonGroup.data.orbitSpeed = 0.05 / moonData.orbitRadius;
-	moonGroup.data.zoomTo = moonData.zoomTo || moonData.size * 10;
+	moonGroup.data.orbitSpeed = 0.00001 / moonData.orbitRadius;
+	moonGroup.data.name = moonData.name;
+	moonGroup.data.zoomTo = moonData.zoomTo || moonData.diameter * 10;
+	moonGroup.name = `${moonGroup.data.name} moon group`;
 	moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
 
 	moonGroup.textGroup = text.build(moonData, planetGroup);
@@ -48,7 +49,7 @@ const buildMoon = async (moonData, planetGroup) => {
 
 	if (!moonData.modelPath) {
 		const moonMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(size, segments, segments),
+			new THREE.SphereBufferGeometry(diameter, segments, segments),
 			new THREE.MeshStandardMaterial(material)
 		);
 
@@ -71,13 +72,13 @@ const buildMoon = async (moonData, planetGroup) => {
 };
 
 const buildPlanet = async (planetData) => {
-	const { size, segments, material } = planetData;
+	const { diameter, segments, material } = planetData;
 	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
 	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
 	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
 
 	const planetMesh = new THREE.Mesh(
-		new THREE.SphereBufferGeometry(size, segments, segments),
+		new THREE.SphereBufferGeometry(diameter, segments, segments),
 		new THREE.MeshStandardMaterial(material)
 	);
 
@@ -103,16 +104,17 @@ const buildPlanet = async (planetData) => {
 	planetGroup.orbitLine = orbitLine.build(planetData);
 	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
 
-	planetGroup.name = `${planetData.name} group`;
 	planetGroup.data = planetData.data || {};
 	planetGroup.data.id = planetData.id;
-	planetGroup.data.size = planetData.size;
+	planetGroup.data.name = planetData.name;
+	planetGroup.data.diameter = planetData.diameter;
 	planetGroup.data.orbitRadius = planetData.orbitRadius;
 	planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;
 	planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-	planetGroup.data.orbitSpeed = 0.009 / planetGroup.data.orbitRadius;
+	planetGroup.data.orbitSpeed = 0.0009 / planetGroup.data.orbitRadius;
 	planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
-	planetGroup.data.zoomTo = planetData.zoomTo || planetData.size * 10;
+	planetGroup.data.zoomTo = planetData.zoomTo || planetData.diameter * 10;
+	planetGroup.name = `${planetGroup.data.name} group`;
 	planetGroup.rotation.y = THREE.MathUtils.randFloatSpread(360);
 	planetGroup.position.set(
 		Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
@@ -123,7 +125,7 @@ const buildPlanet = async (planetData) => {
 
 	planetMesh.name = `${planetData.name} mesh`;
 	planetMesh.data = planetMesh.data || {};
-	planetMesh.data.size = planetData.size;
+	planetMesh.data.diameter = planetData.diameter;
 
 	if (planetData.moons && planetData.moons.length) {
 		planetGroup.moonData = planetData.moons; // storing the data here so can access outside the loop
@@ -195,7 +197,10 @@ const skybox = (texturePaths) => {
 	const skyboxMaterialArray = texturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
 	);
-	const skybox = new THREE.Mesh(new THREE.BoxBufferGeometry(10000, 10000, 10000), skyboxMaterialArray);
+	const skybox = new THREE.Mesh(
+		new THREE.BoxBufferGeometry(10000000000, 10000000000, 10000000000),
+		skyboxMaterialArray
+	);
 	skybox.name = 'skybox';
 
 	return skybox;

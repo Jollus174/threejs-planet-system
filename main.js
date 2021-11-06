@@ -5,7 +5,9 @@ import './style.css';
 import * as THREE from 'three';
 import { state } from './modules/state';
 import { settings } from './modules/settings';
-import { renderer } from './modules/renderer';
+import { renderer } from './modules/renderers/renderer';
+import { labelRenderer } from './modules/renderers/labelRenderer';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { easeTo, calculatePlanetDistance, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility, targetLine, labelLine, clickTarget, text, rings } from './modules/objectProps';
@@ -15,6 +17,7 @@ import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from '
 import { scene } from './modules/scene';
 
 window.state = state;
+window.settings = settings;
 
 let delta;
 
@@ -136,6 +139,7 @@ const render = () => {
 
 	state.controls.update();
 	renderer.render(state.scene, state.camera);
+	labelRenderer.render(state.scene, state.camera);
 };
 
 const animate = () => {
@@ -169,56 +173,66 @@ const init = () => {
 				state.scene.add(planetGroup.orbitLine);
 			}
 
-			if (planetGroup.moons) {
-				const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
+			// 		if (planetGroup.moons) {
+			// 			const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
 
-				Promise.all(moonPromises).then((moonGroups) => {
-					moonGroups.forEach((moonGroup) => {
-						planetGroup.moons.push(moonGroup);
-						state.bodies._orbitLines.push(moonGroup.orbitLine);
-						planetGroup.add(moonGroup.orbitLine);
-						state.scene.add(moonGroup);
-						state.bodies._moonGroups.push(moonGroup);
-						state.bodies._navigable.push(moonGroup);
-						state.bodies._textGroups.push(moonGroup.textGroup);
-						state.bodies._labelLines.push(moonGroup.labelLine);
-						state.bodies._targetLines.push(moonGroup.targetLine);
-					});
-				});
-			}
+			// 			Promise.all(moonPromises).then((moonGroups) => {
+			// 				moonGroups.forEach((moonGroup) => {
+			// 					planetGroup.moons.push(moonGroup);
+			// 					state.bodies._orbitLines.push(moonGroup.orbitLine);
+			// 					planetGroup.add(moonGroup.orbitLine);
+			// 					state.scene.add(moonGroup);
+			// 					state.bodies._moonGroups.push(moonGroup);
+			// 					state.bodies._navigable.push(moonGroup);
+			// 					state.bodies._textGroups.push(moonGroup.textGroup);
+			// 					state.bodies._labelLines.push(moonGroup.labelLine);
+			// 					state.bodies._targetLines.push(moonGroup.targetLine);
+			// 				});
+			// 			});
+			// 		}
 
 			state.bodies._navigable.push(planetGroup);
 			state.bodies._textGroups.push(planetGroup.textGroup);
 			state.bodies._labelLines.push(planetGroup.labelLine);
 			state.bodies._targetLines.push(planetGroup.targetLine);
 			state.scene.add(planetGroup);
+
+			const planetDiv = document.createElement('div');
+			planetDiv.className = 'label';
+			planetDiv.textContent = planetGroup.data.name;
+			const planetLabel = new CSS2DObject(planetDiv);
+			planetLabel.position.set(0, 0, 0);
+			console.log(planetLabel);
+			planetGroup.add(planetLabel);
 		});
-
-		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(window.innerWidth, window.innerHeight);
-
-		state.camera.position.y = 32;
-		state.camera.position.z = 100;
-
-		state.isDesktop = checkIfDesktop();
-
-		// adding lights to state
-		state.lights._pointLights = pointLights();
-		// state.lights._spotLights = spotLights();
-		state.lights._ambientLights = ambientLights();
-
-		// add all lights at once because I cbf doing them individually
-		const lightTypeKeys = Object.keys(state.lights);
-		lightTypeKeys.forEach((lightType) => {
-			state.lights[lightType].forEach((lightObjsArr) => {
-				lightObjsArr.forEach((lightObj) => scene.add(lightObj));
-			});
-		});
-
-		initMousePointerEvents();
-
-		animate();
 	});
+
+	state.isDesktop = checkIfDesktop();
+
+	// adding lights to state
+	state.lights._pointLights = pointLights();
+	// state.lights._spotLights = spotLights();
+	state.lights._ambientLights = ambientLights();
+
+	// add all lights at once because I cbf doing them individually
+	const lightTypeKeys = Object.keys(state.lights);
+	lightTypeKeys.forEach((lightType) => {
+		state.lights[lightType].forEach((lightObjsArr) => {
+			lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+		});
+	});
+
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	document.body.appendChild(labelRenderer.domElement);
+	labelRenderer.render(state.scene, state.camera);
+
+	state.camera.position.y = 10000000;
+	state.camera.position.z = 120000000;
+	initMousePointerEvents();
+
+	animate();
 };
 
 init();

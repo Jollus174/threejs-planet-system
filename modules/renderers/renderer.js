@@ -1,5 +1,5 @@
 import { WebGLRenderer } from 'three';
-import { settings } from './settings';
+import { settings } from '../settings';
 
 const domTarget = document.querySelector('#bg');
 const renderer = new WebGLRenderer({

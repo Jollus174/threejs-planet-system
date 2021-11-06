@@ -1,5 +1,11 @@
+import { settings } from './settings';
 import { PerspectiveCamera } from 'three';
 
-const camera = new PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new PerspectiveCamera(
+	settings.camera._fov,
+	settings.camera._aspect,
+	settings.camera._near,
+	settings.camera._far
+);
 
 export { camera };

@@ -1,17 +1,19 @@
 // custom OrbitControls so can expose the dollyIn() / dollyOut() functions
 import { OrbitControls } from './custom/jsm/controls/OrbitControls';
 import { camera } from './camera';
-import { renderer } from './renderer';
+import { settings } from './settings';
+import { labelRenderer } from './renderers/labelRenderer';
 
-// window.controls = state.controls;
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.minDistance = 0.1;
-controls.maxDistance = 650;
-controls.enableKeys = true;
-controls.minPolarAngle = 0.5;
-controls.maxPolarAngle = 2.5;
+const controls = new OrbitControls(camera, labelRenderer.domElement);
+
+controls.minDistance = settings.controls._minDistance;
+controls.maxDistance = settings.controls._maxDistance;
+controls.enableDamping = settings.controls._enableDamping;
+controls.dampingFactor = settings.controls._dampingFactor;
+controls.enableKeys = settings.controls._enableKeys;
+controls.minPolarAngle = settings.controls._minPolarAngle;
+controls.maxPolarAngle = settings.controls._maxPolarAngle;
+
 controls.keys = {
 	LEFT: 'KeyA',
 	UP: 'KeyW',
