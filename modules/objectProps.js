@@ -253,23 +253,61 @@ const targetLine = {
 
 const orbitLine = {
 	build: (item) => {
-		if (!item.includeOrbitLine) return;
 		let vertexCount = 720;
-		if (item.name === 'Uranus') vertexCount = 1600;
-		if (item.name === 'Neptune') vertexCount = 2400;
-		const orbit = new THREE.Line(
-			new THREE.RingBufferGeometry(item.orbitRadius, item.orbitRadius, vertexCount), // starts to go wrong at Uranus
+		if (item.englishName === 'Uranus') vertexCount = 1600;
+		if (item.englishName === 'Neptune') vertexCount = 2400;
+		// it sounds like aphelion * eccentricity should be applied to the x-axis...
+		// const curve = new THREE.EllipseCurve(
+		// 	item.aphelion * item.eccentricity,
+		// 	0,
+		// 	item.aphelion,
+		// 	item.perihelion,
+		// 	0,
+		// 	2 * Math.PI,
+		// 	false,
+		// 	0
+		// );
+		// const curvePoints = [
+		// 	new THREE.Vector3(item.aphelion, 0, -item.perihelion),
+		// 	new THREE.Vector3(item.aphelion, 100000, item.perihelion),
+		// 	new THREE.Vector3(-item.aphelion, 0, item.perihelion),
+		// 	new THREE.Vector3(-item.aphelion, 500000, -item.perihelion)
+		// ];
+		const inclinationAdj = item.aphelion * (item.inclination / 90);
+		const eccentricityAdj = item.aphelion * item.eccentricity;
+		// top, right, bottom, left
+		const curvePoints = [
+			new THREE.Vector3(0 + eccentricityAdj, 0, item.perihelion),
+			new THREE.Vector3(item.aphelion + eccentricityAdj, inclinationAdj, 0),
+			new THREE.Vector3(0 + eccentricityAdj, 0, -item.perihelion),
+			new THREE.Vector3(-item.aphelion + eccentricityAdj, -inclinationAdj, 0)
+		];
+		const curve = new THREE.CatmullRomCurve3(curvePoints);
+		curve.closed = true;
+		curve.curveType = 'catmullrom';
+		// 0 being sharp angles, 1 being the angles being stretched as much as possible
+		curve.tension = 0.85;
+
+		const points = curve.getPoints(vertexCount);
+		const ellipse = new THREE.Line(
+			new THREE.BufferGeometry().setFromPoints(points),
 			new THREE.LineBasicMaterial({
 				color: 0xffffff,
 				transparent: true,
-				opacity: 0.1,
+				// opacity: 0.1,
+				opacity: 1,
 				visible: setOrbitVisibility()
 			})
 		);
-		orbit.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
-		orbit.name = `${item.name} orbit line`;
 
-		return orbit;
+		// ellipse.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
+		// ellipse.rotation.y = THREE.Math.degToRad(item.inclination);
+		// ellipse.rotation.z = THREE.Math.degToRad(item.longAscNode);
+		ellipse.name = `${item.englishName} orbit line`;
+
+		console.log([item.englishName, curve, ellipse]);
+
+		return { curve, ellipse };
 	}
 };
 
