@@ -14,7 +14,7 @@ const settings = {
 		_minPolarAngle: 0.5,
 		_maxPolarAngle: 2.5,
 
-		_dollySpeedMax: 0.95,
+		_dollySpeedMax: 0.93,
 		_dollySpeedMin: 0.999
 	},
 	mouse: {

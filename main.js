@@ -7,13 +7,20 @@ import { state } from './modules/state';
 import { settings } from './modules/settings';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { easeTo, calculatePlanetDistance, checkIfDesktop } from './modules/utils';
+import { easeTo, getLabelDistances, checkIfDesktop, getRandomArbitrary, calculateOrbit } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { setOrbitVisibility, targetLine, labelLine, clickTarget, text, rings } from './modules/objectProps';
-import { skyboxTexturePaths, sunData, planetData } from './modules/data/solarSystem';
-import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
+import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from './modules/objectProps';
+import { skyboxTexturePaths, sunData, rawPlanetData, planetColours } from './modules/data/solarSystem';
+import {
+	asteroidBelt,
+	skybox,
+	starField,
+	buildPlanet,
+	buildMoon,
+	buildPlanetLabel
+} from './modules/factories/solarSystemFactory';
 import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
+import { orbitLine } from './modules/objectProps';
 import { scene } from './modules/scene';
 
 window.state = state;
@@ -27,11 +34,7 @@ const clock = new THREE.Clock();
 
 const render = () => {
 	delta = 5 * clock.getDelta();
-	if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
-
-	state.mouseState._mouseHoverTarget = state.mouseState._mouseHasMoved
-		? returnHoveredGroup()
-		: state.mouseState._mouseHoverTarget;
+	// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
 
 	// determining if mouse was held
 	if (state.mouseState._mouseClicked) {
@@ -61,51 +64,34 @@ const render = () => {
 		});
 	}
 
-	if (state.mouseState._clickedGroup) {
-		// This is because since the mesh is bound to its parent, it's xyz is 0,0,0 and therefore useless
-		state.controls.update();
-	}
+	// text.renderLoop(state.bodies._sun);
 
-	text.renderLoop(state.bodies._sun);
-
-	state.bodies._planetGroups.forEach((planetGroup) => {
-		planetGroup.rotation.y += planetGroup.data.rotSpeed * delta;
-		planetGroup.data.orbit += planetGroup.data.orbitSpeed;
-		planetGroup.position.set(
-			Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-			0,
-			Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-		);
-		planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
-
-		clickTarget.renderLoop(planetGroup);
-		text.renderLoop(planetGroup);
-		labelLine.renderLoop(planetGroup);
-		targetLine.renderLoop(planetGroup);
-		rings.renderLoop(planetGroup);
-
-		if (planetGroup.moons) {
-			planetGroup.moons.forEach((moonGroup) => {
-				moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
-
-				moonGroup.position.set(
-					planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-					planetGroup.position.y + 0,
-					planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-				);
-
-				moonGroup.rotation.z -= 0.01 * delta;
-				if (moonGroup && moonGroup.data) {
-					moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
-
-					clickTarget.renderLoop(moonGroup);
-					text.renderLoop(moonGroup);
-					labelLine.renderLoop(moonGroup);
-					targetLine.renderLoop(moonGroup);
-				}
-			});
-		}
-	});
+	// state.bodies._planetGroups.forEach((planetGroup) => {
+	// planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
+	// clickTarget.renderLoop(planetGroup);
+	// text.renderLoop(planetGroup);
+	// labelLine.renderLoop(planetGroup);
+	// targetLine.renderLoop(planetGroup);
+	// rings.renderLoop(planetGroup);
+	// if (planetGroup.moons) {
+	// 	planetGroup.moons.forEach((moonGroup) => {
+	// 		moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
+	// 		moonGroup.position.set(
+	// 			planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
+	// 			planetGroup.position.y + 0,
+	// 			planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
+	// 		);
+	// 		moonGroup.rotation.z -= 0.01 * delta;
+	// 		if (moonGroup && moonGroup.data) {
+	// 			moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
+	// 			clickTarget.renderLoop(moonGroup);
+	// 			text.renderLoop(moonGroup);
+	// 			labelLine.renderLoop(moonGroup);
+	// 			targetLine.renderLoop(moonGroup);
+	// 		}
+	// 	});
+	// }
+	// });
 
 	if (state.mouseState._clickedGroup) {
 		state.controls.target.x += easeTo({ from: state.controls.target.x, to: state.mouseState._clickedGroup.position.x });
@@ -114,7 +100,7 @@ const render = () => {
 	}
 
 	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
-		const objZoomTo = state.mouseState._clickedGroup.data.zoomTo;
+		const objZoomTo = state.mouseState._clickedGroup.data.meanRadius * 4; // TODO: probably temp number
 		const distanceToTarget = state.controls.getDistance();
 		const distCalc = objZoomTo; // zoom out further on mobile due to smaller width
 
@@ -153,6 +139,36 @@ const init = () => {
 	state.bodies._asteroidBelt = asteroidBelt();
 
 	state.scene.add(state.skybox);
+
+	// hacky business to add in some colours
+	// will expand upon when constructing the data object
+	const planetData = [...rawPlanetData];
+	planetData.forEach((planet) => {
+		const orbitMesh = orbitLine.build(planet);
+		orbitMesh.name = `${planet.englishName} orbit line`;
+		state.bodies._orbitLines.push(orbitMesh);
+		state.scene.add(orbitMesh);
+
+		let planetLabelGroup = new THREE.Group();
+		const planetLabel = buildPlanetLabel(planet, planet.englishName, planetColours[planet.englishName.toLowerCase()]);
+		planetLabelGroup.add(planetLabel);
+
+		planetLabelGroup.name = `${planet.englishName} group label`;
+		planetLabelGroup.data = { ...planet };
+
+		state.bodies._planetLabels.push(planetLabelGroup);
+
+		const { x, y, z } = calculateOrbit(
+			getRandomArbitrary(0, 360),
+			planet.perihelion,
+			planet.aphelion,
+			planet.inclination,
+			planet.eccentricity
+		);
+		planetLabelGroup.position.set(x, y, z);
+		scene.add(planetLabelGroup);
+	});
+
 	// state.scene.add(state.bodies._starField);
 	// state.scene.add(state.bodies._asteroidBelt);
 
@@ -165,42 +181,45 @@ const init = () => {
 		state.scene.add(sunGroup);
 	});
 
-	const planetPromises = planetData.map((pData) => buildPlanet(pData));
+	/* const planetPromises = planetData.map((pData) => buildPlanet(pData));
 	Promise.all(planetPromises).then((planetGroups) => {
 		planetGroups.forEach((planetGroup) => {
-			state.bodies._planetGroups.push(planetGroup);
+			// console.log(planetGroup);
 
-			if (planetGroup.orbitLine) {
-				state.bodies._orbitLines.push(planetGroup.orbitLine);
-				state.scene.add(planetGroup.orbitLine);
-			}
+			// const orbitLine = planetGroup.orbitLine;
+			// const orbitCurve = planetGroup.orbitCurve;
+			// if (orbitLine) {
+			// 	state.bodies._orbitLines.push(orbitLine);
+			// 	state.scene.add(orbitLine);
+			// }
 
-			if (planetGroup.moons) {
-				const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
+			// if (planetGroup.moons) {
+			// 	const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
 
-				Promise.all(moonPromises).then((moonGroups) => {
-					moonGroups.forEach((moonGroup) => {
-						planetGroup.moons.push(moonGroup);
-						state.bodies._orbitLines.push(moonGroup.orbitLine);
-						planetGroup.add(moonGroup.orbitLine);
-						state.scene.add(moonGroup);
-						state.bodies._moonGroups.push(moonGroup);
-						state.bodies._navigable.push(moonGroup);
-						state.bodies._textGroups.push(moonGroup.textGroup);
-						state.bodies._labelLines.push(moonGroup.labelLine);
-						state.bodies._targetLines.push(moonGroup.targetLine);
-					});
-				});
-			}
+			// 	Promise.all(moonPromises).then((moonGroups) => {
+			// 		moonGroups.forEach((moonGroup) => {
+			// 			planetGroup.moons.push(moonGroup);
+			// 			state.bodies._orbitLines.push(moonGroup.orbitLine);
+			// 			planetGroup.add(moonGroup.orbitLine);
+			// 			state.scene.add(moonGroup);
+			// 			state.bodies._moonGroups.push(moonGroup);
+			// 			state.bodies._navigable.push(moonGroup);
+			// 			state.bodies._textGroups.push(moonGroup.textGroup);
+			// 			state.bodies._labelLines.push(moonGroup.labelLine);
+			// 			state.bodies._targetLines.push(moonGroup.targetLine);
+			// 		});
+			// 	});
+			// }
 
-			state.bodies._navigable.push(planetGroup);
-			state.bodies._textLabels.push(planetGroup.textLabel);
-			state.bodies._textGroups.push(planetGroup.textGroup);
-			state.bodies._labelLines.push(planetGroup.labelLine);
-			state.bodies._targetLines.push(planetGroup.targetLine);
-			state.scene.add(planetGroup);
+			// state.bodies._navigable.push(planetGroup);
+			// if (planetGroup.textLabel) state.bodies._textLabels.push(planetGroup.textLabel);
+			if (planetGroup.textGroup) state.bodies._textGroups.push(planetGroup.textGroup);
+			if (planetGroup.labelLine) state.bodies._labelLines.push(planetGroup.labelLine);
+			if (planetGroup.targetLine) state.bodies._targetLines.push(planetGroup.targetLine);
+
+			// planetGroup.position.set(30000000, 0, 1000);
 		});
-	});
+	}); */
 
 	state.isDesktop = checkIfDesktop();
 
@@ -228,6 +247,15 @@ const init = () => {
 	initMousePointerEvents();
 
 	animate();
+
+	// stuff that we don't need every frame since that could be expensive
+	setInterval(getLabelDistances, 500);
+
+	// TODO: temp button
+	document.querySelector('#position-back').addEventListener('click', () => {
+		state.mouseState._clickedGroup = null;
+		state.controls.reset();
+	});
 };
 
 init();
@@ -245,6 +273,7 @@ settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
 });
 
 document.addEventListener('keydown', (e) => {
+	// TODO: when all planet data finished loading in, create a new ordered array based on their distance from the sun
 	const getIndexById = (targetId) => state.bodies._navigable.findIndex((item) => item.data.id === targetId);
 	if (e.code === 'KeyZ' || e.code === 'KeyC') {
 		const navigableLength = state.bodies._navigable.length;

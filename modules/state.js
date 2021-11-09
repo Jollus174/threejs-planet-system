@@ -28,14 +28,16 @@ const state = {
 		_sun: null,
 		_starField: null,
 		_asteroidBelt: null,
-		_planetGroups: [],
+		_planetLabels: [],
+		// _planetGroups: [],
 		_moonGroups: [],
 		_orbitLines: [],
 		_labelLines: [],
 		_targetLines: [],
 		_textGroups: [],
 		_textLabels: [],
-		_navigable: []
+		_navigable: [],
+		_inRange: []
 	},
 	orbitLines: {
 		_orbitLinesVisible: true

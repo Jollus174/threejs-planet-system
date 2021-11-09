@@ -2,9 +2,8 @@
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
-import { textLabel, text, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
+import { textLabel, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
-import { Color } from 'three';
 
 // Making sure to build the moon + planet based off the data that's passed in
 const buildMoon = async (moonData, planetGroup) => {
@@ -21,9 +20,6 @@ const buildMoon = async (moonData, planetGroup) => {
 	moonGroup.data.zoomTo = moonData.zoomTo || moonData.diameter * 10;
 	moonGroup.name = `${moonGroup.data.name} moon group`;
 	moonGroup.position.set(planetGroup.position.x, planetGroup.position.y, planetGroup.position.z);
-
-	moonGroup.textGroup = text.build(moonData, planetGroup);
-	if (moonGroup.textGroup) moonGroup.add(moonGroup.textGroup);
 
 	moonGroup.labelLine = labelLine.build(moonData);
 	if (moonGroup.labelLine) moonGroup.add(moonGroup.labelLine);
@@ -45,7 +41,7 @@ const buildMoon = async (moonData, planetGroup) => {
 	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
 	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
 	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
-	material.emissive = material.emissive ? new Color(material.emissive) : null;
+	material.emissive = material.emissive ? new THREE.Color(material.emissive) : null;
 
 	if (!moonData.modelPath) {
 		const moonMesh = new THREE.Mesh(
@@ -71,6 +67,8 @@ const buildMoon = async (moonData, planetGroup) => {
 	return moonGroup;
 };
 
+const buildPlanetLabel = (planetData, item, colour) => textLabel.build(planetData, item, colour);
+
 const buildPlanet = async (planetData) => {
 	const { diameter, segments, material } = planetData;
 	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
@@ -78,55 +76,41 @@ const buildPlanet = async (planetData) => {
 	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
 
 	// create group first, label gets added here
-	const planetGroup = new THREE.Group();
-	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
 
-	planetGroup.data = planetData.data || {};
-	planetGroup.data.id = planetData.id;
-	planetGroup.data.name = planetData.name;
-	planetGroup.data.diameter = planetData.diameter;
-	planetGroup.data.orbitRadius = planetData.orbitRadius;
-	planetGroup.data.rotSpeed = 0.005 + Math.random() * 0.01;
-	planetGroup.data.rotSpeed *= Math.random() < 0.1 ? -1 : 1;
-	planetGroup.data.orbitSpeed = 0.0009 / planetGroup.data.orbitRadius;
-	planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
-	planetGroup.data.zoomTo = planetData.zoomTo || planetData.diameter * 10;
+	const planetGroup = new THREE.Group();
+
+	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
+	planetGroup.data = { ...planetData };
+	planetGroup.data.name = planetData.englishName;
 	planetGroup.name = `${planetGroup.data.name} group`;
-	planetGroup.rotation.y = THREE.MathUtils.randFloatSpread(360);
-	planetGroup.position.set(
-		Math.cos(planetGroup.data.orbit) * planetGroup.data.orbitRadius,
-		0,
-		Math.sin(planetGroup.data.orbit) * planetGroup.data.orbitRadius
-	);
+	planetGroup.data.diameter = planetData.meanRadius * 2;
+	// planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
+	planetGroup.data.zoomTo = planetData.zoomTo || planetGroup.data.diameter * 10;
 	planetGroup.data.cameraDistance = null; // to set in the render loop
 
-	planetGroup.textLabel = textLabel.build(planetGroup);
-	planetGroup.add(planetGroup.textLabel);
+	// planetGroup.textLabel = textLabel.build(planetGroup);
+	// planetGroup.add(planetGroup.textLabel);
 
-	planetGroup.textGroup = text.build(planetGroup);
-	if (planetGroup.textGroup) planetGroup.add(planetGroup.textGroup);
+	// planetGroup.textGroup = text.build(planetGroup);
+	// if (planetGroup.textGroup) planetGroup.add(planetGroup.textGroup);
 
-	planetGroup.labelLine = labelLine.build(planetData);
-	if (planetGroup.labelLine) planetGroup.add(planetGroup.labelLine);
+	// planetGroup.labelLine = labelLine.build(planetData);
+	// if (planetGroup.labelLine) planetGroup.add(planetGroup.labelLine);
 
-	planetGroup.targetLine = targetLine.build(planetData);
-	if (planetGroup.targetLine) planetGroup.add(planetGroup.targetLine);
+	// planetGroup.targetLine = targetLine.build(planetData);
+	// if (planetGroup.targetLine) planetGroup.add(planetGroup.targetLine);
 
-	planetGroup.clickTarget = clickTarget.build(planetData);
-	if (planetGroup.clickTarget) planetGroup.add(planetGroup.clickTarget);
+	// planetGroup.clickTarget = clickTarget.build(planetData);
+	// if (planetGroup.clickTarget) planetGroup.add(planetGroup.clickTarget);
 
-	planetGroup.rings = rings.build(planetData);
-	if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
-
-	planetGroup.orbitLine = orbitLine.build(planetData);
+	// planetGroup.rings = rings.build(planetData);
+	// if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
 
 	const planetMesh = new THREE.Mesh(
 		new THREE.SphereBufferGeometry(diameter, segments, segments),
 		new THREE.MeshStandardMaterial(material)
 	);
 	planetMesh.name = `${planetData.name} mesh`;
-	planetMesh.data = planetMesh.data || {};
-	planetMesh.data.diameter = planetData.diameter;
 	planetGroup.add(planetMesh);
 
 	if (planetData.moons && planetData.moons.length) {
@@ -245,4 +229,4 @@ const starField = () => {
 	return starfieldObj;
 };
 
-export { skybox, starField, asteroidBelt, buildPlanet, buildMoon };
+export { skybox, starField, asteroidBelt, buildPlanetLabel, buildPlanet, buildMoon };

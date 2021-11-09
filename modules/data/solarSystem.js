@@ -64,442 +64,419 @@ const sunData = {
 	}
 };
 
-const planetData = [
+const rawPlanetData = [
 	{
-		id: 1,
-		name: 'Mercury',
-		orbitRadius: 55565000,
-		diameter: 4879.4,
-		segments: 32,
-		zoomTo: null,
-		labelColour: '#b78668',
-		textColour: '#b78668',
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 55565000,
-			diameter: 4879.4,
-			spinTime: 59,
-			orbitTime: 88,
-			gravity: 0.38
+		id: 'mercure',
+		name: 'Mercure',
+		englishName: 'Mercury',
+		isPlanet: true,
+		moons: null,
+		semimajorAxis: 57909227,
+		perihelion: 46001200,
+		aphelion: 69816900,
+		eccentricity: 0.2056,
+		inclination: 7.0,
+		mass: {
+			massValue: 3.30114,
+			massExponent: 23
 		},
-		material: {
-			map: textureMercury,
-			normalMap: normalMercury
-		}
+		vol: {
+			volValue: 6.083,
+			volExponent: 10
+		},
+		density: 5.4291,
+		gravity: 3.7,
+		escape: 4250.0,
+		meanRadius: 2439.4,
+		equaRadius: 2440.53,
+		polarRadius: 2439.7,
+		flattening: 0.0,
+		dimension: '',
+		sideralOrbit: 87.969,
+		sideralRotation: 1407.6,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 0.0352,
+		avgTemp: 0,
+		mainAnomaly: 174.796,
+		argPeriapsis: 29.022,
+		longAscNode: 48.378,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mercure'
 	},
 	{
-		id: 2,
-		name: 'Venus',
-		orbitRadius: 108650000,
-		diameter: 121036,
-		segments: 32,
-		labelColour: '#f3b3b3',
-		textColour: '#f3b3b3',
-		zoomTo: null,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 108650000,
-			diameter: 12104,
-			spinTime: 243,
-			orbitTime: 224,
-			gravity: 0.9
+		id: 'venus',
+		name: 'Vénus',
+		englishName: 'Venus',
+		isPlanet: true,
+		moons: null,
+		semimajorAxis: 108208475,
+		perihelion: 107477000,
+		aphelion: 108939000,
+		eccentricity: 0.0067,
+		inclination: 3.39,
+		mass: {
+			massValue: 4.86747,
+			massExponent: 24
 		},
-		material: {
-			map: textureVenus,
-			normalMap: normalVenus
-		}
+		vol: {
+			volValue: 9.2843,
+			volExponent: 11
+		},
+		density: 5.243,
+		gravity: 8.87,
+		escape: 10360.0,
+		meanRadius: 6051.8,
+		equaRadius: 6051.8,
+		polarRadius: 6051.8,
+		flattening: 0.0,
+		dimension: '',
+		sideralOrbit: 224.701,
+		sideralRotation: -5832.5,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 177.36,
+		avgTemp: 0,
+		mainAnomaly: 50.115,
+		argPeriapsis: 54.78,
+		longAscNode: 76.785,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/venus'
 	},
 	{
-		id: 3,
-		name: 'Earth',
-		orbitRadius: 148900000,
-		diameter: 12742,
-		segments: 32,
-		labelColour: '#6dcbe7',
-		textColour: '#6dcbe7',
-		zoomTo: null,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 148900000,
-			diameter: 12742,
-			spinTime: 1,
-			orbitTime: 365.25,
-			gravity: 1
-		},
-		material: {
-			map: textureEarth,
-			normalMap: normalEarth
-		},
+		id: 'terre',
+		name: 'La Terre',
+		englishName: 'Earth',
+		isPlanet: true,
 		moons: [
 			{
-				id: 4,
-				name: 'Luna',
-				parentName: 'Earth',
-				orbitRadius: 384400,
-				diameter: 3474.8,
-				segments: 32,
-				labelColour: '#dae0e0',
-				textColour: '#dae0e0',
-				zoomTo: null,
-				includeOrbitLine: true,
-				includeLabelLine: true,
-				includeTargetLine: true,
-				spaceBetweenText: 0.5,
-				titleFontSize: 0.3,
-				statsFontSize: 0.085,
-				stats: {
-					distanceFromPlanet: 384400,
-					diameter: 3478.8,
-					spinTime: 27,
-					orbitTime: 27,
-					gravity: 0.1654
-				},
-				material: {
-					map: textureMoon,
-					normalMap: normalMoon
-				}
-			}
-		]
-	},
-	{
-		id: 5,
-		name: 'Mars',
-		orbitRadius: 241130000,
-		diameter: 6779,
-		segments: 32,
-		labelColour: '#fe9657',
-		textColour: '#fe9657',
-		zoomTo: null,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 241130000,
-			diameter: 6794,
-			spinTime: 1.0257,
-			orbitTime: 687,
-			gravity: 0.38
-		},
-		material: {
-			map: textureMars,
-			normalMap: normalMars
-		},
-		moons: [
-			{
-				id: 6,
-				name: 'Phobos',
-				parentName: 'Mars',
-				orbitRadius: 9380,
-				diameter: 22.5,
-				segments: 32,
-				labelColour: '#8c8c8b',
-				textColour: '#8c8c8b',
-				zoomTo: null,
-				modelPath: `${domainPath}models/phobos.glb`,
-				modelScale: 0.002,
-				includeOrbitLine: true,
-				includeLabelLine: true,
-				includeTargetLine: true,
-				spaceBetweenText: 0.5,
-				titleFontSize: 0.3,
-				statsFontSize: 0.085,
-				stats: {
-					distanceFromPlanet: 9380,
-					diameter: 22.5,
-					spinTime: 0.3191,
-					orbitTime: 0.3191,
-					gravity: 0.006
-				},
-				material: {
-					emissive: '#FFF',
-					emissiveIntensity: 0.02
-				}
-			},
-			{
-				id: 7,
-				name: 'Deimos',
-				parentName: 'Mars',
-				orbitRadius: 23436,
-				diameter: 12.4,
-				segments: 32,
-				labelColour: '#8c8c8b',
-				textColour: '#8c8c8b',
-				zoomTo: null,
-				modelPath: `${domainPath}models/deimos.glb`,
-				modelScale: 0.002,
-				includeOrbitLine: true,
-				includeLabelLine: true,
-				includeTargetLine: true,
-				spaceBetweenText: 0.5,
-				titleFontSize: 0.3,
-				statsFontSize: 0.085,
-				stats: {
-					distanceFromPlanet: 23436,
-					diameter: 12.4,
-					spinTime: 1.26244,
-					orbitTime: 1.26244,
-					gravity: 0.003
-				},
-				material: {
-					emissive: '#FFF',
-					emissiveIntensity: 0.05
-				}
-			}
-		]
-	},
-	{
-		id: 8,
-		name: 'Jupiter',
-		orbitRadius: 749140000,
-		diameter: 139820,
-		segments: 64,
-		labelColour: '#e0ab79',
-		textColour: '#e0ab79',
-		// zoomTo: 20,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 778369000,
-			diameter: 139820,
-			spinTime: 0.4132,
-			orbitTime: 11.86,
-			gravity: 2.64
-		},
-		material: {
-			map: textureJupiter
-		},
-		moons: [
-			{
-				id: 9,
-				name: 'Io',
-				parentName: 'Jupiter',
-				orbitRadius: 422000,
-				diameter: 3643,
-				segments: 32,
-				labelColour: '#8c8c8b',
-				textColour: '#8c8c8b',
-				zoomTo: null,
-				includeOrbitLine: true,
-				includeLabelLine: true,
-				includeTargetLine: true,
-				titleFontSize: null,
-				statsFontSize: null,
-				stats: {
-					distanceFromPlanet: 422000,
-					diameter: 3643,
-					spinTime: 1.77,
-					orbitTime: 1.77,
-					gravity: 0.183
-				},
-				material: {
-					map: textureIo
-				}
+				moon: 'La Lune',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/lune'
 			}
 		],
-		rings: [
-			{
-				start: 2.7,
-				end: 4.2,
-				angle: 85,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.1,
-					map: textureSaturnRing,
-					side: DoubleSide
-				}
-			}
-		]
+		semimajorAxis: 149598262,
+		perihelion: 147095000,
+		aphelion: 152100000,
+		eccentricity: 0.0167,
+		inclination: 0.0,
+		mass: {
+			massValue: 5.97237,
+			massExponent: 24
+		},
+		vol: {
+			volValue: 1.08321,
+			volExponent: 12
+		},
+		density: 5.5136,
+		gravity: 9.8,
+		escape: 11190.0,
+		meanRadius: 6371.0084,
+		equaRadius: 6378.1366,
+		polarRadius: 6356.8,
+		flattening: 0.00335,
+		dimension: '',
+		sideralOrbit: 365.256,
+		sideralRotation: 23.9345,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 23.4393,
+		avgTemp: 0,
+		mainAnomaly: 358.617,
+		argPeriapsis: 85.901,
+		longAscNode: 18.272,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/terre'
 	},
 	{
-		id: 10,
-		name: 'Saturn',
-		orbitRadius: 1483200000,
-		diameter: 116460,
-		segments: 64,
-		labelColour: '#ffe577',
-		textColour: '#ffe577',
-		// zoomTo: 20,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 1483200000,
-			diameter: 116460,
-			spinTime: 0.4438,
-			orbitTime: 29,
-			gravity: 1.11
-		},
-		material: {
-			map: textureSaturn
-		},
-		rings: [
+		id: 'mars',
+		name: 'Mars',
+		englishName: 'Mars',
+		isPlanet: true,
+		moons: [
 			{
-				start: 2.4,
-				end: 5,
-				angle: 75,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					map: textureSaturnRing,
-					side: DoubleSide
-				}
+				moon: 'Phobos',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/phobos'
+			},
+			{
+				moon: 'Deïmos',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/deimos'
 			}
-		]
+		],
+		semimajorAxis: 227943824,
+		perihelion: 206700000,
+		aphelion: 249200000,
+		eccentricity: 0.0935,
+		inclination: 1.85,
+		mass: {
+			massValue: 6.41712,
+			massExponent: 23
+		},
+		vol: {
+			volValue: 1.6318,
+			volExponent: 11
+		},
+		density: 3.9341,
+		gravity: 3.71,
+		escape: 5030.0,
+		meanRadius: 3389.5,
+		equaRadius: 3396.19,
+		polarRadius: 3376.2,
+		flattening: 0.00589,
+		dimension: '',
+		sideralOrbit: 686.98,
+		sideralRotation: 24.6229,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 25.19,
+		avgTemp: 0,
+		mainAnomaly: 19.412,
+		argPeriapsis: 286.231,
+		longAscNode: 49.667,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mars'
 	},
 	{
-		id: 11,
+		id: 'jupiter',
+		name: 'Jupiter',
+		englishName: 'Jupiter',
+		isPlanet: true,
+		moons: [],
+		semimajorAxis: 778340821,
+		perihelion: 740379835,
+		aphelion: 816620000,
+		eccentricity: 0.0489,
+		inclination: 1.304,
+		mass: {
+			massValue: 1.89819,
+			massExponent: 27
+		},
+		vol: {
+			volValue: 1.43128,
+			volExponent: 15
+		},
+		density: 1.3262,
+		gravity: 24.79,
+		escape: 60200.0,
+		meanRadius: 69911.0,
+		equaRadius: 71492.0,
+		polarRadius: 66854.0,
+		flattening: 0.06487,
+		dimension: '',
+		sideralOrbit: 4332.589,
+		sideralRotation: 9.925,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 3.12,
+		avgTemp: 0,
+		mainAnomaly: 20.02,
+		argPeriapsis: 273.442,
+		longAscNode: 100.398,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/jupiter'
+	},
+	{
+		id: 'saturne',
+		name: 'Saturne',
+		englishName: 'Saturn',
+		isPlanet: true,
+		moons: [],
+		semimajorAxis: 1426666422,
+		perihelion: 1349823615,
+		aphelion: 1503509229,
+		eccentricity: 0.0565,
+		inclination: 2.485,
+		mass: {
+			massValue: 5.68336,
+			massExponent: 26
+		},
+		vol: {
+			volValue: 8.2713,
+			volExponent: 14
+		},
+		density: 0.6871,
+		gravity: 10.44,
+		escape: 36090.0,
+		meanRadius: 58232.0,
+		equaRadius: 60268.0,
+		polarRadius: 54364.0,
+		flattening: 0.09796,
+		dimension: '',
+		sideralOrbit: 10759.22,
+		sideralRotation: 10.656,
+		aroundPlanet: null,
+		discoveredBy: '',
+		discoveryDate: '',
+		alternativeName: '',
+		axialTilt: 26.73,
+		avgTemp: 0,
+		mainAnomaly: 317.02,
+		argPeriapsis: 336.178,
+		longAscNode: 113.759,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/saturne'
+	},
+	{
+		id: 'uranus',
 		name: 'Uranus',
-		orbitRadius: 2951658186,
-		diameter: 50724,
-		segments: 64,
-		// zoomTo: 15,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 2951658186,
-			diameter: 50724,
-			spinTime: 0.718,
-			orbitTime: 84,
-			gravity: 1.11
+		englishName: 'Uranus',
+		isPlanet: true,
+		moons: [],
+		semimajorAxis: 2870658186,
+		perihelion: 2734998229,
+		aphelion: 3006318143,
+		eccentricity: 0.0457,
+		inclination: 0.772,
+		mass: {
+			massValue: 8.68127,
+			massExponent: 25
 		},
-		labelColour: '#c8ecef',
-		textColour: '#c8ecef',
-		material: {
-			map: textureUranus
-		}
-		// rings: [
-		// 	{
-		// 		start: 2.0,
-		// 		end: 2.2,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.05,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	},
-		// 	{
-		// 		start: 2.25,
-		// 		end: 2.4,
-		// 		angle: 87,
-		// 		material: {
-		// 			color: 0xffffff,
-		// 			transparent: true,
-		// 			opacity: 0.1,
-		// 			map: textureRing,
-		// 			side: DoubleSide
-		// 		}
-		// 	}
-		// ]
+		vol: {
+			volValue: 6.833,
+			volExponent: 13
+		},
+		density: 1.27,
+		gravity: 8.87,
+		escape: 21380.0,
+		meanRadius: 25362.0,
+		equaRadius: 25559.0,
+		polarRadius: 24973.0,
+		flattening: 0.02293,
+		dimension: '',
+		sideralOrbit: 30685.4,
+		sideralRotation: -17.24,
+		aroundPlanet: null,
+		discoveredBy: 'William Herschel',
+		discoveryDate: '13/03/1781',
+		alternativeName: '',
+		axialTilt: 97.77,
+		avgTemp: 0,
+		mainAnomaly: 142.2386,
+		argPeriapsis: 98.862,
+		longAscNode: 73.967,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/uranus'
 	},
 	{
-		id: 12,
+		id: 'neptune',
 		name: 'Neptune',
-		orbitRadius: 4474960000,
-		diameter: 24622,
-		segments: 64,
-		// zoomTo: 15,
-		includeOrbitLine: true,
-		includeLabelLine: true,
-		includeTargetLine: true,
-		spaceBetweenText: 1,
-		titleFontSize: 0.5,
-		statsFontSize: 0.15,
-		stats: {
-			distanceToSun: 4474960000,
-			diameter: 49532,
-			spinTime: 0.6715,
-			orbitTime: 164.8,
-			gravity: 1.21
+		englishName: 'Neptune',
+		isPlanet: true,
+		moons: [],
+		semimajorAxis: 4498396441,
+		perihelion: 4459753056,
+		aphelion: 4537039826,
+		eccentricity: 0.0113,
+		inclination: 1.769,
+		mass: {
+			massValue: 1.02413,
+			massExponent: 26
 		},
-		labelColour: '#3b54d2',
-		textColour: '#3b54d2',
-		material: {
-			map: textureNeptune
+		vol: {
+			volValue: 6.254,
+			volExponent: 13
 		},
-		rings: [
+		density: 1.638,
+		gravity: 11.15,
+		escape: 23560.0,
+		meanRadius: 24622.0,
+		equaRadius: 24764.0,
+		polarRadius: 24341.0,
+		flattening: 0.01708,
+		dimension: '',
+		sideralOrbit: 60189.0,
+		sideralRotation: 16.11,
+		aroundPlanet: null,
+		discoveredBy: 'Urbain Le Verrier, John Couch Adams, Johann Galle',
+		discoveryDate: '23/09/1846',
+		alternativeName: '',
+		axialTilt: 28.3,
+		avgTemp: 0,
+		mainAnomaly: 256.228,
+		argPeriapsis: 256.932,
+		longAscNode: 131.823,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/neptune'
+	},
+
+	{
+		id: 'pluton',
+		name: 'Pluton',
+		englishName: 'Pluto',
+		isPlanet: true,
+		moons: [
 			{
-				start: 2.0,
-				end: 2.05,
-				angle: 87,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.05,
-					map: textureRing,
-					side: DoubleSide
-				}
+				moon: 'Charon',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/charon'
 			},
 			{
-				start: 2.08,
-				end: 2.11,
-				angle: 87,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.05,
-					map: textureRing,
-					side: DoubleSide
-				}
+				moon: 'Nix',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/nix'
 			},
 			{
-				start: 2.17,
-				end: 2.4,
-				angle: 87,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.1,
-					map: textureRing,
-					side: DoubleSide
-				}
+				moon: 'Hydra',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/hydra'
 			},
 			{
-				start: 2.45,
-				end: 2.5,
-				angle: 87,
-				material: {
-					color: 0xffffff,
-					transparent: true,
-					opacity: 0.1,
-					map: textureRing,
-					side: DoubleSide
-				}
+				moon: 'Kerberos',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/kerberos'
+			},
+			{
+				moon: 'Styx',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/styx'
 			}
-		]
+		],
+		semimajorAxis: 5906440628,
+		perihelion: 4436756954,
+		aphelion: 7376124302,
+		eccentricity: 0.2488,
+		inclination: 17.16,
+		mass: {
+			massValue: 1.303,
+			massExponent: 22
+		},
+		vol: {
+			volValue: 7.15,
+			volExponent: 9
+		},
+		density: 1.89,
+		gravity: 0.62,
+		escape: 1210,
+		meanRadius: 1188.3,
+		equaRadius: 1188.3,
+		polarRadius: 1195,
+		flattening: 0,
+		dimension: '',
+		sideralOrbit: 90465,
+		sideralRotation: -153.2928,
+		aroundPlanet: null,
+		discoveredBy: 'Clyde W. Tombaugh',
+		discoveryDate: '18/02/1930',
+		alternativeName: '',
+		axialTilt: 122.5,
+		avgTemp: 0,
+		mainAnomaly: 14.53,
+		argPeriapsis: 113.175,
+		longAscNode: 110.088,
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pluton'
 	}
 ];
 
-export { skyboxTexturePaths, sunData, planetData };
+const planetColours = {
+	sun: '#ffb01f', // the sun
+	mercury: '#b78668', // mercury
+	venus: '#f3b3b3', // venus
+	earth: '#6dcbe7', // earth
+	luna: '#dae0e0', // luna
+	mars: '#fe9657', // mars
+	phobos: '#8c8c8b', // phobos
+	deimos: '#8c8c8b', // deimos
+	jupiter: '#e0ab79', // jupiter
+	io: '#8c8c8b', // io
+	saturn: '#ffe577', // saturn
+	uranus: '#c8ecef', // uranus
+	neptune: '#3b54d2' // neptune
+};
+
+export { skyboxTexturePaths, sunData, rawPlanetData, planetColours };

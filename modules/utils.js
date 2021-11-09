@@ -1,13 +1,40 @@
 'use strict';
-import { Texture, BufferGeometry, RingBufferGeometry, Vector3, PointsMaterial } from 'three';
+import { Texture, BufferGeometry, RingBufferGeometry, Vector3, PointsMaterial, MathUtils } from 'three';
 import { state } from './state';
-import { settings } from './settings';
 
 // get deviation between a set of values stored in an array
 const getStandardDeviation = (array) => {
 	const n = array.length;
 	const mean = array.reduce((a, b) => a + b) / n;
 	return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+};
+
+const getRandomArbitrary = (min, max) => {
+	return Math.random() * (max - min) + min;
+};
+
+const calculateOrbit = (i, perihelion, aphelion, inclination, eccentricity) => {
+	let x = 0,
+		y = 0,
+		z = 0;
+	if (
+		i === undefined ||
+		perihelion === undefined ||
+		aphelion === undefined ||
+		inclination === undefined ||
+		eccentricity === undefined
+	) {
+		return { x, y, z };
+	}
+
+	const inclinationAdj = aphelion * (inclination / 90);
+	const eccentricityAdj = aphelion * eccentricity;
+
+	x = Math.sin(MathUtils.degToRad(i)) * aphelion + eccentricityAdj;
+	y = Math.sin(MathUtils.degToRad(i)) * inclinationAdj;
+	z = Math.cos(MathUtils.degToRad(i)) * perihelion;
+
+	return { x, y, z };
 };
 
 // draw a circle to a new canvas so we can render a circle texture (good for Points)
@@ -28,6 +55,18 @@ const createCircleTexture = (color, size) => {
 	texture.needsUpdate = true;
 	// return a texture made from the canvas
 	return texture;
+};
+
+const getLabelDistances = () => {
+	state.bodies._planetLabels.forEach((planetLabel) => {
+		planetLabel.data.distance = state.camera.position.distanceTo(planetLabel.position);
+
+		// either 1000000 or 10000000
+		// if (planetLabel.data.distance < 1000000) {
+		if (planetLabel.data.distance < 10000000) {
+			console.log(`${planetLabel.name} is in range`);
+		}
+	});
 };
 
 const createCircleFromPoints = (radius) => {
@@ -74,28 +113,6 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 	return (to - from) / incrementer;
 };
 
-const fadeTextOpacity = (group, text) => {
-	const { _clickedGroup } = state.mouseState;
-	const { _textOpacityDefault } = settings.text;
-
-	if (
-		_clickedGroup &&
-		_clickedGroup.name === group.name &&
-		group.data.cameraDistance < group.data.zoomTo + 14 &&
-		group.data.cameraDistance > group.data.zoomTo - 1
-	) {
-		text.material.forEach((m) => {
-			m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
-		});
-	} else {
-		text.material.forEach((m) => {
-			m.opacity = m.opacity > _textOpacityDefault ? (m.opacity -= 0.05) : 0;
-		});
-	}
-};
-
-const calculatePlanetDistance = (planet) => state.camera.position.distanceTo(planet.position);
-
 const fadeTargetLineOpacity = (group, targetLine) => {
 	const { _clickedGroup } = state.mouseState;
 	let m = targetLine.material;
@@ -118,13 +135,14 @@ const checkIfDesktop = () => ['screen-lg', 'screen-xl'].includes(getBreakpoint()
 
 export {
 	getStandardDeviation,
+	getRandomArbitrary,
+	calculateOrbit,
 	createCircleTexture,
+	getLabelDistances,
 	createCircleFromPoints,
 	ringUVMapGeometry,
 	easeTo,
-	calculatePlanetDistance,
 	fadeTargetLineOpacity,
-	fadeTextOpacity,
 	numberWithCommas,
 	getBreakpoint,
 	checkIfDesktop

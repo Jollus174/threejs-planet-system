@@ -3,125 +3,29 @@ import * as THREE from 'three';
 import { createCircleFromPoints, numberWithCommas, ringUVMapGeometry } from './utils';
 import { state } from './state';
 import { settings } from './settings';
-import { checkIfDesktop, easeTo, fadeTextOpacity, fadeTargetLineOpacity } from './utils';
+import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from 'three/examples/jsm/renderers/css2drenderer';
+import { updateClickedGroup } from './events/mousePointer';
 
 const setOrbitVisibility = () => {
 	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
 };
 
-const text = {
-	build: (item) => {
-		if (!item.textColour) return;
-		const fontGroup = new THREE.Group();
-		const { _textOpacityDefault, _fontSettings } = settings.text;
-
-		const createTextMesh = (geo, color) => {
-			const textMesh = new THREE.Mesh(geo, [
-				new THREE.MeshBasicMaterial({
-					color,
-					side: THREE.FrontSide,
-					depthTest: false,
-					depthWrite: false,
-					opacity: _textOpacityDefault,
-					transparent: true
-				}), // front
-				new THREE.MeshBasicMaterial({
-					color,
-					side: THREE.FrontSide,
-					opacity: _textOpacityDefault,
-					transparent: true,
-					depthTest: false,
-					depthWrite: false
-				}) // side
-			]);
-
-			textMesh.renderOrder = 999; // will force text to always render on top, even on weird stuff (like Saturn's rings)
-
-			return textMesh;
-		};
-
-		fontLoader.load(`fonts/futura-lt_book.json`, (font) => {
-			// am only including the uppercase glyphs for this
-			const titleGeo = new THREE.TextGeometry(item.name.toUpperCase(), {
-				font,
-				size: item.diameter * 0.5,
-				..._fontSettings
-			});
-			titleGeo.computeBoundingBox(); // for aligning the text
-
-			const titleMesh = createTextMesh(titleGeo, item.textColour);
-
-			const centreOffsetY = -0.5 * (titleGeo.boundingBox.max.y - titleGeo.boundingBox.min.y);
-			const rightOffset = titleGeo.boundingBox.min.x;
-			fontGroup.position.x = rightOffset; // will CENTRE the group, to use as a foundation for positioning other elements
-			titleMesh.position.x = 0 - titleGeo.boundingBox.max.x - item.diameter * 2; // will align text to the LEFT of the planet
-			titleMesh.position.y = centreOffsetY;
-			titleMesh.name = `${item.name} title`;
-
-			fontGroup.add(titleMesh);
-
-			fontLoader.load(`fonts/sylfaen_regular.json`, (font) => {
-				const stats = item.stats || {};
-				const { distanceToSun, diameter, spinTime, orbitTime, gravity, distanceFromPlanet } = stats;
-
-				const textArray = [];
-				const textValues = [
-					distanceToSun ? `Distance to Sun: ${numberWithCommas(distanceToSun)} km` : null,
-					distanceFromPlanet ? `Distance from ${item.parentName}: ${numberWithCommas(distanceFromPlanet)} km` : null,
-					diameter ? `Diameter: ${numberWithCommas(diameter)} km` : null,
-					spinTime ? `Spin Time: ${numberWithCommas(spinTime)} Days` : null,
-					orbitTime ? `Orbit Time: ${numberWithCommas(orbitTime)} Days` : null,
-					gravity ? `Gravity: ${gravity} G` : null
-				];
-				textValues.forEach((val) => {
-					if (val !== null) textArray.push(val);
-				});
-
-				const descGeo = new THREE.TextGeometry(textArray.join('\n'), {
-					font,
-					size: item.diameter * 0.2,
-					..._fontSettings
-				});
-				descGeo.computeBoundingBox(); // for aligning the text
-
-				const descMesh = createTextMesh(descGeo, 0xffffff);
-				// descMesh.scale.set(item.statsScale, item.statsScale, item.statsScale); // sorry Sun, we're doing this the proper way
-
-				const centreOffsetY = -0.5 * (descGeo.boundingBox.max.y - descGeo.boundingBox.min.y);
-				descMesh.position.x = item.diameter * 2; // will align text to the LEFT of the planet
-				descMesh.position.y = 0 - centreOffsetY - item.diameter / 10; // this value seems to correct the v-alignment, not sure why
-				descMesh.name = `${item.name} desc`;
-				fontGroup.add(descMesh);
-			});
-		});
-
-		fontGroup.name = `${item.name} text group`;
-
-		return fontGroup;
-	},
-
-	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.textGroup) return;
-		planetGroup.textGroup.lookAt(state.camera.position);
-		planetGroup.textGroup.children.forEach((text) => fadeTextOpacity(planetGroup, text));
-	}
-};
-
 const textLabel = {
-	build: (itemGroup) => {
+	build: (item, name, colour) => {
 		const labelDiv = document.createElement('div');
 		labelDiv.className = 'label';
-		labelDiv.style.borderColor = itemGroup.data.labelColour;
-		labelDiv.innerHTML = `<span>${itemGroup.data.name}</span>`;
+		labelDiv.style.borderColor = colour;
+		labelDiv.innerHTML = `<span>${name}</span>`;
 		const groupLabel = new CSS2DObject(labelDiv);
 		groupLabel.position.set(0, 0, 0);
 
 		labelDiv.addEventListener('pointerdown', () => {
-			console.log('pointer down');
 			state.cameraState._zoomToTarget = true;
-			state.mouseState._clickedGroup = itemGroup;
+			state.controls.saveState(); // saving state so can use the [Back] button
+			document.querySelector('#position-back').disabled = false;
+			updateClickedGroup(state.bodies._planetLabels.filter((p) => p.name.includes(item.englishName))[0]);
 		});
 
 		return groupLabel;
@@ -244,7 +148,7 @@ const targetLine = {
 	},
 
 	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.targetLine);
+		if (!planetGroup || !planetGroup.targetLine) return;
 		const targetLine = planetGroup.targetLine;
 		targetLine.lookAt(state.camera.position);
 		fadeTargetLineOpacity(planetGroup, targetLine);
@@ -253,42 +157,12 @@ const targetLine = {
 
 const orbitLine = {
 	build: (item) => {
-		let vertexCount = 720;
-		if (item.englishName === 'Uranus') vertexCount = 1600;
-		if (item.englishName === 'Neptune') vertexCount = 2400;
-		// it sounds like aphelion * eccentricity should be applied to the x-axis...
-		// const curve = new THREE.EllipseCurve(
-		// 	item.aphelion * item.eccentricity,
-		// 	0,
-		// 	item.aphelion,
-		// 	item.perihelion,
-		// 	0,
-		// 	2 * Math.PI,
-		// 	false,
-		// 	0
-		// );
-		// const curvePoints = [
-		// 	new THREE.Vector3(item.aphelion, 0, -item.perihelion),
-		// 	new THREE.Vector3(item.aphelion, 100000, item.perihelion),
-		// 	new THREE.Vector3(-item.aphelion, 0, item.perihelion),
-		// 	new THREE.Vector3(-item.aphelion, 500000, -item.perihelion)
-		// ];
-		const inclinationAdj = item.aphelion * (item.inclination / 90);
-		const eccentricityAdj = item.aphelion * item.eccentricity;
-		// top, right, bottom, left
-		const curvePoints = [
-			new THREE.Vector3(0 + eccentricityAdj, 0, item.perihelion),
-			new THREE.Vector3(item.aphelion + eccentricityAdj, inclinationAdj, 0),
-			new THREE.Vector3(0 + eccentricityAdj, 0, -item.perihelion),
-			new THREE.Vector3(-item.aphelion + eccentricityAdj, -inclinationAdj, 0)
-		];
-		const curve = new THREE.CatmullRomCurve3(curvePoints);
-		curve.closed = true;
-		curve.curveType = 'catmullrom';
-		// 0 being sharp angles, 1 being the angles being stretched as much as possible
-		curve.tension = 0.85;
+		const points = [];
+		for (let i = 0; i <= 360; i += 0.03) {
+			const { x, y, z } = calculateOrbit(i, item.perihelion, item.aphelion, item.inclination, item.eccentricity);
+			points.push(new THREE.Vector3(x, y, z));
+		}
 
-		const points = curve.getPoints(vertexCount);
 		const ellipse = new THREE.Line(
 			new THREE.BufferGeometry().setFromPoints(points),
 			new THREE.LineBasicMaterial({
@@ -300,14 +174,8 @@ const orbitLine = {
 			})
 		);
 
-		// ellipse.rotation.x = THREE.Math.degToRad(90); // to set them from vertical to horizontal
-		// ellipse.rotation.y = THREE.Math.degToRad(item.inclination);
-		// ellipse.rotation.z = THREE.Math.degToRad(item.longAscNode);
 		ellipse.name = `${item.englishName} orbit line`;
-
-		console.log([item.englishName, curve, ellipse]);
-
-		return { curve, ellipse };
+		return ellipse;
 	}
 };
 
@@ -363,4 +231,4 @@ const clickTarget = {
 	}
 };
 
-export { setOrbitVisibility, textLabel, text, labelLine, targetLine, rings, orbitLine, clickTarget };
+export { setOrbitVisibility, textLabel, labelLine, targetLine, rings, orbitLine, clickTarget };
