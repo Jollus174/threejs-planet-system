@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
-import { textLabel, labelLine, targetLine, orbitLine, rings, clickTarget } from '../objectProps';
+import { textLabel, labelLine, targetLine, OrbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
 
 // Making sure to build the moon + planet based off the data that's passed in
@@ -30,7 +30,7 @@ const buildMoon = async (moonData, planetGroup) => {
 	moonGroup.clickTarget = clickTarget.build(moonData);
 	if (moonGroup.clickTarget) moonGroup.add(moonGroup.clickTarget);
 
-	moonGroup.orbitLine = orbitLine.build(moonData);
+	// moonGroup.orbitLine = orbitLine.build(moonData);
 
 	moonGroup.position.set(
 		planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
@@ -66,8 +66,6 @@ const buildMoon = async (moonData, planetGroup) => {
 
 	return moonGroup;
 };
-
-const buildPlanetLabel = (planetData, item, colour) => textLabel.build(planetData, item, colour);
 
 const buildPlanet = async (planetData) => {
 	const { diameter, segments, material } = planetData;
@@ -229,4 +227,4 @@ const starField = () => {
 	return starfieldObj;
 };
 
-export { skybox, starField, asteroidBelt, buildPlanetLabel, buildPlanet, buildMoon };
+export { skybox, starField, asteroidBelt, textLabel, buildPlanet, buildMoon };

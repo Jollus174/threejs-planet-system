@@ -34,7 +34,19 @@ const settings = {
 	orbitLines: {
 		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
 	},
-	domTarget: document.querySelector('#bg')
+	domTarget: document.querySelector('#bg'),
+	planetColours: {
+		default: '#8c8c8b',
+		sun: '#ffb01f',
+		mercury: '#b78668',
+		venus: '#f3b3b3',
+		earth: '#6dcbe7',
+		mars: '#fe9657',
+		jupiter: '#e0ab79',
+		saturn: '#ffe577',
+		uranus: '#c8ecef',
+		neptune: '#3b54d2'
+	}
 };
 
 export { settings };

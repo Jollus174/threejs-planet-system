@@ -7,21 +7,22 @@ import { state } from './modules/state';
 import { settings } from './modules/settings';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
-import { easeTo, getLabelDistances, checkIfDesktop, getRandomArbitrary, calculateOrbit } from './modules/utils';
+import { easeTo, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from './modules/objectProps';
-import { skyboxTexturePaths, sunData, rawPlanetData, planetColours } from './modules/data/solarSystem';
+import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
 import {
 	asteroidBelt,
 	skybox,
 	starField,
 	buildPlanet,
 	buildMoon,
-	buildPlanetLabel
+	textLabel
 } from './modules/factories/solarSystemFactory';
 import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
-import { orbitLine } from './modules/objectProps';
+import { PlanetLabelClass } from './modules/objectProps';
 import { scene } from './modules/scene';
+import { sortAllData } from './modules/data/api';
 
 window.state = state;
 window.settings = settings;
@@ -140,33 +141,10 @@ const init = () => {
 
 	state.scene.add(state.skybox);
 
-	// hacky business to add in some colours
-	// will expand upon when constructing the data object
-	const planetData = [...rawPlanetData];
-	planetData.forEach((planet) => {
-		const orbitMesh = orbitLine.build(planet);
-		orbitMesh.name = `${planet.englishName} orbit line`;
-		state.bodies._orbitLines.push(orbitMesh);
-		state.scene.add(orbitMesh);
-
-		let planetLabelGroup = new THREE.Group();
-		const planetLabel = buildPlanetLabel(planet, planet.englishName, planetColours[planet.englishName.toLowerCase()]);
-		planetLabelGroup.add(planetLabel);
-
-		planetLabelGroup.name = `${planet.englishName} group label`;
-		planetLabelGroup.data = { ...planet };
-
-		state.bodies._planetLabels.push(planetLabelGroup);
-
-		const { x, y, z } = calculateOrbit(
-			getRandomArbitrary(0, 360),
-			planet.perihelion,
-			planet.aphelion,
-			planet.inclination,
-			planet.eccentricity
-		);
-		planetLabelGroup.position.set(x, y, z);
-		scene.add(planetLabelGroup);
+	state.bodies._planets.forEach((planet) => {
+		const planetLabelClass = new PlanetLabelClass(planet);
+		state.bodies.classes._planetLabels.push(planetLabelClass);
+		planetLabelClass.build();
 	});
 
 	// state.scene.add(state.bodies._starField);
@@ -248,17 +226,16 @@ const init = () => {
 
 	animate();
 
-	// stuff that we don't need every frame since that could be expensive
-	setInterval(getLabelDistances, 500);
-
-	// TODO: temp button
+	// TODO: temp buttons
 	document.querySelector('#position-back').addEventListener('click', () => {
 		state.mouseState._clickedGroup = null;
 		state.controls.reset();
 	});
-};
 
-init();
+	document.querySelector('#clear-all').addEventListener('click', () => {
+		state.bodies.classes._planetLabels.forEach((pLabelClass) => pLabelClass.remove());
+	});
+};
 
 window.addEventListener('resize', () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -301,3 +278,5 @@ document.addEventListener('keydown', (e) => {
 		}
 	}
 });
+
+sortAllData().then(init);

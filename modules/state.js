@@ -25,19 +25,28 @@ const state = {
 	},
 	skybox: null,
 	bodies: {
-		_sun: null,
+		_bodiesAll: [],
+		_sun: {},
+		_dwarfPlanets: [],
 		_starField: null,
 		_asteroidBelt: null,
 		_planetLabels: [],
+		_moonLabels: [],
+		_dwarfPlanetLabels: [],
 		// _planetGroups: [],
-		_moonGroups: [],
+		_planets: [],
+		_moons: [],
+		_satellites: [],
 		_orbitLines: [],
 		_labelLines: [],
 		_targetLines: [],
 		_textGroups: [],
 		_textLabels: [],
 		_navigable: [],
-		_inRange: []
+		_inRange: [],
+		classes: {
+			_planetLabels: []
+		}
 	},
 	orbitLines: {
 		_orbitLinesVisible: true

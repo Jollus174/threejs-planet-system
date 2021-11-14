@@ -3,10 +3,11 @@ import * as THREE from 'three';
 import { createCircleFromPoints, numberWithCommas, ringUVMapGeometry } from './utils';
 import { state } from './state';
 import { settings } from './settings';
-import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit } from './utils';
+import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from 'three/examples/jsm/renderers/css2drenderer';
 import { updateClickedGroup } from './events/mousePointer';
+import { asteroidBelt } from './factories/solarSystemFactory';
 
 const setOrbitVisibility = () => {
 	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
@@ -31,6 +32,127 @@ const textLabel = {
 		return groupLabel;
 	}
 };
+
+class OrbitLine {
+	constructor(object) {
+		this.object = object;
+		this.orbitLineName = `${object.englishName} orbit line`;
+		this.orbitMesh = null;
+	}
+
+	build() {
+		const isMoon = this.object.aroundPlanet;
+		const isDwarfPlanet = state.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.object.name);
+		const points = [];
+		for (let i = 0; i <= 360; i += 0.03) {
+			const { x, y, z } = calculateOrbit(
+				i,
+				this.object.perihelion,
+				this.object.aphelion,
+				this.object.inclination,
+				this.object.eccentricity
+			);
+			points.push(new THREE.Vector3(x, y, z));
+		}
+
+		this.orbitMesh = new THREE.Line(
+			new THREE.BufferGeometry().setFromPoints(points),
+			new THREE.LineBasicMaterial({
+				color: isMoon ? settings.planetColours.default : '#FFF',
+				transparent: true,
+				opacity: isDwarfPlanet ? 0.2 : 1,
+				visible: setOrbitVisibility()
+			})
+		);
+
+		this.orbitMesh.name = this.orbitLineName;
+		state.bodies._orbitLines.push(this.orbitMesh);
+		state.scene.add(this.orbitMesh); // TODO, this should be the parent of the group
+	}
+
+	remove() {
+		const i = state.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
+		state.bodies._orbitLines.splice(i, 1);
+		state.scene.remove(this.orbitMesh);
+	}
+}
+
+const handleLabelClick = (data) => {
+	state.cameraState._zoomToTarget = true;
+	state.controls.saveState(); // saving state so can use the [Back] button
+	document.querySelector('#position-back').disabled = false;
+	console.log(this);
+	updateClickedGroup(state.bodies._planetLabels.filter((p) => p.data.englishName.includes(data.englishName))[0]);
+};
+
+class PlanetLabelClass {
+	constructor(data) {
+		this.data = data;
+		this.labelDiv = document.createElement('div');
+		this.orbitLine = new OrbitLine(data);
+		this.planetLabelGroup = new THREE.Mesh();
+		this.intervalCheckDistance = null;
+		this.evtHandleLabelClick = null;
+	}
+
+	build() {
+		this.labelDiv.className = 'label';
+		this.labelDiv.style.borderColor = this.data.labelColour;
+		this.labelDiv.innerHTML = `<span>${this.data.englishName}</span>`;
+		const CSSObj = new CSS2DObject(this.labelDiv);
+		CSSObj.position.set(0, 0, 0);
+
+		this.planetLabelGroup.name = `${this.data.englishName} group label`;
+		this.planetLabelGroup.data = this.data;
+		this.planetLabelGroup.add(CSSObj);
+		state.bodies._planetLabels.push(this.planetLabelGroup);
+
+		// calculate orbit
+		const { x, y, z } = calculateOrbit(
+			getRandomArbitrary(0, 360), // random position along orbit
+			this.data.perihelion,
+			this.data.aphelion,
+			this.data.inclination,
+			this.data.eccentricity
+		);
+		this.planetLabelGroup.position.set(x, y, z);
+
+		this.evtHandleLabelClick = () => handleLabelClick(this.data);
+		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
+
+		this.intervalCheckDistance = setInterval(() => {
+			this.handleDistance();
+		}, 1000);
+
+		// building + adding orbit mesh
+		this.orbitLine.build();
+
+		state.scene.add(this.planetLabelGroup);
+	}
+
+	handleDistance() {
+		const distance = state.camera.position.distanceTo(this.planetLabelGroup.position);
+
+		// either 1000000 or 10000000
+		if (distance < 10000000) {
+			console.log(`${this.data.englishName} is in range`);
+		}
+	}
+
+	update() {
+		// render loop stuff, I suppose?
+		// could get expensive
+	}
+
+	remove() {
+		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
+		clearInterval(this.intervalCheckDistance);
+		this.orbitLine.remove();
+
+		this.planetLabelGroup.children.forEach((child) => this.planetLabelGroup.remove(child));
+		state.scene.remove(this.planetLabelGroup);
+	}
+}
 
 const labelLine = {
 	build: (item) => {
@@ -155,30 +277,6 @@ const targetLine = {
 	}
 };
 
-const orbitLine = {
-	build: (item) => {
-		const points = [];
-		for (let i = 0; i <= 360; i += 0.03) {
-			const { x, y, z } = calculateOrbit(i, item.perihelion, item.aphelion, item.inclination, item.eccentricity);
-			points.push(new THREE.Vector3(x, y, z));
-		}
-
-		const ellipse = new THREE.Line(
-			new THREE.BufferGeometry().setFromPoints(points),
-			new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				transparent: true,
-				// opacity: 0.1,
-				opacity: 1,
-				visible: setOrbitVisibility()
-			})
-		);
-
-		ellipse.name = `${item.englishName} orbit line`;
-		return ellipse;
-	}
-};
-
 const clickTarget = {
 	build: (item) => {
 		const clickTargetSizeMobile = Math.min(item.diameter * 50, 8),
@@ -231,4 +329,4 @@ const clickTarget = {
 	}
 };
 
-export { setOrbitVisibility, textLabel, labelLine, targetLine, rings, orbitLine, clickTarget };
+export { setOrbitVisibility, textLabel, PlanetLabelClass, OrbitLine, labelLine, targetLine, rings, clickTarget };

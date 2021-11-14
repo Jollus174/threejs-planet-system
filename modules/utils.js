@@ -57,18 +57,6 @@ const createCircleTexture = (color, size) => {
 	return texture;
 };
 
-const getLabelDistances = () => {
-	state.bodies._planetLabels.forEach((planetLabel) => {
-		planetLabel.data.distance = state.camera.position.distanceTo(planetLabel.position);
-
-		// either 1000000 or 10000000
-		// if (planetLabel.data.distance < 1000000) {
-		if (planetLabel.data.distance < 10000000) {
-			console.log(`${planetLabel.name} is in range`);
-		}
-	});
-};
-
 const createCircleFromPoints = (radius) => {
 	const points = [];
 
@@ -138,7 +126,6 @@ export {
 	getRandomArbitrary,
 	calculateOrbit,
 	createCircleTexture,
-	getLabelDistances,
 	createCircleFromPoints,
 	ringUVMapGeometry,
 	easeTo,

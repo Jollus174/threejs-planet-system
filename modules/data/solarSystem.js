@@ -64,6 +64,10 @@ const sunData = {
 	}
 };
 
+const rawMoonData = [
+	
+];
+
 const rawPlanetData = [
 	{
 		id: 'mercure',
@@ -463,20 +467,4 @@ const rawPlanetData = [
 	}
 ];
 
-const planetColours = {
-	sun: '#ffb01f', // the sun
-	mercury: '#b78668', // mercury
-	venus: '#f3b3b3', // venus
-	earth: '#6dcbe7', // earth
-	luna: '#dae0e0', // luna
-	mars: '#fe9657', // mars
-	phobos: '#8c8c8b', // phobos
-	deimos: '#8c8c8b', // deimos
-	jupiter: '#e0ab79', // jupiter
-	io: '#8c8c8b', // io
-	saturn: '#ffe577', // saturn
-	uranus: '#c8ecef', // uranus
-	neptune: '#3b54d2' // neptune
-};
-
-export { skyboxTexturePaths, sunData, rawPlanetData, planetColours };
+export { skyboxTexturePaths, sunData, rawPlanetData };
