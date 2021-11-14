@@ -5,7 +5,7 @@ import { state } from './state';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
-import { CSS2DObject } from 'three/examples/jsm/renderers/css2drenderer';
+import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { updateClickedGroup } from './events/mousePointer';
 import { asteroidBelt } from './factories/solarSystemFactory';
 
