@@ -1,4 +1,4 @@
-import { CSS2DRenderer } from 'three/examples/jsm/renderers/css2drenderer';
+import { CSS2DRenderer } from '../custom/jsm/renderers/CSS2DRenderer';
 
 const labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);

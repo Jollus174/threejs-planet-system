@@ -495,6 +495,8 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function handleMouseWheel(event) {
+			stateDefault.cameraState._zoomToTarget = false;
+
 			if (event.deltaY < 0) {
 				_global.dollyIn(getZoomScale());
 			} else if (event.deltaY > 0) {

@@ -10,7 +10,8 @@ const state = {
 		_zoomToTarget: false,
 		_dollySpeed: null,
 		_rotateToTarget: false,
-		_rotateCameraYTo: null
+		_rotateCameraYTo: null,
+		_currentZoomDistanceThreshold: 0
 	},
 	mouseState: {
 		_mouseHasMoved: false,

@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
-import { textLabel, labelLine, targetLine, OrbitLine, rings, clickTarget } from '../objectProps';
+import { labelLine, targetLine, OrbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
 
 // Making sure to build the moon + planet based off the data that's passed in
@@ -227,4 +227,4 @@ const starField = () => {
 	return starfieldObj;
 };
 
-export { skybox, starField, asteroidBelt, textLabel, buildPlanet, buildMoon };
+export { skybox, starField, asteroidBelt, buildPlanet, buildMoon };

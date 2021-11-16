@@ -1,3 +1,4 @@
+/* globals Element */
 import { Matrix4, Object3D, Vector3 } from 'three';
 
 class CSS2DObject extends Object3D {
@@ -111,6 +112,7 @@ class CSS2DRenderer {
 				}
 
 				element.style.display = object.visible && _vector.z >= -1 && _vector.z <= 1 ? '' : 'none';
+				element.dataset.labelName = element.textContent.toLowerCase();
 
 				const objectData = {
 					distanceToCameraSquared: getDistanceToSquared(camera, object)

@@ -13,26 +13,6 @@ const setOrbitVisibility = () => {
 	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
 };
 
-const textLabel = {
-	build: (item, name, colour) => {
-		const labelDiv = document.createElement('div');
-		labelDiv.className = 'label';
-		labelDiv.style.borderColor = colour;
-		labelDiv.innerHTML = `<span>${name}</span>`;
-		const groupLabel = new CSS2DObject(labelDiv);
-		groupLabel.position.set(0, 0, 0);
-
-		labelDiv.addEventListener('pointerdown', () => {
-			state.cameraState._zoomToTarget = true;
-			state.controls.saveState(); // saving state so can use the [Back] button
-			document.querySelector('#position-back').disabled = false;
-			updateClickedGroup(state.bodies._planetLabels.filter((p) => p.name.includes(item.englishName))[0]);
-		});
-
-		return groupLabel;
-	}
-};
-
 class OrbitLine {
 	constructor(object) {
 		this.object = object;
@@ -90,15 +70,15 @@ class PlanetLabelClass {
 		this.data = data;
 		this.labelDiv = document.createElement('div');
 		this.orbitLine = new OrbitLine(data);
-		this.planetLabelGroup = new THREE.Mesh();
+		this.planetLabelGroup = new THREE.Group();
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
 	}
 
 	build() {
 		this.labelDiv.className = 'label';
-		this.labelDiv.style.borderColor = this.data.labelColour;
-		this.labelDiv.innerHTML = `<span>${this.data.englishName}</span>`;
+		this.labelDiv.style.color = this.data.labelColour;
+		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
 		const CSSObj = new CSS2DObject(this.labelDiv);
 		CSSObj.position.set(0, 0, 0);
 
@@ -136,6 +116,23 @@ class PlanetLabelClass {
 		// either 1000000 or 10000000
 		if (distance < 10000000) {
 			console.log(`${this.data.englishName} is in range`);
+		}
+
+		if (this.data.englishName === 'Sun') {
+			state.cameraState._currentZoomDistanceThreshold =
+				distance < settings.systemZoomDistanceThresholds[0]
+					? 0
+					: distance < settings.systemZoomDistanceThresholds[1]
+					? 1
+					: 2;
+		}
+
+		if (this.data.isInnerPlanet) {
+			if (state.cameraState._currentZoomDistanceThreshold === 0) {
+				this.labelDiv.classList.remove('faded');
+			} else {
+				this.labelDiv.classList.add('faded');
+			}
 		}
 	}
 
@@ -329,4 +326,4 @@ const clickTarget = {
 	}
 };
 
-export { setOrbitVisibility, textLabel, PlanetLabelClass, OrbitLine, labelLine, targetLine, rings, clickTarget };
+export { setOrbitVisibility, PlanetLabelClass, OrbitLine, labelLine, targetLine, rings, clickTarget };

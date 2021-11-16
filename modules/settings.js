@@ -35,6 +35,7 @@ const settings = {
 		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
 	},
 	domTarget: document.querySelector('#bg'),
+	// shoutouts to F-Zero
 	planetColours: {
 		default: '#8c8c8b',
 		sun: '#ffb01f',
@@ -46,7 +47,8 @@ const settings = {
 		saturn: '#ffe577',
 		uranus: '#c8ecef',
 		neptune: '#3b54d2'
-	}
+	},
+	systemZoomDistanceThresholds: [1700000000, 5000000000]
 };
 
 export { settings };

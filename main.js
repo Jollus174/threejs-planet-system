@@ -11,14 +11,7 @@ import { easeTo, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from './modules/objectProps';
 import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
-import {
-	asteroidBelt,
-	skybox,
-	starField,
-	buildPlanet,
-	buildMoon,
-	textLabel
-} from './modules/factories/solarSystemFactory';
+import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
 import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
 import { scene } from './modules/scene';
@@ -141,6 +134,10 @@ const init = () => {
 
 	state.scene.add(state.skybox);
 
+	const sunLabelClass = new PlanetLabelClass(state.bodies._sun);
+	state.bodies.classes._planetLabels.push(sunLabelClass);
+	sunLabelClass.build();
+
 	state.bodies._planets.forEach((planet) => {
 		const planetLabelClass = new PlanetLabelClass(planet);
 		state.bodies.classes._planetLabels.push(planetLabelClass);
@@ -232,8 +229,12 @@ const init = () => {
 		state.controls.reset();
 	});
 
-	document.querySelector('#clear-all').addEventListener('click', () => {
+	document.querySelector('#clear-all-planets').addEventListener('click', () => {
 		state.bodies.classes._planetLabels.forEach((pLabelClass) => pLabelClass.remove());
+	});
+
+	document.querySelector('#build-all-planets').addEventListener('click', () => {
+		state.bodies.classes._planetLabels.forEach((pLabelClass) => pLabelClass.build());
 	});
 };
 
