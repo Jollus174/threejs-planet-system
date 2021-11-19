@@ -289,4 +289,5 @@ document.addEventListener('keydown', (e) => {
 	}
 });
 
-sortAllData().then(init);
+sortAllData();
+init();
