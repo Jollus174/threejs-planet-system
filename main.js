@@ -88,9 +88,18 @@ const render = () => {
 	// });
 
 	if (state.mouseState._clickedGroup) {
-		state.controls.target.x += easeTo({ from: state.controls.target.x, to: state.mouseState._clickedGroup.position.x });
-		state.controls.target.y += easeTo({ from: state.controls.target.y, to: state.mouseState._clickedGroup.position.y });
-		state.controls.target.z += easeTo({ from: state.controls.target.z, to: state.mouseState._clickedGroup.position.z });
+		let { x, y, z } = state.mouseState._clickedGroup.position;
+
+		if (state.mouseState._clickedGroup.data.aroundPlanet) {
+			// is moon, so also account for the planet's position
+			x += state.mouseState._clickedGroup.parent.position.x;
+			y += state.mouseState._clickedGroup.parent.position.y;
+			z += state.mouseState._clickedGroup.parent.position.z;
+		}
+
+		state.controls.target.x += easeTo({ from: state.controls.target.x, to: x });
+		state.controls.target.y += easeTo({ from: state.controls.target.y, to: y });
+		state.controls.target.z += easeTo({ from: state.controls.target.z, to: z });
 	}
 
 	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {

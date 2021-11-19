@@ -2,7 +2,7 @@ const settings = {
 	camera: {
 		_fov: 55,
 		_aspect: window.innerWidth / window.innerHeight,
-		_near: 300,
+		_near: 2,
 		_far: 1000000000000
 	},
 	controls: {

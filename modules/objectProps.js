@@ -14,23 +14,24 @@ const setOrbitVisibility = () => {
 };
 
 class OrbitLine {
-	constructor(object) {
-		this.object = object;
-		this.orbitLineName = `${object.englishName} orbit line`;
+	constructor(data, objectGroup) {
+		this.data = data;
+		this.orbitLineName = `${this.data.englishName} orbit line`;
 		this.orbitMesh = null;
+		this.objectGroup = objectGroup;
 	}
 
 	build() {
-		const isMoon = this.object.aroundPlanet;
-		const isDwarfPlanet = state.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.object.name);
+		const isMoon = this.data.aroundPlanet;
+		const isDwarfPlanet = state.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
 		const points = [];
 		for (let i = 0; i <= 360; i += 0.03) {
 			const { x, y, z } = calculateOrbit(
 				i,
-				this.object.perihelion,
-				this.object.aphelion,
-				this.object.inclination,
-				this.object.eccentricity
+				this.data.perihelion,
+				this.data.aphelion,
+				this.data.inclination,
+				this.data.eccentricity
 			);
 			points.push(new THREE.Vector3(x, y, z));
 		}
@@ -47,13 +48,13 @@ class OrbitLine {
 
 		this.orbitMesh.name = this.orbitLineName;
 		state.bodies._orbitLines.push(this.orbitMesh);
-		state.scene.add(this.orbitMesh); // TODO, this should be the parent of the group
+		this.objectGroup.parent.add(this.orbitMesh);
 	}
 
 	remove() {
 		const i = state.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
 		state.bodies._orbitLines.splice(i, 1);
-		state.scene.remove(this.orbitMesh);
+		this.objectGroup.parent.remove(this.orbitMesh);
 	}
 }
 
@@ -61,31 +62,35 @@ const handleLabelClick = (data) => {
 	state.cameraState._zoomToTarget = true;
 	state.controls.saveState(); // saving state so can use the [Back] button
 	document.querySelector('#position-back').disabled = false;
-	console.log(this);
-	updateClickedGroup(state.bodies._planetLabels.filter((p) => p.data.englishName.includes(data.englishName))[0]);
+	const isMoon = data.aroundPlanet;
+	const clickedGroup = state.bodies[isMoon ? '_moonLabels' : '_planetLabels'].find((p) =>
+		p.data.englishName.includes(data.englishName)
+	);
+	updateClickedGroup(clickedGroup);
 };
 
-class PlanetLabelClass {
-	constructor(data) {
+class MoonLabelClass {
+	constructor(data, planetGroup) {
 		this.data = data;
 		this.labelDiv = document.createElement('div');
-		this.orbitLine = new OrbitLine(data);
-		this.planetLabelGroup = new THREE.Group();
+		this.labelGroup = new THREE.Group();
+		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
+		this.planetGroup = planetGroup;
 	}
 
 	build() {
-		this.labelDiv.className = 'label';
+		this.labelDiv.className = 'label is-moon';
 		this.labelDiv.style.color = this.data.labelColour;
 		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
 		const CSSObj = new CSS2DObject(this.labelDiv);
 		CSSObj.position.set(0, 0, 0);
 
-		this.planetLabelGroup.name = `${this.data.englishName} group label`;
-		this.planetLabelGroup.data = this.data;
-		this.planetLabelGroup.add(CSSObj);
-		state.bodies._planetLabels.push(this.planetLabelGroup);
+		this.labelGroup.name = `${this.data.englishName} group label`;
+		this.labelGroup.data = this.data;
+		this.labelGroup.add(CSSObj);
+		state.bodies._moonLabels.push(this.labelGroup);
 
 		// calculate orbit
 		const { x, y, z } = calculateOrbit(
@@ -95,27 +100,108 @@ class PlanetLabelClass {
 			this.data.inclination,
 			this.data.eccentricity
 		);
-		this.planetLabelGroup.position.set(x, y, z);
+		this.labelGroup.position.set(x, y, z);
+
+		this.evtHandleLabelClick = () => handleLabelClick(this.data);
+		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
+
+		this.planetGroup.add(this.labelGroup);
+		// building orbitLine after the group is added to the scene, so the group has a parent
+		this.OrbitLine.build();
+	}
+
+	remove() {
+		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
+		this.OrbitLine.remove();
+
+		this.labelGroup.children.forEach((child) => {
+			this.labelGroup.remove(child);
+		});
+		state.bodies._moonLabels.splice(
+			state.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
+			1
+		);
+		this.planetGroup.remove(this.labelGroup);
+	}
+}
+
+class PlanetLabelClass {
+	constructor(data) {
+		this.data = data;
+		this.labelDiv = document.createElement('div');
+		this.labelGroup = new THREE.Group();
+		this.OrbitLine = new OrbitLine(data, this.labelGroup);
+		this.intervalCheckDistance = null;
+		this.evtHandleLabelClick = null;
+	}
+
+	build() {
+		this.labelDiv.className = 'label is-planet';
+		this.labelDiv.style.color = this.data.labelColour;
+		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
+		const CSSObj = new CSS2DObject(this.labelDiv);
+		CSSObj.position.set(0, 0, 0);
+
+		this.labelGroup.name = `${this.data.englishName} group label`;
+		this.labelGroup.data = this.data;
+		this.labelGroup.add(CSSObj);
+		state.bodies._planetLabels.push(this.labelGroup);
+
+		// calculate orbit
+		const { x, y, z } = calculateOrbit(
+			getRandomArbitrary(0, 360), // random position along orbit
+			this.data.perihelion,
+			this.data.aphelion,
+			this.data.inclination,
+			this.data.eccentricity
+		);
+		this.labelGroup.position.set(x, y, z);
 
 		this.evtHandleLabelClick = () => handleLabelClick(this.data);
 		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
 
 		this.intervalCheckDistance = setInterval(() => {
 			this.handleDistance();
-		}, 1000);
+		}, 200);
 
-		// building + adding orbit mesh
-		this.orbitLine.build();
-
-		state.scene.add(this.planetLabelGroup);
+		state.scene.add(this.labelGroup);
+		// building orbitLine after the group is added to the scene, so the group has a parent
+		this.OrbitLine.build();
 	}
 
 	handleDistance() {
-		const distance = state.camera.position.distanceTo(this.planetLabelGroup.position);
+		const distance = state.camera.position.distanceTo(this.labelGroup.position);
 
 		// either 1000000 or 10000000
-		if (distance < 10000000) {
-			console.log(`${this.data.englishName} is in range`);
+		if (distance < 60000000) {
+			// console.log(`${this.data.englishName} is in range`);
+			state.cameraState._currentPlanetInRange = this.data.englishName;
+			this.labelDiv.classList.add('in-range');
+			if (
+				this.data.moons &&
+				!state.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)
+			) {
+				this.data.moons.forEach((moon) => {
+					const moonLabelClass = new MoonLabelClass(moon, this.labelGroup);
+					state.bodies.classes._moonLabels.push(moonLabelClass);
+					moonLabelClass.build(); // TODO: this should be a promise
+				});
+			}
+		} else {
+			this.labelDiv.classList.remove('in-range');
+
+			if (
+				state.cameraState._currentPlanetInRange &&
+				this.labelGroup.name.includes(state.cameraState._currentPlanetInRange)
+			) {
+				state.bodies.classes._moonLabels.forEach((moonClass, i) => {
+					moonClass.remove();
+					state.bodies.classes._moonLabels.splice(i, 1);
+				});
+				if (!state.bodies.classes._moonLabels.length) {
+					state.cameraState._currentPlanetInRange = '';
+				}
+			}
 		}
 
 		if (this.data.englishName === 'Sun') {
@@ -136,18 +222,13 @@ class PlanetLabelClass {
 		}
 	}
 
-	update() {
-		// render loop stuff, I suppose?
-		// could get expensive
-	}
-
 	remove() {
 		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
 		clearInterval(this.intervalCheckDistance);
 		this.orbitLine.remove();
 
-		this.planetLabelGroup.children.forEach((child) => this.planetLabelGroup.remove(child));
-		state.scene.remove(this.planetLabelGroup);
+		this.labelGroup.children.forEach((child) => this.labelGroup.remove(child));
+		state.scene.remove(this.labelGroup);
 	}
 }
 

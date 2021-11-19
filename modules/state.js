@@ -11,7 +11,8 @@ const state = {
 		_dollySpeed: null,
 		_rotateToTarget: false,
 		_rotateCameraYTo: null,
-		_currentZoomDistanceThreshold: 0
+		_currentZoomDistanceThreshold: 0,
+		_currentPlanetInRange: ''
 	},
 	mouseState: {
 		_mouseHasMoved: false,
@@ -46,7 +47,8 @@ const state = {
 		_navigable: [],
 		_inRange: [],
 		classes: {
-			_planetLabels: []
+			_planetLabels: [],
+			_moonLabels: []
 		}
 	},
 	orbitLines: {
