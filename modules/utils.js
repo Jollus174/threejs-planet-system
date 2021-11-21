@@ -13,7 +13,7 @@ const getRandomArbitrary = (min, max) => {
 	return Math.random() * (max - min) + min;
 };
 
-const calculateOrbit = (i, perihelion, aphelion, inclination, eccentricity) => {
+const calculateOrbit = (i, perihelion, aphelion, inclination, eccentricity, orbitRotationRandomiser) => {
 	let x = 0,
 		y = 0,
 		z = 0;
@@ -29,10 +29,12 @@ const calculateOrbit = (i, perihelion, aphelion, inclination, eccentricity) => {
 
 	const inclinationAdj = aphelion * (inclination / 90);
 	const eccentricityAdj = aphelion * eccentricity;
+	const orbitRandom = orbitRotationRandomiser || 0;
+	// console.log(orbitRandom);
 
-	x = Math.sin(MathUtils.degToRad(i)) * aphelion + eccentricityAdj;
-	y = Math.sin(MathUtils.degToRad(i)) * inclinationAdj;
-	z = Math.cos(MathUtils.degToRad(i)) * perihelion;
+	x = Math.sin(MathUtils.degToRad(i + orbitRandom)) * aphelion + eccentricityAdj;
+	y = Math.sin(MathUtils.degToRad(i + orbitRandom)) * inclinationAdj;
+	z = Math.cos(MathUtils.degToRad(i + orbitRandom)) * perihelion;
 
 	return { x, y, z };
 };
@@ -121,6 +123,20 @@ const getBreakpoint = () =>
 
 const checkIfDesktop = () => ['screen-lg', 'screen-xl'].includes(getBreakpoint());
 
+const convertToKebabCase = (str) => {
+	return str.replace(/\W/g, '-').toLowerCase();
+};
+
+const convertToCamelCase = (str) => {
+	// get rid of anything that's a weird character and convert it to a space, then capitalise every item except for first, then join everything together
+	return str
+		.toLowerCase()
+		.replace(/\W/g, ' ')
+		.split(' ')
+		.map((item, index) => (index === 0 ? item : item.charAt(0).toUpperCase() + item.slice(1)))
+		.join('');
+};
+
 export {
 	getStandardDeviation,
 	getRandomArbitrary,
@@ -132,5 +148,7 @@ export {
 	fadeTargetLineOpacity,
 	numberWithCommas,
 	getBreakpoint,
-	checkIfDesktop
+	checkIfDesktop,
+	convertToKebabCase,
+	convertToCamelCase
 };

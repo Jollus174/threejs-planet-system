@@ -7,6 +7,7 @@ import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRando
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { updateClickedGroup } from './events/mousePointer';
+import { setWikipediaData } from './data/api';
 import { asteroidBelt } from './factories/solarSystemFactory';
 
 const setOrbitVisibility = () => {
@@ -31,7 +32,8 @@ class OrbitLine {
 				this.data.perihelion,
 				this.data.aphelion,
 				this.data.inclination,
-				this.data.eccentricity
+				this.data.eccentricity,
+				this.data.orbitRotationRandomiser
 			);
 			points.push(new THREE.Vector3(x, y, z));
 		}
@@ -62,10 +64,16 @@ const handleLabelClick = (data) => {
 	state.cameraState._zoomToTarget = true;
 	state.controls.saveState(); // saving state so can use the [Back] button
 	document.querySelector('#position-back').disabled = false;
-	const isMoon = data.aroundPlanet;
-	const clickedGroup = state.bodies[isMoon ? '_moonLabels' : '_planetLabels'].find((p) =>
+	const dataStorageKey = data.aroundPlanet ? '_moonLabels' : '_planetLabels';
+	const clickedGroupIndex = state.bodies[dataStorageKey].findIndex((p) =>
 		p.data.englishName.includes(data.englishName)
 	);
+	const clickedGroup = state.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
+
+	if (!clickedGroup.data.content) {
+		const wikiKey = clickedGroup.data.wikipediaKey || clickedGroup.data.englishName;
+		setWikipediaData(wikiKey, clickedGroup);
+	}
 	updateClickedGroup(clickedGroup);
 };
 
@@ -78,6 +86,7 @@ class MoonLabelClass {
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
 		this.planetGroup = planetGroup;
+		// this.storageKey = '_moonLabels';
 	}
 
 	build() {
@@ -93,13 +102,7 @@ class MoonLabelClass {
 		state.bodies._moonLabels.push(this.labelGroup);
 
 		// calculate orbit
-		const { x, y, z } = calculateOrbit(
-			getRandomArbitrary(0, 360), // random position along orbit
-			this.data.perihelion,
-			this.data.aphelion,
-			this.data.inclination,
-			this.data.eccentricity
-		);
+		const { x, y, z } = this.data.startingPosition;
 		this.labelGroup.position.set(x, y, z);
 
 		this.evtHandleLabelClick = () => handleLabelClick(this.data);
@@ -107,12 +110,25 @@ class MoonLabelClass {
 
 		this.planetGroup.add(this.labelGroup);
 		// building orbitLine after the group is added to the scene, so the group has a parent
-		this.OrbitLine.build();
+		// limiting the number of orbitLines rendered to save memory
+		if (this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000) {
+			this.OrbitLine.build();
+		}
 	}
 
 	remove() {
 		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
-		this.OrbitLine.remove();
+
+		if (this.OrbitLine) this.OrbitLine.remove();
+
+		// snap the camera back to the planet if the clicked group moon is deloaded
+		if (
+			state.mouseState._clickedGroup &&
+			state.mouseState._clickedGroup.data &&
+			state.mouseState._clickedGroup.data.aroundPlanet
+		) {
+			state.mouseState._clickedGroup = state.mouseState._clickedGroup.parent;
+		}
 
 		this.labelGroup.children.forEach((child) => {
 			this.labelGroup.remove(child);
@@ -148,14 +164,12 @@ class PlanetLabelClass {
 		state.bodies._planetLabels.push(this.labelGroup);
 
 		// calculate orbit
-		const { x, y, z } = calculateOrbit(
-			getRandomArbitrary(0, 360), // random position along orbit
-			this.data.perihelion,
-			this.data.aphelion,
-			this.data.inclination,
-			this.data.eccentricity
-		);
-		this.labelGroup.position.set(x, y, z);
+		if (this.data.startingPosition) {
+			const { x, y, z } = this.data.startingPosition;
+			this.labelGroup.position.set(x, y, z);
+		} else {
+			this.labelGroup.position.set(0, 0, 0);
+		}
 
 		this.evtHandleLabelClick = () => handleLabelClick(this.data);
 		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
@@ -173,10 +187,13 @@ class PlanetLabelClass {
 		const distance = state.camera.position.distanceTo(this.labelGroup.position);
 
 		// either 1000000 or 10000000
+		// TODO: need to specify between INNER moons and OUTER moons... some are really far away...
 		if (distance < 60000000) {
 			// console.log(`${this.data.englishName} is in range`);
 			state.cameraState._currentPlanetInRange = this.data.englishName;
 			this.labelDiv.classList.add('in-range');
+			// this seems inefficient since it's iterating through the array many times...
+			// should we have some kind of render queue?
 			if (
 				this.data.moons &&
 				!state.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)

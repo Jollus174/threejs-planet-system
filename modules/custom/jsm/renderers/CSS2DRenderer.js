@@ -161,6 +161,9 @@ class CSS2DRenderer {
 
 			for (let i = 0, l = sorted.length; i < l; i++) {
 				sorted[i].element.style.zIndex = zMax - i;
+				if (sorted[i].element.classList.contains('is-planet')) {
+					sorted[i].element.style.zIndex += 1000;
+				}
 			}
 		}
 	}

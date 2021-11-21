@@ -15,7 +15,7 @@ import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modul
 import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
 import { scene } from './modules/scene';
-import { sortAllData } from './modules/data/api';
+import { setWikipediaData, sortAllData } from './modules/data/api';
 
 window.state = state;
 window.settings = settings;
@@ -90,7 +90,7 @@ const render = () => {
 	if (state.mouseState._clickedGroup) {
 		let { x, y, z } = state.mouseState._clickedGroup.position;
 
-		if (state.mouseState._clickedGroup.data.aroundPlanet) {
+		if (state.mouseState._clickedGroup.parent && state.mouseState._clickedGroup.data.aroundPlanet) {
 			// is moon, so also account for the planet's position
 			x += state.mouseState._clickedGroup.parent.position.x;
 			y += state.mouseState._clickedGroup.parent.position.y;

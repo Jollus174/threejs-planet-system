@@ -1,3 +1,4 @@
+// jshint ignore: start
 const solarSystemData = [
 	{
 		id: 'lune',
@@ -40,7 +41,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lune'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lune',
+		wikipediaKey: 'Moon'
 	},
 	{
 		id: 'phobos',
@@ -83,7 +85,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/phobos'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/phobos',
+		wikipediaKey: 'Phobos_(moon)'
 	},
 	{
 		id: 'deimos',
@@ -126,7 +129,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/deimos'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/deimos',
+		wikipediaKey: 'Deimos_(moon)'
 	},
 	{
 		id: 'io',
@@ -166,7 +170,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/io'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/io',
+		wikipediaKey: 'Io_(moon)'
 	},
 	{
 		id: 'europe',
@@ -206,7 +211,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/europe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/europe',
+		wikipediaKey: 'Europa_(moon)'
 	},
 	{
 		id: 'ganymede',
@@ -246,7 +252,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ganymede'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ganymede',
+		wikipediaKey: 'Ganymede_(moon)'
 	},
 	{
 		id: 'callisto',
@@ -286,7 +293,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callisto'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callisto',
+		wikipediaKey: 'Callisto_(moon)'
 	},
 	{
 		id: 'amalthee',
@@ -326,7 +334,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/amalthee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/amalthee',
+		wikipediaKey: 'Amalthea_(moon)'
 	},
 	{
 		id: 'himalia',
@@ -366,7 +375,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/himalia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/himalia',
+		wikipediaKey: 'Himalia_(moon)'
 	},
 	{
 		id: 'elara',
@@ -375,8 +385,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11741000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11741000,
+		aphelion: 11741000,
 		eccentricity: 0.217,
 		inclination: 26.63,
 		mass: {
@@ -406,7 +416,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/elara'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/elara',
+		wikipediaKey: 'Elara_(moon)'
 	},
 	{
 		id: 'pasiphae',
@@ -415,8 +426,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23624000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23624000,
+		aphelion: 23624000,
 		eccentricity: 0.409,
 		inclination: 151.4,
 		mass: {
@@ -446,7 +457,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pasiphae'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pasiphae',
+		wikipediaKey: 'Pasiphae_(moon)'
 	},
 	{
 		id: 'sinope',
@@ -455,8 +467,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23939000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23939000,
+		aphelion: 23939000,
 		eccentricity: 0.25,
 		inclination: 158.1,
 		mass: {
@@ -486,7 +498,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sinope'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sinope',
+		wikipediaKey: 'Sinope_(moon)'
 	},
 	{
 		id: 'lysithea',
@@ -495,8 +508,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11717000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11717000,
+		aphelion: 11717000,
 		eccentricity: 0.112,
 		inclination: 28.3,
 		mass: {
@@ -526,7 +539,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lysithea'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lysithea',
+		wikipediaKey: 'Lysithea_(moon)'
 	},
 	{
 		id: 'carme',
@@ -535,8 +549,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23404000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23404000,
+		aphelion: 23404000,
 		eccentricity: 0.253,
 		inclination: 164.9,
 		mass: {
@@ -566,7 +580,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/carme'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/carme',
+		wikipediaKey: 'Carme_(moon)'
 	},
 	{
 		id: 'ananke',
@@ -575,8 +590,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21276000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21276000,
+		aphelion: 21276000,
 		eccentricity: 0.244,
 		inclination: 148.9,
 		mass: {
@@ -606,7 +621,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ananke'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ananke',
+		wikipediaKey: 'Ananke_(moon)'
 	},
 	{
 		id: 'leda',
@@ -615,8 +631,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11165000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11165000,
+		aphelion: 11165000,
 		eccentricity: 0.164,
 		inclination: 27.46,
 		mass: {
@@ -646,7 +662,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/leda'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/leda',
+		wikipediaKey: 'Leda_(moon)'
 	},
 	{
 		id: 'thebe',
@@ -686,7 +703,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thebe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thebe',
+		wikipediaKey: 'Thebe_(moon)'
 	},
 	{
 		id: 'adrastee',
@@ -695,8 +713,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 129000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 129000,
+		aphelion: 129000,
 		eccentricity: 0.002,
 		inclination: 0.054,
 		mass: {
@@ -726,7 +744,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/adrastee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/adrastee',
+		wikipediaKey: 'Adrastea_(moon)'
 	},
 	{
 		id: 'metis',
@@ -766,7 +785,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/metis'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/metis',
+		wikipediaKey: 'Metis_(moon)'
 	},
 	{
 		id: 'callirrhoe',
@@ -775,8 +795,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 24102000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 24102000,
+		aphelion: 24102000,
 		eccentricity: 0.283,
 		inclination: 147.1,
 		mass: {
@@ -806,7 +826,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callirrhoe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callirrhoe',
+		wikipediaKey: 'Callirrhoe_(moon)'
 	},
 	{
 		id: 'themisto',
@@ -846,7 +867,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/themisto'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/themisto',
+		wikipediaKey: 'Themisto_(moon)'
 	},
 	{
 		id: 'megaclite',
@@ -855,8 +877,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 14146700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 14146700,
+		aphelion: 14146700,
 		eccentricity: 0.421,
 		inclination: 152.8,
 		mass: {
@@ -886,7 +908,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/megaclite'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/megaclite',
+		wikipediaKey: 'Megaclite_(moon)'
 	},
 	{
 		id: 'taygete',
@@ -895,8 +918,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23363000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23363000,
+		aphelion: 23363000,
 		eccentricity: 0.252,
 		inclination: 165.2,
 		mass: {
@@ -926,7 +949,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/taygete'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/taygete',
+		wikipediaKey: 'Taygete_(moon)'
 	},
 	{
 		id: 'chaldene',
@@ -935,8 +959,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23179000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23179000,
+		aphelion: 23179000,
 		eccentricity: 0.251,
 		inclination: 165.2,
 		mass: {
@@ -966,7 +990,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chaldene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chaldene',
+		wikipediaKey: 'Chaldene_(moon)'
 	},
 	{
 		id: 'harpalyke',
@@ -975,8 +1000,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21104000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21104000,
+		aphelion: 21104000,
 		eccentricity: 0.226,
 		inclination: 148.6,
 		mass: {
@@ -1006,7 +1031,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/harpalyke'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/harpalyke',
+		wikipediaKey: 'Harpalyke_(moon)'
 	},
 	{
 		id: 'kalyke',
@@ -1015,8 +1041,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23564000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23564000,
+		aphelion: 23564000,
 		eccentricity: 0.245,
 		inclination: 165.2,
 		mass: {
@@ -1046,7 +1072,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kalyke'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kalyke',
+		wikipediaKey: 'Kalyke_(moon)'
 	},
 	{
 		id: 'iocaste',
@@ -1055,8 +1082,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21272000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21272000,
+		aphelion: 21272000,
 		eccentricity: 0.216,
 		inclination: 149.4,
 		mass: {
@@ -1086,7 +1113,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/iocaste'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/iocaste',
+		wikipediaKey: 'Iocaste_(moon)'
 	},
 	{
 		id: 'erinome',
@@ -1095,8 +1123,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23283000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23283000,
+		aphelion: 23283000,
 		eccentricity: 0.266,
 		inclination: 164.9,
 		mass: {
@@ -1126,7 +1154,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/erinome'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/erinome',
+		wikipediaKey: 'Erinome_(moon)'
 	},
 	{
 		id: 'isonoe',
@@ -1135,8 +1164,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23231000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23231000,
+		aphelion: 23231000,
 		eccentricity: 0.246,
 		inclination: 165.2,
 		mass: {
@@ -1166,7 +1195,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/isonoe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/isonoe',
+		wikipediaKey: 'Isonoe_(moon)'
 	},
 	{
 		id: 'praxidike',
@@ -1175,8 +1205,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21148000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21148000,
+		aphelion: 21148000,
 		eccentricity: 0.23,
 		inclination: 149,
 		mass: {
@@ -1206,7 +1236,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/praxidike'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/praxidike',
+		wikipediaKey: 'Praxidike_(moon)'
 	},
 	{
 		id: 'autonoe',
@@ -1215,8 +1246,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 24033000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 24033000,
+		aphelion: 24033000,
 		eccentricity: 0.334,
 		inclination: 152.9,
 		mass: {
@@ -1246,7 +1277,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/autonoe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/autonoe',
+		wikipediaKey: 'Autonoe_(moon)'
 	},
 	{
 		id: 'thyone',
@@ -1255,8 +1287,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21192000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21192000,
+		aphelion: 21192000,
 		eccentricity: 0.229,
 		inclination: 148.5,
 		mass: {
@@ -1286,7 +1318,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thyone'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thyone',
+		wikipediaKey: 'Thyone_(moon)'
 	},
 	{
 		id: 'hermippe',
@@ -1295,8 +1328,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21300000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21300000,
+		aphelion: 21300000,
 		eccentricity: 0.21,
 		inclination: 150.7,
 		mass: {
@@ -1326,7 +1359,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hermippe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hermippe',
+		wikipediaKey: 'Hermippe_(moon)'
 	},
 	{
 		id: 'aitne',
@@ -1335,8 +1369,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23315000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23315000,
+		aphelion: 23315000,
 		eccentricity: 0.264,
 		inclination: 165.1,
 		mass: {
@@ -1366,7 +1400,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aitne'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aitne',
+		wikipediaKey: 'Aitne_(moon)'
 	},
 	{
 		id: 'eurydome',
@@ -1375,8 +1410,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23148000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23148000,
+		aphelion: 23148000,
 		eccentricity: 0.276,
 		inclination: 150.3,
 		mass: {
@@ -1406,7 +1441,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eurydome'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eurydome',
+		wikipediaKey: 'Eurydome_(moon)'
 	},
 	{
 		id: 'euanthe',
@@ -1415,8 +1451,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21038000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21038000,
+		aphelion: 21038000,
 		eccentricity: 0.232,
 		inclination: 148.9,
 		mass: {
@@ -1446,7 +1482,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/euanthe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/euanthe',
+		wikipediaKey: 'Euanthe_(moon)'
 	},
 	{
 		id: 'euporie',
@@ -1455,8 +1492,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19339000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19339000,
+		aphelion: 19339000,
 		eccentricity: 0.144,
 		inclination: 145.8,
 		mass: {
@@ -1486,7 +1523,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/euporie'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/euporie',
+		wikipediaKey: 'Euporie_(moon)'
 	},
 	{
 		id: 'orthosie',
@@ -1495,8 +1533,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21164000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21164000,
+		aphelion: 21164000,
 		eccentricity: 0.281,
 		inclination: 145.9,
 		mass: {
@@ -1526,7 +1564,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/orthosie'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/orthosie',
+		wikipediaKey: 'Orthosie_(moon)'
 	},
 	{
 		id: 'sponde',
@@ -1535,8 +1574,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23790000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23790000,
+		aphelion: 23790000,
 		eccentricity: 0.312,
 		inclination: 151,
 		mass: {
@@ -1566,7 +1605,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sponde'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sponde',
+		wikipediaKey: 'Sponde_(moon)'
 	},
 	{
 		id: 'cale',
@@ -1575,8 +1615,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23302000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23302000,
+		aphelion: 23302000,
 		eccentricity: 0.26,
 		inclination: 165,
 		mass: {
@@ -1606,7 +1646,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cale'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cale',
+		wikipediaKey: 'Kale_(moon)'
 	},
 	{
 		id: 'pasithee',
@@ -1615,8 +1656,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23090000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23090000,
+		aphelion: 23090000,
 		eccentricity: 0.267,
 		inclination: 165.1,
 		mass: {
@@ -1646,7 +1687,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pasithee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pasithee',
+		wikipediaKey: 'Pasithee_(moon)'
 	},
 	{
 		id: 'hegemone',
@@ -1655,8 +1697,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23566000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23566000,
+		aphelion: 23566000,
 		eccentricity: 0.328,
 		inclination: 155.2,
 		mass: {
@@ -1686,7 +1728,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hegemone'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hegemone',
+		wikipediaKey: 'Hegemone_(moon)'
 	},
 	{
 		id: 'mneme',
@@ -1695,8 +1738,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21036000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21036000,
+		aphelion: 21036000,
 		eccentricity: 0.227,
 		inclination: 148.6,
 		mass: {
@@ -1726,7 +1769,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mneme'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mneme',
+		wikipediaKey: 'Mneme_(moon)'
 	},
 	{
 		id: 'aoede',
@@ -1735,8 +1779,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23969000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23969000,
+		aphelion: 23969000,
 		eccentricity: 0.432,
 		inclination: 158.3,
 		mass: {
@@ -1766,7 +1810,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aoede'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aoede',
+		wikipediaKey: 'Aoede_(moon)'
 	},
 	{
 		id: 'thelxinoe',
@@ -1775,8 +1820,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21165000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21165000,
+		aphelion: 21165000,
 		eccentricity: 0.221,
 		inclination: 151.4,
 		mass: {
@@ -1806,7 +1851,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thelxinoe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thelxinoe',
+		wikipediaKey: 'Thelxinoe_(moon)'
 	},
 	{
 		id: 'arche',
@@ -1815,8 +1861,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23355000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23355000,
+		aphelion: 23355000,
 		eccentricity: 0.259,
 		inclination: 165,
 		mass: {
@@ -1846,7 +1892,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/arche'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/arche',
+		wikipediaKey: 'Arche_(moon)'
 	},
 	{
 		id: 'callichore',
@@ -1855,8 +1902,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23273000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23273000,
+		aphelion: 23273000,
 		eccentricity: 0.264,
 		inclination: 165.5,
 		mass: {
@@ -1886,7 +1933,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callichore'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/callichore',
+		wikipediaKey: 'Kallichore(moon)'
 	},
 	{
 		id: 'helice',
@@ -1895,8 +1943,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21064000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21064000,
+		aphelion: 21064000,
 		eccentricity: 0.156,
 		inclination: 154.8,
 		mass: {
@@ -1926,7 +1974,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/helice'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/helice',
+		wikipediaKey: 'Helike_(moon)'
 	},
 	{
 		id: 'carpo',
@@ -1935,8 +1984,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17078000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17078000,
+		aphelion: 17078000,
 		eccentricity: 0.43,
 		inclination: 51.4,
 		mass: {
@@ -1966,7 +2015,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/carpo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/carpo',
+		wikipediaKey: 'Carpo_(moon)'
 	},
 	{
 		id: 'eukelade',
@@ -1975,8 +2025,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23322000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23322000,
+		aphelion: 23322000,
 		eccentricity: 0.272,
 		inclination: 165.5,
 		mass: {
@@ -2006,7 +2056,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eukelade'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eukelade',
+		wikipediaKey: 'Eukelade_(moon)'
 	},
 	{
 		id: 'cyllene',
@@ -2015,8 +2066,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23787000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23787000,
+		aphelion: 23787000,
 		eccentricity: 0.319,
 		inclination: 149.3,
 		mass: {
@@ -2046,7 +2097,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cyllene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cyllene',
+		wikipediaKey: 'Cyllene_(moon)'
 	},
 	{
 		id: 'core',
@@ -2055,8 +2107,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 24486000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 24486000,
+		aphelion: 24486000,
 		eccentricity: 0.325,
 		inclination: 145,
 		mass: {
@@ -2086,7 +2138,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/core'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/core',
+		wikipediaKey: 'Kore_(moon)'
 	},
 	{
 		id: 'herse',
@@ -2095,8 +2148,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23405000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23405000,
+		aphelion: 23405000,
 		eccentricity: 0.2,
 		inclination: 164.2,
 		mass: {
@@ -2126,7 +2179,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/herse'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/herse',
+		wikipediaKey: 'Herse_(moon)'
 	},
 	{
 		id: 's2003j2',
@@ -2135,8 +2189,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 28332000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 28332000,
+		aphelion: 28332000,
 		eccentricity: 0.38,
 		inclination: 151.8,
 		mass: {
@@ -2166,7 +2220,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j2',
+		wikipediaKey: 'S/2003_J_2'
 	},
 	{
 		id: 'eupheme',
@@ -2175,8 +2230,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20230000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20230000,
+		aphelion: 20230000,
 		eccentricity: 0.253,
 		inclination: 148,
 		mass: {
@@ -2206,7 +2261,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eupheme'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eupheme',
+		wikipediaKey: 'Eupheme_(moon)'
 	},
 	{
 		id: 's2003j4',
@@ -2215,8 +2271,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23928000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23928000,
+		aphelion: 23928000,
 		eccentricity: 0.204,
 		inclination: 144.9,
 		mass: {
@@ -2246,7 +2302,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j4'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j4',
+		wikipediaKey: 'S/2003_J_4'
 	},
 	{
 		id: 'eirene',
@@ -2255,8 +2312,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23493000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23493000,
+		aphelion: 23493000,
 		eccentricity: 0.22,
 		inclination: 163.1,
 		mass: {
@@ -2286,7 +2343,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eirene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eirene',
+		wikipediaKey: 'Eirene_(moon)'
 	},
 	{
 		id: 's2003j9',
@@ -2295,8 +2353,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23385000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23385000,
+		aphelion: 23385000,
 		eccentricity: 0.269,
 		inclination: 164.5,
 		mass: {
@@ -2326,7 +2384,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j9'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j9',
+		wikipediaKey: 'S/2003_J_9'
 	},
 	{
 		id: 's2003j10',
@@ -2335,8 +2394,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23042000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23042000,
+		aphelion: 23042000,
 		eccentricity: 0.214,
 		inclination: 164.1,
 		mass: {
@@ -2366,7 +2425,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j10'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j10',
+		wikipediaKey: 'S/2003_J_10'
 	},
 	{
 		id: 's2003j12',
@@ -2375,8 +2435,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17835000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17835000,
+		aphelion: 17835000,
 		eccentricity: 0.376,
 		inclination: 145.8,
 		mass: {
@@ -2406,7 +2466,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j12'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j12',
+		wikipediaKey: 'S/2003_J_12'
 	},
 	{
 		id: 'philophrosyne',
@@ -2415,8 +2476,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22622000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22622000,
+		aphelion: 22622000,
 		eccentricity: 0.194,
 		inclination: 143.6,
 		mass: {
@@ -2446,7 +2507,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/philophrosyne'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/philophrosyne',
+		wikipediaKey: 'Philophrosyne_(moon)'
 	},
 	{
 		id: 's2003j16',
@@ -2455,8 +2517,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20948000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20948000,
+		aphelion: 20948000,
 		eccentricity: 0.23,
 		inclination: 148.5,
 		mass: {
@@ -2486,7 +2548,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j16'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j16',
+		wikipediaKey: 'S/2003_J_16'
 	},
 	{
 		id: 's2003j18',
@@ -2495,8 +2558,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20494000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20494000,
+		aphelion: 20494000,
 		eccentricity: 0.105,
 		inclination: 146.4,
 		mass: {
@@ -2526,7 +2589,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j18'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j18',
+		wikipediaKey: 'S/2003_J_18'
 	},
 	{
 		id: 's2003j19',
@@ -2535,8 +2599,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23532000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23532000,
+		aphelion: 23532000,
 		eccentricity: 0.334,
 		inclination: 162.9,
 		mass: {
@@ -2566,7 +2630,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j19'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j19',
+		wikipediaKey: 'S/2003_J_19'
 	},
 	{
 		id: 's2003j23',
@@ -2575,8 +2640,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23549000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23549000,
+		aphelion: 23549000,
 		eccentricity: 0.309,
 		inclination: 149.2,
 		mass: {
@@ -2606,7 +2671,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j23'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2003j23',
+		wikipediaKey: 'S/2003_J_23'
 	},
 	{
 		id: 'mimas',
@@ -2646,7 +2712,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mimas'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mimas',
+		wikipediaKey: 'Mimas_(moon)'
 	},
 	{
 		id: 'encelade',
@@ -2686,7 +2753,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/encelade'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/encelade',
+		wikipediaKey: 'Enceladus'
 	},
 	{
 		id: 'tethys',
@@ -2726,7 +2794,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tethys'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tethys',
+		wikipediaKey: 'Tethys_(moon)'
 	},
 	{
 		id: 'dione',
@@ -2766,7 +2835,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dione'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dione',
+		wikipediaKey: 'Dione_(moon)'
 	},
 	{
 		id: 'rhea',
@@ -2806,7 +2876,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/rhea'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/rhea',
+		wikipediaKey: 'Rhea_(moon)'
 	},
 	{
 		id: 'titan',
@@ -2846,7 +2917,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/titan'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/titan',
+		wikipediaKey: 'Titan_(moon)'
 	},
 	{
 		id: 'hyperion',
@@ -2886,7 +2958,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyperion'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyperion',
+		wikipediaKey: 'Hyperion_(moon)'
 	},
 	{
 		id: 'japet',
@@ -2926,7 +2999,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/japet'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/japet',
+		wikipediaKey: 'Iapetus_(moon)'
 	},
 	{
 		id: 'phoebe',
@@ -2935,8 +3009,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 12947913,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 1000000,
+		aphelion: 1000000,
 		eccentricity: 0.164,
 		inclination: 174.8,
 		mass: {
@@ -2966,7 +3040,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/phoebe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/phoebe',
+		wikipediaKey: 'Phoebe_(moon)'
 	},
 	{
 		id: 'janus',
@@ -2975,8 +3050,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 151460,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 151460,
+		aphelion: 151460,
 		eccentricity: 0.007,
 		inclination: 0.14,
 		mass: {
@@ -3006,7 +3081,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/janus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/janus',
+		wikipediaKey: 'Janus_(moon)'
 	},
 	{
 		id: 'epimethee',
@@ -3015,8 +3091,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 151410,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 151410,
+		aphelion: 151410,
 		eccentricity: 0.009,
 		inclination: 0.34,
 		mass: {
@@ -3046,7 +3122,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/epimethee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/epimethee',
+		wikipediaKey: 'Epimetheus_(moon)'
 	},
 	{
 		id: 'helene',
@@ -3054,11 +3131,11 @@ const solarSystemData = [
 		englishName: 'Helene',
 		isPlanet: false,
 		moons: null,
-		semimajorAxis: 377420,
-		perihelion: 0,
-		aphelion: 0,
-		eccentricity: 0.005,
-		inclination: 0,
+		semimajorAxis: 377396,
+		perihelion: 377396,
+		aphelion: 377396,
+		eccentricity: 0.0022,
+		inclination: 0.199,
 		mass: {
 			massValue: 2.4,
 			massExponent: 16
@@ -3086,7 +3163,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/helene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/helene',
+		wikipediaKey: 'Helene_(moon)'
 	},
 	{
 		id: 'telesto',
@@ -3094,11 +3172,11 @@ const solarSystemData = [
 		englishName: 'Telesto',
 		isPlanet: false,
 		moons: null,
-		semimajorAxis: 294710,
-		perihelion: 0,
-		aphelion: 0,
+		semimajorAxis: 294619,
+		perihelion: 294619,
+		aphelion: 294619,
 		eccentricity: 0.001,
-		inclination: 1.158,
+		inclination: 1.19,
 		mass: {
 			massValue: 1,
 			massExponent: 16
@@ -3126,7 +3204,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/telesto'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/telesto',
+		wikipediaKey: 'Telesto_(moon)'
 	},
 	{
 		id: 'calypso',
@@ -3134,11 +3213,11 @@ const solarSystemData = [
 		englishName: 'Calypso',
 		isPlanet: false,
 		moons: null,
-		semimajorAxis: 294710,
-		perihelion: 0,
-		aphelion: 0,
-		eccentricity: 0.001,
-		inclination: 1.473,
+		semimajorAxis: 294619,
+		perihelion: 294619,
+		aphelion: 294619,
+		eccentricity: 0,
+		inclination: 1.56,
 		mass: {
 			massValue: 6.5,
 			massExponent: 15
@@ -3166,7 +3245,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/calypso'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/calypso',
+		wikipediaKey: 'Calypso_(moon)'
 	},
 	{
 		id: 'atlas',
@@ -3175,18 +3255,18 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 137670,
-		perihelion: 0,
-		aphelion: 0,
-		eccentricity: 0,
-		inclination: 0.3,
+		perihelion: 137670,
+		aphelion: 137670,
+		eccentricity: 0.0012,
+		inclination: 0.003,
 		mass: {
 			massValue: 7,
 			massExponent: 15
 		},
 		vol: null,
 		density: 0.5,
-		gravity: 0,
-		escape: 0,
+		gravity: 0.0002,
+		escape: 0.0062,
 		meanRadius: 33,
 		equaRadius: 0,
 		polarRadius: 0,
@@ -3206,7 +3286,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/atlas'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/atlas',
+		wikipediaKey: 'Atlas_(moon)'
 	},
 	{
 		id: 'promethee',
@@ -3215,8 +3296,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 139380,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 139380,
+		aphelion: 139380,
 		eccentricity: 0.00204,
 		inclination: 0,
 		mass: {
@@ -3246,7 +3327,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/promethee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/promethee',
+		wikipediaKey: 'Prometheus_(moon)'
 	},
 	{
 		id: 'pandore',
@@ -3255,8 +3337,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 141720,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 141720,
+		aphelion: 141720,
 		eccentricity: 0.0042,
 		inclination: 0,
 		mass: {
@@ -3286,7 +3368,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pandore'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pandore',
+		wikipediaKey: 'Pandora_(moon)'
 	},
 	{
 		id: 'pan',
@@ -3295,8 +3378,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 133580,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 133580,
+		aphelion: 133580,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -3326,7 +3409,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pan'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pan',
+		wikipediaKey: 'Pan_(moon)'
 	},
 	{
 		id: 'ymir',
@@ -3335,8 +3419,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23140400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23140400,
+		aphelion: 23140400,
 		eccentricity: 0.187,
 		inclination: 167.9,
 		mass: {
@@ -3366,7 +3450,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ymir'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ymir',
+		wikipediaKey: 'Ymir_(moon)'
 	},
 	{
 		id: 'paaliaq',
@@ -3406,7 +3491,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/paaliaq'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/paaliaq',
+		wikipediaKey: 'Paaliaq_(moon)'
 	},
 	{
 		id: 'tarvos',
@@ -3415,8 +3501,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18263200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18263200,
+		aphelion: 18263200,
 		eccentricity: 0.531,
 		inclination: 33.8,
 		mass: {
@@ -3446,7 +3532,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tarvos'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tarvos',
+		wikipediaKey: 'Tarvos_(moon)'
 	},
 	{
 		id: 'ijiraq',
@@ -3455,8 +3542,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11367400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11367400,
+		aphelion: 11367400,
 		eccentricity: 0.316,
 		inclination: 49.1,
 		mass: {
@@ -3486,7 +3573,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ijiraq'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ijiraq',
+		wikipediaKey: 'Ijiraq_(moon)'
 	},
 	{
 		id: 'suttungr',
@@ -3495,8 +3583,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19476700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19476700,
+		aphelion: 19476700,
 		eccentricity: 0.114,
 		inclination: 175.8,
 		mass: {
@@ -3526,7 +3614,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/suttungr'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/suttungr',
+		wikipediaKey: 'Suttungr_(moon)'
 	},
 	{
 		id: 'kiviuq',
@@ -3535,8 +3624,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11311100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11311100,
+		aphelion: 11311100,
 		eccentricity: 0.334,
 		inclination: 48.7,
 		mass: {
@@ -3566,7 +3655,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kiviuq'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kiviuq',
+		wikipediaKey: 'Kiviuq_(moon)'
 	},
 	{
 		id: 'mundilfari',
@@ -3575,8 +3665,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18667900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18667900,
+		aphelion: 18667900,
 		eccentricity: 0.21,
 		inclination: 169.4,
 		mass: {
@@ -3606,7 +3696,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mundilfari'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mundilfari',
+		wikipediaKey: 'Mundilfari_(moon)'
 	},
 	{
 		id: 'albiorix',
@@ -3615,8 +3706,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 16401100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 16401100,
+		aphelion: 16401100,
 		eccentricity: 0.469,
 		inclination: 34,
 		mass: {
@@ -3646,7 +3737,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/albiorix'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/albiorix',
+		wikipediaKey: 'Albiorix_(moon)'
 	},
 	{
 		id: 'skathi',
@@ -3655,8 +3747,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 15614300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 15614300,
+		aphelion: 15614300,
 		eccentricity: 0.27,
 		inclination: 148.5,
 		mass: {
@@ -3686,7 +3778,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/skathi'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/skathi',
+		wikipediaKey: 'Skathi_(moon)'
 	},
 	{
 		id: 'erriapo',
@@ -3695,8 +3788,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17611400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17611400,
+		aphelion: 17611400,
 		eccentricity: 0.474,
 		inclination: 34.6,
 		mass: {
@@ -3726,7 +3819,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/erriapo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/erriapo',
+		wikipediaKey: 'Erriapus_(moon)'
 	},
 	{
 		id: 'siarnaq',
@@ -3735,8 +3829,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18015400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18015400,
+		aphelion: 18015400,
 		eccentricity: 0.295,
 		inclination: 45.6,
 		mass: {
@@ -3766,7 +3860,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/siarnaq'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/siarnaq',
+		wikipediaKey: 'Siarnaq_(moon)'
 	},
 	{
 		id: 'thrymr',
@@ -3775,8 +3870,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20439600,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20439600,
+		aphelion: 20439600,
 		eccentricity: 0.47,
 		inclination: 175,
 		mass: {
@@ -3806,7 +3901,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thrymr'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thrymr',
+		wikipediaKey: 'Thrymr_(moon)'
 	},
 	{
 		id: 'narvi',
@@ -3815,8 +3911,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19417300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19417300,
+		aphelion: 19417300,
 		eccentricity: 0.431,
 		inclination: 145.8,
 		mass: {
@@ -3846,7 +3942,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/narvi'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/narvi',
+		wikipediaKey: 'Narvi_(moon)'
 	},
 	{
 		id: 'methone',
@@ -3886,7 +3983,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/methone'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/methone',
+		wikipediaKey: 'Methone_(moon)'
 	},
 	{
 		id: 'pallene',
@@ -3895,8 +3993,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 212280,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 212280,
+		aphelion: 212280,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -3926,7 +4024,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pallene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pallene',
+		wikipediaKey: 'Pallene_(moon)'
 	},
 	{
 		id: 'pollux',
@@ -3935,8 +4034,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 377200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 377200,
+		aphelion: 377200,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -3966,7 +4065,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pollux'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pollux',
+		wikipediaKey: 'Pollux_(moon)'
 	},
 	{
 		id: 'daphnis',
@@ -3975,8 +4075,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 136500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 136500,
+		aphelion: 136500,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -4006,7 +4106,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/daphnis'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/daphnis',
+		wikipediaKey: 'Daphnis_(moon)'
 	},
 	{
 		id: 'aegir',
@@ -4015,8 +4116,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20749800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20749800,
+		aphelion: 20749800,
 		eccentricity: 0.252,
 		inclination: 166.7,
 		mass: {
@@ -4046,7 +4147,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aegir'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/aegir',
+		wikipediaKey: 'Aegir_(moon)'
 	},
 	{
 		id: 'bebhionn',
@@ -4055,8 +4157,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17117800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17117800,
+		aphelion: 17117800,
 		eccentricity: 0.469,
 		inclination: 35,
 		mass: {
@@ -4086,7 +4188,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bebhionn'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bebhionn',
+		wikipediaKey: 'Bebhionn_(moon)'
 	},
 	{
 		id: 'bergelmir',
@@ -4095,8 +4198,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19338300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19338300,
+		aphelion: 19338300,
 		eccentricity: 0.142,
 		inclination: 158.5,
 		mass: {
@@ -4126,7 +4229,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bergelmir'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bergelmir',
+		wikipediaKey: 'Bergelmir_(moon)'
 	},
 	{
 		id: 'bestla',
@@ -4135,8 +4239,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20278000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20278000,
+		aphelion: 20278000,
 		eccentricity: 0.521,
 		inclination: 145.2,
 		mass: {
@@ -4166,7 +4270,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bestla'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bestla',
+		wikipediaKey: 'Bestla_(moon)'
 	},
 	{
 		id: 'farbauti',
@@ -4175,8 +4280,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20387000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20387000,
+		aphelion: 20387000,
 		eccentricity: 0.206,
 		inclination: 156.4,
 		mass: {
@@ -4206,7 +4311,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/farbauti'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/farbauti',
+		wikipediaKey: 'Farbauti_(moon)'
 	},
 	{
 		id: 'fenrir',
@@ -4215,8 +4321,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22454800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22454800,
+		aphelion: 22454800,
 		eccentricity: 0.136,
 		inclination: 164.9,
 		mass: {
@@ -4246,7 +4352,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/fenrir'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/fenrir',
+		wikipediaKey: 'Fenrir_(moon)'
 	},
 	{
 		id: 'fornjot',
@@ -4255,8 +4362,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 25151200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 25151200,
+		aphelion: 25151200,
 		eccentricity: 0.206,
 		inclination: 170.4,
 		mass: {
@@ -4286,7 +4393,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/fornjot'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/fornjot',
+		wikipediaKey: 'Fornjot_(moon)'
 	},
 	{
 		id: 'hati',
@@ -4295,8 +4403,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19775000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19775000,
+		aphelion: 19775000,
 		eccentricity: 0.372,
 		inclination: 165.8,
 		mass: {
@@ -4326,7 +4434,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hati'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hati',
+		wikipediaKey: 'Hati_(moon)'
 	},
 	{
 		id: 'hyrrokkin',
@@ -4335,8 +4444,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18437300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18437300,
+		aphelion: 18437300,
 		eccentricity: 0.333,
 		inclination: 151.4,
 		mass: {
@@ -4366,7 +4475,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyrrokkin'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyrrokkin',
+		wikipediaKey: 'Hyrrokkin_(moon)'
 	},
 	{
 		id: 'kari',
@@ -4375,8 +4485,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22077100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22077100,
+		aphelion: 22077100,
 		eccentricity: 0.478,
 		inclination: 156.3,
 		mass: {
@@ -4406,7 +4516,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kari'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kari',
+		wikipediaKey: 'Kari_(moon)'
 	},
 	{
 		id: 'loge',
@@ -4415,8 +4526,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23065500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23065500,
+		aphelion: 23065500,
 		eccentricity: 0.335,
 		inclination: 173.1,
 		mass: {
@@ -4446,7 +4557,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/loge'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/loge',
+		wikipediaKey: 'Loge_(moon)'
 	},
 	{
 		id: 'skoll',
@@ -4455,8 +4567,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17663300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17663300,
+		aphelion: 17663300,
 		eccentricity: 0.464,
 		inclination: 161.2,
 		mass: {
@@ -4486,7 +4598,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/skoll'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/skoll',
+		wikipediaKey: 'Skoll_(moon)'
 	},
 	{
 		id: 'surtur',
@@ -4495,8 +4608,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22920400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22920400,
+		aphelion: 22920400,
 		eccentricity: 0.451,
 		inclination: 177.5,
 		mass: {
@@ -4526,7 +4639,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/surtur'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/surtur',
+		wikipediaKey: 'Surtur_(moon)'
 	},
 	{
 		id: 'anthe',
@@ -4535,8 +4649,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 197700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 197700,
+		aphelion: 197700,
 		eccentricity: 0.001,
 		inclination: 0.1,
 		mass: {
@@ -4566,7 +4680,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/anthe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/anthe',
+		wikipediaKey: 'Anthe_(moon)'
 	},
 	{
 		id: 'jarnsaxa',
@@ -4575,8 +4690,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19356400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19356400,
+		aphelion: 19356400,
 		eccentricity: 0.216,
 		inclination: 163.3,
 		mass: {
@@ -4606,7 +4721,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/jarnsaxa'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/jarnsaxa',
+		wikipediaKey: 'Jarnsaxa_(moon)'
 	},
 	{
 		id: 'greip',
@@ -4615,8 +4731,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18442200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18442200,
+		aphelion: 18442200,
 		eccentricity: 0.326,
 		inclination: 179.8,
 		mass: {
@@ -4646,7 +4762,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/greip'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/greip',
+		wikipediaKey: 'Greip_(moon)'
 	},
 	{
 		id: 'tarqeq',
@@ -4655,8 +4772,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17909900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17909900,
+		aphelion: 17909900,
 		eccentricity: 0.16,
 		inclination: 46.1,
 		mass: {
@@ -4686,7 +4803,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tarqeq'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/tarqeq',
+		wikipediaKey: 'Tarqeq_(moon)'
 	},
 	{
 		id: 'egeon',
@@ -4695,8 +4813,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 167500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 167500,
+		aphelion: 167500,
 		eccentricity: 0.0002,
 		inclination: 0.001,
 		mass: {
@@ -4726,7 +4844,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/egeon'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/egeon',
+		wikipediaKey: 'Egeon_(moon)'
 	},
 	{
 		id: 's2004s7',
@@ -4735,8 +4854,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21005800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21005800,
+		aphelion: 21005800,
 		eccentricity: 0.58,
 		inclination: 165.1,
 		mass: {
@@ -4766,7 +4885,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s7'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s7',
+		wikipediaKey: '2004_S_7'
 	},
 	{
 		id: 's2004s12',
@@ -4775,8 +4895,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19867500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19867500,
+		aphelion: 19867500,
 		eccentricity: 0.401,
 		inclination: 164,
 		mass: {
@@ -4806,7 +4926,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s12'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s12',
+		wikipediaKey: '2004_S_12'
 	},
 	{
 		id: 's2004s13',
@@ -4815,8 +4936,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18408700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18408700,
+		aphelion: 18408700,
 		eccentricity: 0.273,
 		inclination: 167.4,
 		mass: {
@@ -4846,7 +4967,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s13'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s13',
+		wikipediaKey: '2004_S_13'
 	},
 	{
 		id: 's2004s17',
@@ -4855,8 +4977,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19449900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19449900,
+		aphelion: 19449900,
 		eccentricity: 0.259,
 		inclination: 166.6,
 		mass: {
@@ -4886,7 +5008,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s17'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s17',
+		wikipediaKey: '2004_S_17'
 	},
 	{
 		id: 's2006s1',
@@ -4895,8 +5018,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18797400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18797400,
+		aphelion: 18797400,
 		eccentricity: 0.13,
 		inclination: 154.2,
 		mass: {
@@ -4926,7 +5049,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s1',
+		wikipediaKey: '2006_S_1'
 	},
 	{
 		id: 's2006s3',
@@ -4935,8 +5059,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22100100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22100100,
+		aphelion: 22100100,
 		eccentricity: 0.471,
 		inclination: 150.8,
 		mass: {
@@ -4966,7 +5090,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s3'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s3',
+		wikipediaKey: '2006_S_3'
 	},
 	{
 		id: 's2007s2',
@@ -4975,8 +5100,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 16723300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 16723300,
+		aphelion: 16723300,
 		eccentricity: 0.218,
 		inclination: 176.7,
 		mass: {
@@ -5006,7 +5131,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s2',
+		wikipediaKey: '2007_S_2'
 	},
 	{
 		id: 's2007s3',
@@ -5015,8 +5141,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18981900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18981900,
+		aphelion: 18981900,
 		eccentricity: 0.13,
 		inclination: 177.2,
 		mass: {
@@ -5046,7 +5172,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s3'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s3',
+		wikipediaKey: '2007_S_3'
 	},
 	{
 		id: 's2009s1',
@@ -5055,8 +5182,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 117000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 117000,
+		aphelion: 117000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -5086,7 +5213,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2009s1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2009s1',
+		wikipediaKey: '2009_S_1'
 	},
 	{
 		id: 'ariel',
@@ -5126,7 +5254,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ariel'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ariel',
+		wikipediaKey: 'Ariel_(moon)'
 	},
 	{
 		id: 'umbriel',
@@ -5166,7 +5295,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/umbriel'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/umbriel',
+		wikipediaKey: 'Umbriel_(moon)'
 	},
 	{
 		id: 'titania',
@@ -5206,7 +5336,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/titania'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/titania',
+		wikipediaKey: 'Titania_(moon)'
 	},
 	{
 		id: 'oberon',
@@ -5246,7 +5377,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/oberon'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/oberon',
+		wikipediaKey: 'Oberon_(moon)'
 	},
 	{
 		id: 'miranda',
@@ -5286,7 +5418,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/miranda'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/miranda',
+		wikipediaKey: 'Miranda_(moon)'
 	},
 	{
 		id: 'cordelia',
@@ -5295,8 +5428,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 49800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 49800,
+		aphelion: 49800,
 		eccentricity: 0.0003,
 		inclination: 0.08,
 		mass: {
@@ -5326,7 +5459,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cordelia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cordelia',
+		wikipediaKey: 'Cordelia_(moon)'
 	},
 	{
 		id: 'ophelia',
@@ -5335,8 +5469,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 53800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 53800,
+		aphelion: 53800,
 		eccentricity: 0.0099,
 		inclination: 0.1,
 		mass: {
@@ -5366,7 +5500,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ophelia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ophelia',
+		wikipediaKey: 'Ophelia_(moon)'
 	},
 	{
 		id: 'bianca',
@@ -5375,8 +5510,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 59200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 59200,
+		aphelion: 59200,
 		eccentricity: 0.0009,
 		inclination: 0.19,
 		mass: {
@@ -5406,7 +5541,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bianca'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/bianca',
+		wikipediaKey: 'Bianca_(moon)'
 	},
 	{
 		id: 'cressida',
@@ -5415,8 +5551,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 61800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 61800,
+		aphelion: 61800,
 		eccentricity: 0.0004,
 		inclination: 0.01,
 		mass: {
@@ -5446,7 +5582,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cressida'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cressida',
+		wikipediaKey: 'Cressida_(moon)'
 	},
 	{
 		id: 'desdemona',
@@ -5455,8 +5592,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 62700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 62700,
+		aphelion: 62700,
 		eccentricity: 0.0001,
 		inclination: 0.11,
 		mass: {
@@ -5486,7 +5623,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/desdemona'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/desdemona',
+		wikipediaKey: 'Desdemona_(moon)'
 	},
 	{
 		id: 'juliet',
@@ -5495,8 +5633,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 64400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 64400,
+		aphelion: 64400,
 		eccentricity: 0.0007,
 		inclination: 0.07,
 		mass: {
@@ -5526,7 +5664,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/juliet'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/juliet',
+		wikipediaKey: 'Juliet_(moon)'
 	},
 	{
 		id: 'portia',
@@ -5535,8 +5674,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 66100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 66100,
+		aphelion: 66100,
 		eccentricity: 0.0001,
 		inclination: 0.06,
 		mass: {
@@ -5566,7 +5705,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/portia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/portia',
+		wikipediaKey: 'Portia_(moon)'
 	},
 	{
 		id: 'rosalind',
@@ -5575,8 +5715,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 69900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 69900,
+		aphelion: 69900,
 		eccentricity: 0.0001,
 		inclination: 0.28,
 		mass: {
@@ -5606,7 +5746,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/rosalind'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/rosalind',
+		wikipediaKey: 'Rosalind_(moon)'
 	},
 	{
 		id: 'belinda',
@@ -5615,8 +5756,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 75300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 75300,
+		aphelion: 75300,
 		eccentricity: 0.0001,
 		inclination: 0.03,
 		mass: {
@@ -5646,7 +5787,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/belinda'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/belinda',
+		wikipediaKey: 'Belinda_(moon)'
 	},
 	{
 		id: 'puck',
@@ -5655,8 +5797,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 86000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 86000,
+		aphelion: 86000,
 		eccentricity: 0.0001,
 		inclination: 0.32,
 		mass: {
@@ -5686,7 +5828,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/puck'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/puck',
+		wikipediaKey: 'Puck_(moon)'
 	},
 	{
 		id: 'caliban',
@@ -5695,8 +5838,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 7231100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 7231100,
+		aphelion: 7231100,
 		eccentricity: 0.1812,
 		inclination: 141.53,
 		mass: {
@@ -5726,7 +5869,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/caliban'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/caliban',
+		wikipediaKey: 'Caliban_(moon)'
 	},
 	{
 		id: 'sycorax',
@@ -5735,8 +5879,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 12179400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 12179400,
+		aphelion: 12179400,
 		eccentricity: 0.5219,
 		inclination: 159.42,
 		mass: {
@@ -5766,7 +5910,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sycorax'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sycorax',
+		wikipediaKey: 'Sycorax_(moon)'
 	},
 	{
 		id: 'prospero',
@@ -5775,8 +5920,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 16276800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 16276800,
+		aphelion: 16276800,
 		eccentricity: 0.4445,
 		inclination: 151.83,
 		mass: {
@@ -5806,7 +5951,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/prospero'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/prospero',
+		wikipediaKey: 'Prospero_(moon)'
 	},
 	{
 		id: 'setebos',
@@ -5815,8 +5961,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17420400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17420400,
+		aphelion: 17420400,
 		eccentricity: 0.5908,
 		inclination: 158.24,
 		mass: {
@@ -5846,7 +5992,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/setebos'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/setebos',
+		wikipediaKey: 'Setebos_(moon)'
 	},
 	{
 		id: 'stephano',
@@ -5855,8 +6002,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 8007400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 8007400,
+		aphelion: 8007400,
 		eccentricity: 0.2248,
 		inclination: 143.82,
 		mass: {
@@ -5886,7 +6033,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/stephano'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/stephano',
+		wikipediaKey: 'Stephano_(moon)'
 	},
 	{
 		id: 'trinculo',
@@ -5895,8 +6043,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 8505200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 8505200,
+		aphelion: 8505200,
 		eccentricity: 0.2194,
 		inclination: 166.93,
 		mass: {
@@ -5926,7 +6074,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/trinculo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/trinculo',
+		wikipediaKey: 'Trinculo_(moon)'
 	},
 	{
 		id: 'francisco',
@@ -5935,8 +6084,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 4282900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 4282900,
+		aphelion: 4282900,
 		eccentricity: 0.1324,
 		inclination: 147.25,
 		mass: {
@@ -5966,7 +6115,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/francisco'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/francisco',
+		wikipediaKey: 'Francisco_(moon)'
 	},
 	{
 		id: 'margaret',
@@ -5975,8 +6125,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23808000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23808000,
+		aphelion: 23808000,
 		eccentricity: 0.6772,
 		inclination: 57.37,
 		mass: {
@@ -6006,7 +6156,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/margaret'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/margaret',
+		wikipediaKey: 'Margaret_(moon)'
 	},
 	{
 		id: 'ferdinand',
@@ -6015,8 +6166,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20430000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20430000,
+		aphelion: 20430000,
 		eccentricity: 0.3993,
 		inclination: 169.79,
 		mass: {
@@ -6046,7 +6197,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ferdinand'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ferdinand',
+		wikipediaKey: 'Ferdinand_(moon)'
 	},
 	{
 		id: 'perdita',
@@ -6055,8 +6207,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 76417,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 76417,
+		aphelion: 76417,
 		eccentricity: 0,
 		inclination: 0.47,
 		mass: {
@@ -6086,7 +6238,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/perdita'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/perdita',
+		wikipediaKey: 'Perdita_(moon)'
 	},
 	{
 		id: 'mab',
@@ -6095,8 +6248,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 97736,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 97736,
+		aphelion: 97736,
 		eccentricity: 0,
 		inclination: 0.13,
 		mass: {
@@ -6126,7 +6279,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mab'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mab',
+		wikipediaKey: 'Mab_(moon)'
 	},
 	{
 		id: 'cupid',
@@ -6135,8 +6289,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 74392,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 74392,
+		aphelion: 74392,
 		eccentricity: 0,
 		inclination: 0.1,
 		mass: {
@@ -6166,7 +6320,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cupid'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cupid',
+		wikipediaKey: 'Cupid_(moon)'
 	},
 	{
 		id: 'triton',
@@ -6206,7 +6361,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/triton'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/triton',
+		wikipediaKey: 'Triton_(moon)'
 	},
 	{
 		id: 'nereide',
@@ -6246,7 +6402,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nereide'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nereide',
+		wikipediaKey: 'Nereide_(moon)'
 	},
 	{
 		id: 'naiade',
@@ -6255,8 +6412,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 48227,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 48227,
+		aphelion: 48227,
 		eccentricity: 0.0003,
 		inclination: 4.74,
 		mass: {
@@ -6286,7 +6443,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/naiade'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/naiade',
+		wikipediaKey: 'Naiade_(moon)'
 	},
 	{
 		id: 'thalassa',
@@ -6295,8 +6453,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 50074,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 50074,
+		aphelion: 50074,
 		eccentricity: 0.0002,
 		inclination: 0.21,
 		mass: {
@@ -6326,7 +6484,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thalassa'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/thalassa',
+		wikipediaKey: 'Thalassa_(moon)'
 	},
 	{
 		id: 'despina',
@@ -6335,8 +6494,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 52526,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 52526,
+		aphelion: 52526,
 		eccentricity: 0.0001,
 		inclination: 0.07,
 		mass: {
@@ -6366,7 +6525,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/despina'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/despina',
+		wikipediaKey: 'Despina_(moon)'
 	},
 	{
 		id: 'galatee',
@@ -6375,8 +6535,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 61953,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 61953,
+		aphelion: 61953,
 		eccentricity: 0.0001,
 		inclination: 0.05,
 		mass: {
@@ -6406,7 +6566,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/galatee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/galatee',
+		wikipediaKey: 'Galatee_(moon)'
 	},
 	{
 		id: 'larissa',
@@ -6415,8 +6576,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 73548,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 73548,
+		aphelion: 73548,
 		eccentricity: 0.0014,
 		inclination: 0.2,
 		mass: {
@@ -6446,7 +6607,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/larissa'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/larissa',
+		wikipediaKey: 'Larissa_(moon)'
 	},
 	{
 		id: 'protee',
@@ -6455,8 +6617,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 117646,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 117646,
+		aphelion: 117646,
 		eccentricity: 0.0004,
 		inclination: 0.04,
 		mass: {
@@ -6486,7 +6648,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/protee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/protee',
+		wikipediaKey: 'Protee_(moon)'
 	},
 	{
 		id: 'halimede',
@@ -6495,8 +6658,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 16611000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 16611000,
+		aphelion: 16611000,
 		eccentricity: 0.571,
 		inclination: 134.1,
 		mass: {
@@ -6526,7 +6689,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/halimede'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/halimede',
+		wikipediaKey: 'Halimede_(moon)'
 	},
 	{
 		id: 'psamathee',
@@ -6535,8 +6699,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 48096000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 48096000,
+		aphelion: 48096000,
 		eccentricity: 0.45,
 		inclination: 137.4,
 		mass: {
@@ -6566,7 +6730,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/psamathee'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/psamathee',
+		wikipediaKey: 'Psamathee_(moon)'
 	},
 	{
 		id: 'sao',
@@ -6575,8 +6740,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22228000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22228000,
+		aphelion: 22228000,
 		eccentricity: 0.293,
 		inclination: 48.5,
 		mass: {
@@ -6606,7 +6771,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sao'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sao',
+		wikipediaKey: 'Sao_(moon)'
 	},
 	{
 		id: 'laomedie',
@@ -6615,8 +6781,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23567000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23567000,
+		aphelion: 23567000,
 		eccentricity: 0.424,
 		inclination: 34.7,
 		mass: {
@@ -6646,7 +6812,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/laomedie'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/laomedie',
+		wikipediaKey: 'Laomedie_(moon)'
 	},
 	{
 		id: 'neso',
@@ -6655,8 +6822,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 49285000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 49285000,
+		aphelion: 49285000,
 		eccentricity: 0.495,
 		inclination: 132.6,
 		mass: {
@@ -6686,7 +6853,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/neso'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/neso',
+		wikipediaKey: 'Neso_(moon)'
 	},
 	{
 		id: 'charon',
@@ -6695,8 +6863,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17536,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17536,
+		aphelion: 17536,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6726,7 +6894,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/charon'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/charon',
+		wikipediaKey: 'Charon_(moon)'
 	},
 	{
 		id: 'nix',
@@ -6735,8 +6904,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 48708,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 48708,
+		aphelion: 48708,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6766,7 +6935,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nix'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nix',
+		wikipediaKey: 'Nix_(moon)'
 	},
 	{
 		id: 'hydra',
@@ -6775,8 +6945,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 64749,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 64749,
+		aphelion: 64749,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6806,7 +6976,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hydra'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hydra',
+		wikipediaKey: 'Hydra_(moon)'
 	},
 	{
 		id: 'namaka',
@@ -6815,8 +6986,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 39300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 39300,
+		aphelion: 39300,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6846,7 +7017,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/namaka'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/namaka',
+		wikipediaKey: 'Namaka_(moon)'
 	},
 	{
 		id: 'hiiaka',
@@ -6855,8 +7027,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 49500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 49500,
+		aphelion: 49500,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6886,7 +7058,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hiiaka'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hiiaka',
+		wikipediaKey: 'Hiʻiaka_(moon)'
 	},
 	{
 		id: 'dysnomie',
@@ -6895,8 +7068,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 30000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 30000,
+		aphelion: 30000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -6926,7 +7099,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dysnomie'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dysnomie',
+		wikipediaKey: 'Dysnomia_(moon)'
 	},
 	{
 		id: 'dia',
@@ -6935,8 +7109,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 12555000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 12555000,
+		aphelion: 12555000,
 		eccentricity: 0.211,
 		inclination: 28.23,
 		mass: {
@@ -6966,7 +7140,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dia',
+		wikipediaKey: 'Dia_(moon)'
 	},
 	{
 		id: 's2004s3',
@@ -6975,8 +7150,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 141000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 141000,
+		aphelion: 141000,
 		eccentricity: 0.02,
 		inclination: 0,
 		mass: {
@@ -7006,7 +7181,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s3'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s3',
+		wikipediaKey: 'S/2004_S_3'
 	},
 	{
 		id: 's2004s4',
@@ -7015,8 +7191,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 140100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 140100,
+		aphelion: 140100,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7046,7 +7222,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s4'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s4',
+		wikipediaKey: 'S/2004_S_4'
 	},
 	{
 		id: 's2004s6',
@@ -7055,8 +7232,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 140000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 140000,
+		aphelion: 140000,
 		eccentricity: 0.002,
 		inclination: 0.02,
 		mass: {
@@ -7086,7 +7263,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s6'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s6',
+		wikipediaKey: 'S/2004_S_6'
 	},
 	{
 		id: 's2010j1',
@@ -7095,8 +7273,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23314335,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23314335,
+		aphelion: 23314335,
 		eccentricity: 0.32,
 		inclination: 163.2,
 		mass: {
@@ -7126,7 +7304,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2010j1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2010j1',
+		wikipediaKey: 'S/2010_J_1'
 	},
 	{
 		id: 's2010j2',
@@ -7135,8 +7314,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20320000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20320000,
+		aphelion: 20320000,
 		eccentricity: 0.307,
 		inclination: 150.4,
 		mass: {
@@ -7166,7 +7345,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2010j2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2010j2',
+		wikipediaKey: 'S/2010_J_2'
 	},
 	{
 		id: 'ceres',
@@ -7206,7 +7386,8 @@ const solarSystemData = [
 		mainAnomaly: 77.3721,
 		argPeriapsis: 73.59769,
 		longAscNode: 80.30553,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ceres'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ceres',
+		wikipediaKey: 'Ceres_(dwarf_planet)'
 	},
 	{
 		id: 'hebe',
@@ -7215,8 +7396,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 362959000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 362959000,
+		aphelion: 362959000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7243,7 +7424,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hebe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hebe',
+		wikipediaKey: '6_Hebe'
 	},
 	{
 		id: 'lempo',
@@ -7252,8 +7434,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 5884000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 5884000000,
+		aphelion: 5884000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7280,17 +7462,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lempo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lempo',
+		wikipediaKey: '47171_Lempo'
 	},
 	{
 		id: 'petitprince',
 		name: 'Petit-Prince',
-		englishName: 'The Little Prince',
+		englishName: 'Petit-Prince',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 1190,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 1190,
+		aphelion: 1190,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7321,7 +7504,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/petitprince'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/petitprince',
+		wikipediaKey: 'Petit-Prince_(moon)'
 	},
 	{
 		id: 'pulcova',
@@ -7330,8 +7514,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 472579673,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 472579673,
+		aphelion: 472579673,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7358,7 +7542,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pulcova'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pulcova',
+		wikipediaKey: '762_Pulcova'
 	},
 	{
 		id: 'toutatis',
@@ -7367,8 +7552,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 377326000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 377326000,
+		aphelion: 377326000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7395,7 +7580,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/toutatis'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/toutatis',
+		wikipediaKey: '4179_Toutatis'
 	},
 	{
 		id: 'quaoar',
@@ -7404,8 +7590,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 6489054000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 6489054000,
+		aphelion: 6489054000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7432,7 +7618,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/quaoar'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/quaoar',
+		wikipediaKey: '50000_Quaoar'
 	},
 	{
 		id: 'steins',
@@ -7441,8 +7628,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 353495000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 353495000,
+		aphelion: 353495000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7469,7 +7656,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/steins'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/steins',
+		wikipediaKey: '2867_Šteins'
 	},
 	{
 		id: 'eris',
@@ -7514,7 +7702,8 @@ const solarSystemData = [
 		mainAnomaly: 205.989,
 		argPeriapsis: 151.639,
 		longAscNode: 35.951,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eris'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eris',
+		wikipediaKey: 'Eris_(dwarf_planet)'
 	},
 	{
 		id: 'astree',
@@ -7523,8 +7712,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 384877000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 384877000,
+		aphelion: 384877000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7551,7 +7740,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/astree'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/astree',
+		wikipediaKey: '5_Astraea'
 	},
 	{
 		id: 'pholus',
@@ -7560,8 +7750,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 3055227000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 3055227000,
+		aphelion: 3055227000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7588,7 +7778,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pholus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pholus',
+		wikipediaKey: '5145_Pholus'
 	},
 	{
 		id: 'castalia',
@@ -7597,8 +7788,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 159053000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 159053000,
+		aphelion: 159053000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7625,7 +7816,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/castalia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/castalia',
+		wikipediaKey: '4769_Castalia'
 	},
 	{
 		id: 'remus',
@@ -7634,8 +7826,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 706,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 706,
+		aphelion: 706,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7665,7 +7857,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/remus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/remus',
+		wikipediaKey: 'Remus_(moon)'
 	},
 	{
 		id: 'hector',
@@ -7674,8 +7867,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 781183000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 781183000,
+		aphelion: 781183000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7702,7 +7895,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hector'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hector',
+		wikipediaKey: '624_Hektor'
 	},
 	{
 		id: 'kleopatra',
@@ -7711,8 +7905,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 417796000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 417796000,
+		aphelion: 417796000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7739,7 +7933,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kleopatra'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kleopatra',
+		wikipediaKey: '216_Kleopatra'
 	},
 	{
 		id: 'cruithne',
@@ -7748,8 +7943,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 149260000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 149260000,
+		aphelion: 149260000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7776,7 +7971,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cruithne'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cruithne',
+		wikipediaKey: '3753_Cruithne'
 	},
 	{
 		id: 'junon',
@@ -7785,8 +7981,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 399480000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 399480000,
+		aphelion: 399480000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7813,7 +8009,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/junon'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/junon',
+		wikipediaKey: '3_Junon'
 	},
 	{
 		id: 'hygie',
@@ -7822,8 +8019,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 469345000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 469345000,
+		aphelion: 469345000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7850,7 +8047,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hygie'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hygie',
+		wikipediaKey: '10_Hygiea'
 	},
 	{
 		id: 'lutetia',
@@ -7859,8 +8057,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 364277000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 364277000,
+		aphelion: 364277000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7887,7 +8085,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lutetia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lutetia',
+		wikipediaKey: '21_Lutetia'
 	},
 	{
 		id: 'mathilde',
@@ -7896,8 +8095,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 395900000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 395900000,
+		aphelion: 395900000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -7924,7 +8123,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mathilde'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mathilde',
+		wikipediaKey: '253_Mathilde'
 	},
 	{
 		id: 'uranus',
@@ -8073,7 +8273,8 @@ const solarSystemData = [
 		mainAnomaly: 142.2386,
 		argPeriapsis: 98.862,
 		longAscNode: 73.967,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/uranus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/uranus',
+		wikipediaKey: 'Uranus'
 	},
 	{
 		id: 'iris',
@@ -8082,8 +8283,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 357019000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 357019000,
+		aphelion: 357019000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8110,7 +8311,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/iris'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/iris',
+		wikipediaKey: '7_Iris'
 	},
 	{
 		id: 'eros',
@@ -8119,8 +8321,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 218155000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 218155000,
+		aphelion: 218155000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8147,7 +8349,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eros'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eros',
+		wikipediaKey: '433_Eros'
 	},
 	{
 		id: 'vanth',
@@ -8156,8 +8359,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 8980,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 8980,
+		aphelion: 8980,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8187,7 +8390,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/vanth'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/vanth',
+		wikipediaKey: 'Vanth_(moon)'
 	},
 	{
 		id: 'sedna',
@@ -8196,8 +8400,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 75659770000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 75659770000,
+		aphelion: 75659770000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8224,7 +8428,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sedna'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sedna',
+		wikipediaKey: '90377_Sedna'
 	},
 	{
 		id: 'chariklo',
@@ -8233,8 +8438,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 2380000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 2380000000,
+		aphelion: 2380000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8261,7 +8466,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chariklo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chariklo',
+		wikipediaKey: '10199_Chariklo'
 	},
 	{
 		id: 'sylvia',
@@ -8270,8 +8476,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 522135000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 522135000,
+		aphelion: 522135000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8298,17 +8504,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sylvia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sylvia',
+		wikipediaKey: '87_Sylvia'
 	},
 	{
 		id: 'dactyl',
 		name: 'Dactyl',
-		englishName: '(243) Ida I Dactyl',
+		englishName: 'Dactyl',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 108,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 108,
+		aphelion: 108,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8338,7 +8545,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dactyl'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/dactyl',
+		wikipediaKey: 'Dactyl_(moon)'
 	},
 	{
 		id: 'orcus',
@@ -8347,8 +8555,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 5862440000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 5862440000,
+		aphelion: 5862440000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8375,7 +8583,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/orcus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/orcus',
+		wikipediaKey: '90482_Orcus'
 	},
 	{
 		id: 'pluton',
@@ -8445,8 +8654,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 8368303000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 8368303000,
+		aphelion: 8368303000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8473,7 +8682,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/damocles'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/damocles',
+		wikipediaKey: '5335_Damocles'
 	},
 	{
 		id: 'romulus',
@@ -8482,8 +8692,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 1356,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 1356,
+		aphelion: 1356,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8513,7 +8723,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/romulus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/romulus',
+		wikipediaKey: 'Romulus_(moon)'
 	},
 	{
 		id: 'alexhelios',
@@ -8522,8 +8733,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 775,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 775,
+		aphelion: 775,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8553,7 +8764,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/alexhelios'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/alexhelios',
+		wikipediaKey: 'Alexhelios_(moon)'
 	},
 	{
 		id: 'cleoselene',
@@ -8562,8 +8774,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 380,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 380,
+		aphelion: 380,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8593,7 +8805,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cleoselene'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/cleoselene',
+		wikipediaKey: 'Cleoselene_(moon)'
 	},
 	{
 		id: 'flore',
@@ -8602,8 +8815,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 329313000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 329313000,
+		aphelion: 329313000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8630,7 +8843,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/flore'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/flore',
+		wikipediaKey: '8_Flora'
 	},
 	{
 		id: 'chiron',
@@ -8639,8 +8853,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 2042652000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 2042652000,
+		aphelion: 2042652000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8667,7 +8881,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chiron'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chiron',
+		wikipediaKey: '2060_Chiron'
 	},
 	{
 		id: 'eureka',
@@ -8676,8 +8891,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 227908000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 227908000,
+		aphelion: 227908000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8704,7 +8919,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eureka'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eureka',
+		wikipediaKey: '5261_Eureka'
 	},
 	{
 		id: 'achille',
@@ -8713,8 +8929,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 776669000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 776669000,
+		aphelion: 776669000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8741,7 +8957,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/achille'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/achille',
+		wikipediaKey: '588_Achilles'
 	},
 	{
 		id: 'weywot',
@@ -8750,8 +8967,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 10000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 10000,
+		aphelion: 10000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8781,7 +8998,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/weywot'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/weywot',
+		wikipediaKey: 'Weywot'
 	},
 	{
 		id: 'ixion',
@@ -8790,8 +9008,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 5910896000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 5910896000,
+		aphelion: 5910896000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8818,7 +9036,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ixion'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ixion',
+		wikipediaKey: '28978_Ixion'
 	},
 	{
 		id: 'neptune',
@@ -8952,7 +9171,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sl9'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/sl9',
+		wikipediaKey: 'Comet_Shoemaker–Levy_9'
 	},
 	{
 		id: '9metis',
@@ -8961,8 +9181,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 357052000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 357052000,
+		aphelion: 357052000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -8989,7 +9209,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/9metis'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/9metis',
+		wikipediaKey: '9_Metis'
 	},
 	{
 		id: 'haumea',
@@ -9038,7 +9259,8 @@ const solarSystemData = [
 		mainAnomaly: 218.205,
 		argPeriapsis: 239.041,
 		longAscNode: 122.167,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/haumea'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/haumea',
+		wikipediaKey: '136108_Haumea'
 	},
 	{
 		id: 'nessus',
@@ -9047,8 +9269,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 3689000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 3689000000,
+		aphelion: 3689000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9075,7 +9297,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nessus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nessus',
+		wikipediaKey: '7066_Nessus'
 	},
 	{
 		id: 'itokawa',
@@ -9084,8 +9307,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 198049628,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 198049628,
+		aphelion: 198049628,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9112,7 +9335,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/itokawa'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/itokawa',
+		wikipediaKey: '25143_Itokawa'
 	},
 	{
 		id: 'hylonome',
@@ -9121,8 +9345,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 3779000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 3779000000,
+		aphelion: 3779000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9149,7 +9373,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hylonome'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hylonome',
+		wikipediaKey: '10370_Hylonome'
 	},
 	{
 		id: 'eugenia',
@@ -9158,8 +9383,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 406934000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 406934000,
+		aphelion: 406934000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9186,7 +9411,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eugenia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/eugenia',
+		wikipediaKey: '45_Eugenia'
 	},
 	{
 		id: '2006SQ372',
@@ -9195,8 +9421,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 151692240180,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 151692240180,
+		aphelion: 151692240180,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9223,7 +9449,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/2006SQ372'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/2006SQ372',
+		wikipediaKey: '(308933)_2006_SQ372'
 	},
 	{
 		id: 'pallas',
@@ -9232,8 +9459,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 414717000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 414717000,
+		aphelion: 414717000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9260,7 +9487,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pallas'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pallas',
+		wikipediaKey: '2_Pallas'
 	},
 	{
 		id: 'asbolus',
@@ -9269,8 +9497,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 2694000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 2694000000,
+		aphelion: 2694000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9297,7 +9525,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/asbolus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/asbolus',
+		wikipediaKey: '8405_Asbolus'
 	},
 	{
 		id: 'varuna',
@@ -9306,8 +9535,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 6451398000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 6451398000,
+		aphelion: 6451398000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9334,7 +9563,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/varuna'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/varuna',
+		wikipediaKey: '20000_Varuna'
 	},
 	{
 		id: 'vesta',
@@ -9343,8 +9573,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 353343000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 353343000,
+		aphelion: 353343000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9371,7 +9601,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/vesta'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/vesta',
+		wikipediaKey: '4_Vesta'
 	},
 	{
 		id: 'ida',
@@ -9380,8 +9611,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 428000000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 428000000,
+		aphelion: 428000000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9408,7 +9639,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ida'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ida',
+		wikipediaKey: '243_Ida'
 	},
 	{
 		id: 'hyakutake',
@@ -9445,7 +9677,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyakutake'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hyakutake',
+		wikipediaKey: 'Comet_Hyakutake'
 	},
 	{
 		id: 'gaspra',
@@ -9454,8 +9687,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 330513000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 330513000,
+		aphelion: 330513000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9482,7 +9715,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/gaspra'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/gaspra',
+		wikipediaKey: '951_Gaspra'
 	},
 	{
 		id: 'albion',
@@ -9491,8 +9725,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 6547379000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 6547379000,
+		aphelion: 6547379000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9519,12 +9753,13 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/albion'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/albion',
+		wikipediaKey: '15760_Albion'
 	},
 	{
 		id: 'makemake',
 		name: '(136472) Makémaké',
-		englishName: '136472 Makemake',
+		englishName: 'Makemake',
 		isPlanet: true,
 		moons: [
 			{
@@ -9564,7 +9799,8 @@ const solarSystemData = [
 		mainAnomaly: 165.514,
 		argPeriapsis: 294.834,
 		longAscNode: 79.62,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/makemake'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/makemake',
+		wikipediaKey: 'Makemake'
 	},
 	{
 		id: 'halley',
@@ -9573,8 +9809,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 2677801885,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 2677801885,
+		aphelion: 2677801885,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -9601,7 +9837,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/halley'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/halley',
+		wikipediaKey: 'Halley%27s_Comet'
 	},
 	{
 		id: 'jupiter',
@@ -10047,7 +10284,8 @@ const solarSystemData = [
 		mainAnomaly: 174.796,
 		argPeriapsis: 29.022,
 		longAscNode: 48.378,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mercure'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mercure',
+		wikipediaKey: 'Mercury_(planet)'
 	},
 	{
 		id: 'saturne',
@@ -10547,8 +10785,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 59000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 59000,
+		aphelion: 59000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -10578,7 +10816,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kerberos'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kerberos',
+		wikipediaKey: 'Kerberos_(moon)'
 	},
 	{
 		id: 's2011j1',
@@ -10587,8 +10826,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20155290,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20155290,
+		aphelion: 20155290,
 		eccentricity: 0.296,
 		inclination: 162.8,
 		mass: {
@@ -10618,7 +10857,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2011j1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2011j1',
+		wikipediaKey: 'S/2011_J_1'
 	},
 	{
 		id: 's2011j2',
@@ -10627,8 +10867,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23329710,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23329710,
+		aphelion: 23329710,
 		eccentricity: 0.332,
 		inclination: 148.8,
 		mass: {
@@ -10658,7 +10898,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2011j2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2011j2',
+		wikipediaKey: 'S/2011_J_2'
 	},
 	{
 		id: 'styx',
@@ -10667,8 +10908,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 45000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 45000,
+		aphelion: 45000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -10698,7 +10939,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/styx'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/styx',
+		wikipediaKey: 'Styx_(moon)'
 	},
 	{
 		id: 'hippocampe',
@@ -10707,8 +10949,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 105200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 105200,
+		aphelion: 105200,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -10738,7 +10980,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hippocampe'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/hippocampe',
+		wikipediaKey: 'Hippocamp_(moon)'
 	},
 	{
 		id: 'mk2',
@@ -10747,8 +10990,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21100,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21100,
+		aphelion: 21100,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -10778,7 +11021,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mk2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mk2',
+		wikipediaKey: 'S/2015_(136472)_1'
 	},
 	{
 		id: 's2017j1',
@@ -10787,8 +11031,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23587000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23587000,
+		aphelion: 23587000,
 		eccentricity: 0.397,
 		inclination: 149.2,
 		mass: {
@@ -10818,7 +11062,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j1',
+		wikipediaKey: 'S/2017_J_1'
 	},
 	{
 		id: 's2016j1',
@@ -10827,8 +11072,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20651000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20651000,
+		aphelion: 20651000,
 		eccentricity: 0.141,
 		inclination: 139.8,
 		mass: {
@@ -10858,7 +11103,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2016j1'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2016j1',
+		wikipediaKey: 'S/2016_J_1'
 	},
 	{
 		id: 'valetudo',
@@ -10867,8 +11113,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 18980000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 18980000,
+		aphelion: 18980000,
 		eccentricity: 0.222,
 		inclination: 34,
 		mass: {
@@ -10898,7 +11144,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/valetudo'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/valetudo',
+		wikipediaKey: 'Valetudo_(moon)'
 	},
 	{
 		id: 's2017j2',
@@ -10907,8 +11154,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23303000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23303000,
+		aphelion: 23303000,
 		eccentricity: 0.236,
 		inclination: 166.4,
 		mass: {
@@ -10938,7 +11185,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j2'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j2',
+		englishName: 'S/2017_J_2'
 	},
 	{
 		id: 's2017j3',
@@ -10947,8 +11195,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20694000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20694000,
+		aphelion: 20694000,
 		eccentricity: 0.148,
 		inclination: 147.9,
 		mass: {
@@ -10978,7 +11226,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j3'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j3',
+		wikipediaKey: 'S/2017_J_3'
 	},
 	{
 		id: 'pandia',
@@ -10987,8 +11236,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11525000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11525000,
+		aphelion: 11525000,
 		eccentricity: 0.18,
 		inclination: 28.2,
 		mass: {
@@ -11018,7 +11267,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pandia'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pandia',
+		wikipediaKey: 'Pandia'
 	},
 	{
 		id: 's2017j5',
@@ -11027,8 +11277,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23232000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23232000,
+		aphelion: 23232000,
 		eccentricity: 0.284,
 		inclination: 164.3,
 		mass: {
@@ -11058,7 +11308,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j5'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j5',
+		wikipediaKey: 'S/2017_J_5'
 	},
 	{
 		id: 's2017j6',
@@ -11067,8 +11318,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22455000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22455000,
+		aphelion: 22455000,
 		eccentricity: 0.557,
 		inclination: 155.2,
 		mass: {
@@ -11098,7 +11349,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j6'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j6',
+		wikipediaKey: 'S/2017_J_6'
 	},
 	{
 		id: 's2017j7',
@@ -11107,8 +11359,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20627000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20627000,
+		aphelion: 20627000,
 		eccentricity: 0.215,
 		inclination: 143.4,
 		mass: {
@@ -11138,7 +11390,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j7'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j7',
+		wikipediaKey: 'S/2017_J_7'
 	},
 	{
 		id: 's2017j8',
@@ -11147,8 +11400,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23233000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23233000,
+		aphelion: 23233000,
 		eccentricity: 0.312,
 		inclination: 164.7,
 		mass: {
@@ -11178,7 +11431,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j8'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j8',
+		wikipediaKey: 'S/2017_J_8'
 	},
 	{
 		id: 's2017j9',
@@ -11187,8 +11441,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21487000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21487000,
+		aphelion: 21487000,
 		eccentricity: 0.229,
 		inclination: 152.7,
 		mass: {
@@ -11218,7 +11472,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j9'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2017j9',
+		wikipediaKey: 'S/2017_J_9'
 	},
 	{
 		id: 'ersa',
@@ -11227,8 +11482,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 11483000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 11483000,
+		aphelion: 11483000,
 		eccentricity: 0.094,
 		inclination: 30.6,
 		mass: {
@@ -11258,7 +11513,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ersa'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ersa',
+		wikipediaKey: 'Ersa_(moon)'
 	},
 	{
 		id: 'arrokoth',
@@ -11267,8 +11523,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 6633400000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 6633400000,
+		aphelion: 6633400000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -11295,7 +11551,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/arrokoth'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/arrokoth',
+		wikipediaKey: '486958_Arrokoth'
 	},
 	{
 		id: 'benou',
@@ -11304,8 +11561,8 @@ const solarSystemData = [
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 168400000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 168400000,
+		aphelion: 168400000,
 		eccentricity: 0,
 		inclination: 0,
 		mass: {
@@ -11332,17 +11589,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/benou'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/benou',
+		wikipediaKey: '101955_Bennu'
 	},
 	{
 		id: 's2004s22',
 		name: 'S/2004 S 22',
-		englishName: '',
+		englishName: 'S/2004 S 22',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20379900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20379900,
+		aphelion: 20379900,
 		eccentricity: 0.257,
 		inclination: 177.4,
 		mass: null,
@@ -11369,17 +11627,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s22'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s22',
+		wikipediaKey: '2004_S_22'
 	},
 	{
 		id: 's2004s21',
 		name: 'S/2004 S 21',
-		englishName: '',
+		englishName: 'S/2004 S 21',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23810400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23810400,
+		aphelion: 23810400,
 		eccentricity: 0.312,
 		inclination: 154.6,
 		mass: null,
@@ -11406,17 +11665,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s21'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s21',
+		wikipediaKey: '2004_S_21'
 	},
 	{
 		id: 's2004s20',
 		name: 'S/2004 S 20',
-		englishName: '',
+		englishName: 'S/2004 S 20',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19211000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19211000,
+		aphelion: 19211000,
 		eccentricity: 0.204,
 		inclination: 163.1,
 		mass: null,
@@ -11443,17 +11703,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s20'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s20',
+		wikipediaKey: '2004_S_20'
 	},
 	{
 		id: 's2004s23',
 		name: 'S/2004 S 23',
-		englishName: '',
+		englishName: 'S/2004 S 23',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21427000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21427000,
+		aphelion: 21427000,
 		eccentricity: 0.399,
 		inclination: 177.7,
 		mass: null,
@@ -11480,17 +11741,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s23'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s23',
+		wikipediaKey: '2004_S_23'
 	},
 	{
 		id: 's2004s24',
 		name: 'S/2004 S 24',
-		englishName: '',
+		englishName: 'S/2004 S 24',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23231300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23231300,
+		aphelion: 23231300,
 		eccentricity: 0.049,
 		inclination: 36.78,
 		mass: null,
@@ -11517,17 +11779,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s24'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s24',
+		wikipediaKey: '2004_S_24'
 	},
 	{
 		id: 's2004s25',
 		name: 'S/2004 S 25',
-		englishName: '',
+		englishName: 'S/2004 S 25',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20544500,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20544500,
+		aphelion: 20544500,
 		eccentricity: 0.457,
 		inclination: 173.3,
 		mass: null,
@@ -11554,17 +11817,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s25'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s25',
+		wikipediaKey: '2004_S_25'
 	},
 	{
 		id: 's2004s26',
 		name: 'S/2004 S 26',
-		englishName: '',
+		englishName: 'S/2004 S 26',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 26737800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 26737800,
+		aphelion: 26737800,
 		eccentricity: 0.148,
 		inclination: 171.3,
 		mass: null,
@@ -11591,17 +11855,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s26'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s26',
+		wikipediaKey: '2004_S_26'
 	},
 	{
 		id: 's2004s27',
 		name: 'S/2004 S 27',
-		englishName: '',
+		englishName: 'S/2004 S 27',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 19776700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 19776700,
+		aphelion: 19776700,
 		eccentricity: 0.12,
 		inclination: 167.1,
 		mass: null,
@@ -11628,17 +11893,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s27'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s27',
+		wikipediaKey: '2004_S_27'
 	},
 	{
 		id: 's2004s28',
 		name: 'S/2004 S 28',
-		englishName: '',
+		englishName: 'S/2004 S 28',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21791300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21791300,
+		aphelion: 21791300,
 		eccentricity: 0.133,
 		inclination: 171,
 		mass: null,
@@ -11665,17 +11931,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s28'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s28',
+		wikipediaKey: '2004_S_28'
 	},
 	{
 		id: 's2004s29',
 		name: 'S/2004 S 29',
-		englishName: '',
+		englishName: 'S/2004 S 29',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17470700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17470700,
+		aphelion: 17470700,
 		eccentricity: 0.472,
 		inclination: 44.43,
 		mass: null,
@@ -11702,17 +11969,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s29'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s29',
+		wikipediaKey: '2004_S_29'
 	},
 	{
 		id: 's2004s30',
 		name: 'S/2004 S 30',
-		englishName: '',
+		englishName: 'S/2004 S 30',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 20424000,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 20424000,
+		aphelion: 20424000,
 		eccentricity: 0.113,
 		inclination: 156.3,
 		mass: null,
@@ -11739,17 +12007,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s30'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s30',
+		wikipediaKey: '2004_S_30'
 	},
 	{
 		id: 's2004s31',
 		name: 'S/2004 S 31',
-		englishName: '',
+		englishName: 'S/2004 S 31',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 17402800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 17402800,
+		aphelion: 17402800,
 		eccentricity: 0.242,
 		inclination: 48.11,
 		mass: null,
@@ -11776,17 +12045,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s31'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s31',
+		wikipediaKey: '2004_S_31'
 	},
 	{
 		id: 's2004s32',
 		name: 'S/2004 S 32',
-		englishName: '',
+		englishName: 'S/2004 S 32',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21564200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21564200,
+		aphelion: 21564200,
 		eccentricity: 0.262,
 		inclination: 158.5,
 		mass: null,
@@ -11813,17 +12083,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s32'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s32',
+		wikipediaKey: '2004_S_32'
 	},
 	{
 		id: 's2004s33',
 		name: 'S/2004 S 33',
-		englishName: '',
+		englishName: 'S/2004 S 33',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23764800,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23764800,
+		aphelion: 23764800,
 		eccentricity: 0.417,
 		inclination: 161.5,
 		mass: null,
@@ -11850,17 +12121,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s33'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s33',
+		wikipediaKey: '2004_S_33'
 	},
 	{
 		id: 's2004s34',
 		name: 'S/2004 S 34',
-		englishName: '',
+		englishName: 'S/2004 S 34',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 24358900,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 24358900,
+		aphelion: 24358900,
 		eccentricity: 0.267,
 		inclination: 165.7,
 		mass: null,
@@ -11887,17 +12159,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s34'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s34',
+		wikipediaKey: '2004_S_34'
 	},
 	{
 		id: 's2004s35',
 		name: 'S/2004 S 35',
-		englishName: '',
+		englishName: 'S/2004 S 35',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 21953200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 21953200,
+		aphelion: 21953200,
 		eccentricity: 0.182,
 		inclination: 176.4,
 		mass: null,
@@ -11924,17 +12197,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s35'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s35',
+		wikipediaKey: '2004_S_35'
 	},
 	{
 		id: 's2004s36',
 		name: 'S/2004 S 36',
-		englishName: '',
+		englishName: 'S/2004 S 36',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23698700,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23698700,
+		aphelion: 23698700,
 		eccentricity: 0.667,
 		inclination: 147.6,
 		mass: null,
@@ -11961,17 +12235,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s36'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s36',
+		wikipediaKey: '2004_S_36'
 	},
 	{
 		id: 's2004s37',
 		name: 'S/2004 S 37',
-		englishName: '',
+		englishName: 'S/2004 S 37',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 16003300,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 16003300,
+		aphelion: 16003300,
 		eccentricity: 0.506,
 		inclination: 164,
 		mass: null,
@@ -11998,17 +12273,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s37'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s37',
+		wikipediaKey: '2004_S_37'
 	},
 	{
 		id: 's2004s38',
 		name: 'S/2004 S 38',
-		englishName: '',
+		englishName: 'S/2004 S 38',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 23006200,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 23006200,
+		aphelion: 23006200,
 		eccentricity: 0.381,
 		inclination: 155,
 		mass: null,
@@ -12035,17 +12311,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s38'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s38',
+		wikipediaKey: '2004_S_38'
 	},
 	{
 		id: 's2004s39',
 		name: 'S/2004 S 39',
-		englishName: '',
+		englishName: 'S/2004 S 39',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 22790400,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 22790400,
+		aphelion: 22790400,
 		eccentricity: 0.081,
 		inclination: 167.6,
 		mass: null,
@@ -12072,17 +12349,18 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s39'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s39',
+		wikipediaKey: '2004_S_39'
 	},
 	{
 		id: 'c2020f3-neowise',
 		name: 'C/2020 F3 (NEOWISE)',
-		englishName: '',
+		englishName: 'C/2020 F3 (NEOWISE)',
 		isPlanet: false,
 		moons: null,
 		semimajorAxis: 40690620830.4,
-		perihelion: 0,
-		aphelion: 0,
+		perihelion: 4,
+		aphelion: 4,
 		eccentricity: 0.99921,
 		inclination: 128.93,
 		mass: null,
@@ -12106,7 +12384,8 @@ const solarSystemData = [
 		mainAnomaly: 0,
 		argPeriapsis: 0,
 		longAscNode: 0,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/c2020f3-neowise'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/c2020f3-neowise',
+		wikipediaKey: 'Comet_NEOWISE'
 	}
 ];
 
