@@ -6567,7 +6567,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/galatee',
-		wikipediaKey: 'Galatee_(moon)'
+		wikipediaKey: 'Galatea_(moon)'
 	},
 	{
 		id: 'larissa',
@@ -8553,7 +8553,12 @@ const solarSystemData = [
 		name: '(90482) Orcus',
 		englishName: '90482 Orcus',
 		isPlanet: false,
-		moons: null,
+		moons: [
+			{
+				moon: 'Vanth',
+				rel: 'https://api.le-systeme-solaire.net/rest/bodies/vanth'
+			}
+		],
 		semimajorAxis: 5862440000,
 		perihelion: 5862440000,
 		aphelion: 5862440000,

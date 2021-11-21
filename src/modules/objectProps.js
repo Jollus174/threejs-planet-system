@@ -38,17 +38,22 @@ class OrbitLine {
 			points.push(new THREE.Vector3(x, y, z));
 		}
 
+		// this.objectGroup.data = this.data;
+		const opacityDefault = isDwarfPlanet ? 0.2 : 1;
+
 		this.orbitMesh = new THREE.Line(
 			new THREE.BufferGeometry().setFromPoints(points),
 			new THREE.LineBasicMaterial({
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
-				opacity: isDwarfPlanet ? 0.2 : 1,
+				opacity: opacityDefault,
 				visible: setOrbitVisibility()
 			})
 		);
 
 		this.orbitMesh.name = this.orbitLineName;
+		this.orbitMesh.data = this.orbitMesh.data || {};
+		this.orbitMesh.data.opacityDefault = opacityDefault;
 		state.bodies._orbitLines.push(this.orbitMesh);
 		this.objectGroup.parent.add(this.orbitMesh);
 	}
@@ -61,7 +66,7 @@ class OrbitLine {
 }
 
 const handleLabelClick = (data) => {
-	state.cameraState._zoomToTarget = true;
+	console.log(data);
 	state.controls.saveState(); // saving state so can use the [Back] button
 	document.querySelector('#position-back').disabled = false;
 	const dataStorageKey = data.aroundPlanet ? '_moonLabels' : '_planetLabels';
@@ -186,12 +191,21 @@ class PlanetLabelClass {
 	handleDistance() {
 		const distance = state.camera.position.distanceTo(this.labelGroup.position);
 
+		// should fire an event that a planet is in range...
+
 		// either 1000000 or 10000000
 		// TODO: need to specify between INNER moons and OUTER moons... some are really far away...
 		if (distance < 60000000) {
 			// console.log(`${this.data.englishName} is in range`);
 			state.cameraState._currentPlanetInRange = this.data.englishName;
 			this.labelDiv.classList.add('in-range');
+
+			// state.bodies._orbitLines.forEach((o) => {
+			// 	if (!o.name.includes(this.data.englishName)) {
+			// 		o.material.opacity = 0.1;
+			// 	}
+			// });
+
 			// this seems inefficient since it's iterating through the array many times...
 			// should we have some kind of render queue?
 			if (
@@ -240,7 +254,7 @@ class PlanetLabelClass {
 	}
 
 	remove() {
-		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
+		this.labelDiv.removeEventListener('click', this.evtHandleLabelClick);
 		clearInterval(this.intervalCheckDistance);
 		this.orbitLine.remove();
 

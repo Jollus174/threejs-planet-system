@@ -40,7 +40,7 @@ const hasClickedSameTarget = () =>
 
 const updateClickedGroup = (clickedGroup) => {
 	state.mouseState._clickedGroup = clickedGroup;
-
+	console.log(clickedGroup);
 	if (!clickedGroup) return;
 
 	state.cameraState._zoomToTarget = true;
@@ -53,41 +53,39 @@ const updateClickedGroup = (clickedGroup) => {
 
 const initMousePointerEvents = () => {
 	window.addEventListener('mousemove', (e) => {
-		state.mouseState._mouseHasMoved = true;
-		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-		state.mouseState._mouseHoverTarget = state.mouseState._mouseHasMoved
-			? returnHoveredGroup()
-			: state.mouseState._mouseHoverTarget;
+		// state.mouseState._mouseHasMoved = true;
+		// mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+		// mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+		// state.mouseState._mouseHoverTarget = state.mouseState._mouseHasMoved
+		// 	? returnHoveredGroup()
+		// 	: state.mouseState._mouseHoverTarget;
 	});
 
-	window.addEventListener('pointerdown', (e) => {
-		state.mouseState._mouseClicked = true;
-		state.mouseState._mouseClickTimeout = _mouseClickTimeoutDefault;
-		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-		mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-		state.mouseState._mouseClickLocation = [mouse.x, mouse.y];
-	});
+	// window.addEventListener('pointerdown', (e) => {
+	// 	state.mouseState._mouseClicked = true;
+	// 	// state.mouseState._mouseClickTimeout = _mouseClickTimeoutDefault;
+	// 	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+	// 	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+	// 	state.mouseState._mouseClickLocation = [mouse.x, mouse.y];
+	// 	console.log('pointer down');
+	// 	console.log(e.target);
+	// 	e.target.style.display = 'none';
+	// });
 
 	window.addEventListener('wheel', () => {
 		state.cameraState._zoomToTarget = false;
 	});
 
 	window.addEventListener('pointerup', () => {
-		state.mouseState._mouseClicked = false;
-
+		// state.mouseState._mouseClicked = false;
 		// 	// check pointer position deviation for x + y to see if we should unlock the camera from its target
 		// 	const oldMousePos = [state.mouseState._mouseClickLocation[0], state.mouseState._mouseClickLocation[1]];
 		// 	const newMousePos = [mouse.x, mouse.y];
 		// 	const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
 		// 		yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
-
 		// 	const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
 		// 	if (mouseHasDeviated || state.mouseState._mouseHeld) return;
-
 		// updateClickedGroup(returnHoveredGroup());
-
 		// 	// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
 		// 	// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
 		// 	if (
@@ -99,7 +97,6 @@ const initMousePointerEvents = () => {
 		// 		// creating new instance of controls xyz so it doesn't keep tracking an object
 		// 		const newTarget = { ...state.controls.target };
 		// 		const { x, y, z } = newTarget;
-
 		// 		// To make camera stop following
 		// 		state.controls.target.set(x, y, z);
 		// 		state.controls.update();

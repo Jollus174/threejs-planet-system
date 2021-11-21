@@ -856,7 +856,6 @@ class OrbitControls extends EventDispatcher {
 
 		function onTouchStart(event) {
 			trackPointer(event);
-			stateDefault.cameraState._zoomToTarget = false;
 
 			switch (pointers.length) {
 				case 1:

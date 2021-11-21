@@ -3,19 +3,19 @@ import './reset.css';
 import './style.css';
 
 import * as THREE from 'three';
-import { state } from './modules/state';
-import { settings } from './modules/settings';
-import { renderer } from './modules/renderers/renderer';
-import { labelRenderer } from './modules/renderers/labelRenderer';
-import { easeTo, checkIfDesktop } from './modules/utils';
-import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from './modules/objectProps';
-import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
-import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
-import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from './modules/events/mousePointer';
-import { PlanetLabelClass } from './modules/objectProps';
-import { scene } from './modules/scene';
-import { setWikipediaData, sortAllData } from './modules/data/api';
+import { state } from '../modules/state';
+import { settings } from '../modules/settings';
+import { renderer } from '../modules/renderers/renderer';
+import { labelRenderer } from '../modules/renderers/labelRenderer';
+import { easeTo, checkIfDesktop } from '../modules/utils';
+import { pointLights, spotLights, ambientLights } from '../modules/lights';
+import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from '../modules/objectProps';
+import { skyboxTexturePaths, sunData } from '../modules/data/solarSystem';
+import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from '../modules/factories/solarSystemFactory';
+import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from '../modules/events/mousePointer';
+import { PlanetLabelClass } from '../modules/objectProps';
+import { scene } from '../modules/scene';
+import { setWikipediaData, sortAllData } from '../modules/data/api';
 
 window.state = state;
 window.settings = settings;
@@ -105,18 +105,18 @@ const render = () => {
 	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
 		const objZoomTo = state.mouseState._clickedGroup.data.meanRadius * 4; // TODO: probably temp number
 		const distanceToTarget = state.controls.getDistance();
-		const distCalc = objZoomTo; // zoom out further on mobile due to smaller width
+		// const distCalc = objZoomTo;
 
-		if (distanceToTarget > distCalc) {
-			const amountComplete = distCalc / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+		if (distanceToTarget > objZoomTo) {
+			const amountComplete = objZoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
 			state.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
 				settings.controls._dollySpeedMin
 			);
 			state.controls.dollyIn(state.cameraState._dollySpeed);
-		} else if (distanceToTarget + 0.1 < distCalc) {
-			const amountComplete = distanceToTarget / distCalc; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+		} else if (distanceToTarget + 0.1 < objZoomTo) {
+			const amountComplete = distanceToTarget / objZoomTo; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
 			state.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
@@ -291,3 +291,14 @@ document.addEventListener('keydown', (e) => {
 
 sortAllData();
 init();
+
+// checking planet Wikipedia pages
+// const allTitles = state.bodies._bodiesAll.map((item) => item.englishName);
+// console.log(allTitles);
+// const responsesAll = [];
+// window.responsesPlanets = state.bodies._planetLabels.map((p) => setWikipediaData(p.data.englishName));
+// state.bodies._moons.forEach((m) => {
+// 	setWikipediaData(m.englishName);
+// });
+
+// Promise.all(merc).then((resp) => console.log(resp));
