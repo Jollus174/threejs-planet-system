@@ -176,8 +176,8 @@ body::before {
 
 .label {
 	border: 1px solid;
-	width: 10px;
-	height: 10px;
+	width: 12px;
+	height: 12px;
 	border-radius: 50%;
 	font-size: 16px;
 	background: rgba(0, 0, 0, 0.7);
@@ -189,7 +189,8 @@ body::before {
 	position: relative;
 	will-change: transform;
 	box-shadow: 0 0 0 currentColor;
-	transition: background-color 0.4s ease, opacity 0.4s ease, border-color 0.4s ease;
+	/* transition: background-color 0.4s ease, opacity 0.4s ease, border-color 0.4s ease; */
+	transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
 .label .label-text {
@@ -225,6 +226,20 @@ body::before {
 	background-color: transparent;
 }
 
+.label.is-moon {
+	opacity: 0;
+}
+
 .buttons-container {
 	position: absolute;
+}
+
+.modal {
+	z-index: 2000;
+	color: #000;
+}
+
+.modal-body img {
+	float: right;
+	margin: 0 0 15px 15px;
 }

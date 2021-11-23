@@ -4,6 +4,9 @@ import { state } from '../state';
 import { settings } from '../settings';
 import { controls } from '../controls';
 import { getStandardDeviation } from './../utils';
+import { setWikipediaData } from '../data/api';
+import { vueOrrery } from '../app-orrery';
+import { modalInfoButton } from './modals';
 
 const { _mouseClickTimeoutDefault } = settings.mouse;
 const mouse = new Vector2();
@@ -40,11 +43,14 @@ const hasClickedSameTarget = () =>
 
 const updateClickedGroup = (clickedGroup) => {
 	state.mouseState._clickedGroup = clickedGroup;
-	console.log(clickedGroup);
-	if (!clickedGroup) return;
+	if (!clickedGroup) {
+		modalInfoButton.disabled = true;
+		return;
+	}
 
 	state.cameraState._zoomToTarget = true;
 	controls.minDistance = state.mouseState._clickedGroup.data.meanRadius * 2;
+	modalInfoButton.disabled = false;
 
 	// if (!hasClickedSameTarget()) {
 	// 	state.cameraState._rotateCameraYTo = state.mouseState._clickedGroup.position.y + 1.5;
@@ -52,57 +58,25 @@ const updateClickedGroup = (clickedGroup) => {
 };
 
 const initMousePointerEvents = () => {
-	window.addEventListener('mousemove', (e) => {
-		// state.mouseState._mouseHasMoved = true;
-		// mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-		// mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-		// state.mouseState._mouseHoverTarget = state.mouseState._mouseHasMoved
-		// 	? returnHoveredGroup()
-		// 	: state.mouseState._mouseHoverTarget;
-	});
-
-	// window.addEventListener('pointerdown', (e) => {
-	// 	state.mouseState._mouseClicked = true;
-	// 	// state.mouseState._mouseClickTimeout = _mouseClickTimeoutDefault;
-	// 	mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-	// 	mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-	// 	state.mouseState._mouseClickLocation = [mouse.x, mouse.y];
-	// 	console.log('pointer down');
-	// 	console.log(e.target);
-	// 	e.target.style.display = 'none';
+	// window.addEventListener('wheel', () => {
+	// 	state.cameraState._zoomToTarget = false;
 	// });
-
-	window.addEventListener('wheel', () => {
-		state.cameraState._zoomToTarget = false;
-	});
-
-	window.addEventListener('pointerup', () => {
-		// state.mouseState._mouseClicked = false;
-		// 	// check pointer position deviation for x + y to see if we should unlock the camera from its target
-		// 	const oldMousePos = [state.mouseState._mouseClickLocation[0], state.mouseState._mouseClickLocation[1]];
-		// 	const newMousePos = [mouse.x, mouse.y];
-		// 	const xDeviation = getStandardDeviation([oldMousePos[0], newMousePos[0]]),
-		// 		yDeviation = getStandardDeviation([oldMousePos[1], newMousePos[1]]);
-		// 	const mouseHasDeviated = Math.abs(xDeviation) > 0.002 || Math.abs(yDeviation) > 0.002;
-		// 	if (mouseHasDeviated || state.mouseState._mouseHeld) return;
-		// updateClickedGroup(returnHoveredGroup());
-		// 	// after releasing click, if mouse has deviated (we're playing with orbit controls), KEEP the target!
-		// 	// also check that the same target hasn't been clicked, and that whatever has been clicked on is NOT clickable
-		// 	if (
-		// 		!mouseHasDeviated &&
-		// 		!state.mouseState._mouseHeld &&
-		// 		!state.mouseState._clickedGroup &&
-		// 		!hasClickedSameTarget()
-		// 	) {
-		// 		// creating new instance of controls xyz so it doesn't keep tracking an object
-		// 		const newTarget = { ...state.controls.target };
-		// 		const { x, y, z } = newTarget;
-		// 		// To make camera stop following
-		// 		state.controls.target.set(x, y, z);
-		// 		state.controls.update();
-		// 		state.mouseState._clickedGroup = null;
-		// 	}
-	});
 };
 
-export { returnHoveredGroup, initMousePointerEvents, updateClickedGroup };
+const handleLabelClick = (data) => {
+	state.controls.saveState(); // saving state so can use the [Back] button
+	document.querySelector('#position-back').disabled = false;
+	const dataStorageKey = data.aroundPlanet ? '_moonLabels' : '_planetLabels';
+	const clickedGroupIndex = vueOrrery.bodies[dataStorageKey].findIndex((p) =>
+		p.data.englishName.includes(data.englishName)
+	);
+	const clickedGroup = vueOrrery.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
+
+	if (!clickedGroup.data.content) {
+		const wikiKey = clickedGroup.data.wikipediaKey || clickedGroup.data.englishName;
+		setWikipediaData(wikiKey, clickedGroup);
+	}
+	updateClickedGroup(clickedGroup);
+};
+
+export { returnHoveredGroup, initMousePointerEvents, updateClickedGroup, handleLabelClick };

@@ -112,6 +112,11 @@ class CSS2DRenderer {
 				}
 
 				element.style.display = object.visible && _vector.z >= -1 && _vector.z <= 1 ? '' : 'none';
+
+				if (!element.classList.contains('is-planet')) {
+					element.style.opacity = 1 - (Math.abs(_vector.x) + Math.abs(_vector.y) / 2);
+				}
+
 				element.dataset.labelName = element.textContent.toLowerCase();
 
 				const objectData = {
@@ -160,9 +165,11 @@ class CSS2DRenderer {
 			const zMax = sorted.length;
 
 			for (let i = 0, l = sorted.length; i < l; i++) {
-				sorted[i].element.style.zIndex = zMax - i;
 				if (sorted[i].element.classList.contains('is-planet')) {
-					sorted[i].element.style.zIndex += 1000;
+					sorted[i].element.style.zIndex = zMax + 100 - i;
+				} else {
+					sorted[i].element.style.zIndex = zMax - i;
+					// set opacity based on how close to the centre the label is...
 				}
 			}
 		}

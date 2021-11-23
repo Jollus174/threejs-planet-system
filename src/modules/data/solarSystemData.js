@@ -1,3 +1,4 @@
+// TODO: this'll eventually be a separate JSON import
 // jshint ignore: start
 const solarSystemData = [
 	{
@@ -4886,7 +4887,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s7',
-		wikipediaKey: '2004_S_7'
+		wikipediaKey: 'S/2004_S_7'
 	},
 	{
 		id: 's2004s12',
@@ -4927,7 +4928,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s12',
-		wikipediaKey: '2004_S_12'
+		wikipediaKey: 'S/2004_S_12'
 	},
 	{
 		id: 's2004s13',
@@ -4968,7 +4969,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s13',
-		wikipediaKey: '2004_S_13'
+		wikipediaKey: 'S/2004_S_13'
 	},
 	{
 		id: 's2004s17',
@@ -5009,7 +5010,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s17',
-		wikipediaKey: '2004_S_17'
+		wikipediaKey: 'S/2004_S_17'
 	},
 	{
 		id: 's2006s1',
@@ -5050,7 +5051,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s1',
-		wikipediaKey: '2006_S_1'
+		wikipediaKey: 'S/2006_S_1'
 	},
 	{
 		id: 's2006s3',
@@ -5091,7 +5092,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2006s3',
-		wikipediaKey: '2006_S_3'
+		wikipediaKey: 'S/2006_S_3'
 	},
 	{
 		id: 's2007s2',
@@ -5132,7 +5133,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s2',
-		wikipediaKey: '2007_S_2'
+		wikipediaKey: 'S/2007_S_2'
 	},
 	{
 		id: 's2007s3',
@@ -5173,7 +5174,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2007s3',
-		wikipediaKey: '2007_S_3'
+		wikipediaKey: 'S/2007_S_3'
 	},
 	{
 		id: 's2009s1',
@@ -5214,7 +5215,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2009s1',
-		wikipediaKey: '2009_S_1'
+		wikipediaKey: 'S/2009_S_1'
 	},
 	{
 		id: 'ariel',
@@ -6403,7 +6404,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/nereide',
-		wikipediaKey: 'Nereide_(moon)'
+		wikipediaKey: 'Nereid_(moon)'
 	},
 	{
 		id: 'naiade',
@@ -7657,7 +7658,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/steins',
-		wikipediaKey: '2867_Šteins'
+		wikipediaKey: 'S/2867_Šteins'
 	},
 	{
 		id: 'eris',
@@ -7934,7 +7935,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/kleopatra',
-		wikipediaKey: '216_Kleopatra'
+		wikipediaKey: 'S/216_Kleopatra'
 	},
 	{
 		id: 'cruithne',
@@ -8086,7 +8087,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/lutetia',
-		wikipediaKey: '21_Lutetia'
+		wikipediaKey: 'S/21_Lutetia'
 	},
 	{
 		id: 'mathilde',
@@ -8124,7 +8125,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mathilde',
-		wikipediaKey: '253_Mathilde'
+		wikipediaKey: 'S/253_Mathilde'
 	},
 	{
 		id: 'uranus',
@@ -8595,7 +8596,7 @@ const solarSystemData = [
 		id: 'pluton',
 		name: 'Pluton',
 		englishName: 'Pluto',
-		isPlanet: true,
+		isPlanet: false,
 		moons: [
 			{
 				moon: 'Charon',
@@ -8887,7 +8888,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/chiron',
-		wikipediaKey: '2060_Chiron'
+		wikipediaKey: 'S/2060_Chiron'
 	},
 	{
 		id: 'eureka',
@@ -9042,7 +9043,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ixion',
-		wikipediaKey: '28978_Ixion'
+		wikipediaKey: 'S/28978_Ixion'
 	},
 	{
 		id: 'neptune',
@@ -9341,7 +9342,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/itokawa',
-		wikipediaKey: '25143_Itokawa'
+		wikipediaKey: 'S/25143_Itokawa'
 	},
 	{
 		id: 'hylonome',
@@ -9493,7 +9494,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/pallas',
-		wikipediaKey: '2_Pallas'
+		wikipediaKey: 'S/2_Pallas'
 	},
 	{
 		id: 'asbolus',
@@ -9569,7 +9570,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/varuna',
-		wikipediaKey: '20000_Varuna'
+		wikipediaKey: 'S/20000_Varuna'
 	},
 	{
 		id: 'vesta',
@@ -9645,7 +9646,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/ida',
-		wikipediaKey: '243_Ida'
+		wikipediaKey: 'S/243_Ida'
 	},
 	{
 		id: 'hyakutake',
@@ -11633,7 +11634,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s22',
-		wikipediaKey: '2004_S_22'
+		wikipediaKey: 'S/2004_S_22'
 	},
 	{
 		id: 's2004s21',
@@ -11671,7 +11672,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s21',
-		wikipediaKey: '2004_S_21'
+		wikipediaKey: 'S/2004_S_21'
 	},
 	{
 		id: 's2004s20',
@@ -11709,7 +11710,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s20',
-		wikipediaKey: '2004_S_20'
+		wikipediaKey: 'S/2004_S_20'
 	},
 	{
 		id: 's2004s23',
@@ -11747,7 +11748,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s23',
-		wikipediaKey: '2004_S_23'
+		wikipediaKey: 'S/2004_S_23'
 	},
 	{
 		id: 's2004s24',
@@ -11785,7 +11786,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s24',
-		wikipediaKey: '2004_S_24'
+		wikipediaKey: 'S/2004_S_24'
 	},
 	{
 		id: 's2004s25',
@@ -11823,7 +11824,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s25',
-		wikipediaKey: '2004_S_25'
+		wikipediaKey: 'S/2004_S_25'
 	},
 	{
 		id: 's2004s26',
@@ -11861,7 +11862,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s26',
-		wikipediaKey: '2004_S_26'
+		wikipediaKey: 'S/2004_S_26'
 	},
 	{
 		id: 's2004s27',
@@ -11899,7 +11900,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s27',
-		wikipediaKey: '2004_S_27'
+		wikipediaKey: 'S/2004_S_27'
 	},
 	{
 		id: 's2004s28',
@@ -11937,7 +11938,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s28',
-		wikipediaKey: '2004_S_28'
+		wikipediaKey: 'S/2004_S_28'
 	},
 	{
 		id: 's2004s29',
@@ -11975,7 +11976,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s29',
-		wikipediaKey: '2004_S_29'
+		wikipediaKey: 'S/2004_S_29'
 	},
 	{
 		id: 's2004s30',
@@ -12013,7 +12014,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s30',
-		wikipediaKey: '2004_S_30'
+		wikipediaKey: 'S/2004_S_30'
 	},
 	{
 		id: 's2004s31',
@@ -12051,7 +12052,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s31',
-		wikipediaKey: '2004_S_31'
+		wikipediaKey: 'S/2004_S_31'
 	},
 	{
 		id: 's2004s32',
@@ -12089,7 +12090,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s32',
-		wikipediaKey: '2004_S_32'
+		wikipediaKey: 'S/2004_S_32'
 	},
 	{
 		id: 's2004s33',
@@ -12127,7 +12128,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s33',
-		wikipediaKey: '2004_S_33'
+		wikipediaKey: 'S/2004_S_33'
 	},
 	{
 		id: 's2004s34',
@@ -12165,7 +12166,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s34',
-		wikipediaKey: '2004_S_34'
+		wikipediaKey: 'S/2004_S_34'
 	},
 	{
 		id: 's2004s35',
@@ -12203,7 +12204,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s35',
-		wikipediaKey: '2004_S_35'
+		wikipediaKey: 'S/2004_S_35'
 	},
 	{
 		id: 's2004s36',
@@ -12241,7 +12242,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s36',
-		wikipediaKey: '2004_S_36'
+		wikipediaKey: 'S/2004_S_36'
 	},
 	{
 		id: 's2004s37',
@@ -12279,7 +12280,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s37',
-		wikipediaKey: '2004_S_37'
+		wikipediaKey: 'S/2004_S_37'
 	},
 	{
 		id: 's2004s38',
@@ -12317,7 +12318,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s38',
-		wikipediaKey: '2004_S_38'
+		wikipediaKey: 'S/2004_S_38'
 	},
 	{
 		id: 's2004s39',
@@ -12355,7 +12356,7 @@ const solarSystemData = [
 		argPeriapsis: 0,
 		longAscNode: 0,
 		rel: 'https://api.le-systeme-solaire.net/rest/bodies/s2004s39',
-		wikipediaKey: '2004_S_39'
+		wikipediaKey: 'S/2004_S_39'
 	},
 	{
 		id: 'c2020f3-neowise',

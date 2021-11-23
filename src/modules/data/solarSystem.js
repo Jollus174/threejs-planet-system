@@ -1,5 +1,5 @@
 import { DoubleSide } from 'three';
-import textureSun from './../../img/textures/sun.jpg';
+import textureSun from './../../img/textures/sun-min.jpg';
 import textureMercury from './../../img/textures/mercury.jpg';
 import textureVenus from './../../img/textures/venus.jpg';
 import textureEarth from './../../img/textures/earth.jpg';
@@ -63,10 +63,6 @@ const sunData = {
 		side: DoubleSide
 	}
 };
-
-const rawMoonData = [
-	
-];
 
 const rawPlanetData = [
 	{

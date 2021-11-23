@@ -5,3 +5,5 @@ https://eyes.jpl.nasa.gov/apps/orrery/#/home - Solar System example
 https://www.solarsystemscope.com/textures/ - Textures
 
 http://www.astronoo.com/en/moons-of-saturn.html
+
+https://dev.to/kouts/how-to-create-a-vue-js-2-bootstrap-4-project-with-vite-54f1 - Project setup

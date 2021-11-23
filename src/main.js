@@ -1,24 +1,26 @@
 'use strict';
-import './reset.css';
-import './style.css';
+import './node_modules/bootstrap/dist/css/bootstrap.css';
+import './css/style.css';
 
 import * as THREE from 'three';
-import { state } from '../modules/state';
-import { settings } from '../modules/settings';
-import { renderer } from '../modules/renderers/renderer';
-import { labelRenderer } from '../modules/renderers/labelRenderer';
-import { easeTo, checkIfDesktop } from '../modules/utils';
-import { pointLights, spotLights, ambientLights } from '../modules/lights';
-import { setOrbitVisibility, targetLine, labelLine, clickTarget, rings } from '../modules/objectProps';
-import { skyboxTexturePaths, sunData } from '../modules/data/solarSystem';
-import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from '../modules/factories/solarSystemFactory';
-import { returnHoveredGroup, initMousePointerEvents, updateClickedGroup } from '../modules/events/mousePointer';
-import { PlanetLabelClass } from '../modules/objectProps';
-import { scene } from '../modules/scene';
-import { setWikipediaData, sortAllData } from '../modules/data/api';
+import { state } from './modules/state';
+import { settings } from './modules/settings';
+import { renderer } from './modules/renderers/renderer';
+import { labelRenderer } from './modules/renderers/labelRenderer';
+import { easeTo, checkIfDesktop } from './modules/utils';
+import { pointLights, spotLights, ambientLights } from './modules/lights';
+import { setOrbitVisibility } from './modules/objectProps';
+import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
+import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
+import { initMousePointerEvents } from './modules/events/mousePointer';
+import { PlanetLabelClass } from './modules/objectProps';
+import { sortAllData } from './modules/data/api';
+import { vueOrrery } from './modules/app-orrery';
+import { scene } from './modules/scene';
 
-window.state = state;
+window.state = state; // TODO: state is now deprecated, use the Vue Orrery data instead
 window.settings = settings;
+window.renderLoop;
 
 let delta;
 
@@ -57,35 +59,6 @@ const render = () => {
 			if (group.mouseHoverTimeout <= 0) arr.splice(i, 1);
 		});
 	}
-
-	// text.renderLoop(state.bodies._sun);
-
-	// state.bodies._planetGroups.forEach((planetGroup) => {
-	// planetGroup.data.cameraDistance = calculatePlanetDistance(planetGroup);
-	// clickTarget.renderLoop(planetGroup);
-	// text.renderLoop(planetGroup);
-	// labelLine.renderLoop(planetGroup);
-	// targetLine.renderLoop(planetGroup);
-	// rings.renderLoop(planetGroup);
-	// if (planetGroup.moons) {
-	// 	planetGroup.moons.forEach((moonGroup) => {
-	// 		moonGroup.data.orbit -= moonGroup.data.orbitSpeed * delta;
-	// 		moonGroup.position.set(
-	// 			planetGroup.position.x + Math.cos(moonGroup.data.orbit) * moonGroup.data.orbitRadius,
-	// 			planetGroup.position.y + 0,
-	// 			planetGroup.position.z + Math.sin(moonGroup.data.orbit) * moonGroup.data.orbitRadius
-	// 		);
-	// 		moonGroup.rotation.z -= 0.01 * delta;
-	// 		if (moonGroup && moonGroup.data) {
-	// 			moonGroup.data.cameraDistance = calculatePlanetDistance(moonGroup);
-	// 			clickTarget.renderLoop(moonGroup);
-	// 			text.renderLoop(moonGroup);
-	// 			labelLine.renderLoop(moonGroup);
-	// 			targetLine.renderLoop(moonGroup);
-	// 		}
-	// 	});
-	// }
-	// });
 
 	if (state.mouseState._clickedGroup) {
 		let { x, y, z } = state.mouseState._clickedGroup.position;
@@ -127,83 +100,37 @@ const render = () => {
 	}
 
 	state.controls.update();
-	renderer.render(state.scene, state.camera);
-	labelRenderer.render(state.scene, state.camera);
+	renderer.render(scene, state.camera);
+	labelRenderer.render(scene, state.camera);
 };
 
-const animate = () => {
+// using window so RAF can be accessed through solution without importing
+// TODO: can probably be tidied up in future
+window.animate = () => {
 	render();
-	window.requestAnimationFrame(animate);
+	window.renderLoop = requestAnimationFrame(window.animate);
 };
 
 const init = () => {
-	state.skybox = skybox(skyboxTexturePaths);
-	state.bodies._starField = starField();
-	state.bodies._asteroidBelt = asteroidBelt();
+	vueOrrery.bodies._starField = starField();
+	vueOrrery.bodies._asteroidBelt = asteroidBelt();
 
-	state.scene.add(state.skybox);
+	scene.add(skybox(skyboxTexturePaths));
 
-	const sunLabelClass = new PlanetLabelClass(state.bodies._sun);
-	state.bodies.classes._planetLabels.push(sunLabelClass);
+	const sunLabelClass = new PlanetLabelClass(vueOrrery.bodies._sun);
+	vueOrrery.bodies.classes._planetLabels.push(sunLabelClass);
 	sunLabelClass.build();
 
-	state.bodies._planets.forEach((planet) => {
+	vueOrrery.bodies._planets.forEach((planet) => {
 		const planetLabelClass = new PlanetLabelClass(planet);
-		state.bodies.classes._planetLabels.push(planetLabelClass);
+		vueOrrery.bodies.classes._planetLabels.push(planetLabelClass);
 		planetLabelClass.build();
 	});
 
-	// state.scene.add(state.bodies._starField);
-	// state.scene.add(state.bodies._asteroidBelt);
+	// scene.add(state.bodies._starField);
+	// scene.add(state.bodies._asteroidBelt);
 
-	buildPlanet(sunData).then((sunGroup) => {
-		state.bodies._sun = sunGroup;
-		state.bodies._textGroups.push(sunGroup.textGroup);
-		state.bodies._labelLines.push(sunGroup.labelLine);
-		state.bodies._targetLines.push(sunGroup.targetLine);
-		state.bodies._navigable.push(sunGroup);
-		state.scene.add(sunGroup);
-	});
-
-	/* const planetPromises = planetData.map((pData) => buildPlanet(pData));
-	Promise.all(planetPromises).then((planetGroups) => {
-		planetGroups.forEach((planetGroup) => {
-			// console.log(planetGroup);
-
-			// const orbitLine = planetGroup.orbitLine;
-			// const orbitCurve = planetGroup.orbitCurve;
-			// if (orbitLine) {
-			// 	state.bodies._orbitLines.push(orbitLine);
-			// 	state.scene.add(orbitLine);
-			// }
-
-			// if (planetGroup.moons) {
-			// 	const moonPromises = planetGroup.moonData.map((moonData) => buildMoon(moonData, planetGroup));
-
-			// 	Promise.all(moonPromises).then((moonGroups) => {
-			// 		moonGroups.forEach((moonGroup) => {
-			// 			planetGroup.moons.push(moonGroup);
-			// 			state.bodies._orbitLines.push(moonGroup.orbitLine);
-			// 			planetGroup.add(moonGroup.orbitLine);
-			// 			state.scene.add(moonGroup);
-			// 			state.bodies._moonGroups.push(moonGroup);
-			// 			state.bodies._navigable.push(moonGroup);
-			// 			state.bodies._textGroups.push(moonGroup.textGroup);
-			// 			state.bodies._labelLines.push(moonGroup.labelLine);
-			// 			state.bodies._targetLines.push(moonGroup.targetLine);
-			// 		});
-			// 	});
-			// }
-
-			// state.bodies._navigable.push(planetGroup);
-			// if (planetGroup.textLabel) state.bodies._textLabels.push(planetGroup.textLabel);
-			if (planetGroup.textGroup) state.bodies._textGroups.push(planetGroup.textGroup);
-			if (planetGroup.labelLine) state.bodies._labelLines.push(planetGroup.labelLine);
-			if (planetGroup.targetLine) state.bodies._targetLines.push(planetGroup.targetLine);
-
-			// planetGroup.position.set(30000000, 0, 1000);
-		});
-	}); */
+	buildPlanet(sunData).then((sunGroup) => scene.add(sunGroup));
 
 	state.isDesktop = checkIfDesktop();
 
@@ -224,26 +151,18 @@ const init = () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	document.querySelector('main').prepend(labelRenderer.domElement);
-	labelRenderer.render(state.scene, state.camera);
+	labelRenderer.render(scene, state.camera);
 
 	state.camera.position.y = 10000000;
 	state.camera.position.z = 120000000;
 	initMousePointerEvents();
 
-	animate();
+	window.animate();
 
 	// TODO: temp buttons
 	document.querySelector('#position-back').addEventListener('click', () => {
 		state.mouseState._clickedGroup = null;
 		state.controls.reset();
-	});
-
-	document.querySelector('#clear-all-planets').addEventListener('click', () => {
-		state.bodies.classes._planetLabels.forEach((pLabelClass) => pLabelClass.remove());
-	});
-
-	document.querySelector('#build-all-planets').addEventListener('click', () => {
-		state.bodies.classes._planetLabels.forEach((pLabelClass) => pLabelClass.build());
 	});
 };
 
@@ -259,46 +178,5 @@ settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
 	state.bodies._orbitLines.forEach((orbitLine) => (orbitLine.material.visible = setOrbitVisibility()));
 });
 
-document.addEventListener('keydown', (e) => {
-	// TODO: when all planet data finished loading in, create a new ordered array based on their distance from the sun
-	const getIndexById = (targetId) => state.bodies._navigable.findIndex((item) => item.data.id === targetId);
-	if (e.code === 'KeyZ' || e.code === 'KeyC') {
-		const navigableLength = state.bodies._navigable.length;
-		const currentId =
-			state.mouseState._clickedGroup &&
-			state.mouseState._clickedGroup.data &&
-			state.mouseState._clickedGroup.data.id !== undefined
-				? state.mouseState._clickedGroup.data.id
-				: null;
-
-		if (currentId === null) {
-			updateClickedGroup(state.bodies._navigable[getIndexById(1)]); // if no clicked group, start off with a planet instead of the sun to make it more interesting
-			return;
-		}
-
-		if (e.code === 'KeyZ') {
-			const targetIndex = currentId - 1 > -1 ? getIndexById(currentId - 1) : getIndexById(navigableLength - 1);
-			updateClickedGroup(state.bodies._navigable[targetIndex]);
-			state.cameraState._rotateToTarget = true;
-		}
-
-		if (e.code === 'KeyC') {
-			const targetIndex = currentId < navigableLength - 1 ? getIndexById(currentId + 1) : getIndexById(0);
-			updateClickedGroup(state.bodies._navigable[targetIndex]);
-		}
-	}
-});
-
 sortAllData();
 init();
-
-// checking planet Wikipedia pages
-// const allTitles = state.bodies._bodiesAll.map((item) => item.englishName);
-// console.log(allTitles);
-// const responsesAll = [];
-// window.responsesPlanets = state.bodies._planetLabels.map((p) => setWikipediaData(p.data.englishName));
-// state.bodies._moons.forEach((m) => {
-// 	setWikipediaData(m.englishName);
-// });
-
-// Promise.all(merc).then((resp) => console.log(resp));
