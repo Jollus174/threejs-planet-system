@@ -2,36 +2,40 @@
 'use strict';
 // Will render too huge of a chunk in the build...
 // import './../../node_modules/bootstrap/dist/js/bootstrap';
-import { state } from '../state';
 
-const modalInfoEl = document.querySelector('#modalInfo');
-const modalInfoModal = new bootstrap.Modal(modalInfoEl, {});
-const modalInfoButton = document.querySelector('#modal-info-btn');
+const setModalEvents = () => {
+	console.log('setting events!');
 
-// suspend render animations while modal is open to save performance (at least in theory)
-modalInfoEl.addEventListener('show.bs.modal', () => {
-	cancelAnimationFrame(window.renderLoop);
-});
+	const modalInfoEl = document.querySelector('#modal-info');
+	const modalInfoModal = new bootstrap.Modal(modalInfoEl, {});
+	// const modalInfoButton = document.querySelector('#btn-modal-info');
 
-modalInfoEl.addEventListener('hide.bs.modal', () => {
-	window.renderLoop = requestAnimationFrame(window.animate);
-});
+	// suspend render animations while modal is open to save performance (at least in theory)
+	modalInfoEl.addEventListener('show.bs.modal', () => {
+		cancelAnimationFrame(window.renderLoop);
+	});
 
-modalInfoButton.addEventListener('click', () => {
-	modalInfoModal.show();
+	modalInfoEl.addEventListener('hide.bs.modal', () => {
+		window.renderLoop = requestAnimationFrame(window.animate);
+	});
 
-	// TODO: this is to read from Vue!!
-	const { title, content, image, wikipediaKey, englishName } = state.mouseState._clickedGroup.data;
-	modalInfoEl.querySelector('.modal-title').textContent = title;
-	console.log(image);
-	modalInfoEl.querySelector('.modal-body').innerHTML = `
-    <img src="${image.source}" width="${image.width}" height="${image.height}" alt="${image.alt}" />
-    ${content}
-  `;
-	modalInfoEl.querySelector('#modal-info-read-more').href = `https://en.wikipedia.org/wiki/${
-		wikipediaKey || englishName
-	}`;
-	console.log(content);
-});
+	document.querySelector('#btn-modal-info').addEventListener('click', () => {
+		console.log('clicked');
+		modalInfoModal.show();
 
-export { modalInfoEl, modalInfoModal, modalInfoButton };
+		// TODO: this is to read from Vue!!
+		// const { title, content, image, wikipediaKey, englishName } = window.vueOrrery.mouseState._clickedGroup.data;
+		// modalInfoEl.querySelector('.modal-title').textContent = title;
+		// console.log(image);
+		// modalInfoEl.querySelector('.modal-body').innerHTML = `
+		//   <img src="${image.source}" width="${image.width}" height="${image.height}" alt="${image.alt}" />
+		//   ${content}
+		// `;
+		// modalInfoEl.querySelector('#modal-info-read-more').href = `https://en.wikipedia.org/wiki/${
+		// 	wikipediaKey || englishName
+		// }`;
+		// console.log(content);
+	});
+};
+
+export { setModalEvents };

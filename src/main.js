@@ -14,9 +14,9 @@ import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
-import { sortAllData } from './modules/data/api';
-import { vueOrrery } from './modules/app-orrery';
+import { sortData } from './modules/data/api';
 import { scene } from './modules/scene';
+import { setModalEvents } from './modules/events/modals';
 
 window.state = state; // TODO: state is now deprecated, use the Vue Orrery data instead
 window.settings = settings;
@@ -60,14 +60,15 @@ const render = () => {
 		});
 	}
 
-	if (state.mouseState._clickedGroup) {
-		let { x, y, z } = state.mouseState._clickedGroup.position;
+	if (window.vueOrrery.mouseState._clickedGroup) {
+		const _clickedGroup = window.vueOrrery.mouseState._clickedGroup;
+		let { x, y, z } = _clickedGroup.position;
 
-		if (state.mouseState._clickedGroup.parent && state.mouseState._clickedGroup.data.aroundPlanet) {
+		if (_clickedGroup.parent && _clickedGroup.data.aroundPlanet) {
 			// is moon, so also account for the planet's position
-			x += state.mouseState._clickedGroup.parent.position.x;
-			y += state.mouseState._clickedGroup.parent.position.y;
-			z += state.mouseState._clickedGroup.parent.position.z;
+			x += _clickedGroup.parent.position.x;
+			y += _clickedGroup.parent.position.y;
+			z += _clickedGroup.parent.position.z;
 		}
 
 		state.controls.target.x += easeTo({ from: state.controls.target.x, to: x });
@@ -75,8 +76,8 @@ const render = () => {
 		state.controls.target.z += easeTo({ from: state.controls.target.z, to: z });
 	}
 
-	if (state.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
-		const objZoomTo = state.mouseState._clickedGroup.data.meanRadius * 4; // TODO: probably temp number
+	if (window.vueOrrery.mouseState._clickedGroup && state.cameraState._zoomToTarget) {
+		const objZoomTo = window.vueOrrery.mouseState._clickedGroup.data.meanRadius * 4; // TODO: probably temp number
 		const distanceToTarget = state.controls.getDistance();
 		// const distCalc = objZoomTo;
 
@@ -111,72 +112,166 @@ window.animate = () => {
 	window.renderLoop = requestAnimationFrame(window.animate);
 };
 
-const init = () => {
-	vueOrrery.bodies._starField = starField();
-	vueOrrery.bodies._asteroidBelt = asteroidBelt();
+window.vueOrrery = new Vue({
+	el: '#app-orrery',
+	data: {
+		mouseState: {
+			_clickedGroup: null
+		},
+		// these data props are non-reactive on purpose
+		// it doesn't need to react, just conveniently store data
+		bodies: {
+			// _all: [],
+			_sun: {},
+			_planets: [],
+			_moons: [],
+			_dwarfPlanets: [],
+			_satellites: [],
+			_planetLabels: [],
+			_moonLabels: [],
+			_dwarfPlanetLabels: [],
+			_orbitLines: [],
+			_starfield: null,
+			_asteroidBelt: null,
+			classes: {
+				_planetLabels: [],
+				_moonLabels: []
+			}
+		}
+	},
+	computed: {
+		// TODO: make one for clicked group?
+		// modalTest() {
+		// 	return this.mouseState._clickedGroup && this.mouseState._clickedGroup.data
+		// 		? { title: this.mouseState._clickedGroup.data.title, content: this.mouseState._clickedGroup.data.content }
+		// 		: '';
+		// },
 
-	scene.add(skybox(skyboxTexturePaths));
+		modalTitle: () => (this.mouseState._clickedGroup ? this.mouseState._clickedGroup.data.title : ''),
+		modalContent() {
+			return this.mouseState._clickedGroup && this.mouseState._clickedGroup.data
+				? this.mouseState._clickedGroup.data.content
+				: '';
+		},
+		modalImageSrc() {
+			return this.mouseState._clickedGroup &&
+				this.mouseState._clickedGroup.data &&
+				this.mouseState._clickedGroup.data.image
+				? this.mouseState._clickedGroup.data.image.source
+				: '';
+		},
 
-	const sunLabelClass = new PlanetLabelClass(vueOrrery.bodies._sun);
-	vueOrrery.bodies.classes._planetLabels.push(sunLabelClass);
-	sunLabelClass.build();
+		modalReadMore() {
+			return this.mouseState._clickedGroup && this.mouseState._clickedGroup.data
+				? this.mouseState._clickedGroup.data.wikipediaKey || this.mouseState._clickedGroup.data.title
+				: '';
+		}
+	},
+	methods: {
+		// refreshModalData: () => {
+		// 	if (!this.mouseState._clickedGroup || !this.mouseState._clickedGroup.data) return;
+		// 	const { title, content } = this.mouseState._clickedGroup.data;
+		// 	const { source, width, height, alt } = this.mouseState._clickedGroup.data.image;
 
-	vueOrrery.bodies._planets.forEach((planet) => {
-		const planetLabelClass = new PlanetLabelClass(planet);
-		vueOrrery.bodies.classes._planetLabels.push(planetLabelClass);
-		planetLabelClass.build();
-	});
+		// 	return {
+		// 		title,
+		// 		content,
+		// 		source,
+		// 		width,
+		// 		height,
+		// 		alt
+		// 	};
+		// },
 
-	// scene.add(state.bodies._starField);
-	// scene.add(state.bodies._asteroidBelt);
+		getSolarSystemData: async () => {
+			return await fetch('./modules/data/solarSystemData.json').then((response) => {
+				if (!response.ok) throw new Error('Error retrieving Solar System data');
+				return response.json();
+			});
+		}
+	},
+	mounted() {
+		if (window.hasMounted) return;
+		window.hasMounted = true;
 
-	buildPlanet(sunData).then((sunGroup) => scene.add(sunGroup));
+		this.getSolarSystemData().then((data) => {
+			console.log('inited!!');
 
-	state.isDesktop = checkIfDesktop();
+			const sortedData = sortData(data);
+			this.bodies._sun = sortedData.sun;
+			this.bodies._planets = sortedData.planets;
+			this.bodies._moons = sortedData.moons;
+			this.bodies._dwarfPlanets = sortedData.dwarfPlanets;
+			this.bodies._satellites = sortedData.satellites;
 
-	// adding lights to state
-	state.lights._pointLights = pointLights();
-	// state.lights._spotLights = spotLights();
-	state.lights._ambientLights = ambientLights();
+			scene.add(skybox(skyboxTexturePaths));
 
-	// add all lights at once because I cbf doing them individually
-	const lightTypeKeys = Object.keys(state.lights);
-	lightTypeKeys.forEach((lightType) => {
-		state.lights[lightType].forEach((lightObjsArr) => {
-			lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+			const sunLabelClass = new PlanetLabelClass(this.bodies._sun);
+			this.bodies.classes._planetLabels.push(sunLabelClass);
+			sunLabelClass.build();
+
+			this.bodies._planets.forEach((planet) => {
+				const planetLabelClass = new PlanetLabelClass(planet);
+				this.bodies.classes._planetLabels.push(planetLabelClass);
+				planetLabelClass.build();
+			});
+
+			buildPlanet(sunData).then((sunGroup) => scene.add(sunGroup));
+
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			// console.log(selectors.main);
+
+			// selectors.main.prepend(labelRenderer.domElement);
+			document.querySelector('main').prepend(labelRenderer.domElement);
+
+			labelRenderer.render(scene, state.camera);
+
+			state.camera.position.y = 10000000;
+			state.camera.position.z = 120000000;
+
+			initMousePointerEvents();
+			setModalEvents();
+
+			state.isDesktop = checkIfDesktop();
+
+			// adding lights to state
+			state.lights._pointLights = pointLights();
+			// state.lights._spotLights = spotLights();
+			state.lights._ambientLights = ambientLights();
+
+			// add all lights at once because I cbf doing them individually
+			const lightTypeKeys = Object.keys(state.lights);
+			lightTypeKeys.forEach((lightType) => {
+				state.lights[lightType].forEach((lightObjsArr) => {
+					lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+				});
+			});
+
+			window.animate();
+
+			// scene.add(state.bodies._starField);
+			// scene.add(state.bodies._asteroidBelt);
+
+			// TODO: temp buttons
+
+			settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
+				state.bodies._orbitLines.forEach((orbitLine) => (orbitLine.material.visible = setOrbitVisibility()));
+			});
 		});
-	});
 
-	renderer.setPixelRatio(window.devicePixelRatio);
-	renderer.setSize(window.innerWidth, window.innerHeight);
+		document.querySelector('#btn-back').addEventListener('click', () => {
+			state.mouseState._clickedGroup = null;
+			state.controls.reset();
+		});
 
-	document.querySelector('main').prepend(labelRenderer.domElement);
-	labelRenderer.render(scene, state.camera);
-
-	state.camera.position.y = 10000000;
-	state.camera.position.z = 120000000;
-	initMousePointerEvents();
-
-	window.animate();
-
-	// TODO: temp buttons
-	document.querySelector('#position-back').addEventListener('click', () => {
-		state.mouseState._clickedGroup = null;
-		state.controls.reset();
-	});
-};
-
-window.addEventListener('resize', () => {
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	labelRenderer.setSize(window.innerWidth, window.innerHeight);
-	state.camera.aspect = window.innerWidth / window.innerHeight;
-	state.camera.updateProjectionMatrix();
-	state.isDesktop = checkIfDesktop();
+		window.addEventListener('resize', () => {
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			labelRenderer.setSize(window.innerWidth, window.innerHeight);
+			state.camera.aspect = window.innerWidth / window.innerHeight;
+			state.camera.updateProjectionMatrix();
+			state.isDesktop = checkIfDesktop();
+		});
+	}
 });
-
-settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
-	state.bodies._orbitLines.forEach((orbitLine) => (orbitLine.material.visible = setOrbitVisibility()));
-});
-
-sortAllData();
-init();

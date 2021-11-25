@@ -864,7 +864,6 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enableRotate === false) return;
 
 							handleTouchStartRotate();
-
 							state = STATE.TOUCH_ROTATE;
 
 							break;
@@ -873,7 +872,6 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enablePan === false) return;
 
 							handleTouchStartPan();
-
 							state = STATE.TOUCH_PAN;
 
 							break;
@@ -890,6 +888,7 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enableZoom === false && scope.enablePan === false) return;
 
 							handleTouchStartDollyPan();
+							stateDefault.cameraState._zoomToTarget = false;
 
 							state = STATE.TOUCH_DOLLY_PAN;
 
@@ -899,6 +898,7 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enableZoom === false && scope.enableRotate === false) return;
 
 							handleTouchStartDollyRotate();
+							stateDefault.cameraState._zoomToTarget = false;
 
 							state = STATE.TOUCH_DOLLY_ROTATE;
 

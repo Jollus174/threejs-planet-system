@@ -2,12 +2,12 @@
 import * as THREE from 'three';
 import { createCircleFromPoints, numberWithCommas, ringUVMapGeometry } from './utils';
 import { state } from './state';
+import { scene } from './scene';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { asteroidBelt } from './factories/solarSystemFactory';
-import { vueOrrery } from './app-orrery';
 import { handleLabelClick } from './events/mousePointer';
 
 const setOrbitVisibility = () => {
@@ -24,7 +24,7 @@ class OrbitLine {
 
 	build() {
 		const isMoon = this.data.aroundPlanet;
-		const isDwarfPlanet = vueOrrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
+		const isDwarfPlanet = window.vueOrrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
 		const points = [];
 		for (let i = 0; i <= 360; i += 0.03) {
 			const { x, y, z } = calculateOrbit(
@@ -53,13 +53,13 @@ class OrbitLine {
 		this.orbitMesh.name = this.orbitLineName;
 		this.orbitMesh.data = this.orbitMesh.data || {};
 		this.orbitMesh.data.opacityDefault = opacityDefault;
-		vueOrrery.bodies._orbitLines.push(this.orbitMesh);
+		window.vueOrrery.bodies._orbitLines.push(this.orbitMesh);
 		this.objectGroup.parent.add(this.orbitMesh);
 	}
 
 	remove() {
-		const i = vueOrrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
-		vueOrrery.bodies._orbitLines.splice(i, 1);
+		const i = window.vueOrrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
+		window.vueOrrery.bodies._orbitLines.splice(i, 1);
 		this.objectGroup.parent.remove(this.orbitMesh);
 	}
 }
@@ -86,7 +86,7 @@ class MoonLabelClass {
 		this.labelGroup.name = `${this.data.englishName} group label`;
 		this.labelGroup.data = this.data;
 		this.labelGroup.add(CSSObj);
-		vueOrrery.bodies._moonLabels.push(this.labelGroup);
+		window.vueOrrery.bodies._moonLabels.push(this.labelGroup);
 
 		// calculate orbit
 		const { x, y, z } = this.data.startingPosition;
@@ -110,18 +110,18 @@ class MoonLabelClass {
 
 		// snap the camera back to the planet if the clicked group moon is deloaded
 		if (
-			state.mouseState._clickedGroup &&
-			state.mouseState._clickedGroup.data &&
-			state.mouseState._clickedGroup.data.aroundPlanet
+			window.vueOrrery.mouseState._clickedGroup &&
+			window.vueOrrery.mouseState._clickedGroup.data &&
+			window.vueOrrery.mouseState._clickedGroup.data.aroundPlanet
 		) {
-			state.mouseState._clickedGroup = state.mouseState._clickedGroup.parent;
+			window.vueOrrery.mouseState._clickedGroup = window.vueOrrery.mouseState._clickedGroup.parent;
 		}
 
 		this.labelGroup.children.forEach((child) => {
 			this.labelGroup.remove(child);
 		});
-		vueOrrery.bodies._moonLabels.splice(
-			vueOrrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
+		window.vueOrrery.bodies._moonLabels.splice(
+			window.vueOrrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
 			1
 		);
 		this.planetGroup.remove(this.labelGroup);
@@ -148,7 +148,7 @@ class PlanetLabelClass {
 		this.labelGroup.name = `${this.data.englishName} group label`;
 		this.labelGroup.data = this.data;
 		this.labelGroup.add(CSSObj);
-		vueOrrery.bodies._planetLabels.push(this.labelGroup);
+		window.vueOrrery.bodies._planetLabels.push(this.labelGroup);
 
 		// calculate orbit
 		if (this.data.startingPosition) {
@@ -165,7 +165,7 @@ class PlanetLabelClass {
 			this.handleDistance();
 		}, 200);
 
-		state.scene.add(this.labelGroup);
+		scene.add(this.labelGroup);
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
 	}
@@ -192,11 +192,11 @@ class PlanetLabelClass {
 			// should we have some kind of render queue?
 			if (
 				this.data.moons &&
-				!vueOrrery.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)
+				!window.vueOrrery.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)
 			) {
 				this.data.moons.forEach((moon) => {
 					const moonLabelClass = new MoonLabelClass(moon, this.labelGroup);
-					vueOrrery.bodies.classes._moonLabels.push(moonLabelClass);
+					window.vueOrrery.bodies.classes._moonLabels.push(moonLabelClass);
 					moonLabelClass.build(); // TODO: this should be a promise
 				});
 			}
@@ -207,11 +207,11 @@ class PlanetLabelClass {
 				state.cameraState._currentPlanetInRange &&
 				this.labelGroup.name.includes(state.cameraState._currentPlanetInRange)
 			) {
-				vueOrrery.bodies.classes._moonLabels.forEach((moonClass, i) => {
+				window.vueOrrery.bodies.classes._moonLabels.forEach((moonClass, i) => {
 					moonClass.remove();
-					vueOrrery.bodies.classes._moonLabels.splice(i, 1);
+					window.vueOrrery.bodies.classes._moonLabels.splice(i, 1);
 				});
-				if (!vueOrrery.bodies.classes._moonLabels.length) {
+				if (!window.vueOrrery.bodies.classes._moonLabels.length) {
 					state.cameraState._currentPlanetInRange = '';
 				}
 			}
@@ -241,7 +241,7 @@ class PlanetLabelClass {
 		this.orbitLine.remove();
 
 		this.labelGroup.children.forEach((child) => this.labelGroup.remove(child));
-		state.scene.remove(this.labelGroup);
+		scene.remove(this.labelGroup);
 	}
 }
 

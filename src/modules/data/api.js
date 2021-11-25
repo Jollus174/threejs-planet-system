@@ -1,10 +1,7 @@
 'use strict';
 import { settings } from '../settings';
-import { solarSystemData } from '../data/solarSystemData';
 import { getRandomArbitrary, calculateOrbit } from '../utils';
-import { vueOrrery } from '../app-orrery';
 
-const dwarfPlanetList = ['Ceres', 'Eris', 'Makemake', 'Haumea', 'Pluto', 'Orcus'];
 const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
 
 const startingOrbitPosition = (data) => {
@@ -20,23 +17,16 @@ const startingOrbitPosition = (data) => {
 	return { x, y, z };
 };
 
-const sortAllData = () => {
-	const data = solarSystemData;
+const sortData = (data) => {
+	const sun = data.find((item) => item.englishName === 'Sun');
+	sun.labelColour = settings.planetColours.sun;
 
-	// Sorting out all the bodies in the API into separate lists for easier referral
-	window.data = data;
-
-	vueOrrery.bodies._sun = data.find((item) => item.englishName === 'Sun');
-	vueOrrery.bodies._sun.labelColour = settings.planetColours.sun;
-
-	// get the initial moons so we can reference them when populating the planets and dwarf planets
-	vueOrrery.bodies._moons = data.filter(
+	const moons = data.filter(
 		(item) =>
 			item.aroundPlanet !== undefined && item.aroundPlanet !== null && item.perihelion !== 0 && item.aphelion !== 0
 	);
 
-	// TODO: should use Vue.set for these...
-	vueOrrery.bodies._moons.forEach((moon) => {
+	moons.forEach((moon) => {
 		// all the moons will be default grey for now
 		moon.labelColour = settings.planetColours.default;
 		moon.orbitRotationRandomiser = getRandomArbitrary(0, 360);
@@ -44,30 +34,25 @@ const sortAllData = () => {
 		moon.startingPosition = { x, y, z };
 	});
 
-	// sorting out dwarf planets
-	// TODO: should use Vue.set for these...
-	// This should be moved to the Vue app
-	dwarfPlanetList.forEach((dPlanet) => {
-		const dwarfPlanet = data.find((item) => item.englishName.includes(dPlanet));
+	const dwarfPlanetList = ['Ceres', 'Eris', 'Makemake', 'Haumea', 'Pluto', 'Orcus'];
+	const dwarfPlanets = dwarfPlanetList.map((dPlanet) => data.find((item) => item.englishName.includes(dPlanet)));
+	dwarfPlanets.forEach((dwarfPlanet) => {
 		dwarfPlanet.isPlanet = false;
 		const { x, y, z } = startingOrbitPosition(dwarfPlanet);
 		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(-1, 1);
 		dwarfPlanet.startingPosition = { x, y, z };
-		// will only do pluto for now
-		if (dwarfPlanet.englishName !== 'Pluto') return;
-		vueOrrery.bodies._dwarfPlanets.push(dwarfPlanet);
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
 			const moonNames = dwarfPlanet.moons.map((moonData) => moonData.moon);
 			dwarfPlanet.moons = [];
 			moonNames.forEach((moonName) => {
-				const moonData = vueOrrery.bodies._moons.find((moon) => moonName === moon.name);
+				const moonData = moons.find((moon) => moonName === moon.name);
 				if (moonData) dwarfPlanet.moons.push(moonData);
 			});
 		}
 	});
 
-	vueOrrery.bodies._planets = data.filter((item) => item.isPlanet);
-	vueOrrery.bodies._planets.forEach((planet) => {
+	const planets = data.filter((item) => item.isPlanet);
+	planets.forEach((planet) => {
 		// firstly get the moon names then clear the pre-existing moon array from the API of garbage
 		planet.labelColour = settings.planetColours[planet.englishName.toLowerCase()] || settings.planetColours.default;
 		planet.isInnerPlanet = innerPlanets.indexOf(planet.englishName) !== -1;
@@ -75,28 +60,36 @@ const sortAllData = () => {
 		const { x, y, z } = startingOrbitPosition(planet);
 		planet.startingPosition = { x, y, z };
 		if (planet.moons && planet.moons.length) {
-			const moonNames = planet.moons.map((moonData) => moonData.moon); // is called 'moon' not 'name' in the data! Whoa
+			const moonNames = planet.moons.map((moonData) => moonData.moon); // is called 'moon' not 'name' in the data! Whack
 			planet.moons = [];
 			moonNames.forEach((moonName) => {
-				const moonData = vueOrrery.bodies._moons.find((moon) => moonName === moon.name);
+				const moonData = moons.find((moon) => moonName === moon.name);
 				if (moonData) planet.moons.push(moonData);
 			});
 		}
 	});
 
-	// if not the sun or a planet or a moon, then is a satellite
-	vueOrrery.bodies._satellites = data.filter(
+	const satellites = data.filter(
 		(item) =>
 			item.englishName !== 'Sun' &&
 			item.isPlanet === false &&
 			item.aroundPlanet === null &&
-			!vueOrrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
+			!dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
 	);
+
+	return {
+		sun,
+		moons,
+		dwarfPlanets,
+		planets,
+		satellites
+	};
 };
 
 const getWikipediaData = async (articleTitle) => {
 	// example URL: https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=Jupiter
 	const baseUrl = 'https://en.wikipedia.org/w/api.php';
+	const imgUrl = 'https://upload.wikimedia.org/wikipedia/commons/';
 	const queryParams = [
 		['format', 'json'],
 		['action', 'query'],
@@ -144,20 +137,4 @@ const getWikipediaData = async (articleTitle) => {
 		});
 };
 
-const setWikipediaData = (objectName, targetGroup) => {
-	getWikipediaData(objectName)
-		.then((response) => {
-			if (targetGroup) {
-				// TODO: use Vue.set
-				targetGroup.data.title = response.title;
-				targetGroup.data.content = response.content;
-				targetGroup.data.image = response.image;
-			}
-			return response;
-		})
-		.catch((err) => {
-			console.error(err);
-		});
-};
-
-export { sortAllData, setWikipediaData };
+export { sortData, getWikipediaData };

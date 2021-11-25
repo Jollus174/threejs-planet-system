@@ -104,13 +104,13 @@ const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 };
 
 const fadeTargetLineOpacity = (group, targetLine) => {
-	const { _clickedGroup } = state.mouseState;
-	let m = targetLine.material;
-	if (_clickedGroup && _clickedGroup.name === group.name) {
-		m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
-	} else {
-		m.opacity = m.opacity > 0 ? (m.opacity -= 0.05) : 0;
-	}
+	// const { _clickedGroup } = window.vueOrrery.mouseState;
+	// let m = targetLine.material;
+	// if (_clickedGroup && _clickedGroup.name === group.name) {
+	// 	m.opacity = m.opacity < 1 ? (m.opacity += 0.025) : 1;
+	// } else {
+	// 	m.opacity = m.opacity > 0 ? (m.opacity -= 0.05) : 0;
+	// }
 };
 
 const numberWithCommas = (n) => {

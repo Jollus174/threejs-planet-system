@@ -1,6 +1,6 @@
 const settings = {
 	camera: {
-		_fov: 55,
+		_fov: 50,
 		_aspect: window.innerWidth / window.innerHeight,
 		_near: 1,
 		_far: 1000000000000

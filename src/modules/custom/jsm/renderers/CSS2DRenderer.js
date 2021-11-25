@@ -85,6 +85,7 @@ class CSS2DRenderer {
 			domElement.style.height = height + 'px';
 		};
 
+		const opacityFalloff = 1.5; // with 1 being linear scale of opacity 0 at the outer edges of the canvas and 1 at the centre
 		function renderObject(object, scene, camera) {
 			if (object.isCSS2DObject) {
 				object.onBeforeRender(_this, scene, camera);
@@ -114,7 +115,7 @@ class CSS2DRenderer {
 				element.style.display = object.visible && _vector.z >= -1 && _vector.z <= 1 ? '' : 'none';
 
 				if (!element.classList.contains('is-planet')) {
-					element.style.opacity = 1 - (Math.abs(_vector.x) + Math.abs(_vector.y) / 2);
+					element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
 				}
 
 				element.dataset.labelName = element.textContent.toLowerCase();
