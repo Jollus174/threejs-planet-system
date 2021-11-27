@@ -48,7 +48,7 @@ const settings = {
 		uranus: '#c8ecef',
 		neptune: '#3b54d2'
 	},
-	systemZoomDistanceThresholds: [1700000000, 5000000000]
+	systemZoomDistanceThresholds: [2200000000, 5000000000]
 };
 
 export { settings };

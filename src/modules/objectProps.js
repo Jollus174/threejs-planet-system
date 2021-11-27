@@ -237,7 +237,9 @@ class PlanetLabelClass {
 		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
-		this.isAdded = false;
+		this.fadingIn = false;
+		this.fadingOut = false;
+		this.isVisible = false;
 	}
 
 	build() {
@@ -278,13 +280,41 @@ class PlanetLabelClass {
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
 
-		gsap.to(this.labelDiv.querySelector('.label-content'), {
-			opacity: 1,
-			duration: 1,
-			onComplete: () => {
-				this.isAdded = true;
-			}
-		});
+		this.fadeIn();
+	}
+
+	fadeOut() {
+		if (!this.fadingOut && this.isVisible) {
+			this.fadingOut = true;
+			const labelContent = this.labelDiv.querySelector('.label-content');
+			gsap.to(labelContent, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					// TODO: debug mode complete message?
+					this.fadingOut = false;
+					this.isVisible = false;
+					labelContent.style.pointerEvents = 'none';
+				}
+			});
+		}
+	}
+
+	fadeIn() {
+		if (!this.fadingIn && !this.isVisible) {
+			this.fadingIn = true;
+			this.visible = true;
+			const labelContent = this.labelDiv.querySelector('.label-content');
+			gsap.to(labelContent, {
+				opacity: 1,
+				duration: 1,
+				onComplete: () => {
+					this.fadingIn = false;
+					this.isVisible = true;
+					labelContent.style.pointerEvents = 'all';
+				}
+			});
+		}
 	}
 
 	handleDistance() {
@@ -342,10 +372,11 @@ class PlanetLabelClass {
 
 		if (this.data.isInnerPlanet) {
 			if (orrery.cameraState._currentZoomDistanceThreshold === 0) {
-				// TODO: remove this, not more using CSS to control label visibility since we need to control the orbit line too
-				this.labelDiv.querySelector('.label-content').classList.remove('faded');
+				this.fadeIn();
+				this.OrbitLine.fadeIn();
 			} else {
-				this.labelDiv.querySelector('.label-content').classList.add('faded');
+				this.fadeOut();
+				this.OrbitLine.fadeOut();
 			}
 		}
 	}
