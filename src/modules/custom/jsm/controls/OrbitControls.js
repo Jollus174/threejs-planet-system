@@ -1,7 +1,7 @@
 // not my file, I'm just making small edits
 /* jshint ignore:start */
 import { EventDispatcher, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 } from 'three';
-import { state as stateDefault } from '../../../state';
+import { orrery } from '../../../orrery';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -495,7 +495,7 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function handleMouseWheel(event) {
-			stateDefault.cameraState._zoomToTarget = false;
+			orrery.cameraState._zoomToTarget = false;
 
 			if (event.deltaY < 0) {
 				_global.dollyIn(getZoomScale());
@@ -888,7 +888,7 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enableZoom === false && scope.enablePan === false) return;
 
 							handleTouchStartDollyPan();
-							stateDefault.cameraState._zoomToTarget = false;
+							orrery.cameraState._zoomToTarget = false;
 
 							state = STATE.TOUCH_DOLLY_PAN;
 
@@ -898,7 +898,7 @@ class OrbitControls extends EventDispatcher {
 							if (scope.enableZoom === false && scope.enableRotate === false) return;
 
 							handleTouchStartDollyRotate();
-							stateDefault.cameraState._zoomToTarget = false;
+							orrery.cameraState._zoomToTarget = false;
 
 							state = STATE.TOUCH_DOLLY_ROTATE;
 

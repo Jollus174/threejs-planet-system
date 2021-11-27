@@ -85,7 +85,6 @@ class CSS2DRenderer {
 			domElement.style.height = height + 'px';
 		};
 
-		const opacityFalloff = 1.5; // with 1 being linear scale of opacity 0 at the outer edges of the canvas and 1 at the centre
 		function renderObject(object, scene, camera) {
 			if (object.isCSS2DObject) {
 				object.onBeforeRender(_this, scene, camera);
@@ -115,6 +114,9 @@ class CSS2DRenderer {
 				element.style.display = object.visible && _vector.z >= -1 && _vector.z <= 1 ? '' : 'none';
 
 				if (!element.classList.contains('is-planet')) {
+					let opacityFalloff = 1; // with 1 (min) being linear scale of opacity 0 at the outer edges of the canvas and 1 at the centre
+					if (element.classList.contains('is-moon')) opacityFalloff = 1.5; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
+					if (element.classList.contains('is-dwarf-planet')) opacityFalloff = 1;
 					element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
 				}
 

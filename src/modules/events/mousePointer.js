@@ -1,6 +1,6 @@
 'use strict';
 import { Raycaster, Vector2 } from 'three';
-import { state } from '../state';
+import { orrery } from '../orrery';
 import { settings } from '../settings';
 import { controls } from '../controls';
 import { getStandardDeviation } from './../utils';
@@ -11,8 +11,8 @@ const mouse = new Vector2();
 const raycaster = new Raycaster();
 
 const returnHoveredGroup = () => {
-	raycaster.setFromCamera(mouse, state.camera);
-	const intersects = raycaster.intersectObjects(state.scene.children, true);
+	raycaster.setFromCamera(mouse, orrery.camera);
+	const intersects = raycaster.intersectObjects(orrery.scene.children, true);
 	let objsClickable = intersects.filter(
 		(intersect) => intersect.object && intersect.object.name.includes('click target')
 	);
@@ -33,31 +33,31 @@ const returnHoveredGroup = () => {
 };
 
 // const hasClickedSameTarget = () =>
-// 	window.vueOrrery.mouseState._clickedGroup &&
+// 	orrery.mouseState._clickedGroup &&
 // 	returnHoveredGroup() &&
 // 	returnHoveredGroup().name &&
-// 	window.vueOrrery.mouseState._clickedGroup.name &&
-// 	returnHoveredGroup().name === window.vueOrrery.mouseState._clickedGroup.name;
+// 	orrery.mouseState._clickedGroup.name &&
+// 	returnHoveredGroup().name === orrery.mouseState._clickedGroup.name;
 
 const initMousePointerEvents = () => {
 	window.addEventListener('wheel', () => {
-		state.cameraState._zoomToTarget = false;
+		orrery.cameraState._zoomToTarget = false;
 	});
 };
 
 const handleLabelClick = (data) => {
-	state.controls.saveState(); // saving state so can use the [Back] button
+	orrery.controls.saveState(); // saving state so can use the [Back] button
 	document.querySelector('#btn-back').disabled = false;
 	const dataStorageKey = data.aroundPlanet ? '_moonLabels' : '_planetLabels';
-	const clickedGroupIndex = window.vueOrrery.bodies[dataStorageKey].findIndex((p) =>
+	const clickedGroupIndex = orrery.bodies[dataStorageKey].findIndex((p) =>
 		p.data.englishName.includes(data.englishName)
 	);
-	const clickedGroup = window.vueOrrery.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
+	const clickedGroup = orrery.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
 
-	state.cameraState._zoomToTarget = true;
+	orrery.cameraState._zoomToTarget = true;
 	controls.minDistance = clickedGroup.data.meanRadius * 2;
 	document.querySelector('#btn-modal-info').disabled = false;
-	window.vueOrrery.mouseState._clickedGroup = clickedGroup; // to get the camera moving
+	orrery.mouseState._clickedGroup = clickedGroup; // to get the camera moving
 
 	// updating modal with Wikipedia data
 	if (!clickedGroup.data.content) {
@@ -69,18 +69,10 @@ const handleLabelClick = (data) => {
 				clickedGroup.data.title = response.title;
 				clickedGroup.data.content = response.content;
 				clickedGroup.data.image = response.image;
-
-				window.vueOrrery.mouseState._clickedGroup = Object.assign({}, window.vueOrrery.mouseState._clickedGroup, {
-					...clickedGroup
-				});
 			})
 			.catch((err) => {
 				console.error(err);
 			});
-	} else {
-		window.vueOrrery.mouseState._clickedGroup = Object.assign({}, window.vueOrrery.mouseState._clickedGroup, {
-			...clickedGroup
-		});
 	}
 };
 

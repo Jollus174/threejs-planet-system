@@ -2,7 +2,7 @@ import { scene } from './scene';
 import { controls } from './controls';
 import { camera } from './camera';
 
-const state = {
+const orrery = {
 	scene,
 	controls,
 	camera,
@@ -27,7 +27,7 @@ const state = {
 	},
 	skybox: null,
 	bodies: {
-		_bodiesAll: [],
+		_all: [],
 		_sun: {},
 		_dwarfPlanets: [],
 		_starField: null,
@@ -35,20 +35,15 @@ const state = {
 		_planetLabels: [],
 		_moonLabels: [],
 		_dwarfPlanetLabels: [],
-		// _planetGroups: [],
 		_planets: [],
 		_moons: [],
 		_satellites: [],
 		_orbitLines: [],
-		_labelLines: [],
-		_targetLines: [],
-		_textGroups: [],
-		_textLabels: [],
-		_navigable: [],
 		_inRange: [],
 		classes: {
 			_planetLabels: [],
-			_moonLabels: []
+			_moonLabels: [],
+			_dwarfLabels: []
 		}
 	},
 	orbitLines: {
@@ -62,4 +57,6 @@ const state = {
 	isDesktop: false
 };
 
-export { state };
+window.orrery = orrery;
+
+export { orrery };

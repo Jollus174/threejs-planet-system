@@ -1,6 +1,5 @@
 'use strict';
 import { Texture, BufferGeometry, RingBufferGeometry, Vector3, PointsMaterial, MathUtils } from 'three';
-import { state } from './state';
 
 // get deviation between a set of values stored in an array
 const getStandardDeviation = (array) => {
@@ -99,6 +98,7 @@ const ringUVMapGeometry = (from, to) => {
 
 // returns a value that we should iterate over
 // chuck this in the render() function for it to work
+// eg: xFrom += easeTo({ from: xFrom, to: xTo });
 const easeTo = ({ from = null, to = null, incrementer = 10 } = {}) => {
 	return (to - from) / incrementer;
 };

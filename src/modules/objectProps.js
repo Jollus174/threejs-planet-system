@@ -1,7 +1,7 @@
 'use strict';
 import * as THREE from 'three';
 import { createCircleFromPoints, numberWithCommas, ringUVMapGeometry } from './utils';
-import { state } from './state';
+import { orrery } from './orrery';
 import { scene } from './scene';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
@@ -9,9 +9,10 @@ import { textureLoader, fontLoader } from './loadManager'; // still not 100% sur
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
+import { gsap } from 'gsap';
 
 const setOrbitVisibility = () => {
-	return (state.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
+	return (orrery.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
 };
 
 class OrbitLine {
@@ -20,11 +21,13 @@ class OrbitLine {
 		this.orbitLineName = `${this.data.englishName} orbit line`;
 		this.orbitMesh = null;
 		this.objectGroup = objectGroup;
+		this.fadingIn = false;
+		this.fadingOut = false;
 	}
 
-	build() {
+	build({ renderInvisible = false } = {}) {
 		const isMoon = this.data.aroundPlanet;
-		const isDwarfPlanet = window.vueOrrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
+		const isDwarfPlanet = orrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
 		const points = [];
 		for (let i = 0; i <= 360; i += 0.03) {
 			const { x, y, z } = calculateOrbit(
@@ -46,20 +49,48 @@ class OrbitLine {
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
 				opacity: opacityDefault,
-				visible: setOrbitVisibility()
+				// visible: setOrbitVisibility()
+				visible: !renderInvisible
 			})
 		);
 
 		this.orbitMesh.name = this.orbitLineName;
 		this.orbitMesh.data = this.orbitMesh.data || {};
 		this.orbitMesh.data.opacityDefault = opacityDefault;
-		window.vueOrrery.bodies._orbitLines.push(this.orbitMesh);
+		orrery.bodies._orbitLines.push(this.orbitMesh);
 		this.objectGroup.parent.add(this.orbitMesh);
 	}
 
+	fadeOut() {
+		if (!this.fadingOut && this.orbitMesh.material.opacity !== 0) {
+			this.fadingOut = true;
+			gsap.to(this.orbitMesh.material, {
+				opacity: 0,
+				duration: 0.5,
+				onComplete: () => {
+					// TODO: debug mode complete message?
+					this.fadingOut = false;
+				}
+			});
+		}
+	}
+
+	fadeIn() {
+		if (!this.fadingIn && this.orbitMesh.material.opacity !== this.orbitMesh.data.opacityDefault) {
+			this.fadingIn = true;
+			gsap.to(this.orbitMesh.material, {
+				opacity: this.orbitMesh.data.opacityDefault,
+				duration: 0.5,
+				onComplete: () => {
+					this.fadingIn = false;
+				}
+			});
+		}
+	}
+
 	remove() {
-		const i = window.vueOrrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
-		window.vueOrrery.bodies._orbitLines.splice(i, 1);
+		const i = orrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
+		orrery.bodies._orbitLines.splice(i, 1);
 		this.objectGroup.parent.remove(this.orbitMesh);
 	}
 }
@@ -86,7 +117,7 @@ class MoonLabelClass {
 		this.labelGroup.name = `${this.data.englishName} group label`;
 		this.labelGroup.data = this.data;
 		this.labelGroup.add(CSSObj);
-		window.vueOrrery.bodies._moonLabels.push(this.labelGroup);
+		orrery.bodies._moonLabels.push(this.labelGroup);
 
 		// calculate orbit
 		const { x, y, z } = this.data.startingPosition;
@@ -95,33 +126,52 @@ class MoonLabelClass {
 		this.evtHandleLabelClick = () => handleLabelClick(this.data);
 		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
 
+		this.intervalCheckDistance = setInterval(() => {
+			this.handleDistance();
+		}, 200);
+
 		this.planetGroup.add(this.labelGroup);
 		// building orbitLine after the group is added to the scene, so the group has a parent
-		// limiting the number of orbitLines rendered to save memory
-		if (this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000) {
-			this.OrbitLine.build();
+		// limiting the number of orbitLines RENDERED to save memory
+		const visibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000;
+		this.OrbitLine.build({ renderInvisible: !visibleAtBuild });
+	}
+
+	handleDistance() {
+		const distance = orrery.camera.position.distanceTo({
+			x: this.planetGroup.position.x + this.labelGroup.position.x,
+			y: this.planetGroup.position.y + this.labelGroup.position.y,
+			z: this.planetGroup.position.z + this.labelGroup.position.z
+		});
+
+		if (this.OrbitLine) {
+			if (distance < 3000) {
+				this.OrbitLine.fadeOut();
+			} else {
+				this.OrbitLine.fadeIn();
+			}
 		}
 	}
 
 	remove() {
 		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
-
+		clearInterval(this.intervalCheckDistance);
 		if (this.OrbitLine) this.OrbitLine.remove();
 
 		// snap the camera back to the planet if the clicked group moon is deloaded
 		if (
-			window.vueOrrery.mouseState._clickedGroup &&
-			window.vueOrrery.mouseState._clickedGroup.data &&
-			window.vueOrrery.mouseState._clickedGroup.data.aroundPlanet
+			orrery.mouseState._clickedGroup &&
+			orrery.mouseState._clickedGroup.data &&
+			orrery.mouseState._clickedGroup.data.aroundPlanet
 		) {
-			window.vueOrrery.mouseState._clickedGroup = window.vueOrrery.mouseState._clickedGroup.parent;
+			orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 		}
 
 		this.labelGroup.children.forEach((child) => {
 			this.labelGroup.remove(child);
 		});
-		window.vueOrrery.bodies._moonLabels.splice(
-			window.vueOrrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
+		orrery.bodies._moonLabels.splice(
+			orrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
 			1
 		);
 		this.planetGroup.remove(this.labelGroup);
@@ -139,7 +189,7 @@ class PlanetLabelClass {
 	}
 
 	build() {
-		this.labelDiv.className = 'label is-planet';
+		this.labelDiv.className = `label ${this.data.isPlanet ? 'is-planet' : 'is-dwarf-planet'}`;
 		this.labelDiv.style.color = this.data.labelColour;
 		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
 		const CSSObj = new CSS2DObject(this.labelDiv);
@@ -148,7 +198,7 @@ class PlanetLabelClass {
 		this.labelGroup.name = `${this.data.englishName} group label`;
 		this.labelGroup.data = this.data;
 		this.labelGroup.add(CSSObj);
-		window.vueOrrery.bodies._planetLabels.push(this.labelGroup);
+		orrery.bodies._planetLabels.push(this.labelGroup);
 
 		// calculate orbit
 		if (this.data.startingPosition) {
@@ -171,32 +221,29 @@ class PlanetLabelClass {
 	}
 
 	handleDistance() {
-		const distance = state.camera.position.distanceTo(this.labelGroup.position);
+		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
 
-		// should fire an event that a planet is in range...
-
-		// either 1000000 or 10000000
 		// TODO: need to specify between INNER moons and OUTER moons... some are really far away...
-		if (distance < 60000000) {
-			// console.log(`${this.data.englishName} is in range`);
-			state.cameraState._currentPlanetInRange = this.data.englishName;
+		if (distance < 80000000) {
+			orrery.cameraState._currentPlanetInRange = this.data.englishName;
 			this.labelDiv.classList.add('in-range');
 
-			// state.bodies._orbitLines.forEach((o) => {
-			// 	if (!o.name.includes(this.data.englishName)) {
-			// 		o.material.opacity = 0.1;
-			// 	}
-			// });
+			// Fade the orbitLine opacity depending on distance here
+			if (distance < 2000000) {
+				this.OrbitLine.fadeOut();
+			} else {
+				this.OrbitLine.fadeIn();
+			}
 
 			// this seems inefficient since it's iterating through the array many times...
 			// should we have some kind of render queue?
 			if (
 				this.data.moons &&
-				!window.vueOrrery.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)
+				!orrery.bodies.classes._moonLabels.find((m) => m.data.englishName === this.data.moons[0].englishName)
 			) {
 				this.data.moons.forEach((moon) => {
 					const moonLabelClass = new MoonLabelClass(moon, this.labelGroup);
-					window.vueOrrery.bodies.classes._moonLabels.push(moonLabelClass);
+					orrery.bodies.classes._moonLabels.push(moonLabelClass);
 					moonLabelClass.build(); // TODO: this should be a promise
 				});
 			}
@@ -204,21 +251,21 @@ class PlanetLabelClass {
 			this.labelDiv.classList.remove('in-range');
 
 			if (
-				state.cameraState._currentPlanetInRange &&
-				this.labelGroup.name.includes(state.cameraState._currentPlanetInRange)
+				orrery.cameraState._currentPlanetInRange &&
+				this.labelGroup.name.includes(orrery.cameraState._currentPlanetInRange)
 			) {
-				window.vueOrrery.bodies.classes._moonLabels.forEach((moonClass, i) => {
+				orrery.bodies.classes._moonLabels.forEach((moonClass, i) => {
 					moonClass.remove();
-					window.vueOrrery.bodies.classes._moonLabels.splice(i, 1);
+					orrery.bodies.classes._moonLabels.splice(i, 1);
 				});
-				if (!window.vueOrrery.bodies.classes._moonLabels.length) {
-					state.cameraState._currentPlanetInRange = '';
+				if (!orrery.bodies.classes._moonLabels.length) {
+					orrery.cameraState._currentPlanetInRange = '';
 				}
 			}
 		}
 
 		if (this.data.englishName === 'Sun') {
-			state.cameraState._currentZoomDistanceThreshold =
+			orrery.cameraState._currentZoomDistanceThreshold =
 				distance < settings.systemZoomDistanceThresholds[0]
 					? 0
 					: distance < settings.systemZoomDistanceThresholds[1]
@@ -227,7 +274,7 @@ class PlanetLabelClass {
 		}
 
 		if (this.data.isInnerPlanet) {
-			if (state.cameraState._currentZoomDistanceThreshold === 0) {
+			if (orrery.cameraState._currentZoomDistanceThreshold === 0) {
 				this.labelDiv.classList.remove('faded');
 			} else {
 				this.labelDiv.classList.add('faded');
@@ -238,7 +285,7 @@ class PlanetLabelClass {
 	remove() {
 		this.labelDiv.removeEventListener('click', this.evtHandleLabelClick);
 		clearInterval(this.intervalCheckDistance);
-		this.orbitLine.remove();
+		this.OrbitLine.remove();
 
 		this.labelGroup.children.forEach((child) => this.labelGroup.remove(child));
 		scene.remove(this.labelGroup);
@@ -286,14 +333,14 @@ const labelLine = {
 		if (!planetGroup || !planetGroup.labelLine) return;
 		const labelLine = planetGroup.labelLine;
 
-		labelLine.lookAt(state.camera.position);
+		labelLine.lookAt(orrery.camera.position);
 		let innerRadius = labelLine.geometry.parameters.innerRadius;
 		let outerRadius = labelLine.geometry.parameters.outerRadius;
 		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
 		let regenerate = false;
 		if (
-			state.mouseState._hoveredGroups.length &&
-			state.mouseState._hoveredGroups.some((g) => g.name === planetGroup.name)
+			orrery.mouseState._hoveredGroups.length &&
+			orrery.mouseState._hoveredGroups.some((g) => g.name === planetGroup.name)
 		) {
 			if (outerRadius < origOuterRadius * 1.1) {
 				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius * 1.1, incrementer: 15 });
@@ -363,7 +410,7 @@ const targetLine = {
 	renderLoop: (planetGroup) => {
 		if (!planetGroup || !planetGroup.targetLine) return;
 		const targetLine = planetGroup.targetLine;
-		targetLine.lookAt(state.camera.position);
+		targetLine.lookAt(orrery.camera.position);
 		fadeTargetLineOpacity(planetGroup, targetLine);
 	}
 };
@@ -402,14 +449,14 @@ const clickTarget = {
 			}
 		} else {
 			if (
-				(state.isDesktop &&
+				(orrery.isDesktop &&
 					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeDesktop) ||
-				(!state.isDesktop &&
+				(!orrery.isDesktop &&
 					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeMobile)
 			) {
 				planetGroup.clickTarget.geometry.dispose();
 				planetGroup.clickTarget.geometry = new THREE.SphereBufferGeometry(
-					state.isDesktop
+					orrery.isDesktop
 						? planetGroup.clickTarget.data.clickTargetSizeDesktop
 						: planetGroup.clickTarget.data.clickTargetSizeMobile,
 					10,
