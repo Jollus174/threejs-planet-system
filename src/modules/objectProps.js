@@ -11,6 +11,9 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
 import { gsap } from 'gsap';
 
+const planetRangeThreshold = 80000000;
+const planetOrbitLineRangeThreshold = 2000000;
+
 const setOrbitVisibility = () => {
 	return (orrery.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
 };
@@ -42,13 +45,12 @@ class OrbitLine {
 		}
 
 		const opacityDefault = isDwarfPlanet ? 0.2 : 1;
-
 		this.orbitMesh = new THREE.Line(
 			new THREE.BufferGeometry().setFromPoints(points),
 			new THREE.LineBasicMaterial({
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
-				opacity: opacityDefault,
+				opacity: 0,
 				// visible: setOrbitVisibility()
 				visible: !renderInvisible
 			})
@@ -59,6 +61,9 @@ class OrbitLine {
 		this.orbitMesh.data.opacityDefault = opacityDefault;
 		orrery.bodies._orbitLines.push(this.orbitMesh);
 		this.objectGroup.parent.add(this.orbitMesh);
+
+		// initial page load
+		if (this.orbitMesh.material.opacity === 0) this.fadeIn();
 	}
 
 	fadeOut() {
@@ -66,10 +71,11 @@ class OrbitLine {
 			this.fadingOut = true;
 			gsap.to(this.orbitMesh.material, {
 				opacity: 0,
-				duration: 0.5,
+				duration: 0.25,
 				onComplete: () => {
 					// TODO: debug mode complete message?
 					this.fadingOut = false;
+					this.visible = false;
 				}
 			});
 		}
@@ -78,6 +84,7 @@ class OrbitLine {
 	fadeIn() {
 		if (!this.fadingIn && this.orbitMesh.material.opacity !== this.orbitMesh.data.opacityDefault) {
 			this.fadingIn = true;
+			this.visible = true;
 			gsap.to(this.orbitMesh.material, {
 				opacity: this.orbitMesh.data.opacityDefault,
 				duration: 0.5,
@@ -89,9 +96,19 @@ class OrbitLine {
 	}
 
 	remove() {
-		const i = orrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
-		orrery.bodies._orbitLines.splice(i, 1);
-		this.objectGroup.parent.remove(this.orbitMesh);
+		if (!this.fadingOut) {
+			this.fadingOut = true;
+			gsap.to(this.orbitMesh.material, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					this.fadingOut = false;
+					const i = orrery.bodies._orbitLines.findIndex((o) => o.name === this.orbitLineName);
+					orrery.bodies._orbitLines.splice(i, 1);
+					this.objectGroup.parent.remove(this.orbitMesh);
+				}
+			});
+		}
 	}
 }
 
@@ -104,13 +121,20 @@ class MoonLabelClass {
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
 		this.planetGroup = planetGroup;
-		// this.storageKey = '_moonLabels';
+		this.fadingIn = false;
+		this.fadingOut = false;
+		this.isAdded = false;
 	}
 
 	build() {
 		this.labelDiv.className = 'label is-moon';
 		this.labelDiv.style.color = this.data.labelColour;
-		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
+		this.labelDiv.innerHTML = `
+			<div class="label-content" style="opacity: 0;">
+				<div class="label-circle"></div>
+				<div class="label-text">${this.data.englishName}</div>
+			</div>
+			`;
 		const CSSObj = new CSS2DObject(this.labelDiv);
 		CSSObj.position.set(0, 0, 0);
 
@@ -131,10 +155,19 @@ class MoonLabelClass {
 		}, 200);
 
 		this.planetGroup.add(this.labelGroup);
+
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		// limiting the number of orbitLines RENDERED to save memory
 		const visibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000;
 		this.OrbitLine.build({ renderInvisible: !visibleAtBuild });
+
+		gsap.to(this.labelDiv.querySelector('.label-content'), {
+			opacity: 1,
+			duration: 1,
+			onComplete: () => {
+				this.isAdded = true;
+			}
+		});
 	}
 
 	handleDistance() {
@@ -148,33 +181,51 @@ class MoonLabelClass {
 			if (distance < 3000) {
 				this.OrbitLine.fadeOut();
 			} else {
-				this.OrbitLine.fadeIn();
+				// fixing conflict here with what the PLANET wants to do...
+				// this will prevent flickering
+				const distancePlanetFromSun = orrery.camera.position.distanceTo(this.planetGroup.position);
+				if (distancePlanetFromSun < planetRangeThreshold) {
+					this.OrbitLine.fadeIn();
+				}
 			}
 		}
 	}
 
 	remove() {
-		this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
-		clearInterval(this.intervalCheckDistance);
-		if (this.OrbitLine) this.OrbitLine.remove();
+		if (!this.fadingOut && this.isAdded) {
+			// fading out OrbitLine BEFORE planet (once the planet is gone, so is the line)
+			if (this.OrbitLine) this.OrbitLine.remove();
 
-		// snap the camera back to the planet if the clicked group moon is deloaded
-		if (
-			orrery.mouseState._clickedGroup &&
-			orrery.mouseState._clickedGroup.data &&
-			orrery.mouseState._clickedGroup.data.aroundPlanet
-		) {
-			orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
+			this.fadingOut = true;
+			gsap.to(this.labelDiv.querySelector('.label-content'), {
+				opacity: 0,
+				duration: 0.5,
+				onComplete: () => {
+					this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
+					clearInterval(this.intervalCheckDistance);
+
+					// snap the camera back to the planet if the clicked group moon is deloaded
+					if (
+						orrery.mouseState._clickedGroup &&
+						orrery.mouseState._clickedGroup.data &&
+						orrery.mouseState._clickedGroup.data.aroundPlanet
+					) {
+						orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
+					}
+
+					this.labelGroup.children.forEach((child) => {
+						this.labelGroup.remove(child);
+					});
+					orrery.bodies._moonLabels.splice(
+						orrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
+						1
+					);
+
+					this.planetGroup.remove(this.labelGroup);
+					this.isAdded = false;
+				}
+			});
 		}
-
-		this.labelGroup.children.forEach((child) => {
-			this.labelGroup.remove(child);
-		});
-		orrery.bodies._moonLabels.splice(
-			orrery.bodies._moonLabels.findIndex((m) => m.name.includes(this.data.englishName)),
-			1
-		);
-		this.planetGroup.remove(this.labelGroup);
 	}
 }
 
@@ -186,12 +237,20 @@ class PlanetLabelClass {
 		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.intervalCheckDistance = null;
 		this.evtHandleLabelClick = null;
+		this.isAdded = false;
 	}
 
 	build() {
-		this.labelDiv.className = `label ${this.data.isPlanet ? 'is-planet' : 'is-dwarf-planet'}`;
+		this.labelDiv.className = `label ${
+			this.data.isPlanet || this.data.englishName === 'Sun' ? 'is-planet' : 'is-dwarf-planet'
+		}`;
 		this.labelDiv.style.color = this.data.labelColour;
-		this.labelDiv.innerHTML = `<div class="label-text">${this.data.englishName}</div>`;
+		this.labelDiv.innerHTML = `
+			<div class="label-content" style="opacity: 0;">
+				<div class="label-circle"></div>
+				<div class="label-text">${this.data.englishName}</div>
+			</div>
+			`;
 		const CSSObj = new CSS2DObject(this.labelDiv);
 		CSSObj.position.set(0, 0, 0);
 
@@ -218,18 +277,26 @@ class PlanetLabelClass {
 		scene.add(this.labelGroup);
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
+
+		gsap.to(this.labelDiv.querySelector('.label-content'), {
+			opacity: 1,
+			duration: 1,
+			onComplete: () => {
+				this.isAdded = true;
+			}
+		});
 	}
 
 	handleDistance() {
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
 
 		// TODO: need to specify between INNER moons and OUTER moons... some are really far away...
-		if (distance < 80000000) {
+		if (distance < planetRangeThreshold) {
 			orrery.cameraState._currentPlanetInRange = this.data.englishName;
 			this.labelDiv.classList.add('in-range');
 
 			// Fade the orbitLine opacity depending on distance here
-			if (distance < 2000000) {
+			if (distance < planetOrbitLineRangeThreshold) {
 				this.OrbitLine.fadeOut();
 			} else {
 				this.OrbitLine.fadeIn();
@@ -275,9 +342,10 @@ class PlanetLabelClass {
 
 		if (this.data.isInnerPlanet) {
 			if (orrery.cameraState._currentZoomDistanceThreshold === 0) {
-				this.labelDiv.classList.remove('faded');
+				// TODO: remove this, not more using CSS to control label visibility since we need to control the orbit line too
+				this.labelDiv.querySelector('.label-content').classList.remove('faded');
 			} else {
-				this.labelDiv.classList.add('faded');
+				this.labelDiv.querySelector('.label-content').classList.add('faded');
 			}
 		}
 	}
