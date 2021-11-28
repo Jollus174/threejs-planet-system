@@ -37,7 +37,7 @@ const settings = {
 	domTarget: document.querySelector('#bg'),
 	// shoutouts to F-Zero
 	planetColours: {
-		default: '#8c8c8b',
+		default: '#fff',
 		sun: '#ffb01f',
 		mercury: '#b78668',
 		venus: '#f3b3b3',

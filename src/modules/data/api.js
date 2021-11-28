@@ -7,7 +7,8 @@ const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
 const startingOrbitPosition = (data) => {
 	// console.log(orbitRotationRandomiser);
 	const { x, y, z } = calculateOrbit(
-		getRandomArbitrary(0, 360), // random position along orbit
+		// getRandomArbitrary(0, 360), // random position along orbit
+		getRandomArbitrary(0, 0), // random position along orbit
 		data.perihelion,
 		data.aphelion,
 		data.inclination,
@@ -34,10 +35,11 @@ const sortData = (data) => {
 		moon.startingPosition = { x, y, z };
 	});
 
-	const dwarfPlanetList = ['Ceres', 'Eris', 'Makemake', 'Haumea', 'Pluto', 'Orcus'];
+	const dwarfPlanetList = ['Pluto', 'Ceres', 'Eris', 'Makemake', 'Haumea', 'Orcus'];
 	const dwarfPlanets = dwarfPlanetList.map((dPlanet) => data.find((item) => item.englishName.includes(dPlanet)));
 	dwarfPlanets.forEach((dwarfPlanet) => {
 		dwarfPlanet.isPlanet = false;
+		dwarfPlanet.labelColour = settings.planetColours.default;
 		const { x, y, z } = startingOrbitPosition(dwarfPlanet);
 		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(-1, 1);
 		dwarfPlanet.startingPosition = { x, y, z };

@@ -43,6 +43,12 @@ const initMousePointerEvents = () => {
 	window.addEventListener('wheel', () => {
 		orrery.cameraState._zoomToTarget = false;
 	});
+
+	document.querySelector('#btn-back').addEventListener('click', () => {
+		orrery.cameraState._zoomToTarget = false;
+		document.querySelector('#btn-modal-info').disabled = true;
+		orrery.controls.reset();
+	});
 };
 
 const handleLabelClick = (data) => {
@@ -64,7 +70,6 @@ const handleLabelClick = (data) => {
 		const wikiKey = clickedGroup.data.wikipediaKey || clickedGroup.data.englishName;
 		getWikipediaData(wikiKey)
 			.then((response) => {
-				// TODO: use Vue.set
 				console.log(response);
 				clickedGroup.data.title = response.title;
 				clickedGroup.data.content = response.content;

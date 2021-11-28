@@ -32,7 +32,7 @@ class OrbitLine {
 		const isMoon = this.data.aroundPlanet;
 		const isDwarfPlanet = orrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
 		const points = [];
-		for (let i = 0; i <= 360; i += 0.03) {
+		for (let i = 0; i <= 360; i += 1) {
 			const { x, y, z } = calculateOrbit(
 				i,
 				this.data.perihelion,
@@ -45,16 +45,43 @@ class OrbitLine {
 		}
 
 		const opacityDefault = isDwarfPlanet ? 0.2 : 1;
-		this.orbitMesh = new THREE.Line(
-			new THREE.BufferGeometry().setFromPoints(points),
-			new THREE.LineBasicMaterial({
-				color: isMoon ? settings.planetColours.default : '#FFF',
-				transparent: true,
-				opacity: 0,
-				// visible: setOrbitVisibility()
-				visible: !renderInvisible
-			})
-		);
+		const stemCurve = new THREE.CatmullRomCurve3(points, true, 'catmullrom', 0.95);
+		const orbitPoints = stemCurve.getPoints(360);
+
+		// create geometry using 360 points on the circle
+		const geometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+		const startColor = new THREE.Color(this.data.labelColour);
+		const endColor = new THREE.Color('black');
+
+		const vertCnt = geometry.getAttribute('position').count;
+		const lerpIncrementer = 1 / 360 / 1.5; // how much fade we want
+
+		const colors = new Float32Array(vertCnt * 3);
+		for (let i = 0; i <= 360; i++) {
+			const lerpColor = new THREE.Color(startColor);
+			lerpColor.lerpColors(startColor, endColor, i * lerpIncrementer);
+
+			colors[i * 3 + 0] = lerpColor.r;
+			colors[i * 3 + 1] = lerpColor.g;
+			colors[i * 3 + 2] = lerpColor.b;
+		}
+
+		geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+		const material = new THREE.LineBasicMaterial({
+			color: isMoon ? settings.planetColours.default : '#FFF',
+			transparent: true,
+			opacity: 0,
+			// visible: setOrbitVisibility()
+			visible: !renderInvisible,
+			// blending: THREE.AdditiveBlending,
+			vertexColors: true
+		});
+		this.orbitMesh = new THREE.Line(geometry, material);
+
+		// this.orbitMesh = new THREE.Mesh(line, material);
+		this.orbitMesh = new THREE.Line(geometry, material);
+
+		// this.orbitMesh.computeLineDistances();
 
 		this.orbitMesh.name = this.orbitLineName;
 		this.orbitMesh.data = this.orbitMesh.data || {};
