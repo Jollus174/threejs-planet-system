@@ -46,7 +46,7 @@ const render = () => {
 		orrery.mouseState._mouseHoverTarget.mouseHoverTimeout = settings.mouse._mouseHoverTimeoutDefault;
 		// checking to see if hoveredGroups already contains target
 		if (!orrery.mouseState._hoveredGroups.some((group) => group.name === orrery.mouseState._mouseHoverTarget.name)) {
-			staorreryte.mouseState._hoveredGroups.push(orrery.mouseState._mouseHoverTarget);
+			orrery.mouseState._hoveredGroups.push(orrery.mouseState._mouseHoverTarget);
 		}
 	} else {
 		if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');

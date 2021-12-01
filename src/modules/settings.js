@@ -37,7 +37,8 @@ const settings = {
 	domTarget: document.querySelector('#bg'),
 	// shoutouts to F-Zero
 	planetColours: {
-		default: '#fff',
+		default: '#e4e4e4',
+		dwarfPlanet: '#c8c8c8',
 		sun: '#ffb01f',
 		mercury: '#b78668',
 		venus: '#f3b3b3',
@@ -46,7 +47,13 @@ const settings = {
 		jupiter: '#e0ab79',
 		saturn: '#ffe577',
 		uranus: '#c8ecef',
-		neptune: '#3b54d2'
+		neptune: '#3b54d2',
+		io: '#cab852',
+		europa: '#f2e3ce',
+		ganymede: '#c4c3be',
+		callisto: '#806f79',
+		titan: '#fbd74d',
+		triton: '#cec3c7'
 	},
 	systemZoomDistanceThresholds: [2200000000, 5000000000]
 };

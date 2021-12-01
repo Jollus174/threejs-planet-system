@@ -116,6 +116,7 @@ class CSS2DRenderer {
 				if (!element.classList.contains('is-planet')) {
 					let opacityFalloff = 1; // with 1 (min) being linear scale of opacity 0 at the outer edges of the canvas and 1 at the centre
 					if (element.classList.contains('is-moon')) opacityFalloff = 1.5; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
+					if (element.classList.contains('is-major-moon')) opacityFalloff = 1.75; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
 					if (element.classList.contains('is-dwarf-planet')) opacityFalloff = 1;
 					element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
 				}
@@ -168,7 +169,12 @@ class CSS2DRenderer {
 			const zMax = sorted.length;
 
 			for (let i = 0, l = sorted.length; i < l; i++) {
-				if (sorted[i].element.classList.contains('is-planet')) {
+				if (sorted[i].element.classList.contains('is-sun')) {
+					sorted[i].element.style.zIndex = zMax + 1000 - i;
+				} else if (
+					sorted[i].element.classList.contains('is-planet') ||
+					sorted[i].element.classList.contains('is-major-moon')
+				) {
 					sorted[i].element.style.zIndex = zMax + 100 - i;
 				} else {
 					sorted[i].element.style.zIndex = zMax - i;

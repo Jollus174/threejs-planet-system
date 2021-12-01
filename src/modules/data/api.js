@@ -3,6 +3,105 @@ import { settings } from '../settings';
 import { getRandomArbitrary, calculateOrbit } from '../utils';
 
 const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
+const majorMoons = [
+	// Jupiter
+	'Io',
+	'Europa',
+	'Ganymede',
+	'Callisto',
+
+	// Saturn
+	'Titan',
+	'Dione',
+	'Enceladus',
+	'Hyperion',
+	'Iapetus',
+	'Mimas',
+	'Rhea',
+	'Tethys',
+
+	// Uranus
+	'Miranda',
+	'Ariel',
+	'Umbriel',
+	'Titania',
+	'Oberon'
+];
+const innerMoons = [
+	// Earth
+	'Moon',
+
+	// Mars
+	'Phobos',
+	'Deimos',
+
+	// Jupiter
+	'Metis',
+	'Adrastea',
+	'Amalthea',
+	'Thebe',
+
+	// Saturn
+	'Aegaeon',
+	'Anthe',
+	'Atlas',
+	'Daphnis',
+	'Epimetheus',
+	'Helene',
+	'Janus',
+	'Methone',
+	'Mimas',
+	'Pan',
+	'Pandora',
+	'Polydeuces',
+	'Prometheus',
+	'S/2009 S 1',
+	'Telesto',
+
+	// Uranus
+	'Belinda',
+	'Bianca',
+	'Cordelia',
+	'Cressida',
+	'Cupid',
+	'Desdemona',
+	'Juliet',
+	'Mab',
+	'Ophelia',
+	'Perdita',
+	'Portia',
+	'Puck',
+	'Rosalind',
+
+	// Neptune
+	'Despina',
+	'Galatea',
+	'Hippocamp',
+	'Larissa',
+	'Naiad',
+	'Proteus',
+	'Thalassa',
+
+	// Pluto
+	'Charon',
+	'Hydra',
+	'Kerberos',
+	'Nix',
+	'Styx',
+
+	// Eris
+	'Dysnomia',
+
+	// Makemake
+	'S/2015 (136472) 1',
+
+	// Haumea
+	'Hiʻiaka',
+	'Namaka',
+
+	// Orcus
+	'Vanth'
+];
 
 const startingOrbitPosition = (data) => {
 	// console.log(orbitRotationRandomiser);
@@ -21,6 +120,7 @@ const startingOrbitPosition = (data) => {
 const sortData = (data) => {
 	const sun = data.find((item) => item.englishName === 'Sun');
 	sun.labelColour = settings.planetColours.sun;
+	sun.isSun = true;
 
 	const moons = data.filter(
 		(item) =>
@@ -29,7 +129,9 @@ const sortData = (data) => {
 
 	moons.forEach((moon) => {
 		// all the moons will be default grey for now
-		moon.labelColour = settings.planetColours.default;
+		moon.labelColour = settings.planetColours[moon.englishName.toLowerCase()] || settings.planetColours.default;
+		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
+		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
 		moon.orbitRotationRandomiser = getRandomArbitrary(0, 360);
 		const { x, y, z } = startingOrbitPosition(moon);
 		moon.startingPosition = { x, y, z };
@@ -39,9 +141,10 @@ const sortData = (data) => {
 	const dwarfPlanets = dwarfPlanetList.map((dPlanet) => data.find((item) => item.englishName.includes(dPlanet)));
 	dwarfPlanets.forEach((dwarfPlanet) => {
 		dwarfPlanet.isPlanet = false;
+		dwarfPlanet.isDwarfPlanet = true;
 		dwarfPlanet.labelColour = settings.planetColours.default;
+		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(0, 360);
 		const { x, y, z } = startingOrbitPosition(dwarfPlanet);
-		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(-1, 1);
 		dwarfPlanet.startingPosition = { x, y, z };
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
 			const moonNames = dwarfPlanet.moons.map((moonData) => moonData.moon);
