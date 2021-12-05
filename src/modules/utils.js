@@ -12,28 +12,39 @@ const getRandomArbitrary = (min, max) => {
 	return Math.random() * (max - min) + min;
 };
 
-const calculateOrbit = (i, perihelion, aphelion, inclination, eccentricity, orbitRotationRandomiser) => {
-	let x = 0,
-		y = 0,
-		z = 0;
-	if (
-		i === undefined ||
-		perihelion === undefined ||
-		aphelion === undefined ||
-		inclination === undefined ||
-		eccentricity === undefined
-	) {
-		return { x, y, z };
-	}
+const calculateOrbit = (i, data, parentPlanetData) => {
+	const perihelion = parentPlanetData ? parentPlanetData.meanRadius + data.perihelion : data.perihelion;
+	const aphelion = parentPlanetData ? parentPlanetData.meanRadius + data.aphelion : data.aphelion;
+	const inclination = data.aphelion * (data.inclination / 90);
+	const longAscNode = data.longAscNode !== 0 ? data.longAscNode : 0;
+	const eccentricity = data.aphelion * data.eccentricity;
 
-	const inclinationAdj = aphelion * (inclination / 90);
-	const eccentricityAdj = aphelion * eccentricity;
-	const orbitRandom = orbitRotationRandomiser || 0;
-	// console.log(orbitRandom);
+	// standard ellipse
+	// h to right, k to up
+	// B is the angle to rotate by!
+	// x = aCosT + h
+	// z = bSinT + k
 
-	x = Math.sin(MathUtils.degToRad(i + orbitRandom)) * aphelion + eccentricityAdj;
-	y = Math.sin(MathUtils.degToRad(i + orbitRandom)) * inclinationAdj;
-	z = Math.cos(MathUtils.degToRad(i + orbitRandom)) * perihelion;
+	// rotated ellipse
+	// x' = aCosT * CosB - bSinT * SinB + h
+	// z' = aCosT * SinB + bSinT * CosB + k
+
+	// TODO: If I ever implement orbit over time, then longAscNode will need to gradually change
+
+	let x =
+		aphelion * Math.sin(MathUtils.degToRad(i)) * Math.sin(MathUtils.degToRad(-longAscNode)) -
+		perihelion * Math.cos(MathUtils.degToRad(i)) * Math.cos(MathUtils.degToRad(-longAscNode));
+	const y = Math.sin(MathUtils.degToRad(i)) * inclination;
+	let z =
+		aphelion * Math.sin(MathUtils.degToRad(i)) * Math.cos(MathUtils.degToRad(-longAscNode)) +
+		perihelion * Math.cos(MathUtils.degToRad(i)) * Math.sin(MathUtils.degToRad(-longAscNode));
+
+	x = x - data.aphelion * data.eccentricity * Math.sin(MathUtils.degToRad(-longAscNode));
+	z = z + data.perihelion * data.eccentricity * Math.sin(MathUtils.degToRad(-longAscNode));
+
+	// x = Math.sin(MathUtils.degToRad(i + orbitRandom)) * aphelion + eccentricityAdj;
+	// y = Math.sin(MathUtils.degToRad(i + orbitRandom)) * inclinationAdj;
+	// z = Math.cos(MathUtils.degToRad(i + orbitRandom)) * perihelion;
 
 	return { x, y, z };
 };
