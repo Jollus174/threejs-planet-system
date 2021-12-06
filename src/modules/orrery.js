@@ -36,6 +36,7 @@ const orrery = {
 		_moonLabels: [],
 		_dwarfPlanetLabels: [],
 		_planets: [],
+		_allPlanets: [],
 		_moons: [],
 		_satellites: [],
 		_orbitLines: [],
@@ -43,7 +44,12 @@ const orrery = {
 		classes: {
 			_planetLabels: [],
 			_moonLabels: [],
-			_dwarfLabels: []
+			_dwarfLabels: [],
+			_orbitLines: []
+		},
+		meshes: {
+			_sun: {},
+			_planets: []
 		}
 	},
 	orbitLines: {

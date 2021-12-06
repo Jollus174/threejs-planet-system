@@ -1,9 +1,13 @@
 'use strict';
 import { settings } from '../settings';
 import { getRandomArbitrary, calculateOrbit } from '../utils';
+import { degToRad } from 'three/src/math/mathutils';
 
 const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
 const majorMoons = [
+	// Earth
+	'Moon',
+
 	// Jupiter
 	'Io',
 	'Europa',
@@ -132,7 +136,7 @@ const sortData = (data) => {
 		moon.labelColour = settings.planetColours[moon.englishName.toLowerCase()] || settings.planetColours.default;
 		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
-		moon.orbitRotationRandomiser = getRandomArbitrary(0, 360);
+		moon.longAscNode = moon.longAscNode !== 0 ? moon.longAscNode : getRandomArbitrary(0, 360);
 		const { x, y, z } = startingOrbitPosition(moon);
 		moon.startingPosition = { x, y, z };
 	});
@@ -144,6 +148,7 @@ const sortData = (data) => {
 		dwarfPlanet.isDwarfPlanet = true;
 		dwarfPlanet.labelColour = settings.planetColours.default;
 		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(0, 360);
+		dwarfPlanet.longAscNode = dwarfPlanet.longAscNode !== 0 ? dwarfPlanet.longAscNode : getRandomArbitrary(0, 360);
 		const { x, y, z } = startingOrbitPosition(dwarfPlanet);
 		dwarfPlanet.startingPosition = { x, y, z };
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {

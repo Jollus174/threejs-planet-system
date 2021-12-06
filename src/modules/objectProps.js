@@ -10,10 +10,10 @@ import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
 import { gsap } from 'gsap';
-import { MeshLine } from './custom/plugins/meshline';
-import { MeshLineMaterial } from './custom/plugins/material';
 
-const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
+const planetRangeThreshold = 250000000; // Jupiter moons appear from Ceres at higher range...
+// TODO: set it at this range only for the planet/moon that's targeted
+// const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
 const innerMoonRangeThreshold = 1700000;
 const majorMoonRangeThreshold = 25000000;
 const planetOrbitLineRangeThreshold = 2000000;
@@ -26,27 +26,28 @@ class OrbitLine {
 	constructor(data, objectGroup) {
 		this.data = data;
 		this.orbitLineName = `${this.data.englishName} orbit line`;
+		this.objectGroup = objectGroup;
 		this.orbitMesh = null;
 		this.orbitLine = null;
-		this.objectGroup = objectGroup;
 		this.fadingIn = false;
 		this.fadingOut = false;
+		this.parentPlanetData = data.aroundPlanet
+			? orrery.bodies._allPlanets.find((p) => p.id === data.aroundPlanet.planet)
+			: null;
 	}
 
 	build({ renderInvisible = false } = {}) {
 		orrery.bodies.classes._orbitLines.push(this);
 		const isMoon = this.data.aroundPlanet;
-		const isDwarfPlanet = orrery.bodies._dwarfPlanets.find((dPlanet) => dPlanet.name === this.data.name);
+		const isDwarfPlanet = this.data.isDwarfPlanet;
 		const points = [];
-		for (let i = 0; i <= 360; i += 1) {
-			const { x, y, z } = calculateOrbit(
-				i,
-				this.data.perihelion,
-				this.data.aphelion,
-				this.data.inclination,
-				this.data.eccentricity,
-				this.data.orbitRotationRandomiser
-			);
+
+		for (
+			let i = THREE.MathUtils.degToRad(this.data.longAscNode), j = 0;
+			i < THREE.MathUtils.degToRad(this.data.longAscNode) + ((2 * Math.PI) / 360) * 360;
+			i += (2 * Math.PI) / 360, j += 1
+		) {
+			const { x, y, z } = calculateOrbit(i, this.data, this.parentPlanetData, j);
 			points.push(new THREE.Vector3(x, y, z));
 		}
 
@@ -75,49 +76,25 @@ class OrbitLine {
 
 		geometryLine.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-		const line = new MeshLine();
-		// line.setPoints(points, (p) => 1 - p * 10);
-		line.setPoints(points, (p) => 1 - p);
-
-		// this.orbitMesh = new THREE.Mesh(
-		// 	line,
-		// 	new MeshLineMaterial({
-		// 		// color: isMoon ? settings.planetColours.default : '#FFF',
-		// 		color: startColor,
-		// 		transparent: true,
-		// 		opacity: 1,
-		// 		// visible: setOrbitVisibility()
-		// 		visible: !renderInvisible,
-		// 		resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
-		// 		lineWidth: 500000,
-		// 		depthTest: false,
-		// 		blending: THREE.AdditiveBlending
-		// 	})
-		// ); // can we set this to be same size no matter what... ? Probably not
-
 		this.orbitLine = new THREE.Line(
 			geometryLine,
 			new THREE.LineBasicMaterial({
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
 				opacity: 0,
-				// visible: setOrbitVisibility()
 				visible: !renderInvisible,
 				blending: THREE.AdditiveBlending,
 				vertexColors: true
 			})
 		);
 
-		// this.orbitMesh.computeLineDistances();
-
 		this.orbitLine.name = this.orbitLineName;
-		this.orbitLine.data = this.orbitLine.data || {};
+		this.orbitLine.data = this.data;
+
 		this.orbitLine.data.renderInvisible = renderInvisible;
 		this.orbitLine.data.opacityDefault = opacityDefault;
 		orrery.bodies._orbitLines.push(this.orbitLine);
 		this.objectGroup.parent.add(this.orbitLine);
-
-		// if (!this.data.isDwarfPlanet) this.objectGroup.parent.add(this.orbitMesh); // leaves some rather ugly artifacts when zoomed out...
 
 		// initial page load
 		if (this.orbitLine.material.opacity === 0 && !this.orbitLine.data.renderInvisible) {
@@ -173,7 +150,7 @@ class OrbitLine {
 				duration: 0.25,
 				onComplete: () => {
 					this.fadingOut = false;
-					this.objectGroup.parent.remove(this.orbitLine);
+					this.objectGroup.removeFromParent();
 				}
 			});
 		}
@@ -187,13 +164,12 @@ class MoonLabelClass {
 		this.labelGroup = new THREE.Group();
 		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.intervalCheckDistance = null;
-		this.evtHandleLabelClick = null;
 		this.planetGroup = planetGroup;
 		this.fadingIn = false;
 		this.fadingOut = false;
 		this.isAdded = false;
 		this.isInRange = false;
-		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000;
+		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
 	}
 
 	build() {
@@ -219,8 +195,9 @@ class MoonLabelClass {
 		const { x, y, z } = this.data.startingPosition;
 		this.labelGroup.position.set(x, y, z);
 
-		this.evtHandleLabelClick = () => handleLabelClick(this.data);
-		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
+		this.labelDiv.addEventListener('pointerdown', () => {
+			handleLabelClick(this.data);
+		});
 
 		this.intervalCheckDistance = setInterval(() => {
 			this.handleDistance();
@@ -305,7 +282,6 @@ class MoonLabelClass {
 				opacity: 0,
 				duration: 0.5,
 				onComplete: () => {
-					this.labelDiv.removeEventListener('pointerdown', this.evtHandleLabelClick);
 					clearInterval(this.intervalCheckDistance);
 
 					// snap the camera back to the planet if the clicked group moon is deloaded
@@ -317,7 +293,7 @@ class MoonLabelClass {
 						orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 					}
 
-					this.labelGroup.children.forEach((child) => this.labelGroup.remove(child));
+					this.labelGroup.children.forEach((child) => child.removeFromParent());
 
 					this.planetGroup.remove(this.labelGroup);
 					this.isAdded = false;
@@ -334,7 +310,6 @@ class PlanetLabelClass {
 		this.labelGroup = new THREE.Group();
 		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.intervalCheckDistance = null;
-		this.evtHandleLabelClick = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
 		this.isVisible = false;
@@ -369,9 +344,9 @@ class PlanetLabelClass {
 			this.labelGroup.position.set(0, 0, 0);
 		}
 
-		this.evtHandleLabelClick = () => handleLabelClick(this.data);
-		this.labelDiv.addEventListener('pointerdown', this.evtHandleLabelClick);
-
+		this.labelDiv.addEventListener('pointerdown', () => {
+			handleLabelClick(this.data);
+		});
 		this.intervalCheckDistance = setInterval(() => {
 			this.handleDistance();
 		}, 200);
@@ -471,11 +446,10 @@ class PlanetLabelClass {
 	}
 
 	remove() {
-		this.labelDiv.removeEventListener('click', this.evtHandleLabelClick);
 		clearInterval(this.intervalCheckDistance);
 		this.OrbitLine.remove();
 
-		this.labelGroup.children.forEach((child) => this.labelGroup.remove(child));
+		this.labelGroup.children.forEach((child) => child.removeFromParent());
 		scene.remove(this.labelGroup);
 	}
 }
@@ -486,7 +460,6 @@ const labelLine = {
 
 		const labelGeometry = {
 			origInnerRadius: item.diameter * 1.01,
-			origOuterRadius: item.diameter * 1.01,
 			origSegments: 90
 		};
 		const labelLine = new THREE.Mesh(

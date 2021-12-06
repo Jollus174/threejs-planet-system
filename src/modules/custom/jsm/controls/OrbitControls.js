@@ -711,7 +711,7 @@ class OrbitControls extends EventDispatcher {
 				onMouseUp(event);
 			}
 
-			removePointer(event);
+			removePointer(event); // causes event label 'pointerup' listeners to not fire
 
 			//
 

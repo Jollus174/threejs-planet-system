@@ -1,4 +1,4 @@
-import { DoubleSide } from 'three';
+import { FrontSide } from 'three';
 import textureSun from './../../img/textures/sun-min.jpg';
 import textureMercury from './../../img/textures/mercury.jpg';
 import textureVenus from './../../img/textures/venus.jpg';
@@ -41,7 +41,8 @@ const sunData = {
 	name: 'Sun',
 	orbitRadius: 0.001,
 	diameter: 1392680,
-	segments: 32,
+	meanRadius: 696340,
+	segments: 128,
 	labelColour: '#ffb01f',
 	textColour: '#ffb01f',
 	zoomTo: null,
@@ -59,8 +60,8 @@ const sunData = {
 		normalMap: null,
 		emissive: '#FFF',
 		emissiveMap: textureSun,
-		emissiveIntensity: 0.8,
-		side: DoubleSide
+		emissiveIntensity: 1,
+		side: FrontSide
 	}
 };
 
@@ -103,7 +104,15 @@ const rawPlanetData = [
 		mainAnomaly: 174.796,
 		argPeriapsis: 29.022,
 		longAscNode: 48.378,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mercure'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mercure',
+		material: {
+			map: textureMercury,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'venus',
@@ -143,7 +152,15 @@ const rawPlanetData = [
 		mainAnomaly: 50.115,
 		argPeriapsis: 54.78,
 		longAscNode: 76.785,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/venus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/venus',
+		material: {
+			map: textureVenus,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'terre',
@@ -188,7 +205,15 @@ const rawPlanetData = [
 		mainAnomaly: 358.617,
 		argPeriapsis: 85.901,
 		longAscNode: 18.272,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/terre'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/terre',
+		material: {
+			map: textureEarth,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'mars',
@@ -237,7 +262,15 @@ const rawPlanetData = [
 		mainAnomaly: 19.412,
 		argPeriapsis: 286.231,
 		longAscNode: 49.667,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mars'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/mars',
+		material: {
+			map: textureMars,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'jupiter',
@@ -262,6 +295,7 @@ const rawPlanetData = [
 		gravity: 24.79,
 		escape: 60200.0,
 		meanRadius: 69911.0,
+		diameter: 139822,
 		equaRadius: 71492.0,
 		polarRadius: 66854.0,
 		flattening: 0.06487,
@@ -277,7 +311,15 @@ const rawPlanetData = [
 		mainAnomaly: 20.02,
 		argPeriapsis: 273.442,
 		longAscNode: 100.398,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/jupiter'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/jupiter',
+		material: {
+			map: textureJupiter,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureJupiter,
+			// emissiveIntensity: 0.1,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'saturne',
@@ -317,7 +359,15 @@ const rawPlanetData = [
 		mainAnomaly: 317.02,
 		argPeriapsis: 336.178,
 		longAscNode: 113.759,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/saturne'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/saturne',
+		material: {
+			map: textureSaturn,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'uranus',
@@ -357,7 +407,15 @@ const rawPlanetData = [
 		mainAnomaly: 142.2386,
 		argPeriapsis: 98.862,
 		longAscNode: 73.967,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/uranus'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/uranus',
+		material: {
+			map: textureUranus,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureJupiter,
+			// emissiveIntensity: 0.1,
+			side: FrontSide
+		}
 	},
 	{
 		id: 'neptune',
@@ -397,7 +455,15 @@ const rawPlanetData = [
 		mainAnomaly: 256.228,
 		argPeriapsis: 256.932,
 		longAscNode: 131.823,
-		rel: 'https://api.le-systeme-solaire.net/rest/bodies/neptune'
+		rel: 'https://api.le-systeme-solaire.net/rest/bodies/neptune',
+		material: {
+			map: textureNeptune,
+			normalMap: null,
+			// emissive: '#FFF',
+			// emissiveMap: textureMercury,
+			// emissiveIntensity: 0.8,
+			side: FrontSide
+		}
 	},
 
 	{

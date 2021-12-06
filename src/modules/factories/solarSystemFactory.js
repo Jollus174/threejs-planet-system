@@ -4,6 +4,9 @@ import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { labelLine, targetLine, OrbitLine, rings, clickTarget } from '../objectProps';
 import { createCircleTexture } from '../utils';
+import { camera } from '../camera';
+import fragmentShader from './../shaders/glow/fragmentShader.glsl';
+import vertexShader from './../shaders/glow/vertexShader.glsl';
 
 // Making sure to build the moon + planet based off the data that's passed in
 const buildMoon = async (moonData, planetGroup) => {
@@ -68,7 +71,15 @@ const buildMoon = async (moonData, planetGroup) => {
 };
 
 const buildPlanet = async (planetData) => {
-	const { diameter, segments, material } = planetData;
+	const { segments, material } = planetData;
+	material.transparent = false;
+
+	// magic formula that converts float value to colour of the sun
+	// vec3 brightnesstoColor(float b) {
+	// 	b *= 0.25;
+	// 	return (vec3(b, b*b, b*b*b*b)/0.25)*0.6;
+	// }
+
 	material.map = material.map ? await textureLoader.loadAsync(material.map) : null;
 	material.normalMap = material.normalMap ? await textureLoader.loadAsync(material.normalMap) : null;
 	material.emissiveMap = material.emissiveMap ? await textureLoader.loadAsync(material.emissiveMap) : null;
@@ -79,11 +90,11 @@ const buildPlanet = async (planetData) => {
 
 	// if (planetGroup.orbitLine) planetGroup.add(planetGroup.orbitLine); // this will set their coordinates incorrectly
 	planetGroup.data = { ...planetData };
-	planetGroup.data.name = planetData.englishName;
-	planetGroup.name = `${planetGroup.data.name} group`;
+	planetGroup.data.name = planetData.name;
+	planetGroup.name = `${planetGroup.data.englishName} group`;
 	planetGroup.data.diameter = planetData.meanRadius * 2;
 	// planetGroup.data.orbit = Math.random() * Math.PI * 2; // sets the initial position of each planet along its orbit
-	planetGroup.data.zoomTo = planetData.zoomTo || planetGroup.data.diameter * 10;
+	planetGroup.data.zoomTo = planetData.zoomTo || planetGroup.data.diameter * 100000;
 	planetGroup.data.cameraDistance = null; // to set in the render loop
 
 	// planetGroup.textLabel = textLabel.build(planetGroup);
@@ -104,12 +115,33 @@ const buildPlanet = async (planetData) => {
 	// planetGroup.rings = rings.build(planetData);
 	// if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
 
-	const planetMesh = new THREE.Mesh(
-		new THREE.SphereBufferGeometry(diameter, segments, segments),
-		new THREE.MeshStandardMaterial(material)
-	);
+	const geometry = new THREE.SphereBufferGeometry(planetGroup.data.diameter, segments, segments);
+
+	const planetMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
 	planetMesh.name = `${planetData.name} mesh`;
 	planetGroup.add(planetMesh);
+
+	if (planetData.name === 'Sun') {
+		const shaderMaterial = new THREE.ShaderMaterial({
+			uniforms: {
+				viewVector: {
+					type: 'v3',
+					value: camera.position
+				}
+			},
+			vertexShader,
+			fragmentShader,
+			// side: THREE.FrontSide,
+			side: THREE.DoubleSide,
+			blending: THREE.AdditiveBlending,
+			transparent: true
+		});
+
+		const planetGlowMesh = new THREE.Mesh(geometry, shaderMaterial);
+		planetGroup.add(planetGlowMesh);
+		planetGroup.glow = planetGlowMesh;
+		planetGlowMesh.scale.set(1.2, 1.2, 1.2);
+	}
 
 	if (planetData.moons && planetData.moons.length) {
 		planetGroup.moonData = planetData.moons; // storing the data here so can access outside the loop

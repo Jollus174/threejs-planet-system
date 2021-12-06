@@ -15,36 +15,22 @@ const getRandomArbitrary = (min, max) => {
 const calculateOrbit = (i, data, parentPlanetData) => {
 	const perihelion = parentPlanetData ? parentPlanetData.meanRadius + data.perihelion : data.perihelion;
 	const aphelion = parentPlanetData ? parentPlanetData.meanRadius + data.aphelion : data.aphelion;
-	const inclination = data.aphelion * (data.inclination / 90);
-	const longAscNode = data.longAscNode !== 0 ? data.longAscNode : 0;
-	const eccentricity = data.aphelion * data.eccentricity;
-
-	// standard ellipse
-	// h to right, k to up
-	// B is the angle to rotate by!
-	// x = aCosT + h
-	// z = bSinT + k
-
-	// rotated ellipse
-	// x' = aCosT * CosB - bSinT * SinB + h
-	// z' = aCosT * SinB + bSinT * CosB + k
+	const semimajorAxis = parentPlanetData ? parentPlanetData.meanRadius + data.semimajorAxis : data.semimajorAxis;
+	const eccentricity = data.eccentricity;
 
 	// TODO: If I ever implement orbit over time, then longAscNode will need to gradually change
+	const theta = i; // correct...
+	const rotation = MathUtils.degToRad(data.longAscNode); // this does NOT get iterated upon
 
-	let x =
-		aphelion * Math.sin(MathUtils.degToRad(i)) * Math.sin(MathUtils.degToRad(-longAscNode)) -
-		perihelion * Math.cos(MathUtils.degToRad(i)) * Math.cos(MathUtils.degToRad(-longAscNode));
-	const y = Math.sin(MathUtils.degToRad(i)) * inclination;
-	let z =
-		aphelion * Math.sin(MathUtils.degToRad(i)) * Math.cos(MathUtils.degToRad(-longAscNode)) +
-		perihelion * Math.cos(MathUtils.degToRad(i)) * Math.sin(MathUtils.degToRad(-longAscNode));
-
-	x = x - data.aphelion * data.eccentricity * Math.sin(MathUtils.degToRad(-longAscNode));
-	z = z + data.perihelion * data.eccentricity * Math.sin(MathUtils.degToRad(-longAscNode));
-
-	// x = Math.sin(MathUtils.degToRad(i + orbitRandom)) * aphelion + eccentricityAdj;
-	// y = Math.sin(MathUtils.degToRad(i + orbitRandom)) * inclinationAdj;
-	// z = Math.cos(MathUtils.degToRad(i + orbitRandom)) * perihelion;
+	// polar ellipse rotation
+	// https://www.desmos.com/calculator/zc5zdjqzln
+	const r = (semimajorAxis * (1 - Math.pow(eccentricity, 2))) / (1 - eccentricity * Math.cos(theta - rotation));
+	// converting from polar to cartesian
+	const x = r * Math.cos(theta);
+	const z = r * Math.sin(theta);
+	const y = x * (data.inclination / 90);
+	// https://www.mathwarehouse.com/trigonometry/sine-cosine-tangent-practice3.php
+	// const y = x * Math.tan(data.inclination);
 
 	return { x, y, z };
 };

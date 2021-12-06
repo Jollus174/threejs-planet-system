@@ -5,23 +5,32 @@ import './css/style.css';
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
 import { settings } from './modules/settings';
-import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
-import { skyboxTexturePaths, sunData } from './modules/data/solarSystem';
+import { skyboxTexturePaths, sunData, rawPlanetData } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
 import { sortData } from './modules/data/api';
 import { scene } from './modules/scene';
+import { camera } from './modules/camera';
 import { setModalEvents } from './modules/events/modals';
 
 window.settings = settings;
 window.renderLoop;
 
 let delta;
+
+const domTarget = document.querySelector('#bg');
+const renderer = new THREE.WebGLRenderer({
+	// powerPreference: 'high-performance',
+	powerPreference: 'low-power',
+	stencil: false,
+	canvas: domTarget,
+	antialias: true
+});
 
 const orbitCentroid = new THREE.Object3D();
 orbitCentroid.name = 'orbit centroid';
@@ -32,25 +41,25 @@ const render = () => {
 	// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
 
 	// determining if mouse was held
-	if (orrery.mouseState._mouseClicked) {
-		orrery.mouseState._mouseClickTimeout -= 60;
-		if (orrery.mouseState._mouseClickTimeout <= 0) state.mouseState._mouseHeld = true;
-	} else {
-		orrery.mouseState._mouseClickTimeout = settings.mouse._mouseClickTimeoutDefault;
-		orrery.mouseState._mouseHeld = false;
-	}
+	// if (orrery.mouseState._mouseClicked) {
+	// 	orrery.mouseState._mouseClickTimeout -= 60;
+	// 	if (orrery.mouseState._mouseClickTimeout <= 0) orrery.mouseState._mouseHeld = true;
+	// } else {
+	// 	orrery.mouseState._mouseClickTimeout = settings.mouse._mouseClickTimeoutDefault;
+	// 	orrery.mouseState._mouseHeld = false;
+	// }
 
-	if (orrery.mouseState._mouseHoverTarget !== null) {
-		if (state.isDesktop) settings.domTarget.classList.add('object-hovered');
+	// if (orrery.mouseState._mouseHoverTarget !== null) {
+	// 	if (orrery.isDesktop) settings.domTarget.classList.add('object-hovered');
 
-		orrery.mouseState._mouseHoverTarget.mouseHoverTimeout = settings.mouse._mouseHoverTimeoutDefault;
-		// checking to see if hoveredGroups already contains target
-		if (!orrery.mouseState._hoveredGroups.some((group) => group.name === orrery.mouseState._mouseHoverTarget.name)) {
-			orrery.mouseState._hoveredGroups.push(orrery.mouseState._mouseHoverTarget);
-		}
-	} else {
-		if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');
-	}
+	// 	orrery.mouseState._mouseHoverTarget.mouseHoverTimeout = settings.mouse._mouseHoverTimeoutDefault;
+	// 	// checking to see if hoveredGroups already contains target
+	// 	if (!orrery.mouseState._hoveredGroups.some((group) => group.name === orrery.mouseState._mouseHoverTarget.name)) {
+	// 		orrery.mouseState._hoveredGroups.push(orrery.mouseState._mouseHoverTarget);
+	// 	}
+	// } else {
+	// 	if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');
+	// }
 
 	if (orrery.mouseState._hoveredGroups.length) {
 		orrery.mouseState._hoveredGroups.forEach((group, i, arr) => {
@@ -76,9 +85,9 @@ const render = () => {
 	}
 
 	if (orrery.mouseState._clickedGroup && orrery.cameraState._zoomToTarget) {
-		const objZoomTo = orrery.mouseState._clickedGroup.data.meanRadius * 4; // TODO: probably temp number
+		const objZoomTo =
+			orrery.mouseState._clickedGroup.data.zoomTo || orrery.mouseState._clickedGroup.data.meanRadius * 16;
 		const distanceToTarget = orrery.controls.getDistance();
-		// const distCalc = objZoomTo;
 
 		if (distanceToTarget > objZoomTo) {
 			const amountComplete = objZoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
@@ -98,6 +107,19 @@ const render = () => {
 			orrery.controls.dollyOut(orrery.cameraState._dollySpeed);
 		}
 	}
+
+	// if (orrery.bodies.meshes._sun.glow) {
+	// 	const viewVector = new THREE.Vector3().subVectors(camera.position, orrery.bodies.meshes._sun.parent.position);
+	// 	orrery.bodies.meshes._sun.glow.material.uniforms.viewVector.value = viewVector;
+	// }
+
+	// if (orrery.bodies.meshes._planets.length && orrery.bodies.meshes._planets[0].glow) {
+	// 	const viewVector = new THREE.Vector3().subVectors(
+	// 		camera.position,
+	// 		orrery.bodies.meshes._planets[0].parent.position
+	// 	);
+	// 	orrery.bodies.meshes._planets[0].glow.material.uniforms.viewVector.value = viewVector;
+	// }
 
 	orrery.controls.update();
 	renderer.render(scene, orrery.camera);
@@ -131,6 +153,7 @@ fetch('./../solarSystemData.json')
 		orrery.bodies._moons = sortedData.moons;
 		orrery.bodies._dwarfPlanets = sortedData.dwarfPlanets;
 		orrery.bodies._satellites = sortedData.satellites;
+		orrery.bodies._allPlanets = sortedData.planets.concat(sortedData.dwarfPlanets);
 
 		scene.add(skybox(skyboxTexturePaths));
 
@@ -153,7 +176,22 @@ fetch('./../solarSystemData.json')
 			dPlanetLabelClass.build();
 		});
 
-		buildPlanet(sunData).then((sunGroup) => scene.add(sunGroup));
+		buildPlanet(sunData).then((sunGroup) => {
+			sunGroup.name = 'Sun Group';
+			// scene.add(sunGroup);
+			orrery.bodies._planetLabels.find((l) => l.name.includes('Sun')).add(sunGroup);
+			orrery.bodies.meshes._sun = sunGroup;
+		});
+
+		rawPlanetData
+			.filter((p) => p.material !== undefined)
+			.forEach((planet) => {
+				buildPlanet(planet).then((builtPlanet) => {
+					scene.add(builtPlanet);
+					orrery.bodies._planetLabels.find((l) => l.name.includes(builtPlanet.name)).add(builtPlanet);
+					orrery.bodies.meshes._planets.push(builtPlanet);
+				});
+			});
 
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -162,8 +200,8 @@ fetch('./../solarSystemData.json')
 
 		labelRenderer.render(scene, orrery.camera);
 
-		orrery.camera.position.y = 10000000;
-		orrery.camera.position.z = 120000000;
+		orrery.camera.position.y = 15000000000;
+		orrery.camera.position.z = 10020000000;
 
 		// --------------------
 		// Setting Events

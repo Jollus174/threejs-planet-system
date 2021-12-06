@@ -61,7 +61,7 @@ const handleLabelClick = (data) => {
 	const clickedGroup = orrery.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
 
 	orrery.cameraState._zoomToTarget = true;
-	controls.minDistance = clickedGroup.data.meanRadius * 2;
+	controls.minDistance = clickedGroup.data.meanRadius * 8;
 	document.querySelector('#btn-modal-info').disabled = false;
 	orrery.mouseState._clickedGroup = clickedGroup; // to get the camera moving
 

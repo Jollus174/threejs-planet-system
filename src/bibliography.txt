@@ -5,5 +5,12 @@ https://eyes.jpl.nasa.gov/apps/orrery/#/home - Solar System example
 https://www.solarsystemscope.com/textures/ - Textures
 
 http://www.astronoo.com/en/moons-of-saturn.html
+https://www.space.com/20812-saturn-moons.html
 
 https://dev.to/kouts/how-to-create-a-vue-js-2-bootstrap-4-project-with-vite-54f1 - Project setup
+http://www.wayneparrott.com/how-to-create-three-js-gradient-colored-lines-and-circlelines-part-2/ - Coloured lines
+https://kadekeith.me/2017/09/12/three-glow.html - glowing meshes
+https://www.youtube.com/watch?v=Xuj8gY6He5w&t=444s - Rotating orbits via Longitude of Ascension angle
+https://www.desmos.com/calculator/42lngkxil6 - Rotating ellipsis
+https://www.desmos.com/calculator/zc5zdjqzln - Rotating ellipse around foci
+https://www.youtube.com/watch?v=5l2tR2smeHY - Jupiter moon orbits example

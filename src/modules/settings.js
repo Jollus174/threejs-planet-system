@@ -55,7 +55,7 @@ const settings = {
 		titan: '#fbd74d',
 		triton: '#cec3c7'
 	},
-	systemZoomDistanceThresholds: [2200000000, 5000000000]
+	systemZoomDistanceThresholds: [1800000000, 5000000000]
 };
 
 export { settings };
