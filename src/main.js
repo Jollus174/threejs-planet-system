@@ -9,9 +9,8 @@ import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
-import { skyboxTexturePaths, sunData, rawPlanetData } from './modules/data/solarSystem';
-import { asteroidBelt, skybox, starField, buildPlanet, buildMoon } from './modules/factories/solarSystemFactory';
-import { initMousePointerEvents } from './modules/events/mousePointer';
+import { skyboxTexturePaths } from './modules/data/solarSystem';
+import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { PlanetLabelClass } from './modules/objectProps';
 import { sortData } from './modules/data/api';
 import { scene } from './modules/scene';
@@ -172,23 +171,6 @@ fetch('./../solarSystemData.json')
 			const dPlanetLabelClass = new PlanetLabelClass(dPlanet);
 			dPlanetLabelClass.build();
 		});
-
-		buildPlanet(sunData).then((sunGroup) => {
-			sunGroup.name = 'Sun Group';
-			// scene.add(sunGroup);
-			orrery.bodies._planetLabels.find((l) => l.name.includes('Sun')).add(sunGroup);
-			orrery.bodies.meshes._sun = sunGroup;
-		});
-
-		rawPlanetData
-			.filter((p) => p.material !== undefined)
-			.forEach((planet) => {
-				buildPlanet(planet).then((builtPlanet) => {
-					scene.add(builtPlanet);
-					orrery.bodies._planetLabels.find((l) => l.name.includes(builtPlanet.name)).add(builtPlanet);
-					orrery.bodies.meshes._planets.push(builtPlanet);
-				});
-			});
 
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);

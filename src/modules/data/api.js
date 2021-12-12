@@ -2,6 +2,7 @@
 import { settings } from '../settings';
 import { getRandomArbitrary, calculateOrbit, currentDateTime, convertToCamelCase } from '../utils';
 import { orrery } from '../orrery';
+import { materialData } from './solarSystem';
 
 const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
 const majorMoons = [
@@ -149,6 +150,8 @@ const sortData = (data) => {
 		item.obliquityOfEcliptic = 23.4293 - 3.563e-7 * currentDateTime();
 
 		item.key = convertToCamelCase(item.englishName);
+		item.materialData = materialData[item.key] || null;
+		item.diameter = item.meanRadius * 2;
 	});
 
 	const sun = orrery.bodies._all.find((item) => item.englishName === 'Sun');
@@ -166,6 +169,7 @@ const sortData = (data) => {
 		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
+		moon.materialData = materialData[moon.key] || null;
 		const { x, y, z } = startingOrbitPosition(moon);
 		moon.startingPosition = { x, y, z };
 	});

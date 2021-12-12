@@ -36,18 +36,14 @@ const orrery = {
 		_dwarfPlanets: [],
 		_starField: null,
 		_asteroidBelt: null,
-		_planetLabels: [],
-		_moonLabels: [],
-		_dwarfPlanetLabels: [],
-		_planets: [],
+		_planetLabels: {},
+		_moonLabels: {},
+		_dwarfPlanetLabels: {},
+		_planets: {},
 		_allPlanets: [],
 		_moons: [],
 		_satellites: [],
-		_orbitLines: [],
-		meshes: {
-			_sun: {},
-			_planets: []
-		}
+		_orbitLines: []
 	},
 	orbitLines: {
 		_orbitLinesVisible: true

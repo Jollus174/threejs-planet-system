@@ -118,7 +118,7 @@ class CSS2DRenderer {
 					if (element.classList.contains('is-moon')) opacityFalloff = 1.5; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
 					if (element.classList.contains('is-major-moon')) opacityFalloff = 1.75; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
 					if (element.classList.contains('is-dwarf-planet')) opacityFalloff = 1;
-					element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
+					// element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
 				}
 
 				element.dataset.labelName = element.textContent.toLowerCase();

@@ -7,9 +7,13 @@ import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
+import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
 import { gsap } from 'gsap';
+import fragmentShader from './shaders/glow/fragmentShader.glsl';
+import vertexShader from './shaders/glow/vertexShader.glsl';
+import { materialData as rawMaterialData } from './data/solarSystem';
 
 const planetRangeThreshold = 150000000; // Jupiter moons appear from Ceres at higher range...
 // TODO: set it at this range only for the planet/moon that's targeted
@@ -144,6 +148,7 @@ class MoonLabelClass {
 		this.data = data;
 		this.labelDiv = document.createElement('div');
 		this.labelGroup = new THREE.Group();
+		this.meshGroup = null;
 		this.intervalCheckDistance = null;
 		this.planetGroup = planetGroup;
 		this.fadingIn = false;
@@ -201,7 +206,45 @@ class MoonLabelClass {
 		gsap.to(this.labelDiv.querySelector('.label-content'), {
 			opacity: 1,
 			duration: 1,
-			onComplete: () => {}
+			onComplete: () => {
+				// TODO: meshes should start invisible, or build when the camera is close enough
+				this.buildMoonMesh();
+			}
+		});
+	}
+
+	buildMoonMesh() {
+		// will return a promise
+		const constructMoonMesh = async () => {
+			if (this.meshGroup) return this.meshGroup;
+
+			const materialData = this.data.materialData || rawMaterialData.moon;
+			const segments = materialData.segments || 32;
+
+			const material = {
+				map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
+				normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
+				emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
+				transparent: false,
+				emissive: materialData.emissive || null,
+				emissiveIntensity: materialData.emissiveIntensity || null
+			};
+
+			const moonGroup = new THREE.Group();
+			moonGroup.class = this;
+			moonGroup.name = `${this.data.englishName} group`;
+
+			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
+			const moonMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
+			moonMesh.name = `${this.data.englishName} mesh`;
+			moonGroup.add(moonMesh);
+
+			return moonGroup;
+		};
+
+		constructMoonMesh().then((meshGroup) => {
+			this.meshGroup = meshGroup;
+			this.labelGroup.add(meshGroup);
 		});
 	}
 
@@ -286,6 +329,7 @@ class PlanetLabelClass {
 		this.data = data;
 		this.labelDiv = document.createElement('div');
 		this.labelGroup = new THREE.Group();
+		this.meshGroup = null;
 		this.intervalCheckDistance = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
@@ -315,7 +359,7 @@ class PlanetLabelClass {
 		this.labelGroup.name = `${this.data.englishName} group label`;
 		this.labelGroup.data = this.data;
 		this.labelGroup.add(CSSObj);
-		orrery.bodies._planetLabels.push(this.labelGroup);
+		orrery.bodies._planetLabels[this.data.key] = this.labelGroup;
 
 		// calculate orbit
 		if (this.data.startingPosition) {
@@ -336,6 +380,7 @@ class PlanetLabelClass {
 		if (this.data.moons && this.data.moons.length) {
 			this.data.moons.forEach((moon) => {
 				// now rather than pushing to an array, using key/value pairs for easier referencing
+				// is scoped to the planet so can more easily run them through like an array if need tbe
 				this.moonClasses[moon.key] = {};
 				this.moonClasses[moon.key].class = new MoonLabelClass(moon, this.labelGroup);
 				this.moonClasses[moon.key].isBuilt = false;
@@ -350,6 +395,67 @@ class PlanetLabelClass {
 		this.intervalCheckDistance = setInterval(() => {
 			this.handleDistance();
 		}, 200);
+
+		if (this.data.materialData) {
+			this.buildPlanetMesh();
+		}
+	}
+
+	buildPlanetMesh() {
+		// will return a promise
+		const constructPlanetMesh = async () => {
+			if (this.meshGroup) return this.meshGroup;
+
+			const materialData = this.data.materialData;
+			const segments = materialData.segments || 32;
+
+			const material = {
+				map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
+				normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
+				emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
+				transparent: false,
+				emissive: materialData.emissive || null,
+				emissiveIntensity: materialData.emissiveIntensity || null
+			};
+
+			const planetGroup = new THREE.Group();
+			planetGroup.class = this;
+			planetGroup.name = `${this.data.englishName} group`;
+
+			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
+			const planetMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
+			planetMesh.name = `${this.data.englishName} mesh`;
+			planetGroup.add(planetMesh);
+
+			// if (this.data.englishName === 'Sun') {
+			// 	const shaderMaterial = new THREE.ShaderMaterial({
+			// 		uniforms: {
+			// 			viewVector: {
+			// 				type: 'v3',
+			// 				value: orrery.camera.position
+			// 			}
+			// 		},
+			// 		vertexShader,
+			// 		fragmentShader,
+			// 		// side: THREE.FrontSide,
+			// 		side: THREE.DoubleSide,
+			// 		blending: THREE.AdditiveBlending,
+			// 		transparent: true
+			// 	});
+
+			// 	const planetGlowMesh = new THREE.Mesh(geometry, shaderMaterial);
+			// 	planetGroup.add(planetGlowMesh);
+			// 	planetGroup.glow = planetGlowMesh;
+			// 	planetGlowMesh.scale.set(1.2, 1.2, 1.2);
+			// }
+
+			return planetGroup;
+		};
+
+		constructPlanetMesh().then((meshGroup) => {
+			this.meshGroup = meshGroup;
+			this.labelGroup.add(meshGroup);
+		});
 	}
 
 	fadeOut() {

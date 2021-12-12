@@ -66,7 +66,6 @@ const handleLabelClick = (data, labelGroup) => {
 		const wikiKey = clickedItem.wikipediaKey || clickedItem.englishName;
 		getWikipediaData(wikiKey)
 			.then((response) => {
-				console.log(response);
 				clickedItem.title = response.title;
 				clickedItem.content = response.content;
 				clickedItem.image = response.image;
