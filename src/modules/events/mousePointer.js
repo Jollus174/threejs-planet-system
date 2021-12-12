@@ -51,29 +51,25 @@ const initMousePointerEvents = () => {
 	});
 };
 
-const handleLabelClick = (data) => {
+const handleLabelClick = (data, labelGroup) => {
 	orrery.controls.saveState(); // saving state so can use the [Back] button
 	document.querySelector('#btn-back').disabled = false;
-	const dataStorageKey = data.aroundPlanet ? '_moonLabels' : '_planetLabels';
-	const clickedGroupIndex = orrery.bodies[dataStorageKey].findIndex((p) =>
-		p.data.englishName.includes(data.englishName)
-	);
-	const clickedGroup = orrery.bodies[dataStorageKey][clickedGroupIndex]; // we want to reference + cache content to the original data
+	const clickedItem = data;
 
 	orrery.cameraState._zoomToTarget = true;
-	controls.minDistance = clickedGroup.data.meanRadius * 8;
+	controls.minDistance = clickedItem.meanRadius * 8;
 	document.querySelector('#btn-modal-info').disabled = false;
-	orrery.mouseState._clickedGroup = clickedGroup; // to get the camera moving
+	orrery.mouseState._clickedGroup = labelGroup; // to get the camera moving
 
 	// updating modal with Wikipedia data
-	if (!clickedGroup.data.content) {
-		const wikiKey = clickedGroup.data.wikipediaKey || clickedGroup.data.englishName;
+	if (!clickedItem.content) {
+		const wikiKey = clickedItem.wikipediaKey || clickedItem.englishName;
 		getWikipediaData(wikiKey)
 			.then((response) => {
 				console.log(response);
-				clickedGroup.data.title = response.title;
-				clickedGroup.data.content = response.content;
-				clickedGroup.data.image = response.image;
+				clickedItem.title = response.title;
+				clickedItem.content = response.content;
+				clickedItem.image = response.image;
 			})
 			.catch((err) => {
 				console.error(err);

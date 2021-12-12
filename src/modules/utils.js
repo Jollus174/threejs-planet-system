@@ -12,25 +12,41 @@ const getRandomArbitrary = (min, max) => {
 	return Math.random() * (max - min) + min;
 };
 
-const calculateOrbit = (i, data, parentPlanetData) => {
-	const perihelion = parentPlanetData ? parentPlanetData.meanRadius + data.perihelion : data.perihelion;
-	const aphelion = parentPlanetData ? parentPlanetData.meanRadius + data.aphelion : data.aphelion;
+const calculateOrbit = (index, data, parentPlanetData) => {
 	const semimajorAxis = parentPlanetData ? parentPlanetData.meanRadius + data.semimajorAxis : data.semimajorAxis;
-	const eccentricity = data.eccentricity;
+	// http://www.stjarnhimlen.se/comp/ppcomp.html#4
+	// finding eccentric anomaly
+	const M = MathUtils.degToRad(data.meanAnomaly + index); // mean anomaly (in radians) (this is what will iterate)
+	const e = data.eccentricity;
+	const a = semimajorAxis;
+	const N = MathUtils.degToRad(data.longAscNode); // long of asc node (in radians)
+	const w = MathUtils.degToRad(data.argPeriapsis); // arg of periapis (in radians)
+	const i = MathUtils.degToRad(data.inclination);
 
-	// TODO: If I ever implement orbit over time, then longAscNode will need to gradually change
-	const theta = i; // correct...
-	const rotation = MathUtils.degToRad(data.longAscNode); // this does NOT get iterated upon
+	// iterating for accuracy
+	let E = M + e * Math.sin(M) * (1.0 + e * Math.cos(M));
+	E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+	E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
 
-	// polar ellipse rotation
-	// https://www.desmos.com/calculator/zc5zdjqzln
-	const r = (semimajorAxis * (1 - Math.pow(eccentricity, 2))) / (1 - eccentricity * Math.cos(theta - rotation));
-	// converting from polar to cartesian
-	const x = r * Math.cos(theta);
-	const z = r * Math.sin(theta);
-	const y = x * (data.inclination / 90);
-	// https://www.mathwarehouse.com/trigonometry/sine-cosine-tangent-practice3.php
-	// const y = x * Math.tan(data.inclination);
+	// v = True Anomaly
+	// a = semi-major axis
+	// xv = r * cos(v) = a * ( cos(E) - e )
+	// yv = r * sin(v) = a * ( sqrt(1.0 - e*e) * sin(E) )
+	// v = atan2( yv, xv )
+	// r = sqrt( xv*xv + yv*yv )
+	const xv = a * (Math.cos(E) - e);
+	const yv = a * (Math.sqrt(1 - Math.pow(e, 2)) * Math.sin(E));
+	const v = Math.atan2(yv, xv);
+	const r = Math.sqrt(Math.pow(xv, 2) + Math.pow(yv, 2));
+
+	// Now for the position in space...
+	const x = r * (Math.cos(N) * Math.cos(v + w) - Math.sin(N) * Math.sin(v + w) * Math.cos(i));
+	const y = r * (Math.sin(v + w) * Math.sin(i));
+	const z = r * (Math.sin(N) * Math.cos(v + w) + Math.cos(N) * Math.sin(v + w) * Math.cos(i));
+
+	// ecliptic longitude and latitude
+	// const lonecl = Math.atan2(yh, xh);
+	// const latecl = Math.atan2(zh, Math.sqrt(xh * xh + yh * yh));
 
 	return { x, y, z };
 };
@@ -134,6 +150,29 @@ const convertToCamelCase = (str) => {
 		.join('');
 };
 
+const currentDateTime = () => {
+	const currDate = new Date();
+	const day = currDate.getDate();
+	const month = currDate.getMonth();
+	const year = currDate.getFullYear();
+
+	// const d = 367 * year - (7 * (year + (month + 9) / 12)) / 4 + (275 * month) / 9 + day - 730530; // days since 2000
+	// 7981.444444444496
+	const d =
+		367 * year -
+		(7 * (year + (month + 9) / 12)) / 4 -
+		(3 * ((year + (month - 9) / 7) / 100 + 1)) / 4 +
+		(275 * month) / 9 +
+		day -
+		730515; // days since 2000 (should work for all time)
+	// 7980
+
+	return d;
+};
+
+const kmToAU = (km) => km / 149598000;
+const AUToKm = (au) => au * 149598000;
+
 export {
 	getStandardDeviation,
 	getRandomArbitrary,
@@ -147,5 +186,8 @@ export {
 	getBreakpoint,
 	checkIfDesktop,
 	convertToKebabCase,
-	convertToCamelCase
+	convertToCamelCase,
+	currentDateTime,
+	kmToAU,
+	AUToKm
 };

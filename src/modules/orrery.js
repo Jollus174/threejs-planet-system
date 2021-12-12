@@ -26,6 +26,10 @@ const orrery = {
 		_hoveredGroups: []
 	},
 	skybox: null,
+	classes: {
+		_planets: {},
+		_dwarfPlanets: {}
+	},
 	bodies: {
 		_all: [],
 		_sun: {},
@@ -40,13 +44,6 @@ const orrery = {
 		_moons: [],
 		_satellites: [],
 		_orbitLines: [],
-		_inRange: [],
-		classes: {
-			_planetLabels: [],
-			_moonLabels: [],
-			_dwarfLabels: [],
-			_orbitLines: []
-		},
 		meshes: {
 			_sun: {},
 			_planets: []

@@ -26,7 +26,7 @@ let delta;
 const domTarget = document.querySelector('#bg');
 const renderer = new THREE.WebGLRenderer({
 	// powerPreference: 'high-performance',
-	powerPreference: 'low-power',
+	// powerPreference: 'low-power',
 	stencil: false,
 	canvas: domTarget,
 	antialias: true
@@ -161,18 +161,15 @@ fetch('./../solarSystemData.json')
 		// Building Labels
 		// --------------------
 		const sunLabelClass = new PlanetLabelClass(orrery.bodies._sun);
-		orrery.bodies.classes._planetLabels.push(sunLabelClass);
 		sunLabelClass.build();
 
 		orrery.bodies._planets.forEach((planet) => {
 			const planetLabelClass = new PlanetLabelClass(planet);
-			orrery.bodies.classes._planetLabels.push(planetLabelClass);
 			planetLabelClass.build();
 		});
 
 		orrery.bodies._dwarfPlanets.forEach((dPlanet) => {
 			const dPlanetLabelClass = new PlanetLabelClass(dPlanet);
-			orrery.bodies.classes._dwarfLabels.push(dPlanetLabelClass);
 			dPlanetLabelClass.build();
 		});
 
@@ -200,8 +197,8 @@ fetch('./../solarSystemData.json')
 
 		labelRenderer.render(scene, orrery.camera);
 
-		orrery.camera.position.y = 15000000000;
-		orrery.camera.position.z = 10020000000;
+		orrery.camera.position.y = 120000000;
+		orrery.camera.position.z = 700000000;
 
 		// --------------------
 		// Setting Events
