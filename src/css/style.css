@@ -175,12 +175,12 @@ body::before {
 }
 
 .label-content {
-	position: relative;
 	cursor: pointer;
 	font-family: sans-serif;
 	font-size: 16px;
 	text-align: left;
 	transition: opacity 0.4s ease;
+	text-align: center;
 }
 
 .label .label-circle {
@@ -201,19 +201,24 @@ body::before {
 	transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.4s ease;
 }
 
+.label {
+	display: none;
+}
+.label.is-on-screen {
+	display: block;
+}
+
 .label .label-text {
-	margin-left: 12px;
-	margin-top: 3px;
+	position: relative;
+	top: 20px;
 	opacity: 1;
-	position: absolute;
-	top: -10px;
-	left: -3px;
-	white-space: nowrap;
 	display: inline-block;
+	margin-top: 3px;
+	padding: 3px 4px;
+	white-space: nowrap;
 	color: rgb(162, 162, 162);
 	font-weight: 700;
 	text-shadow: 1px 1px 0 black, -1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, 0 0 3px black;
-	padding: 3px 4px;
 	transition: border-width 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 }
 
@@ -221,6 +226,12 @@ body::before {
 .label.faded .label-circle {
 	opacity: 0;
 	pointer-events: none;
+}
+
+.label.behind-label .label-text,
+.label.behind-label .label-circle {
+	opacity: 0.1 !important;
+	pointer-events: none !important;
 }
 
 .label.is-moon.is-major-moon .label-text {

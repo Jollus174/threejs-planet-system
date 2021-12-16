@@ -11,6 +11,7 @@ import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
+import { initMousePointerEvents, returnHoveredGroup } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
 import { sortData } from './modules/data/api';
 import { scene } from './modules/scene';
@@ -212,4 +213,12 @@ fetch('./../solarSystemData.json')
 
 		// scene.add(orrery.bodies._starField);
 		// scene.add(orrery.bodies._asteroidBelt);
+
+		// sets z-indexing of planets to be correct
+		// checking for overlapping labels (and eventually labels behind planets...)
+		// the former needs to be done in the DOM
+		// the latter... I'm not completely sure yet
+		setInterval(() => {
+			labelRenderer.zOrder(scene);
+		}, 200);
 	});

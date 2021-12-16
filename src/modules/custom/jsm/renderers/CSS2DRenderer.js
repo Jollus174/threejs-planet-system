@@ -1,9 +1,12 @@
 /* globals Element */
 import { Matrix4, Object3D, Vector3 } from 'three';
+import { checkDOMElementOverlap } from './../../../utils';
 
 class CSS2DObject extends Object3D {
-	constructor(element) {
+	constructor(element, classRef) {
 		super();
+
+		this.classRef = classRef;
 
 		this.element = element || document.createElement('div');
 
@@ -56,34 +59,28 @@ class CSS2DRenderer {
 
 		this.domElement = domElement;
 
-		this.getSize = function () {
-			return {
-				width: _width,
-				height: _height
-			};
-		};
+		function getDistanceToSquared(object1, object2) {
+			_a.setFromMatrixPosition(object1.matrixWorld);
+			_b.setFromMatrixPosition(object2.matrixWorld);
 
-		this.render = function (scene, camera) {
-			if (scene.autoUpdate === true) scene.updateMatrixWorld();
-			if (camera.parent === null) camera.updateMatrixWorld();
+			return _a.distanceToSquared(_b);
+		}
 
-			_viewMatrix.copy(camera.matrixWorldInverse);
-			_viewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, _viewMatrix);
+		function isOnScreen(obj) {
+			return obj.visible && _vector.z >= -1 && _vector.z <= 1;
+		}
 
-			renderObject(scene, scene, camera);
-			zOrder(scene);
-		};
+		function filterAndFlatten(scene) {
+			const result = [];
 
-		this.setSize = function (width, height) {
-			_width = width;
-			_height = height;
+			scene.traverse(function (object) {
+				if (object.isCSS2DObject && object.element.classList.contains('is-on-screen')) {
+					result.push(object);
+				}
+			});
 
-			_widthHalf = _width / 2;
-			_heightHalf = _height / 2;
-
-			domElement.style.width = width + 'px';
-			domElement.style.height = height + 'px';
-		};
+			return result;
+		}
 
 		function renderObject(object, scene, camera) {
 			if (object.isCSS2DObject) {
@@ -111,20 +108,17 @@ class CSS2DRenderer {
 						'px)';
 				}
 
-				element.style.display = object.visible && _vector.z >= -1 && _vector.z <= 1 ? '' : 'none';
-
-				if (!element.classList.contains('is-planet')) {
-					let opacityFalloff = 1; // with 1 (min) being linear scale of opacity 0 at the outer edges of the canvas and 1 at the centre
-					if (element.classList.contains('is-moon')) opacityFalloff = 1.5; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
-					if (element.classList.contains('is-major-moon')) opacityFalloff = 1.75; // moons to stay more visible since they aren't always rendered (are completely contextual to their planet)
-					if (element.classList.contains('is-dwarf-planet')) opacityFalloff = 1;
-					// element.style.opacity = 1 - (Math.abs(_vector.x) / opacityFalloff + Math.abs(_vector.y) / opacityFalloff / 2);
+				if (isOnScreen(object)) {
+					element.classList.add('is-on-screen');
+				} else {
+					element.classList.remove('is-on-screen');
 				}
 
 				element.dataset.labelName = element.textContent.toLowerCase();
 
 				const objectData = {
-					distanceToCameraSquared: getDistanceToSquared(camera, object)
+					distanceToCameraSquared: getDistanceToSquared(camera, object),
+					data: object.classRef.data
 				};
 
 				cache.objects.set(object, objectData);
@@ -141,47 +135,91 @@ class CSS2DRenderer {
 			}
 		}
 
-		function getDistanceToSquared(object1, object2) {
-			_a.setFromMatrixPosition(object1.matrixWorld);
-			_b.setFromMatrixPosition(object2.matrixWorld);
+		this.getSize = function () {
+			return {
+				width: _width,
+				height: _height
+			};
+		};
 
-			return _a.distanceToSquared(_b);
-		}
+		this.render = function (scene, camera) {
+			if (scene.autoUpdate === true) scene.updateMatrixWorld();
+			if (camera.parent === null) camera.updateMatrixWorld();
 
-		function filterAndFlatten(scene) {
-			const result = [];
+			_viewMatrix.copy(camera.matrixWorldInverse);
+			_viewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, _viewMatrix);
 
-			scene.traverse(function (object) {
-				if (object.isCSS2DObject) result.push(object);
-			});
+			renderObject(scene, scene, camera);
+		};
 
-			return result;
-		}
+		this.setSize = function (width, height) {
+			_width = width;
+			_height = height;
 
-		function zOrder(scene) {
+			_widthHalf = _width / 2;
+			_heightHalf = _height / 2;
+
+			domElement.style.width = width + 'px';
+			domElement.style.height = height + 'px';
+		};
+
+		// zOrder with the overlapping computation on every frame could be expensive
+		// am putting this in an interval loop instead of the RAF
+		this.zOrder = function (scene) {
 			const sorted = filterAndFlatten(scene).sort(function (a, b) {
-				const distanceA = cache.objects.get(a).distanceToCameraSquared;
-				const distanceB = cache.objects.get(b).distanceToCameraSquared;
+				const objectA = cache.objects.get(a);
+				const objectB = cache.objects.get(b);
 
-				return distanceA - distanceB;
+				let distanceAFromCamera = objectA.distanceToCameraSquared;
+				let distanceBFromCamera = objectB.distanceToCameraSquared;
+
+				// TODO: the fading order should be influenced here, but not the zIndex
+				// hacky way to make the Sun realllly close away so it has the highest z-index (since the below loop starts with highest z-index)
+				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = 0.001;
+				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = 0.001;
+
+				if (objectA.data.englishName === 'Sun' || objectA.data.isPlanet || objectA.data.isMajorMoon)
+					distanceAFromCamera = objectA.distanceToCameraSquared * 0.0001;
+				if (objectB.data.englishName === 'Sun' || objectB.data.isPlanet || objectB.data.isMajorMoon)
+					distanceBFromCamera = objectB.distanceToCameraSquared * 0.0001;
+
+				return distanceBFromCamera - distanceAFromCamera;
 			});
 
-			const zMax = sorted.length;
+			// console.log(sorted.map((s) => s.parent.data.englishName));
 
-			for (let i = 0, l = sorted.length; i < l; i++) {
-				if (sorted[i].element.classList.contains('is-sun')) {
-					sorted[i].element.style.zIndex = zMax + 1000 - i;
-				} else if (
-					sorted[i].element.classList.contains('is-planet') ||
-					sorted[i].element.classList.contains('is-major-moon')
-				) {
-					sorted[i].element.style.zIndex = zMax + 100 - i;
-				} else {
-					sorted[i].element.style.zIndex = zMax - i;
-					// set opacity based on how close to the centre the label is...
+			const newLabelDimensionsObj = {};
+			for (let i = 0; i < sorted.length; i++) {
+				sorted[i].element.style.zIndex = i;
+
+				// this is great, since it already skips the ones that aren't on screen
+				const labelA = sorted[i].element;
+				let clientRectA = newLabelDimensionsObj[i];
+				if (!clientRectA) {
+					clientRectA = labelA.getBoundingClientRect();
+					newLabelDimensionsObj[i] = clientRectA;
+				}
+
+				// iterating forwards through the labels, to see if any are overlapping
+				for (let j = i + 1; j < sorted.length; j++) {
+					const labelB = sorted[j].element;
+					let clientRectB = newLabelDimensionsObj[j];
+					if (!clientRectB) {
+						clientRectB = labelB.getBoundingClientRect();
+						newLabelDimensionsObj[j] = clientRectB;
+					}
+					const isOverlapping = checkDOMElementOverlap(clientRectA, clientRectB);
+					if (isOverlapping) {
+						// abort loop for the div it's underneath another one; don't need to keep checking this div against others for other overlaps
+						labelA.classList.add('behind-label');
+						// console.log(`${labelA.textContent.trim()} overlapped by ${labelB.textContent.trim()}`);
+						break;
+					} else {
+						labelA.classList.remove('behind-label');
+					}
 				}
 			}
-		}
+		};
 	}
 }
 

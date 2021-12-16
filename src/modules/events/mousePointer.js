@@ -13,23 +13,7 @@ const raycaster = new Raycaster();
 const returnHoveredGroup = () => {
 	raycaster.setFromCamera(mouse, orrery.camera);
 	const intersects = raycaster.intersectObjects(orrery.scene.children, true);
-	let objsClickable = intersects.filter(
-		(intersect) => intersect.object && intersect.object.name.includes('click target')
-	);
-
-	const findParentGroup = (obj) => {
-		let objParent = obj.parent;
-		if (!objParent) return null;
-		if (objParent.type === 'Group') return objParent;
-		objParent = objParent.parent;
-		if (objParent.type === 'Group') return objParent;
-		objParent = objParent.parent;
-		if (objParent.type === 'Group') return objParent;
-
-		return null;
-	};
-
-	return objsClickable.length && objsClickable[0].object ? findParentGroup(objsClickable[0].object) : null;
+	return intersects;
 };
 
 // const hasClickedSameTarget = () =>

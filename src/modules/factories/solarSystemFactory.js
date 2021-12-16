@@ -97,21 +97,6 @@ const buildPlanet = async (planetData) => {
 	planetGroup.data.zoomTo = planetData.zoomTo || planetGroup.data.diameter * 100000;
 	planetGroup.data.cameraDistance = null; // to set in the render loop
 
-	// planetGroup.textLabel = textLabel.build(planetGroup);
-	// planetGroup.add(planetGroup.textLabel);
-
-	// planetGroup.textGroup = text.build(planetGroup);
-	// if (planetGroup.textGroup) planetGroup.add(planetGroup.textGroup);
-
-	// planetGroup.labelLine = labelLine.build(planetData);
-	// if (planetGroup.labelLine) planetGroup.add(planetGroup.labelLine);
-
-	// planetGroup.targetLine = targetLine.build(planetData);
-	// if (planetGroup.targetLine) planetGroup.add(planetGroup.targetLine);
-
-	// planetGroup.clickTarget = clickTarget.build(planetData);
-	// if (planetGroup.clickTarget) planetGroup.add(planetGroup.clickTarget);
-
 	// planetGroup.rings = rings.build(planetData);
 	// if (planetGroup.rings) planetGroup.rings.forEach((ring) => planetGroup.add(ring));
 
@@ -259,4 +244,4 @@ const starField = () => {
 	return starfieldObj;
 };
 
-export { skybox, starField, asteroidBelt, buildPlanet, buildMoon };
+export { skybox, starField, asteroidBelt };

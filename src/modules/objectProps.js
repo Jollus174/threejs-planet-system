@@ -15,7 +15,7 @@ import fragmentShader from './shaders/glow/fragmentShader.glsl';
 import vertexShader from './shaders/glow/vertexShader.glsl';
 import { materialData as rawMaterialData } from './data/solarSystem';
 
-const planetRangeThreshold = 150000000; // Jupiter moons appear from Ceres at higher range...
+const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
 // TODO: set it at this range only for the planet/moon that's targeted
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
 const innerMoonRangeThreshold = 1700000;
@@ -157,7 +157,7 @@ class MoonLabelClass {
 		this.isInRange = false;
 
 		this.OrbitLine = new OrbitLine(data, this.labelGroup);
-		// this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
 	}
 
 	build() {
@@ -167,6 +167,7 @@ class MoonLabelClass {
 		this.labelDiv.className = `label is-moon ${this.data.isMajorMoon ? 'is-major-moon' : ''} ${
 			this.data.isInnerMoon ? 'is-inner-moon faded' : ''
 		}`;
+		this.labelDiv.dataset.selector = 'label';
 		this.labelDiv.style.color = this.data.labelColour;
 		this.labelDiv.innerHTML = `
 			<div class="label-content" style="opacity: 0;">
@@ -174,7 +175,7 @@ class MoonLabelClass {
 				<div class="label-text">${this.data.englishName}</div>
 			</div>
 			`;
-		const CSSObj = new CSS2DObject(this.labelDiv);
+		const CSSObj = new CSS2DObject(this.labelDiv, this);
 		CSSObj.position.set(0, 0, 0);
 
 		this.labelGroup.name = `${this.data.englishName} group label`;
@@ -284,7 +285,7 @@ class MoonLabelClass {
 				// fixing conflict here with what the PLANET wants to do...
 				// this will prevent flickering
 				// if we don't do this, the orbit lines won't fade back in...
-				if (distanceFromPlanet < planetRangeThreshold) {
+				if (this.orbitLineVisibleAtBuild && distanceFromPlanet < planetRangeThreshold) {
 					this.OrbitLine.fadeIn();
 				}
 			}
@@ -344,6 +345,7 @@ class PlanetLabelClass {
 		this.labelDiv.className = `label ${
 			this.data.isPlanet || this.data.englishName === 'Sun' ? 'is-planet' : 'is-dwarf-planet'
 		} ${this.data.isSun ? 'is-sun' : ''}`;
+		this.labelDiv.dataset.selector = 'label';
 		this.labelDiv.style.color = this.data.labelColour;
 		this.labelDiv.innerHTML = `
 			<div class="label-content" style="opacity: 0;">
@@ -353,7 +355,7 @@ class PlanetLabelClass {
 				};">${this.data.englishName}</div>
 			</div>
 			`;
-		const CSSObj = new CSS2DObject(this.labelDiv);
+		const CSSObj = new CSS2DObject(this.labelDiv, this);
 		CSSObj.position.set(0, 0, 0);
 
 		this.labelGroup.name = `${this.data.englishName} group label`;
@@ -524,7 +526,8 @@ class PlanetLabelClass {
 				this.OrbitLine.fadeIn();
 			}
 		} else {
-			orrery.cameraState._currentPlanetInRange = '';
+			orrery.cameraState._currentPlanetInRange = ''; // without this on the moons will never disappear
+
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
 				Object.values(this.moonClasses).forEach((m, i) => {
 					if (m.isBuilt) {

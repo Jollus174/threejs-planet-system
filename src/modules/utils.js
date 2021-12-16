@@ -19,7 +19,7 @@ const calculateOrbit = (index, data, parentPlanetData) => {
 	const M = MathUtils.degToRad(data.meanAnomaly + index); // mean anomaly (in radians) (this is what will iterate)
 	const e = data.eccentricity;
 	const a = semimajorAxis;
-	const N = MathUtils.degToRad(data.longAscNode); // long of asc node (in radians)
+	const N = MathUtils.degToRad(data.longAscNode); // longitude of ascending node (in radians)
 	const w = MathUtils.degToRad(data.argPeriapsis); // arg of periapis (in radians)
 	const i = MathUtils.degToRad(data.inclination);
 
@@ -136,6 +136,10 @@ const getBreakpoint = () =>
 
 const checkIfDesktop = () => ['screen-lg', 'screen-xl'].includes(getBreakpoint());
 
+const checkDOMElementOverlap = (a, b) => {
+	return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+};
+
 const convertToKebabCase = (str) => {
 	return str.replace(/\W/g, '-').toLowerCase();
 };
@@ -185,6 +189,7 @@ export {
 	numberWithCommas,
 	getBreakpoint,
 	checkIfDesktop,
+	checkDOMElementOverlap,
 	convertToKebabCase,
 	convertToCamelCase,
 	currentDateTime,
