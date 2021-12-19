@@ -185,8 +185,8 @@ body::before {
 
 .label .label-circle {
 	border: 1px solid;
-	width: 12px;
-	height: 12px;
+	width: 10px;
+	height: 10px;
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.7);
 
@@ -197,7 +197,6 @@ body::before {
 	transform: translate(-50%, -50%);
 	will-change: transform;
 	box-shadow: 0 0 0 currentColor;
-	/* transition: background-color 0.4s ease, opacity 0.4s ease, border-color 0.4s ease; */
 	transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.4s ease;
 }
 
@@ -228,9 +227,11 @@ body::before {
 	pointer-events: none;
 }
 
-.label.behind-label .label-text,
+.label.behind-label .label-text {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
 .label.behind-label .label-circle {
-	opacity: 0.1 !important;
 	pointer-events: none !important;
 }
 
@@ -238,13 +239,13 @@ body::before {
 	color: rgb(255, 255, 255);
 }
 
-.label:hover .label-circle {
+.label:not(.behind-label):hover .label-circle {
 	background-color: currentColor;
 	border-color: white;
 	box-shadow: 0 0 5px currentColor;
 }
 
-.label:hover .label-text {
+.label:not(.behind-label):hover .label-text {
 	opacity: 1;
 	color: #fff;
 }

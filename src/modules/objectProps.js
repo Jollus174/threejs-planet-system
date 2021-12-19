@@ -4,7 +4,7 @@ import { createCircleFromPoints, ringUVMapGeometry } from './utils';
 import { orrery } from './orrery';
 import { scene } from './scene';
 import { settings } from './settings';
-import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, getRandomArbitrary } from './utils';
+import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, convertToCamelCase } from './utils';
 import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
@@ -27,19 +27,23 @@ const setOrbitVisibility = () => {
 };
 
 class OrbitLine {
-	constructor(data, objectGroup) {
+	constructor(data, classRef) {
 		this.data = data;
+		this.classRef = classRef;
 		this.orbitLineName = `${this.data.englishName} orbit line`;
-		this.objectGroup = objectGroup;
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
-		this.parentPlanetData = data.aroundPlanet
-			? orrery.bodies._allPlanets.find((p) => p.id === data.aroundPlanet.planet)
+		this.orbitLineVisibleAtBuild = !this.classRef.orbitLineVisibleAtBuild;
+		this.opacityDefault = this.data.isDwarfPlanet || this.data.isOuterMoon ? 0.2 : 1;
+		this.parentPlanetData = this.data.aroundPlanet
+			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
+		this.parentPlanetId = this.parentPlanetData ? convertToCamelCase(this.parentPlanetData.englishName) : null;
+		this.parentPlanetType = this.parentPlanetData ? (this.data.isDwarfPlanet ? '_dwarfPlanets' : '_planets') : null;
 	}
 
-	build({ renderInvisible = false } = {}) {
+	build() {
 		const isMoon = this.data.aroundPlanet;
 		const points = [];
 
@@ -48,7 +52,6 @@ class OrbitLine {
 			points.push(new THREE.Vector3(x, y, z));
 		}
 
-		const opacityDefault = this.data.isDwarfPlanet || this.data.isOuterMoon ? 0.2 : 1;
 		const orbitPoints = points;
 
 		// create geometry using all points on the circle
@@ -79,22 +82,17 @@ class OrbitLine {
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
 				opacity: 0,
-				visible: !renderInvisible,
+				visible: !this.classRef.orbitLineVisibleAtBuild,
 				blending: THREE.AdditiveBlending,
 				vertexColors: true
 			})
 		);
 
 		this.orbitLine.name = this.orbitLineName;
-		this.orbitLine.data = this.data;
-
-		this.orbitLine.data.renderInvisible = renderInvisible;
-		this.orbitLine.data.opacityDefault = opacityDefault;
-		orrery.bodies._orbitLines.push(this.orbitLine);
-		this.objectGroup.parent.add(this.orbitLine);
+		this.classRef.labelGroup.parent.add(this.orbitLine);
 
 		// initial page load
-		if (this.orbitLine.material.opacity === 0 && !this.orbitLine.data.renderInvisible) {
+		if (this.orbitLine.material.opacity === 0 && !this.classRef.orbitLineVisibleAtBuild) {
 			this.fadeIn();
 		}
 	}
@@ -115,11 +113,11 @@ class OrbitLine {
 	}
 
 	fadeIn() {
-		if (!this.fadingIn && this.orbitLine.material.opacity !== this.orbitLine.data.opacityDefault) {
+		if (!this.fadingIn && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
 			gsap.to(this.orbitLine.material, {
-				opacity: this.orbitLine.data.opacityDefault,
+				opacity: this.opacityDefault,
 				duration: 0.5,
 				onComplete: () => {
 					this.fadingIn = false;
@@ -136,7 +134,9 @@ class OrbitLine {
 				duration: 0.25,
 				onComplete: () => {
 					this.fadingOut = false;
-					this.objectGroup.removeFromParent();
+					orrery.classes[this.parentPlanetType][this.parentPlanetId].labelGroup.children
+						.find((o) => o.name === this.orbitLineName)
+						.removeFromParent();
 				}
 			});
 		}
@@ -156,8 +156,8 @@ class MoonLabelClass {
 		this.isAdded = false;
 		this.isInRange = false;
 
-		this.OrbitLine = new OrbitLine(data, this.labelGroup);
 		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+		this.OrbitLine = new OrbitLine(data, this);
 	}
 
 	build() {
@@ -202,7 +202,7 @@ class MoonLabelClass {
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		// limiting the number of orbitLines RENDERED to save memory
-		this.OrbitLine.build({ renderInvisible: !this.orbitLineVisibleAtBuild });
+		this.OrbitLine.build();
 
 		gsap.to(this.labelDiv.querySelector('.label-content'), {
 			opacity: 1,
@@ -338,7 +338,7 @@ class PlanetLabelClass {
 		this.planetTypeKey = this.data.isDwarfPlanet ? '_dwarfPlanets' : '_planets';
 
 		this.moonClasses = {};
-		this.OrbitLine = new OrbitLine(data, this.labelGroup, this);
+		this.OrbitLine = new OrbitLine(data, this);
 	}
 
 	build() {
@@ -383,9 +383,7 @@ class PlanetLabelClass {
 			this.data.moons.forEach((moon) => {
 				// now rather than pushing to an array, using key/value pairs for easier referencing
 				// is scoped to the planet so can more easily run them through like an array if need tbe
-				this.moonClasses[moon.key] = {};
-				this.moonClasses[moon.key].class = new MoonLabelClass(moon, this.labelGroup);
-				this.moonClasses[moon.key].isBuilt = false;
+				this.moonClasses[moon.key] = new MoonLabelClass(moon, this.labelGroup);
 			});
 		}
 
@@ -497,24 +495,15 @@ class PlanetLabelClass {
 	handleDistance() {
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
 
-		if (this.data.isInnerPlanet) {
-			if (orrery.cameraState._currentZoomDistanceThreshold === 0) {
-				this.labelDiv.classList.remove('faded');
-			} else {
-				this.labelDiv.classList.add('faded');
-			}
-		}
-
 		if (distance < planetRangeThreshold) {
 			orrery.cameraState._currentPlanetInRange = this.data.key;
 			// staggering the building of moon classes to help with performance
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
-					if (!moonClass.isBuilt) {
-						moonClass.isBuilt = true;
+					if (!moonClass.isAdded) {
 						setTimeout(() => {
-							moonClass.class.build();
-						}, i * 50);
+							moonClass.build();
+						}, i * 10);
 					}
 				});
 			}
@@ -529,11 +518,11 @@ class PlanetLabelClass {
 			orrery.cameraState._currentPlanetInRange = ''; // without this on the moons will never disappear
 
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
-				Object.values(this.moonClasses).forEach((m, i) => {
-					if (m.isBuilt) {
-						m.isBuilt = false;
+				Object.values(this.moonClasses).forEach((moonClass, i) => {
+					if (moonClass.isAdded) {
+						moonClass.isAdded = false;
 						setTimeout(() => {
-							m.class.remove();
+							moonClass.remove();
 						}, i * 20);
 					}
 				});

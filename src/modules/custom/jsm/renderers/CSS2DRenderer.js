@@ -178,9 +178,9 @@ class CSS2DRenderer {
 				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = 0.001;
 				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = 0.001;
 
-				if (objectA.data.englishName === 'Sun' || objectA.data.isPlanet || objectA.data.isMajorMoon)
+				if (objectA.data.englishName === 'Sun' || objectA.data.isPlanet || objectA.data.isDwarfPlanet)
 					distanceAFromCamera = objectA.distanceToCameraSquared * 0.0001;
-				if (objectB.data.englishName === 'Sun' || objectB.data.isPlanet || objectB.data.isMajorMoon)
+				if (objectB.data.englishName === 'Sun' || objectB.data.isPlanet || objectB.data.isDwarfPlanet)
 					distanceBFromCamera = objectB.distanceToCameraSquared * 0.0001;
 
 				return distanceBFromCamera - distanceAFromCamera;
@@ -208,7 +208,7 @@ class CSS2DRenderer {
 						clientRectB = labelB.getBoundingClientRect();
 						newLabelDimensionsObj[j] = clientRectB;
 					}
-					const isOverlapping = checkDOMElementOverlap(clientRectA, clientRectB);
+					const isOverlapping = checkDOMElementOverlap(clientRectA, clientRectB, 20);
 					if (isOverlapping) {
 						// abort loop for the div it's underneath another one; don't need to keep checking this div against others for other overlaps
 						labelA.classList.add('behind-label');
