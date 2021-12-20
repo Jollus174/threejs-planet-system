@@ -1,5 +1,5 @@
 'use strict';
-import { PointLight, PointLightHelper, SpotLight, SpotLightHelper, AmbientLight } from 'three';
+import { PointLight, PointLightHelper, SpotLight, SpotLightHelper, AmbientLight, Vector3 } from 'three';
 
 const pointLights = (addHelper) => {
 	const pointLights = [],
@@ -32,14 +32,13 @@ const spotLights = (addHelper) => {
 		const spotLight = new SpotLight(color, intensity, distance, angle, penumbra);
 		const positionAdjuster = i % 2 === 0 ? 10 : -10;
 
-		const positions = {
-			x: i < 2 ? positionAdjuster : 0,
-			y: i >= 2 && i < 3 ? positionAdjuster : 0,
-			z: i >= 3 ? positionAdjuster : 0
-		};
-		const { x, y, z } = positions;
+		const v = new Vector3();
+		v.setX(i < 2 ? positionAdjuster : 0);
+		v.setY(i >= 2 && i < 3 ? positionAdjuster : 0);
+		v.setZ(i >= 3 ? positionAdjuster : 0);
 
-		spotLight.position.set(x, y, z);
+		spotLight.position = new Vector3();
+		spotLight.position.copy(v);
 		spotLights.push(spotLight);
 
 		if (addHelper) spotLightHelpers.push(new SpotLightHelper(spotLight));

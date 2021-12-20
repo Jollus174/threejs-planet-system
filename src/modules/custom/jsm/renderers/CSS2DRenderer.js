@@ -74,7 +74,7 @@ class CSS2DRenderer {
 			const result = [];
 
 			scene.traverse(function (object) {
-				if (object.isCSS2DObject && object.element.classList.contains('is-on-screen')) {
+				if (object.isCSS2DObject && object.isOnScreen) {
 					result.push(object);
 				}
 			});
@@ -109,12 +109,12 @@ class CSS2DRenderer {
 				}
 
 				if (isOnScreen(object)) {
-					element.classList.add('is-on-screen');
+					element.style.display = 'block';
+					object.isOnScreen = true;
 				} else {
-					element.classList.remove('is-on-screen');
+					element.style.display = 'none';
+					object.isOnScreen = false;
 				}
-
-				element.dataset.labelName = element.textContent.toLowerCase();
 
 				const objectData = {
 					distanceToCameraSquared: getDistanceToSquared(camera, object),

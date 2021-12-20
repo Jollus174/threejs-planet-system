@@ -1,4 +1,5 @@
 'use strict';
+import { Vector3 } from 'three';
 import { settings } from '../settings';
 import { getRandomArbitrary, calculateOrbit, currentDateTime, convertToCamelCase } from '../utils';
 import { orrery } from '../orrery';
@@ -113,12 +114,14 @@ const sortData = (data) => {
 		const parentPlanetData = objectData.aroundPlanet
 			? data.find((allData) => allData.id === objectData.aroundPlanet.planet)
 			: null;
-		const { x, y, z } = calculateOrbit(
-			objectData.meanAnomaly, // TODO: this will be incorrect, but will do for now. Is not date-specific
-			objectData,
-			parentPlanetData
+		const v = new Vector3();
+		return v.copy(
+			calculateOrbit(
+				objectData.meanAnomaly, // TODO: this will be incorrect, but will do for now. Is not date-specific
+				objectData,
+				parentPlanetData
+			)
 		);
-		return { x, y, z };
 	};
 
 	// adding additional measurement fields to data
@@ -170,8 +173,8 @@ const sortData = (data) => {
 		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
 		moon.materialData = materialData[moon.key] || null;
-		const { x, y, z } = startingOrbitPosition(moon);
-		moon.startingPosition = { x, y, z };
+		moon.startingPosition = new Vector3();
+		moon.startingPosition.copy(startingOrbitPosition(moon));
 	});
 
 	const dwarfPlanetList = ['Pluto', 'Ceres', 'Eris', 'Makemake', 'Haumea', 'Orcus'];
@@ -182,9 +185,8 @@ const sortData = (data) => {
 		dwarfPlanet.isPlanet = false;
 		dwarfPlanet.isDwarfPlanet = true;
 		dwarfPlanet.labelColour = settings.planetColours.default;
-		dwarfPlanet.orbitRotationRandomiser = getRandomArbitrary(0, 360);
-		const { x, y, z } = startingOrbitPosition(dwarfPlanet);
-		dwarfPlanet.startingPosition = { x, y, z };
+		dwarfPlanet.startingPosition = new Vector3();
+		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
 			const moonNames = dwarfPlanet.moons.map((moonData) => moonData.moon);
 			dwarfPlanet.moons = [];
@@ -200,8 +202,8 @@ const sortData = (data) => {
 		// firstly get the moon names then clear the pre-existing moon array from the API of garbage
 		planet.labelColour = settings.planetColours[planet.englishName.toLowerCase()] || settings.planetColours.default;
 		planet.isInnerPlanet = innerPlanets.indexOf(planet.englishName) !== -1;
-		const { x, y, z } = startingOrbitPosition(planet);
-		planet.startingPosition = { x, y, z };
+		planet.startingPosition = new Vector3();
+		planet.startingPosition.copy(startingOrbitPosition(planet));
 		if (planet.moons && planet.moons.length) {
 			const moonNames = planet.moons.map((moonData) => moonData.moon); // is called 'moon' not 'name' in the data! Whack
 			planet.moons = [];
@@ -238,7 +240,7 @@ const getWikipediaData = async (articleTitle) => {
 		['action', 'query'],
 		['prop', 'extracts|pageimages'],
 		['exintro', '1'],
-		// ['explaintext', '1'], // we want the HTML, so just text content. Saves me needed to do extra formatting.
+		// ['explaintext', '1'], // we want the HTML, so just text content. Saves needing to do extra formatting.
 		['redirects', '1'],
 		['titles', articleTitle],
 		['origin', '*'],

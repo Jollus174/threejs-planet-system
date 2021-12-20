@@ -40,15 +40,16 @@ const calculateOrbit = (index, data, parentPlanetData) => {
 	const r = Math.sqrt(Math.pow(xv, 2) + Math.pow(yv, 2));
 
 	// Now for the position in space...
-	const x = r * (Math.cos(N) * Math.cos(v + w) - Math.sin(N) * Math.sin(v + w) * Math.cos(i));
-	const y = r * (Math.sin(v + w) * Math.sin(i));
-	const z = r * (Math.sin(N) * Math.cos(v + w) + Math.cos(N) * Math.sin(v + w) * Math.cos(i));
+	const vec3 = new Vector3();
+	vec3.setX(r * (Math.cos(N) * Math.cos(v + w) - Math.sin(N) * Math.sin(v + w) * Math.cos(i)));
+	vec3.setY(r * (Math.sin(v + w) * Math.sin(i)));
+	vec3.setZ(r * (Math.sin(N) * Math.cos(v + w) + Math.cos(N) * Math.sin(v + w) * Math.cos(i)));
 
 	// ecliptic longitude and latitude
 	// const lonecl = Math.atan2(yh, xh);
 	// const latecl = Math.atan2(zh, Math.sqrt(xh * xh + yh * yh));
 
-	return { x, y, z };
+	return vec3;
 };
 
 // draw a circle to a new canvas so we can render a circle texture (good for Points)

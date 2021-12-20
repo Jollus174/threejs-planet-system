@@ -235,6 +235,12 @@ body::before {
 	pointer-events: none !important;
 }
 
+.label.behind-planet .label-text,
+.label.behind-planet .label-circle {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+
 .label.is-moon.is-major-moon .label-text {
 	color: rgb(255, 255, 255);
 }

@@ -1,5 +1,5 @@
 'use strict';
-import { Raycaster, Vector2 } from 'three';
+import { Vector2 } from 'three';
 import { orrery } from '../orrery';
 import { settings } from '../settings';
 import { controls } from '../controls';
@@ -8,13 +8,13 @@ import { getWikipediaData } from '../data/api';
 
 const { _mouseClickTimeoutDefault } = settings.mouse;
 const mouse = new Vector2();
-const raycaster = new Raycaster();
+// const raycaster = new Raycaster();
 
-const returnHoveredGroup = () => {
-	raycaster.setFromCamera(mouse, orrery.camera);
-	const intersects = raycaster.intersectObjects(orrery.scene.children, true);
-	return intersects;
-};
+// const returnHoveredGroup = () => {
+// 	raycaster.setFromCamera(mouse, orrery.camera);
+// 	const intersects = raycaster.intersectObjects(orrery.scene.children, true);
+// 	return intersects;
+// };
 
 // const hasClickedSameTarget = () =>
 // 	orrery.mouseState._clickedGroup &&
@@ -60,4 +60,4 @@ const handleLabelClick = (data, labelGroup) => {
 	}
 };
 
-export { returnHoveredGroup, initMousePointerEvents, handleLabelClick };
+export { initMousePointerEvents, handleLabelClick };
