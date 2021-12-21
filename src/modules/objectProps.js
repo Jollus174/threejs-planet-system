@@ -1,16 +1,16 @@
 'use strict';
 import * as THREE from 'three';
+import { gsap } from 'gsap';
 import { createCircleFromPoints, ringUVMapGeometry } from './utils';
 import { orrery } from './orrery';
 import { scene } from './scene';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, convertToCamelCase } from './utils';
-import { textureLoader, fontLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
+import { textureLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
-import { gsap } from 'gsap';
 import fragmentShader from './shaders/glow/fragmentShader.glsl';
 import vertexShader from './shaders/glow/vertexShader.glsl';
 import { materialData as rawMaterialData } from './data/solarSystem';

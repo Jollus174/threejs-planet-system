@@ -11,11 +11,10 @@ import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
-import { initMousePointerEvents, returnHoveredGroup } from './modules/events/mousePointer';
+import { initMousePointerEvents } from './modules/events/mousePointer';
 import { PlanetLabelClass } from './modules/objectProps';
 import { sortData } from './modules/data/api';
 import { scene } from './modules/scene';
-import { camera } from './modules/camera';
 import { setModalEvents } from './modules/events/modals';
 
 window.settings = settings;

@@ -1,7 +1,7 @@
 // not my file, I'm just making small edits
 /* jshint ignore:start */
 import { EventDispatcher, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 } from 'three';
-import { orrery } from '../../../orrery';
+import { orrery } from '../../../../orrery';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
