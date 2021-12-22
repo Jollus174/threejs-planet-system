@@ -11,39 +11,39 @@ import {
 	LinearMipmapLinearFilter,
 	NearestFilter,
 	ClampToEdgeWrapping
-} from '../constants.js';
-import { Frustum } from '../math/Frustum.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
-import { WebGLAnimation } from './webgl/WebGLAnimation.js';
-import { WebGLAttributes } from './webgl/WebGLAttributes.js';
-import { WebGLBackground } from './webgl/WebGLBackground.js';
-import { WebGLBindingStates } from './webgl/WebGLBindingStates.js';
-import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
-import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
-import { WebGLClipping } from './webgl/WebGLClipping.js';
-import { WebGLCubeMaps } from './webgl/WebGLCubeMaps.js';
-import { WebGLCubeUVMaps } from './webgl/WebGLCubeUVMaps.js';
-import { WebGLExtensions } from './webgl/WebGLExtensions.js';
-import { WebGLGeometries } from './webgl/WebGLGeometries.js';
-import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
-import { WebGLInfo } from './webgl/WebGLInfo.js';
-import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
-import { WebGLMultisampleRenderTarget } from './WebGLMultisampleRenderTarget.js';
-import { WebGLObjects } from './webgl/WebGLObjects.js';
-import { WebGLPrograms } from './webgl/WebGLPrograms.js';
-import { WebGLProperties } from './webgl/WebGLProperties.js';
-import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
-import { WebGLRenderStates } from './webgl/WebGLRenderStates.js';
-import { WebGLRenderTarget } from './WebGLRenderTarget.js';
-import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
-import { WebGLState } from './webgl/WebGLState.js';
-import { WebGLTextures } from './webgl/WebGLTextures.js';
-import { WebGLUniforms } from './webgl/WebGLUniforms.js';
-import { WebGLUtils } from './webgl/WebGLUtils.js';
-import { WebXRManager } from './webxr/WebXRManager.js';
-import { WebGLMaterials } from './webgl/WebGLMaterials.js';
+} from '../../../../node_modules/three/src/constants';
+import { Frustum } from '../../../../node_modules/three/src/math/Frustum';
+import { Matrix4 } from '../../../../node_modules/three/src/math/Matrix4.js';
+import { Vector3 } from '../../../../node_modules/three/src/math/Vector3.js';
+import { Vector4 } from '../../../../node_modules/three/src/math/Vector4.js';
+import { WebGLAnimation } from '../../../../node_modules/three/src/renderers/webgl/WebGLAnimation';
+import { WebGLAttributes } from '../../../../node_modules/three/src/renderers/webgl/WebGLAttributes.js';
+import { WebGLBackground } from '../../../../node_modules/three/src/renderers/webgl/WebGLBackground.js';
+import { WebGLBindingStates } from '../../../../node_modules/three/src/renderers/webgl/WebGLBindingStates.js';
+import { WebGLBufferRenderer } from '../../../../node_modules/three/src/renderers/webgl/WebGLBufferRenderer.js';
+import { WebGLCapabilities } from '../../../../node_modules/three/src/renderers/webgl/WebGLCapabilities.js';
+import { WebGLClipping } from '../../../../node_modules/three/src/renderers/webgl/WebGLClipping.js';
+import { WebGLCubeMaps } from '../../../../node_modules/three/src/renderers/webgl/WebGLCubeMaps.js';
+import { WebGLCubeUVMaps } from '../../../../node_modules/three/src/renderers/webgl/WebGLCubeUVMaps.js';
+import { WebGLExtensions } from '../../../../node_modules/three/src/renderers/webgl/WebGLExtensions.js';
+import { WebGLGeometries } from '../../../../node_modules/three/src/renderers/webgl/WebGLGeometries.js';
+import { WebGLIndexedBufferRenderer } from '../../../../node_modules/three/src/renderers/webgl/WebGLIndexedBufferRenderer.js';
+import { WebGLInfo } from '../../../../node_modules/three/src/renderers/webgl/WebGLInfo.js';
+import { WebGLMorphtargets } from '../../../../node_modules/three/src/renderers/webgl/WebGLMorphtargets.js';
+import { WebGLMultisampleRenderTarget } from '../../../../node_modules/three/src/renderers/webglMultisampleRenderTarget.js';
+import { WebGLObjects } from '../../../../node_modules/three/src/renderers/webgl/WebGLObjects.js';
+import { WebGLPrograms } from '../../../../node_modules/three/src/renderers/webgl/WebGLPrograms.js';
+import { WebGLProperties } from '../../../../node_modules/three/src/renderers/webgl/WebGLProperties.js';
+import { WebGLRenderLists } from '../../../../node_modules/three/src/renderers/webgl/WebGLRenderLists.js';
+import { WebGLRenderStates } from '../../../../node_modules/three/src/renderers/webgl/WebGLRenderStates.js';
+import { WebGLRenderTarget } from '../../../../node_modules/three/src/renderers/webglRenderTarget.js';
+import { WebGLShadowMap } from '../../../../node_modules/three/src/renderers/webgl/WebGLShadowMap.js';
+import { WebGLState } from '../../../../node_modules/three/src/renderers/webgl/WebGLState.js';
+import { WebGLTextures } from '../../../../node_modules/three/src/renderers/webgl/WebGLTextures.js';
+import { WebGLUniforms } from '../../../../node_modules/three/src/renderers/webgl/WebGLUniforms.js';
+import { WebGLUtils } from '../../../../node_modules/three/src/renderers/webgl/WebGLUtils.js';
+import { WebXRManager } from '../../../../node_modules/three/src/renderers/webxr/WebXRManager.js';
+import { WebGLMaterials } from '../../../../node_modules/three/src/renderers/webgl/WebGLMaterials.js';
 
 function createCanvasElement() {
 	const canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
@@ -926,6 +926,8 @@ function WebGLRenderer(parameters = {}) {
 				}
 			} else if (object.isSprite) {
 				if (!object.frustumCulled || _frustum.intersectsSprite(object)) {
+					object.inFrustum = true;
+
 					if (sortObjects) {
 						_vector3.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
 					}
@@ -936,6 +938,8 @@ function WebGLRenderer(parameters = {}) {
 					if (material.visible) {
 						currentRenderList.push(object, geometry, material, groupOrder, _vector3.z, null);
 					}
+				} else {
+					object.inFrustum = false;
 				}
 			} else if (object.isImmediateRenderObject) {
 				if (sortObjects) {
@@ -954,6 +958,8 @@ function WebGLRenderer(parameters = {}) {
 				}
 
 				if (!object.frustumCulled || _frustum.intersectsObject(object)) {
+					object.inFrustum = true;
+
 					if (sortObjects) {
 						_vector3.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
 					}
@@ -975,6 +981,8 @@ function WebGLRenderer(parameters = {}) {
 					} else if (material.visible) {
 						currentRenderList.push(object, geometry, material, groupOrder, _vector3.z, null);
 					}
+				} else {
+					object.inFrustum = false;
 				}
 			}
 		}

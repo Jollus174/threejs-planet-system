@@ -197,7 +197,7 @@ body::before {
 	transform: translate(-50%, -50%);
 	will-change: transform;
 	box-shadow: 0 0 0 currentColor;
-	transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.4s ease;
+	transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.2s ease;
 }
 
 .label {
@@ -221,6 +221,18 @@ body::before {
 	transition: border-width 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 }
 
+.label.is-moon .label-circle {
+	width: 8px;
+	height: 8px;
+}
+.label.is-moon .label-text {
+	top: 18px;
+}
+
+.label.is-moon:not(.is-major-moon) .label-text {
+	font-size: 15px;
+}
+
 .label.faded .label-text,
 .label.faded .label-circle {
 	opacity: 0;
@@ -231,6 +243,7 @@ body::before {
 	opacity: 0 !important;
 	pointer-events: none !important;
 }
+
 .label.behind-label .label-circle {
 	pointer-events: none !important;
 }

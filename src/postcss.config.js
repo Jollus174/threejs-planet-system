@@ -14,7 +14,7 @@ module.exports = {
 					return contentWithoutStyleBlocks.match(/[A-Za-z0-9-_/:]*[A-Za-z0-9-_/]+/g) || [];
 				},
 				safelist: {
-					standard: [/label*/, /is-*/]
+					standard: [/label*/, /is-*/, /behind-*/]
 				}
 			})
 	]

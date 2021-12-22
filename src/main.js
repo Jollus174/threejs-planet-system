@@ -5,6 +5,7 @@ import './css/style.css';
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
 import { settings } from './modules/settings';
+import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo, checkIfDesktop } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
@@ -22,14 +23,7 @@ window.renderLoop;
 
 let delta;
 
-const domTarget = document.querySelector('#bg');
-const renderer = new THREE.WebGLRenderer({
-	// powerPreference: 'high-performance',
-	// powerPreference: 'low-power',
-	stencil: false,
-	canvas: domTarget,
-	antialias: true
-});
+window.renderer = renderer;
 
 const orbitCentroid = new THREE.Object3D();
 orbitCentroid.name = 'orbit centroid';
@@ -121,6 +115,7 @@ const render = () => {
 	// }
 
 	orrery.controls.update();
+
 	renderer.render(scene, orrery.camera);
 	labelRenderer.render(scene, orrery.camera);
 };

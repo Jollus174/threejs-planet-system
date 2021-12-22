@@ -59,22 +59,18 @@ class CSS2DRenderer {
 
 		this.domElement = domElement;
 
-		function getDistanceToSquared(object1, object2) {
-			_a.setFromMatrixPosition(object1.matrixWorld);
-			_b.setFromMatrixPosition(object2.matrixWorld);
+		function getDistanceToSquared(camera, object) {
+			_a.setFromMatrixPosition(camera.matrixWorld);
+			_b.setFromMatrixPosition(object.matrixWorld);
 
 			return _a.distanceToSquared(_b);
-		}
-
-		function isOnScreen(obj) {
-			return obj.visible && _vector.z >= -1 && _vector.z <= 1;
 		}
 
 		function filterAndFlatten(scene) {
 			const result = [];
 
 			scene.traverse(function (object) {
-				if (object.isCSS2DObject && object.isOnScreen) {
+				if (object.isCSS2DObject && object.inFrustum) {
 					result.push(object);
 				}
 			});
@@ -108,12 +104,14 @@ class CSS2DRenderer {
 						'px)';
 				}
 
-				if (isOnScreen(object)) {
+				const isOnScreen = object.visible && _vector.z >= -1 && _vector.z <= 1;
+				const isInView = -1 < _vector.x && _vector.x < 1 && -1 < _vector.y && _vector.y < 1;
+				if (isOnScreen && isInView) {
 					element.style.display = 'block';
-					object.isOnScreen = true;
+					object.inFrustum = true;
 				} else {
 					element.style.display = 'none';
-					object.isOnScreen = false;
+					object.inFrustum = false;
 				}
 
 				const objectData = {
@@ -178,10 +176,8 @@ class CSS2DRenderer {
 				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = 0.001;
 				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = 0.001;
 
-				if (objectA.data.englishName === 'Sun' || objectA.data.isPlanet || objectA.data.isDwarfPlanet)
-					distanceAFromCamera = objectA.distanceToCameraSquared * 0.0001;
-				if (objectB.data.englishName === 'Sun' || objectB.data.isPlanet || objectB.data.isDwarfPlanet)
-					distanceBFromCamera = objectB.distanceToCameraSquared * 0.0001;
+				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = objectA.distanceToCameraSquared * 0.0001;
+				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = objectB.distanceToCameraSquared * 0.0001;
 
 				return distanceBFromCamera - distanceAFromCamera;
 			});
@@ -199,6 +195,13 @@ class CSS2DRenderer {
 					clientRectA = labelA.getBoundingClientRect();
 					newLabelDimensionsObj[i] = clientRectA;
 				}
+
+				if (sorted[i].classRef.fadingIn || sorted[i].classRef.fadingOut) {
+					return;
+				}
+
+				// to account for top-most label
+				if (i + 1 === sorted.length) labelA.classList.remove('behind-label');
 
 				// iterating forwards through the labels, to see if any are overlapping
 				for (let j = i + 1; j < sorted.length; j++) {

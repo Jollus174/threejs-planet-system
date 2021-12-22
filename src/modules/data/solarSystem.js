@@ -12,6 +12,7 @@ import textureIo from './../../img/textures/io.jpg';
 import textureSaturn from './../../img/textures/saturn.jpg';
 import textureUranus from './../../img/textures/uranus.jpg';
 import textureNeptune from './../../img/textures/neptune.jpg';
+import texturePluto from './../../img/textures/pluto.jpg';
 
 import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
 import textureRing from './../../img/textures/texture-ring.jpg';
@@ -91,6 +92,11 @@ const materialData = {
 	},
 	neptune: {
 		map: textureNeptune,
+		normalMap: null,
+		side: FrontSide
+	},
+	pluto: {
+		map: texturePluto,
 		normalMap: null,
 		side: FrontSide
 	},
