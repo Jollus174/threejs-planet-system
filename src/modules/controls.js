@@ -1,5 +1,5 @@
 // custom OrbitControls so can expose the dollyIn() / dollyOut() functions
-import { OrbitControls } from './custom/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from './custom/jsm/controls/OrbitControls';
 import { camera } from './camera';
 import { settings } from './settings';
 import { labelRenderer } from './renderers/labelRenderer';
