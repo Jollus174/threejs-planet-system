@@ -15,20 +15,18 @@ const orrery = {
 		_currentPlanetInRange: ''
 	},
 	mouseState: {
-		_mouseHasMoved: false,
 		_mouseClicked: false,
-		_mouseHeld: false,
-		_mouseClickTimeout: null,
-		_mouseClickLocation: [null, null],
 		_mousePosition: [null, null],
 		_mouseHoverTarget: null, // contains a hoverTimeout
-		_clickedGroup: null,
-		_hoveredGroups: []
+		_clickedClass: null,
+		_zoomedClass: null
 	},
 	skybox: null,
 	classes: {
+		_all: {},
 		_planets: {},
-		_dwarfPlanets: {}
+		_dwarfPlanets: {},
+		_moons: {}
 	},
 	bodies: {
 		_all: [],

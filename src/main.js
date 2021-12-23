@@ -27,6 +27,7 @@ window.renderer = renderer;
 const orbitCentroid = new THREE.Object3D();
 orbitCentroid.name = 'orbit centroid';
 const clock = new THREE.Clock();
+const vectorPosition = new THREE.Vector3();
 
 const render = () => {
 	delta = 5 * clock.getDelta();
@@ -53,32 +54,18 @@ const render = () => {
 	// 	if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');
 	// }
 
-	if (orrery.mouseState._hoveredGroups.length) {
-		orrery.mouseState._hoveredGroups.forEach((group, i, arr) => {
-			group.mouseHoverTimeout -= 1;
-			if (group.mouseHoverTimeout <= 0) arr.splice(i, 1);
-		});
-	}
+	if (orrery.mouseState._clickedClass) {
+		const clickedGroup = orrery.mouseState._clickedClass.labelGroup;
+		clickedGroup.getWorldPosition(vectorPosition);
 
-	if (orrery.mouseState._clickedGroup) {
-		const _clickedGroup = orrery.mouseState._clickedGroup;
-		let { x, y, z } = _clickedGroup.position;
-
-		if (_clickedGroup.parent && _clickedGroup.data.aroundPlanet) {
-			// is moon, so also account for the planet's position
-			x += _clickedGroup.parent.position.x;
-			y += _clickedGroup.parent.position.y;
-			z += _clickedGroup.parent.position.z;
+		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
+		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
+		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
 		}
 
-		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: x });
-		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: y });
-		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: z });
-	}
-
-	if (orrery.mouseState._clickedGroup && orrery.cameraState._zoomToTarget) {
+	if (orrery.mouseState._clickedClass && orrery.cameraState._zoomToTarget) {
 		const objZoomTo =
-			orrery.mouseState._clickedGroup.data.zoomTo || orrery.mouseState._clickedGroup.data.meanRadius * 16;
+			orrery.mouseState._clickedClass.data.zoomTo || orrery.mouseState._clickedClass.data.meanRadius * 16;
 		const distanceToTarget = orrery.controls.getDistance();
 
 		if (distanceToTarget > objZoomTo) {
@@ -151,20 +138,25 @@ fetch('./../solarSystemData.json')
 		scene.add(skybox(skyboxTexturePaths));
 
 		// --------------------
-		// Building Labels
+		// Creating Classes and building Labels
 		// --------------------
-		const sunLabelClass = new PlanetLabelClass(orrery.bodies._sun);
-		sunLabelClass.build();
+
+		orrery.classes._planets[orrery.bodies._sun.key] = new PlanetLabelClass(orrery.bodies._sun);
 
 		orrery.bodies._planets.forEach((planet) => {
-			const planetLabelClass = new PlanetLabelClass(planet);
-			planetLabelClass.build();
+			orrery.classes._planets[planet.key] = new PlanetLabelClass(planet);
 		});
 
 		orrery.bodies._dwarfPlanets.forEach((dPlanet) => {
-			const dPlanetLabelClass = new PlanetLabelClass(dPlanet);
-			dPlanetLabelClass.build();
+			orrery.classes._dwarfPlanets[dPlanet.key] = new PlanetLabelClass(dPlanet);
 		});
+
+		// this will also include moons during the class build process
+		orrery.classes._all = {
+			...orrery.classes._planets,
+			...orrery.classes._dwarfPlanets
+		};
+		Object.values(orrery.classes._all).forEach((c) => c.build());
 
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);

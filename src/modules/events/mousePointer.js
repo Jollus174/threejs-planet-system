@@ -35,24 +35,32 @@ const initMousePointerEvents = () => {
 	});
 };
 
-const handleLabelClick = (data, labelGroup) => {
+const handleLabelClick = (classRef) => {
 	orrery.controls.saveState(); // saving state so can use the [Back] button
-	document.querySelector('#btn-back').disabled = false;
-	const clickedItem = data;
+	// document.querySelector('#btn-back').disabled = false;
 
-	orrery.cameraState._zoomToTarget = true;
-	controls.minDistance = clickedItem.meanRadius * 8;
-	document.querySelector('#btn-modal-info').disabled = false;
-	orrery.mouseState._clickedGroup = labelGroup; // to get the camera moving
+	// checking to see if the item has already been clicked
+	// if it has, then zoom to it
+	if (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === classRef.data.key) {
+		orrery.cameraState._zoomToTarget = true; // to get the camera moving
+		orrery.cameraState._zoomedClass = classRef;
+		controls.minDistance = classRef.data.meanRadius * 8;
+	} else {
+		orrery.cameraState._zoomToTarget = false;
+		orrery.cameraState._zoomedClass = null;
+		orrery.mouseState._clickedClass = classRef;
+	}
+
+	// document.querySelector('#btn-modal-info').disabled = false;
 
 	// updating modal with Wikipedia data
-	if (!clickedItem.content) {
-		const wikiKey = clickedItem.wikipediaKey || clickedItem.englishName;
+	if (!classRef.data.content) {
+		const wikiKey = classRef.data.wikipediaKey || classRef.data.englishName;
 		getWikipediaData(wikiKey)
 			.then((response) => {
-				clickedItem.title = response.title;
-				clickedItem.content = response.content;
-				clickedItem.image = response.image;
+				classRef.data.title = response.title;
+				classRef.data.content = response.content;
+				classRef.data.image = response.image;
 			})
 			.catch((err) => {
 				console.error(err);

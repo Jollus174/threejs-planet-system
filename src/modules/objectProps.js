@@ -199,7 +199,7 @@ class MoonLabelClass {
 		this.labelGroup.position.copy(this.data.startingPosition);
 
 		this.labelDiv.addEventListener('pointerdown', () => {
-			handleLabelClick(this.data, this.labelGroup);
+			handleLabelClick(this);
 		});
 
 		setTimeout(() => {
@@ -393,7 +393,7 @@ class PlanetLabelClass {
 		}
 
 		this.labelDiv.addEventListener('pointerdown', () => {
-			handleLabelClick(this.data, this.labelGroup);
+			handleLabelClick(this);
 		});
 
 		setTimeout(() => {
@@ -408,13 +408,12 @@ class PlanetLabelClass {
 
 		scene.add(this.labelGroup);
 
-		orrery.classes[this.planetTypeKey][this.data.key] = this;
-
 		if (this.data.moons && this.data.moons.length) {
 			this.data.moons.forEach((moon) => {
 				// now rather than pushing to an array, using key/value pairs for easier referencing
 				// is scoped to the planet so can more easily run them through like an array if need be
 				this.moonClasses[moon.key] = new MoonLabelClass(moon, this.labelGroup);
+				orrery.classes._moons[moon.key] = this.moonClasses[moon.key];
 			});
 		}
 
@@ -522,9 +521,8 @@ class PlanetLabelClass {
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
 
 		if (distance < planetRangeThreshold) {
-			// if (!orrery.cameraState._currentPlanetInRange) {
-			// 	orrery.cameraState._currentPlanetInRange = this.data.key;
-			// }
+			orrery.cameraState._currentPlanetInRange = this.data.key;
+
 			// staggering the building of moon classes to help with performance
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
@@ -535,16 +533,10 @@ class PlanetLabelClass {
 					}
 				});
 			}
-
-			// Fade the orbitLine opacity depending on distance here
-			if (distance < planetOrbitLineRangeThreshold) {
-				this.OrbitLine.fadeOut();
 			} else {
-				this.OrbitLine.fadeIn();
+			if (orrery.cameraState._currentPlanetInRange === this.data.key) {
+				orrery.cameraState._currentPlanetInRange = '';
 			}
-		} else {
-			// TODO: need a better way to reset this
-			// orrery.cameraState._currentPlanetInRange = ''; // without this on the moons will never disappear
 
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
@@ -555,6 +547,14 @@ class PlanetLabelClass {
 					}
 				});
 			}
+		}
+
+		if (orrery.cameraState._currentPlanetInRange) {
+			if (orrery.cameraState._currentPlanetInRange !== this.data.key) {
+				this.OrbitLine.fadeOut();
+			}
+		} else {
+			this.OrbitLine.fadeIn();
 		}
 
 		if (this.data.englishName === 'Sun') {
@@ -569,6 +569,8 @@ class PlanetLabelClass {
 
 	// gross duplicated code
 	updateRaycaster() {
+		// TODO: This should only run when in range of a planet
+		// or just run it against the Sun if not in range?
 		const cameraPos = orrery.camera.position;
 		const thisPos = new THREE.Vector3();
 		this.labelGroup.getWorldPosition(thisPos);
