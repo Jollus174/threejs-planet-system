@@ -84,7 +84,7 @@ class OrbitLine {
 			geometryLine,
 			new THREE.LineBasicMaterial({
 				color: isMoon ? settings.planetColours.default : '#FFF',
-				transparent: false,
+				transparent: true,
 				opacity: 0,
 				visible: this.classRef.orbitLineVisibleAtBuild,
 				blending: THREE.AdditiveBlending,
@@ -93,6 +93,10 @@ class OrbitLine {
 		);
 
 		this.orbitLine.name = this.orbitLineName;
+
+		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
+		this.orbitLine.renderOrder = this.parentPlanetData ? 1 : 2;
+
 		this.classRef.labelGroup.parent.add(this.orbitLine);
 
 		// initial page load
