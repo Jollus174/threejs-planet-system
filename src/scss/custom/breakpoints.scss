@@ -1,0 +1,21 @@
+// breakpoints
+body::before {
+	display: none;
+	content: "screen-xs";
+
+	@include media-breakpoint-up(sm) {
+		content: "screen-sm";
+	}
+
+	@include media-breakpoint-up(md) {
+		content: "screen-md";
+	}
+
+	@include media-breakpoint-up(lg) {
+		content: "screen-lg";
+	}
+
+	@include media-breakpoint-up(xl) {
+		content: "screen-xl";
+	}
+}

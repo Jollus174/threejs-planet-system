@@ -1,0 +1,9 @@
+- Planet meshes + moons should appear when zoomed into planet
+- Create UX for navigation?
+
+- Allow orbits that tilt on the y-axis
+- Load in and cache more high-res textures as they're needed, unload when not
+- Fancy light for sun
+
+- Collision detection for when zooming around
+- Need better camera swinging controls

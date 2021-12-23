@@ -14,3 +14,6 @@ https://www.youtube.com/watch?v=Xuj8gY6He5w&t=444s - Rotating orbits via Longitu
 https://www.desmos.com/calculator/42lngkxil6 - Rotating ellipsis
 https://www.desmos.com/calculator/zc5zdjqzln - Rotating ellipse around foci
 https://www.youtube.com/watch?v=5l2tR2smeHY - Jupiter moon orbits example
+http://www.stjarnhimlen.se/comp/ppcomp.html#4
+
+https://sbcode.net/threejs/raycaster2/ - Raycaster collision detection

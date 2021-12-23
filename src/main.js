@@ -1,6 +1,5 @@
 'use strict';
-import './node_modules/bootstrap/dist/css/bootstrap.css';
-import './css/style.css';
+import './scss/styles.scss';
 
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';

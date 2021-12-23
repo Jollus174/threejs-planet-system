@@ -1,0 +1,9 @@
+.modal {
+	z-index: $z-modal;
+	color: #000;
+}
+
+.modal-body img {
+	float: right;
+	margin: 0 0 15px 15px;
+}

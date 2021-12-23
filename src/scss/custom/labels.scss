@@ -1,0 +1,108 @@
+.label {
+	display: none;
+	user-select: none;
+
+	&[data-label-name="sun"] {
+		background-color: transparent;
+	}
+
+	&.is-on-screen {
+		display: block;
+	}
+
+	&.is-moon {
+		.label-circle {
+			width: 8px;
+			height: 8px;
+		}
+
+		.label-text {
+			top: 18px;
+		}
+
+		&:not(.is-major-moon) .label-text {
+			font-size: 15px;
+		}
+
+		&.is-major-moon .label-text {
+			color: white;
+		}
+	}
+
+	&.faded {
+		.label-text,
+		.label-circle {
+			opacity: 0;
+			pointer-events: none;
+		}
+	}
+
+	&.behind-label {
+		.label-text {
+			opacity: 0 !important;
+			pointer-events: none !important;
+		}
+
+		.label-circle {
+			pointer-events: none !important;
+		}
+	}
+
+	&.behind-planet {
+		.label-text,
+		.label-circle {
+			opacity: 0 !important;
+			pointer-events: none !important;
+		}
+	}
+
+	&:not(.behind-label):hover {
+		.label-circle {
+			background-color: currentColor;
+			border-color: white;
+			box-shadow: 0 0 5px currentColor;
+		}
+
+		.label-text {
+			opacity: 1;
+			color: #fff;
+		}
+	}
+
+	.label-content {
+		cursor: pointer;
+		font-size: 16px;
+		text-align: center;
+		transition: opacity 0.4s ease;
+	}
+
+	.label-circle {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 10px;
+		height: 10px;
+		border: 1px solid;
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.7);
+		white-space: nowrap;
+		will-change: transform;
+		box-shadow: 0 0 0 currentColor;
+		transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.2s ease;
+	}
+
+	.label-text {
+		position: relative;
+		top: 20px;
+		display: inline-block;
+		opacity: 1;
+		margin-top: 3px;
+		padding: 3px 4px;
+		color: rgb(162, 162, 162);
+		font-weight: 700;
+		white-space: nowrap;
+		text-shadow: 1px 1px 0 black, -1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, 0 0 3px black;
+		transition: border-width 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+	}
+}

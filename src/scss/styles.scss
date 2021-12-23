@@ -1,0 +1,59 @@
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+
+@import "../node_modules/bootstrap/scss/root";
+@import "../node_modules/bootstrap/scss/reboot";
+@import "../node_modules/bootstrap/scss/grid";
+@import "../node_modules/bootstrap/scss/utilities";
+@import "../node_modules/bootstrap/scss/modal";
+@import "../node_modules/bootstrap/scss/close";
+@import "../node_modules//bootstrap/scss/utilities/api";
+
+@import "custom/breakpoints";
+@import "custom/z";
+@import "custom/labels";
+@import "custom/loader";
+@import "custom/modals";
+@import "custom/controls";
+
+:root {
+	--progress-amount: 0%;
+}
+
+body {
+	background-color: #000;
+}
+
+main {
+	font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+	color: #fff;
+	position: absolute;
+	margin: 0px auto;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+canvas[id="bg"] {
+	position: fixed;
+	top: 0;
+	left: 0;
+	visibility: visible;
+}
+
+.object-hovered {
+	cursor: pointer;
+}
+
+table {
+	border-spacing: 0;
+}
+
+.buttons-container {
+	position: absolute;
+}
+
+button {
+	user-select: none;
+}
