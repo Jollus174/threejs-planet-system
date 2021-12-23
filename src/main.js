@@ -57,13 +57,12 @@ const render = () => {
 	if (orrery.mouseState._clickedClass) {
 		const clickedGroup = orrery.mouseState._clickedClass.labelGroup;
 		clickedGroup.getWorldPosition(vectorPosition);
+	}
 
+	if (orrery.mouseState._clickedClass && orrery.cameraState._zoomToTarget) {
 		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
 		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
 		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
-		}
-
-	if (orrery.mouseState._clickedClass && orrery.cameraState._zoomToTarget) {
 		const objZoomTo =
 			orrery.mouseState._clickedClass.data.zoomTo || orrery.mouseState._clickedClass.data.meanRadius * 16;
 		const distanceToTarget = orrery.controls.getDistance();

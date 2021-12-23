@@ -51,7 +51,7 @@ const handleLabelClick = (classRef) => {
 		orrery.mouseState._clickedClass = classRef;
 	}
 
-	// document.querySelector('#btn-modal-info').disabled = false;
+	document.querySelector('#btn-modal-info').disabled = false;
 
 	// updating modal with Wikipedia data
 	if (!classRef.data.content) {

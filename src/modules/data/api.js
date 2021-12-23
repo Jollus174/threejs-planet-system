@@ -109,6 +109,17 @@ const innerMoons = [
 	'Vanth'
 ];
 
+// manually adding own ring data, API does not have this
+const ringData = {
+	saturn: [
+		{
+			inner: 66900,
+			outer: 140220,
+			tilt: null
+		}
+	]
+};
+
 const sortData = (data) => {
 	const startingOrbitPosition = (objectData) => {
 		const parentPlanetData = objectData.aroundPlanet
@@ -211,6 +222,11 @@ const sortData = (data) => {
 				const moonData = moons.find((moon) => moonName === moon.name);
 				if (moonData) planet.moons.push(moonData);
 			});
+		}
+
+		if (ringData[planet.key]) {
+			planet.rings = [];
+			ringData[planet.key].forEach((ring) => planet.rings.push(ring));
 		}
 	});
 

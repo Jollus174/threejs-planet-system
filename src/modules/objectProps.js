@@ -95,7 +95,11 @@ class OrbitLine {
 		this.orbitLine.name = this.orbitLineName;
 
 		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
-		this.orbitLine.renderOrder = this.parentPlanetData ? 1 : 2;
+		if (this.parentPlanetData) {
+			this.orbitLine.renderOrder = 1;
+		} else {
+			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 2 : 3;
+		}
 
 		this.classRef.labelGroup.parent.add(this.orbitLine);
 
@@ -256,6 +260,7 @@ class MoonLabelClass {
 			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
 			const moonMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
 			moonMesh.name = this.data.key;
+			moonMesh.receiveShadow = true;
 			moonGroup.add(moonMesh);
 
 			return moonGroup;
@@ -456,6 +461,9 @@ class PlanetLabelClass {
 			const planetMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
 			planetMesh.name = this.data.key;
 			planetMesh.class = this;
+			planetMesh.castShadow = true;
+			planetMesh.receiveShadow = false;
+
 			planetGroup.add(planetMesh);
 
 			// if (this.data.englishName === 'Sun') {
@@ -483,9 +491,55 @@ class PlanetLabelClass {
 			return planetGroup;
 		};
 
+		const constructRingMeshes = async (ring, i) => {
+			if (!ring) return;
+			const ringMaterial = {
+				map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
+				normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
+				transparent: false,
+				emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
+				emissive: ring.emissive || null,
+				emissiveIntensity: ring.emissiveIntensity || null,
+				side: THREE.DoubleSide,
+				blending: THREE.CustomBlending
+			};
+
+			ringMaterial.blendEquation = THREE.MaxEquation;
+			ringMaterial.blendSrc = THREE.OneFactor;
+			ringMaterial.blendDst = THREE.DstAlphaFactor;
+
+			const ringMesh = new THREE.Mesh(
+				ringUVMapGeometry(
+					this.data.meanRadius + this.data.rings[i].inner,
+					this.data.meanRadius + this.data.rings[i].outer
+				),
+				new THREE.MeshStandardMaterial(ringMaterial)
+			);
+
+			// TODO: Rings don't seem to be receiving shadows...
+			ringMesh.name = `${this.data.key} ring ${i}`;
+			ringMesh.receiveShadow = true;
+
+			return ringMesh;
+		};
+
 		constructPlanetMesh().then((meshGroup) => {
 			this.meshGroup = meshGroup;
 			this.labelGroup.add(meshGroup);
+
+			if (this.data.materialData.rings) {
+				const ringMeshPromises = this.data.materialData.rings.map((ring, i) => {
+					return constructRingMeshes(ring, i);
+				});
+
+				Promise.all(ringMeshPromises).then((ringMeshes) => {
+					ringMeshes.forEach((ringMesh) => {
+						// TODO: this will need to be adjusted later
+						ringMesh.rotation.x = THREE.Math.degToRad(90);
+						this.meshGroup.add(ringMesh);
+					});
+				});
+			}
 		});
 	}
 

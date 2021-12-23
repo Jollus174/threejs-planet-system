@@ -4,6 +4,8 @@
 - Allow orbits that tilt on the y-axis
 - Load in and cache more high-res textures as they're needed, unload when not
 - Fancy light for sun
+- Fix up planet textures, so are still pinched at top/bottom (like Mercury)
+- Include grid helper?
 
 - Collision detection for when zooming around
 - Need better camera swinging controls

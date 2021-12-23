@@ -19,7 +19,7 @@ const setModalEvents = () => {
 	modalInfoButton.addEventListener('click', () => {
 		modalInfoModal.show();
 
-		const { title, content, image, wikipediaKey, englishName } = orrery.mouseState._clickedGroup.data;
+		const { title, content, image, wikipediaKey, englishName } = orrery.mouseState._clickedClass.data;
 		modalInfoEl.querySelector('.modal-title').textContent = title;
 		modalInfoEl.querySelector('.modal-body').innerHTML = `
 		  <img src="${image.source}" width="${image.width}" height="${image.height}" alt="${image.alt}" />

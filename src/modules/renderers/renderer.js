@@ -1,3 +1,4 @@
+import { PCFSoftShadowMap, BasicShadowMap } from 'three';
 import { WebGLRenderer } from '../custom/src/renderers/WebGLRenderer';
 import { checkIfDesktop } from '../utils';
 
@@ -10,5 +11,9 @@ const renderer = new WebGLRenderer({
 	antialias: true,
 	logarithmicDepthBuffer: checkIfDesktop()
 });
+
+// TODO: This isn't quite working yet
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = BasicShadowMap;
 
 export { renderer };

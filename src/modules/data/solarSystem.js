@@ -1,4 +1,4 @@
-import { FrontSide } from 'three';
+import { DoubleSide, FrontSide } from 'three';
 import textureSun from './../../img/textures/sun-min.jpg';
 import textureMercury from './../../img/textures/mercury.jpg';
 import textureVenus from './../../img/textures/venus.jpg';
@@ -10,11 +10,13 @@ import textureJupiter from './../../img/textures/jupiter.jpg';
 import textureIo from './../../img/textures/io.jpg';
 
 import textureSaturn from './../../img/textures/saturn.jpg';
+
 import textureUranus from './../../img/textures/uranus.jpg';
 import textureNeptune from './../../img/textures/neptune.jpg';
 import texturePluto from './../../img/textures/pluto.jpg';
 
-import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
+// import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
+import textureSaturnRing from './../../img/textures/saturn-rings.jpg';
 import textureRing from './../../img/textures/texture-ring.jpg';
 
 // import modelDeimos from './../../img/models/deimos.glb';
@@ -83,7 +85,17 @@ const materialData = {
 	saturn: {
 		map: textureSaturn,
 		normalMap: null,
-		side: FrontSide
+		side: FrontSide,
+		rings: [
+			{
+				map: textureSaturnRing,
+				emissive: '#FFF',
+				emissiveMap: textureSaturnRing,
+				emissiveIntensity: 1,
+				normalMap: null,
+				side: DoubleSide
+			}
+		]
 	},
 	uranus: {
 		map: textureUranus,
