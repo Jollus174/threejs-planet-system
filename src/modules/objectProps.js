@@ -13,6 +13,10 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { handleLabelClick } from './events/mousePointer';
 import fragmentShader from './shaders/glow/fragmentShader.glsl';
 import vertexShader from './shaders/glow/vertexShader.glsl';
+import sunFragmentShader from './shaders/sun/fragmentShader.glsl';
+import sunVertexShader from './shaders/sun/vertexShader.glsl';
+import simpleFragmentShader from './shaders/debug/simpleFragmentShader.glsl';
+import simpleVertexShader from './shaders/debug/simpleVertexShader.glsl';
 import { materialData as rawMaterialData } from './data/solarSystem';
 
 const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
@@ -96,9 +100,9 @@ class OrbitLine {
 
 		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
 		if (this.parentPlanetData) {
-			this.orbitLine.renderOrder = 1;
+			this.orbitLine.renderOrder = 2;
 		} else {
-			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 2 : 3;
+			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
 		}
 
 		this.classRef.labelGroup.parent.add(this.orbitLine);
@@ -210,6 +214,14 @@ class MoonLabelClass {
 			handleLabelClick(this);
 		});
 
+		this.labelDiv.addEventListener('mouseover', () => {
+			orrery.mouseState._hoveredClass = this;
+		});
+
+		this.labelDiv.addEventListener('mouseleave', () => {
+			orrery.mouseState._hoveredClass = '';
+		});
+
 		setTimeout(() => {
 		this.intervalCheckDistance = setInterval(() => {
 			this.handleDistance();
@@ -273,20 +285,29 @@ class MoonLabelClass {
 	}
 
 	handleDistance() {
-		this.distanceFromPlanet = orrery.camera.position.distanceTo(this.planetGroup.position);
-		const distFromPlanetVector = new THREE.Vector3();
-		distFromPlanetVector.copy(this.distanceFromPlanet);
-		this.distanceFromCamera = orrery.camera.position.distanceTo(distFromPlanetVector.add(this.labelGroup.position));
+		const v3 = new THREE.Vector3();
+		const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
+		this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
+		const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+
+		if (cameraZoomedToMoon) {
+			this.labelDiv.classList.add('faded');
+		} else {
+			this.labelDiv.classList.remove('faded');
+		}
 
 		if (this.OrbitLine) {
-			if (this.distanceFromCamera < 3000) {
+			if (cameraZoomedToMoon) {
 				this.OrbitLine.fadeOut();
 			} else {
-				// fixing conflict here with what the PLANET wants to do...
-				// this will prevent flickering
-				// if we don't do this, the orbit lines won't fade back in...
-				if (this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) {
+				if (
+					(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
+					(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
+					(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
+				) {
 					this.OrbitLine.fadeIn();
+				} else {
+					this.OrbitLine.fadeOut();
 				}
 			}
 		}
@@ -363,6 +384,16 @@ class PlanetLabelClass {
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 
+		// TODO: move this into its own Sun class
+		this.uniforms = {
+			aspectRatio: { type: 'f', value: window.innerWidth / window.innerHeight },
+			sunPos: { type: 'v3', value: new THREE.Vector3() },
+			sunScreenPos: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
+			sunSize: { type: 'f', value: 0.1 },
+			randAngle: { type: 'f', value: 0.1 },
+			camAngle: { type: 'f', value: 0.26 }
+		};
+
 		this.moonClasses = {};
 
 		this.orbitLineVisibleAtBuild = true;
@@ -403,6 +434,14 @@ class PlanetLabelClass {
 
 		this.labelDiv.addEventListener('pointerdown', () => {
 			handleLabelClick(this);
+		});
+
+		this.labelDiv.addEventListener('mouseover', () => {
+			orrery.mouseState._hoveredClass = this;
+		});
+
+		this.labelDiv.addEventListener('mouseleave', () => {
+			orrery.mouseState._hoveredClass = '';
 		});
 
 		setTimeout(() => {
@@ -535,12 +574,29 @@ class PlanetLabelClass {
 				Promise.all(ringMeshPromises).then((ringMeshes) => {
 					ringMeshes.forEach((ringMesh) => {
 						// TODO: this will need to be adjusted later
-						ringMesh.rotation.x = THREE.Math.degToRad(90);
+						ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
 						this.meshGroup.add(ringMesh);
 					});
 				});
 			}
 		});
+	}
+
+	draw() {
+		if (!this.meshGroup) return;
+		const camToSun = orrery.camera.position.clone().sub(this.labelGroup.position);
+		const groupPosition = new THREE.Vector3();
+		this.labelGroup.getWorldPosition(groupPosition);
+		// const sunScreenPos = this.labelGroup.position.project(orrery.camera);
+		this.uniforms.sunPos.value.copy(camToSun.multiplyScalar(-1));
+
+		const visibleW = Math.tan(THREE.MathUtils.degToRad(orrery.camera.fov) / 2) * camToSun.length() * 2;
+		const sunScreenRatio = this.data.diameter / visibleW;
+		this.uniforms.sunSize.value = sunScreenRatio;
+		this.uniforms.randAngle.value = this.uniforms.randAngle.value + 0.001;
+		this.uniforms.camAngle.value = camToSun.angleTo(new THREE.Vector3(1, 1, 0));
+		this.uniforms.sunScreenPos.value = new THREE.Vector3(0, 0, 0);
+		this.labelGroup.lookAt(orrery.camera.position);
 	}
 
 	// TODO: seems to be different to moon labels
@@ -569,7 +625,7 @@ class PlanetLabelClass {
 				onComplete: () => {
 					this.fadingIn = false;
 					this.isVisible = true;
-					this.labelDiv.style.pointerEvents = 'all';
+					this.labelDiv.style.pointerEvents = '';
 				}
 			});
 		}
@@ -577,9 +633,11 @@ class PlanetLabelClass {
 
 	handleDistance() {
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
+		const cameraZoomedToPlanet = distance < this.data.zoomTo + 50000000;
 
-		if (distance < planetRangeThreshold) {
+		if (cameraZoomedToPlanet) {
 			orrery.cameraState._currentPlanetInRange = this.data.key;
+			// this.labelDiv.classList.add('faded');
 
 			// staggering the building of moon classes to help with performance
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -591,9 +649,11 @@ class PlanetLabelClass {
 					}
 				});
 			}
-			} else {
+		} else {
+			// TODO: Need a fix for if a second planet immediately replaces the previous one
 			if (orrery.cameraState._currentPlanetInRange === this.data.key) {
 				orrery.cameraState._currentPlanetInRange = '';
+				// this.labelDiv.classList.remove('faded');
 			}
 
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -607,12 +667,18 @@ class PlanetLabelClass {
 			}
 		}
 
-		if (orrery.cameraState._currentPlanetInRange) {
-			if (orrery.cameraState._currentPlanetInRange !== this.data.key) {
-				this.OrbitLine.fadeOut();
-			}
-		} else {
+		if (this.OrbitLine) {
+			// if (
+			// !orrery.cameraState._currentPlanetInRange ||
+			// (orrery.cameraState._currentPlanetInRange && orrery.cameraState._currentPlanetInRange === this.data.key) ||
+			// !orrery.cameraState._isInPlaneOfReference ||
+			// (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
+			// (orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
+			// ) {
 			this.OrbitLine.fadeIn();
+			// } else {
+			// this.OrbitLine.fadeOut();
+			// }
 		}
 
 		if (this.data.englishName === 'Sun') {
@@ -744,7 +810,7 @@ const rings = {
 			);
 
 			ringMesh.name = `${item.name} ring ${i}`;
-			ringMesh.rotation.x = THREE.Math.degToRad(ring.angle);
+			ringMesh.rotation.x = THREE.MathUtils.degToRad(ring.angle);
 			ringsArr.push(ringMesh);
 		});
 

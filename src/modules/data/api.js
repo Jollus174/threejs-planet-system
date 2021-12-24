@@ -166,6 +166,8 @@ const sortData = (data) => {
 		item.key = convertToCamelCase(item.englishName);
 		item.materialData = materialData[item.key] || null;
 		item.diameter = item.meanRadius * 2;
+		// Math.min to account for huge bodies like Sun
+		item.zoomTo = Math.min(item.meanRadius * 16, item.meanRadius + 7000000);
 	});
 
 	const sun = orrery.bodies._all.find((item) => item.englishName === 'Sun');

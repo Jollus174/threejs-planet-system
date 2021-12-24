@@ -105,7 +105,8 @@ class CSS2DRenderer {
 				}
 
 				const isOnScreen = object.visible && _vector.z >= -1 && _vector.z <= 1;
-				const isInView = -1 < _vector.x && _vector.x < 1 && -1 < _vector.y && _vector.y < 1;
+				// 1.1 instead of 1 so the labels some threshold at edge of screen before suddenly vanishing
+				const isInView = -1.1 < _vector.x && _vector.x < 1.1 && -1.1 < _vector.y && _vector.y < 1.1;
 				if (isOnScreen && isInView) {
 					element.style.display = 'block';
 					object.inFrustum = true;
@@ -168,21 +169,11 @@ class CSS2DRenderer {
 				const objectA = cache.objects.get(a);
 				const objectB = cache.objects.get(b);
 
-				let distanceAFromCamera = objectA.distanceToCameraSquared;
-				let distanceBFromCamera = objectB.distanceToCameraSquared;
-
-				// TODO: the fading order should be influenced here, but not the zIndex
-				// hacky way to make the Sun realllly close away so it has the highest z-index (since the below loop starts with highest z-index)
-				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = 0.001;
-				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = 0.001;
-
-				// if (objectA.data.englishName === 'Sun') distanceAFromCamera = objectA.distanceToCameraSquared * 0.0001;
-				// if (objectB.data.englishName === 'Sun') distanceBFromCamera = objectB.distanceToCameraSquared * 0.0001;
+				const distanceAFromCamera = objectA.distanceToCameraSquared;
+				const distanceBFromCamera = objectB.distanceToCameraSquared;
 
 				return distanceBFromCamera - distanceAFromCamera;
 			});
-
-			// console.log(sorted.map((s) => s.parent.data.englishName));
 
 			const newLabelDimensionsObj = {};
 			for (let i = 0; i < sorted.length; i++) {
@@ -206,19 +197,22 @@ class CSS2DRenderer {
 				// iterating forwards through the labels, to see if any are overlapping
 				for (let j = i + 1; j < sorted.length; j++) {
 					const labelB = sorted[j].element;
-					let clientRectB = newLabelDimensionsObj[j];
-					if (!clientRectB) {
-						clientRectB = labelB.getBoundingClientRect();
-						newLabelDimensionsObj[j] = clientRectB;
-					}
-					const isOverlapping = checkDOMElementOverlap(clientRectA, clientRectB, 20);
-					if (isOverlapping) {
-						// abort loop for the div it's underneath another one; don't need to keep checking this div against others for other overlaps
-						labelA.classList.add('behind-label');
-						// console.log(`${labelA.textContent.trim()} overlapped by ${labelB.textContent.trim()}`);
-						break;
-					} else {
-						labelA.classList.remove('behind-label');
+					// skip elements that are already faded, they should not be occluding the label underneath
+					if (!labelB.classList.contains('faded')) {
+						let clientRectB = newLabelDimensionsObj[j];
+						if (!clientRectB) {
+							clientRectB = labelB.getBoundingClientRect();
+							newLabelDimensionsObj[j] = clientRectB;
+						}
+						const isOverlapping = checkDOMElementOverlap(clientRectA, clientRectB, 20);
+						if (isOverlapping) {
+							// abort loop for the div it's underneath another one; don't need to keep checking this div against others for other overlaps
+							labelA.classList.add('behind-label');
+							// console.log(`${labelA.textContent.trim()} overlapped by ${labelB.textContent.trim()}`);
+							break;
+						} else {
+							labelA.classList.remove('behind-label');
+						}
 					}
 				}
 			}

@@ -10,14 +10,14 @@ const orrery = {
 		_zoomToTarget: false,
 		_dollySpeed: null,
 		_rotateToTarget: false,
-		_rotateCameraYTo: null,
 		_currentZoomDistanceThreshold: 0,
-		_currentPlanetInRange: ''
+		_currentPlanetInRange: '',
+		_isInPlaneOfReference: false
 	},
 	mouseState: {
 		_mouseClicked: false,
 		_mousePosition: [null, null],
-		_mouseHoverTarget: null, // contains a hoverTimeout
+		_hoveredClass: null,
 		_clickedClass: null,
 		_zoomedClass: null
 	},

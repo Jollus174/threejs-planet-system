@@ -6,10 +6,10 @@ const domTarget = document.querySelector('#bg');
 const renderer = new WebGLRenderer({
 	// powerPreference: 'high-performance',
 	// powerPreference: 'low-power',
-	stencil: false,
 	canvas: domTarget,
-	antialias: true,
-	logarithmicDepthBuffer: checkIfDesktop()
+	antialias: true
+	// TODO: This messes up the sun shader, and will need to be accounted for
+	// logarithmicDepthBuffer: checkIfDesktop()
 });
 
 // TODO: This isn't quite working yet

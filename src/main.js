@@ -53,6 +53,8 @@ const render = () => {
 	// } else {
 	// 	if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');
 	// }
+	orrery.cameraState._isInPlaneOfReference =
+		orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;
 
 	if (orrery.mouseState._clickedClass) {
 		const clickedGroup = orrery.mouseState._clickedClass.labelGroup;
@@ -63,20 +65,19 @@ const render = () => {
 		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
 		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
 		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
-		const objZoomTo =
-			orrery.mouseState._clickedClass.data.zoomTo || orrery.mouseState._clickedClass.data.meanRadius * 16;
+		const zoomTo = orrery.mouseState._clickedClass.data.zoomTo;
 		const distanceToTarget = orrery.controls.getDistance();
 
-		if (distanceToTarget > objZoomTo) {
-			const amountComplete = objZoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+		if (distanceToTarget > zoomTo) {
+			const amountComplete = zoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
 			orrery.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
 				settings.controls._dollySpeedMin
 			);
 			orrery.controls.dollyIn(orrery.cameraState._dollySpeed);
-		} else if (distanceToTarget + 0.1 < objZoomTo) {
-			const amountComplete = distanceToTarget / objZoomTo; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+		} else if (distanceToTarget + 0.1 < zoomTo) {
+			const amountComplete = distanceToTarget / zoomTo; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
 			orrery.cameraState._dollySpeed = Math.min(
 				settings.controls._dollySpeedMax + amountToIncrease,
@@ -172,9 +173,6 @@ fetch('./../solarSystemData.json')
 		// --------------------
 		initMousePointerEvents();
 		setModalEvents();
-		settings.orbitLines._orbitVisibilityCheckbox.addEventListener('change', () => {
-			orrery.bodies._orbitLines.forEach((orbitLine) => (orbitLine.material.visible = setOrbitVisibility()));
-		});
 
 		orrery.isDesktop = checkIfDesktop();
 

@@ -1,6 +1,7 @@
 .label {
 	display: none;
 	user-select: none;
+	cursor: pointer;
 
 	&[data-label-name="sun"] {
 		background-color: transparent;
@@ -14,6 +15,11 @@
 		.label-circle {
 			width: 8px;
 			height: 8px;
+
+			&::after {
+				width: 18px;
+				height: 18px;
+			}
 		}
 
 		.label-text {
@@ -25,41 +31,40 @@
 		}
 
 		&.is-major-moon .label-text {
-			color: white;
+			color: #fff;
 		}
 	}
 
 	&.faded {
+		pointer-events: none;
+
 		.label-text,
 		.label-circle {
 			opacity: 0;
-			pointer-events: none;
 		}
 	}
 
 	&.behind-label {
+		pointer-events: none;
+
 		.label-text {
 			opacity: 0 !important;
-			pointer-events: none !important;
-		}
-
-		.label-circle {
-			pointer-events: none !important;
 		}
 	}
 
 	&.behind-planet {
+		pointer-events: none;
+
 		.label-text,
 		.label-circle {
 			opacity: 0 !important;
-			pointer-events: none !important;
 		}
 	}
 
-	&:not(.behind-label):hover {
+	&:not(.behind-label):not(.faded):hover {
 		.label-circle {
 			background-color: currentColor;
-			border-color: white;
+			border-color: #fff;
 			box-shadow: 0 0 5px currentColor;
 		}
 
@@ -69,8 +74,17 @@
 		}
 	}
 
+	&.label-selected {
+		.label-circle {
+			border-color: #fff !important;
+
+			&::after {
+				opacity: 1;
+			}
+		}
+	}
+
 	.label-content {
-		cursor: pointer;
 		font-size: 16px;
 		text-align: center;
 		transition: opacity 0.4s ease;
@@ -90,6 +104,20 @@
 		will-change: transform;
 		box-shadow: 0 0 0 currentColor;
 		transition: background-color 0.4s ease, border-color 0.4s ease, opacity 0.2s ease;
+
+		&::after {
+			content: "";
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			width: 20px;
+			height: 20px;
+			border: 1px solid rgba(255, 255, 255, 0.5);
+			border-radius: 50%;
+			opacity: 0;
+			transition: opacity 0.2s ease;
+		}
 	}
 
 	.label-text {

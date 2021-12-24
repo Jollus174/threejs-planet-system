@@ -1,0 +1,1 @@
+- ran into shader issue with logarithmic depth buffering causing shaders to simply render fully transparent objects

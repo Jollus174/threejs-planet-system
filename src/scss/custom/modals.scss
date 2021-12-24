@@ -1,6 +1,18 @@
 .modal {
 	z-index: $z-modal;
 	color: #000;
+
+	&.fade {
+		.modal-dialog {
+			transform: translate(0, 20px);
+		}
+	}
+
+	&.show {
+		.modal-dialog {
+			transform: none;
+		}
+	}
 }
 
 .modal-body img {

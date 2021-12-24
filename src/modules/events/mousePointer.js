@@ -39,6 +39,11 @@ const handleLabelClick = (classRef) => {
 	orrery.controls.saveState(); // saving state so can use the [Back] button
 	// document.querySelector('#btn-back').disabled = false;
 
+	// TODO: this should probably be on :focus, not click
+	const labelSelected = document.querySelector('.label.label-selected');
+	if (labelSelected) labelSelected.classList.remove('label-selected');
+	classRef.labelDiv.classList.add('label-selected');
+
 	// checking to see if the item has already been clicked
 	// if it has, then zoom to it
 	if (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === classRef.data.key) {
@@ -48,7 +53,7 @@ const handleLabelClick = (classRef) => {
 	} else {
 		orrery.cameraState._zoomToTarget = false;
 		orrery.cameraState._zoomedClass = null;
-		orrery.mouseState._clickedClass = classRef;
+		orrery.mouseState._clickedClass = classRef; // TODO: this should be 'focused class'!
 	}
 
 	document.querySelector('#btn-modal-info').disabled = false;
