@@ -10,7 +10,6 @@ const orrery = {
 		_zoomToTarget: false,
 		_dollySpeed: null,
 		_rotateToTarget: false,
-		_currentZoomDistanceThreshold: 0,
 		_currentPlanetInRange: '',
 		_isInPlaneOfReference: false
 	},

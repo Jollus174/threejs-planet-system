@@ -102,6 +102,8 @@ const render = () => {
 
 	orrery.controls.update();
 
+	orrery.classes._sun.draw(delta); // TODO: Should be separate
+
 	renderer.render(scene, orrery.camera);
 	labelRenderer.render(scene, orrery.camera);
 };
@@ -141,14 +143,14 @@ fetch('./../solarSystemData.json')
 		// Creating Classes and building Labels
 		// --------------------
 
-		orrery.classes._planets[orrery.bodies._sun.key] = new PlanetLabelClass(orrery.bodies._sun);
+		orrery.classes._sun = new Sun(orrery.bodies._sun);
 
 		orrery.bodies._planets.forEach((planet) => {
-			orrery.classes._planets[planet.key] = new PlanetLabelClass(planet);
+			orrery.classes._planets[planet.key] = new Planet(planet);
 		});
 
 		orrery.bodies._dwarfPlanets.forEach((dPlanet) => {
-			orrery.classes._dwarfPlanets[dPlanet.key] = new PlanetLabelClass(dPlanet);
+			orrery.classes._dwarfPlanets[dPlanet.key] = new DwarfPlanet(dPlanet);
 		});
 
 		// this will also include moons during the class build process
@@ -156,6 +158,7 @@ fetch('./../solarSystemData.json')
 			...orrery.classes._planets,
 			...orrery.classes._dwarfPlanets
 		};
+		orrery.classes._all.sun = orrery.classes._sun;
 		Object.values(orrery.classes._all).forEach((c) => c.build());
 
 		renderer.setPixelRatio(window.devicePixelRatio);

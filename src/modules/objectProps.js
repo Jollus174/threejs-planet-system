@@ -2,15 +2,16 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { createCircleFromPoints, ringUVMapGeometry } from './utils';
+import { controls } from './controls';
 import { orrery } from './orrery';
 import { scene } from './scene';
 import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, convertToCamelCase } from './utils';
 import { textureLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
+import { getWikipediaData } from './data/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
-import { handleLabelClick } from './events/mousePointer';
 import fragmentShader from './shaders/glow/fragmentShader.glsl';
 import vertexShader from './shaders/glow/vertexShader.glsl';
 import sunFragmentShader from './shaders/sun/fragmentShader.glsl';
@@ -109,11 +110,11 @@ class OrbitLine {
 
 		// initial page load
 		if (this.orbitLine.material.opacity === 0 && this.classRef.orbitLineVisibleAtBuild) {
-			this.fadeIn();
+			this.orbitLineFadeIn();
 		}
 	}
 
-	fadeOut() {
+	orbitLineFadeOut() {
 		if (!this.fadingOut && this.orbitLine.material.opacity !== 0) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
@@ -128,7 +129,7 @@ class OrbitLine {
 		}
 	}
 
-	fadeIn() {
+	orbitLineFadeIn() {
 		if (!this.fadingIn && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
@@ -159,253 +160,44 @@ class OrbitLine {
 	}
 }
 
-class MoonLabelClass {
-	constructor(data, planetGroup) {
-		this.data = data;
-		this.labelDiv = document.createElement('div');
-		this.labelGroup = new THREE.Group();
-		this.meshGroup = null;
-		this.intervalCheckDistance = null;
-		this.planetGroup = planetGroup;
-		this.fadingIn = false;
-		this.fadingOut = false;
-		this.isAdded = false;
-		this.isInRange = false;
-		this.distanceFromCamera = null;
-		this.distanceFromPlanet = null;
-		this.CSSObj = new CSS2DObject(this.labelDiv, this);
-		this.raycaster = new THREE.Raycaster();
-		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
-
-		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
-		this.OrbitLine = new OrbitLine(data, this);
-
-		// debug stuff
-		this.raycasterArrowEnabled = false;
-	}
-
-	build() {
-		if (this.isAdded) return;
-		this.isAdded = true;
-
-		this.labelDiv.className = `label is-moon ${this.data.isMajorMoon ? 'is-major-moon' : ''} ${
-			this.data.isInnerMoon ? 'is-inner-moon' : ''
-		}`;
-		this.labelDiv.dataset.selector = 'label';
-		this.labelDiv.style.color = this.data.labelColour;
-		this.labelDiv.style.opacity = 0;
-		this.labelDiv.innerHTML = `
-			<div class="label-content">
-				<div class="label-circle"></div>
-				<div class="label-text">${this.data.englishName}</div>
-			</div>
-			`;
-		this.CSSObj.name = this.data.key;
-		this.CSSObj.position.set(0, 0, 0);
-
-		this.labelGroup.name = `${this.data.englishName} group label`;
-		this.labelGroup.data = this.data;
-		this.labelGroup.add(this.CSSObj);
-
-		// calculate orbit
-		this.labelGroup.position.copy(this.data.startingPosition);
-
-		this.labelDiv.addEventListener('pointerdown', () => {
-			handleLabelClick(this);
-		});
-
-		this.labelDiv.addEventListener('mouseover', () => {
-			orrery.mouseState._hoveredClass = this;
-		});
-
-		this.labelDiv.addEventListener('mouseleave', () => {
-			orrery.mouseState._hoveredClass = '';
-		});
-
-		setTimeout(() => {
-		this.intervalCheckDistance = setInterval(() => {
-			this.handleDistance();
-				if (this.CSSObj.inFrustum) {
-					this.updateRaycaster();
-				}
-		}, 200);
-		if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
-		}, 800);
-
-		this.planetGroup.add(this.labelGroup);
-
-		// building orbitLine after the group is added to the scene, so the group has a parent
-		// limiting the number of orbitLines RENDERED to save memory
-		this.OrbitLine.build();
-
-		gsap.to(this.labelDiv, {
-			opacity: 1,
-			duration: 1,
-			onComplete: () => {
-				// TODO: meshes should start invisible, or build when the camera is close enough
-				this.buildMoonMesh();
-			}
-		});
-	}
-
-	buildMoonMesh() {
-		// will return a promise
-		const constructMoonMesh = async () => {
-			if (this.meshGroup) return this.meshGroup;
-
-			const materialData = this.data.materialData || rawMaterialData.moon;
-			const segments = materialData.segments || 32;
-
-			const material = {
-				map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
-				normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
-				transparent: false
-				// emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
-				// emissive: materialData.emissive || null,
-				// emissiveIntensity: materialData.emissiveIntensity || null
-			};
-
-			const moonGroup = new THREE.Group();
-			moonGroup.class = this;
-			moonGroup.name = this.data.key;
-
-			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-			const moonMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
-			moonMesh.name = this.data.key;
-			moonMesh.receiveShadow = true;
-			moonGroup.add(moonMesh);
-
-			return moonGroup;
-		};
-
-		constructMoonMesh().then((meshGroup) => {
-			this.meshGroup = meshGroup;
-			this.labelGroup.add(meshGroup);
-		});
-	}
-
-	handleDistance() {
-		const v3 = new THREE.Vector3();
-		const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
-		this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
-		const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
-
-		if (cameraZoomedToMoon) {
-			this.labelDiv.classList.add('faded');
-		} else {
-			this.labelDiv.classList.remove('faded');
-		}
-
-		if (this.OrbitLine) {
-			if (cameraZoomedToMoon) {
-				this.OrbitLine.fadeOut();
-			} else {
-				if (
-					(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
-					(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
-					(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
-				) {
-					this.OrbitLine.fadeIn();
-				} else {
-					this.OrbitLine.fadeOut();
-				}
-			}
-		}
-	}
-
-	updateRaycaster() {
-		// setting raycaster line that'll go from the moonGroup to the camera
-		const cameraPos = orrery.camera.position;
-		const thisPos = new THREE.Vector3();
-		this.labelGroup.getWorldPosition(thisPos);
-		const vDirection = new THREE.Vector3();
-		const direction = vDirection.subVectors(thisPos, cameraPos).normalize();
-		this.raycaster.set(cameraPos, direction);
-		this.raycasterArrow.position.copy(cameraPos);
-		this.raycasterArrow.setDirection(direction);
-
-		// TODO: could be more efficient?
-		const intersects = this.raycaster.intersectObjects(scene.children, true);
-		const meshIntersects = intersects.filter((i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox');
-
-		if (meshIntersects.length && meshIntersects[0].object.name !== this.data.key) {
-			this.labelDiv.classList.add('behind-planet');
-		} else {
-			this.labelDiv.classList.remove('behind-planet');
-		}
-	}
-
-	remove() {
-		if (!this.fadingOut && this.isAdded) {
-			// fading out OrbitLine BEFORE planet (once the planet is gone, so is the line)
-			this.fadingOut = true;
-
-			gsap.to(this.labelDiv.querySelector('.label-content'), {
-				opacity: 0,
-				duration: 1,
-				onComplete: () => {
-					if (this.OrbitLine) this.OrbitLine.remove();
-					// setTimeout seems to allow smoother fading? Weird...
-					setTimeout(() => {
-						clearInterval(this.intervalCheckDistance);
-
-						// snap the camera back to the planet if the clicked group moon is deloaded
-						if (
-							orrery.mouseState._clickedGroup &&
-							orrery.mouseState._clickedGroup.data &&
-							orrery.mouseState._clickedGroup.data.aroundPlanet
-						) {
-							orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
-						}
-						this.labelGroup.children.forEach((child) => child.removeFromParent());
-						this.labelGroup.removeFromParent();
-						this.isAdded = false;
-						this.fadingOut = false;
-						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
-					}, 100);
-				}
-			});
-		}
-	}
-}
-
-class PlanetLabelClass {
+class Entity {
 	constructor(data) {
 		this.data = data;
 		this.labelDiv = document.createElement('div');
 		this.labelGroup = new THREE.Group();
 		this.meshGroup = null;
-		this.intervalCheckDistance = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
 		this.isVisible = false;
-		this.planetTypeKey = this.data.isDwarfPlanet ? '_dwarfPlanets' : '_planets';
 		this.CSSObj = new CSS2DObject(this.labelDiv, this);
+		this.moonClasses = {};
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
+		this.materialData = this.data.materialData;
 
-		// TODO: move this into its own Sun class
-		this.uniforms = {
-			aspectRatio: { type: 'f', value: window.innerWidth / window.innerHeight },
-			sunPos: { type: 'v3', value: new THREE.Vector3() },
-			sunScreenPos: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
-			sunSize: { type: 'f', value: 0.1 },
-			randAngle: { type: 'f', value: 0.1 },
-			camAngle: { type: 'f', value: 0.26 }
-		};
-
-		this.moonClasses = {};
+		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), 1000);
 
 		this.orbitLineVisibleAtBuild = true;
 		this.OrbitLine = new OrbitLine(data, this);
 
-		this.raycasterArrowEnabled = false;
-	}
+		this.raycasterEnabled = true;
 
-	build() {
-		this.labelDiv.className = `label behind-label ${
-			this.data.isPlanet || this.data.englishName === 'Sun' ? 'is-planet' : 'is-dwarf-planet'
-		} ${this.data.isSun ? 'is-sun' : ''}`;
+		// for debugging
+		this.raycasterArrowEnabled = false;
+		// ---
+
+		const entityTypeClasses = [
+			this.data.key === 'sun' ? 'is-sun' : '',
+			this.data.aroundPlanet ? 'is-moon' : '',
+			this.data.isPlanet ? 'is-planet' : '',
+			this.data.isDwarfPlanet ? 'is-dwarf-planet' : '',
+			this.data.isMajorMoon ? 'is-major-moon' : '',
+			this.data.isInnerMoon ? 'is-inner-moon' : ''
+		]
+			.join(' ')
+			.trim();
+
+		this.labelDiv.className = `label behind-label ${entityTypeClasses}`;
 		this.labelDiv.dataset.selector = 'label';
 		this.labelDiv.style.color = this.data.labelColour;
 		this.labelDiv.style.opacity = 0;
@@ -420,20 +212,92 @@ class PlanetLabelClass {
 		this.CSSObj.name = this.data.key;
 		this.CSSObj.position.set(0, 0, 0);
 
-		this.labelGroup.name = `${this.data.englishName} group label`;
+		this.labelGroup.name = `${this.data.key} group label`;
 		this.labelGroup.data = this.data;
-		this.labelGroup.add(this.CSSObj);
+
 		orrery.bodies._planetLabels[this.data.key] = this.labelGroup;
 
-		// calculate orbit
 		if (this.data.startingPosition) {
 			this.labelGroup.position.copy(this.data.startingPosition);
 		} else {
 			this.labelGroup.position.set(0, 0, 0);
 		}
 
+		if (this.data.moons && this.data.moons.length) {
+			this.data.moons.forEach((moon) => {
+				// now rather than pushing to an array, using key/value pairs for easier referencing
+				// is scoped to the planet so can more easily run them through like an array if need be
+				this.moonClasses[moon.key] = new Moon(moon, this.labelGroup);
+				orrery.classes._moons[moon.key] = this.moonClasses[moon.key];
+			});
+		}
+	}
+
+	build() {
+		this.setListeners();
+
+		this.labelGroup.add(this.CSSObj);
+		scene.add(this.labelGroup);
+
+		// building orbitLine after the group is added to the scene, so the group has a parent
+		this.OrbitLine.build();
+
+		if (this.materialData) {
+			this.createEntityMesh();
+		}
+
+		if (!this.fadingIn && !this.isVisible) {
+			this.fadingIn = true;
+			this.visible = true;
+			gsap.to(this.labelDiv, {
+				opacity: 1,
+				duration: 1,
+				onComplete: () => {
+					this.fadingIn = false;
+					this.isVisible = true;
+					this.labelDiv.style.pointerEvents = '';
+				}
+			});
+		}
+	}
+
+	setListeners() {
 		this.labelDiv.addEventListener('pointerdown', () => {
-			handleLabelClick(this);
+			orrery.controls.saveState(); // saving state so can use the [Back] button
+			// document.querySelector('#btn-back').disabled = false;
+
+			// TODO: this should probably be on :focus, not click
+			const labelSelected = document.querySelector('.label.label-selected');
+			if (labelSelected) labelSelected.classList.remove('label-selected');
+			this.labelDiv.classList.add('label-selected');
+
+			// checking to see if the item has already been clicked
+			// if it has, then zoom to it
+			if (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) {
+				orrery.cameraState._zoomToTarget = true; // to get the camera moving
+				orrery.cameraState._zoomedClass = this;
+				controls.minDistance = this.data.meanRadius * 8;
+			} else {
+				orrery.cameraState._zoomToTarget = false;
+				orrery.cameraState._zoomedClass = null;
+				orrery.mouseState._clickedClass = this; // TODO: this should be 'focused class'!
+			}
+
+			document.querySelector('#btn-modal-info').disabled = false;
+
+			// updating modal with Wikipedia data
+			if (!this.data.content) {
+				const wikiKey = this.data.wikipediaKey || this.data.englishName;
+				getWikipediaData(wikiKey)
+					.then((response) => {
+						this.data.title = response.title;
+						this.data.content = response.content;
+						this.data.image = response.image;
+					})
+					.catch((err) => {
+						console.error(err);
+					});
+			}
 		});
 
 		this.labelDiv.addEventListener('mouseover', () => {
@@ -443,91 +307,40 @@ class PlanetLabelClass {
 		this.labelDiv.addEventListener('mouseleave', () => {
 			orrery.mouseState._hoveredClass = '';
 		});
-
-		setTimeout(() => {
-			this.intervalCheckDistance = setInterval(() => {
-				this.handleDistance();
-				if (this.CSSObj.inFrustum) {
-					this.updateRaycaster();
-				}
-			}, 200);
-			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
-		}, 500);
-
-		scene.add(this.labelGroup);
-
-		if (this.data.moons && this.data.moons.length) {
-			this.data.moons.forEach((moon) => {
-				// now rather than pushing to an array, using key/value pairs for easier referencing
-				// is scoped to the planet so can more easily run them through like an array if need be
-				this.moonClasses[moon.key] = new MoonLabelClass(moon, this.labelGroup);
-				orrery.classes._moons[moon.key] = this.moonClasses[moon.key];
-			});
-		}
-
-		// building orbitLine after the group is added to the scene, so the group has a parent
-		this.OrbitLine.build();
-
-		this.fadeIn();
-
-		if (this.data.materialData) {
-			this.buildPlanetMesh();
-		}
 	}
 
-	buildPlanetMesh() {
-		// will return a promise
-		const constructPlanetMesh = async () => {
+	createEntityMesh() {
+		const constructEntityMesh = async () => {
 			if (this.meshGroup) return this.meshGroup;
 
-			const materialData = this.data.materialData;
-			const segments = materialData.segments || 32;
-
-			const material = {
-				map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
-				normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
+			const segments = this.materialData.segments || 32;
+			const materialProps = {
+				map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
+				normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
 				transparent: false,
-				emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
-				emissive: materialData.emissive || null,
-				emissiveIntensity: materialData.emissiveIntensity || null
+				emissiveMap: this.materialData.emissiveMap
+					? await textureLoader.loadAsync(this.materialData.emissiveMap)
+					: null,
+				emissive: this.materialData.emissive || null,
+				emissiveIntensity: this.materialData.emissiveIntensity || null
 			};
 
-			const planetGroup = new THREE.Group();
-			planetGroup.class = this;
-			planetGroup.name = this.data.key;
+			const meshGroup = new THREE.Group();
+			meshGroup.class = this;
+			meshGroup.name = this.data.key;
 
 			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-			const planetMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial(material));
-			planetMesh.name = this.data.key;
-			planetMesh.class = this;
-			planetMesh.castShadow = true;
-			planetMesh.receiveShadow = false;
+			const material = new THREE.MeshStandardMaterial(materialProps);
 
-			planetGroup.add(planetMesh);
+			const entityMesh = new THREE.Mesh(geometry, material);
+			entityMesh.name = this.data.key;
+			entityMesh.class = this;
+			entityMesh.castShadow = true;
+			entityMesh.receiveShadow = false;
 
-			// if (this.data.englishName === 'Sun') {
-			// 	const shaderMaterial = new THREE.ShaderMaterial({
-			// 		uniforms: {
-			// 			viewVector: {
-			// 				type: 'v3',
-			// 				value: orrery.camera.position
-			// 			}
-			// 		},
-			// 		vertexShader,
-			// 		fragmentShader,
-			// 		// side: THREE.FrontSide,
-			// 		side: THREE.DoubleSide,
-			// 		blending: THREE.AdditiveBlending,
-			// 		transparent: true
-			// 	});
+			meshGroup.add(entityMesh);
 
-			// 	const planetGlowMesh = new THREE.Mesh(geometry, shaderMaterial);
-			// 	planetGroup.add(planetGlowMesh);
-			// 	planetGroup.glow = planetGlowMesh;
-			// 	planetGlowMesh.scale.set(1.2, 1.2, 1.2);
-			// }
-
-			return planetGroup;
+			return meshGroup;
 		};
 
 		const constructRingMeshes = async (ring, i) => {
@@ -555,19 +368,18 @@ class PlanetLabelClass {
 				new THREE.MeshStandardMaterial(ringMaterial)
 			);
 
-			// TODO: Rings don't seem to be receiving shadows...
 			ringMesh.name = `${this.data.key} ring ${i}`;
 			ringMesh.receiveShadow = true;
 
 			return ringMesh;
 		};
 
-		constructPlanetMesh().then((meshGroup) => {
+		constructEntityMesh().then((meshGroup) => {
 			this.meshGroup = meshGroup;
 			this.labelGroup.add(meshGroup);
 
-			if (this.data.materialData.rings) {
-				const ringMeshPromises = this.data.materialData.rings.map((ring, i) => {
+			if (this.materialData.rings) {
+				const ringMeshPromises = this.materialData.rings.map((ring, i) => {
 					return constructRingMeshes(ring, i);
 				});
 
@@ -582,56 +394,93 @@ class PlanetLabelClass {
 		});
 	}
 
-	draw() {
-		if (!this.meshGroup) return;
-		const camToSun = orrery.camera.position.clone().sub(this.labelGroup.position);
-		const groupPosition = new THREE.Vector3();
-		this.labelGroup.getWorldPosition(groupPosition);
-		// const sunScreenPos = this.labelGroup.position.project(orrery.camera);
-		this.uniforms.sunPos.value.copy(camToSun.multiplyScalar(-1));
+	// for updates that need to happen in the main render loop
+	// draw() {};
 
-		const visibleW = Math.tan(THREE.MathUtils.degToRad(orrery.camera.fov) / 2) * camToSun.length() * 2;
-		const sunScreenRatio = this.data.diameter / visibleW;
-		this.uniforms.sunSize.value = sunScreenRatio;
-		this.uniforms.randAngle.value = this.uniforms.randAngle.value + 0.001;
-		this.uniforms.camAngle.value = camToSun.angleTo(new THREE.Vector3(1, 1, 0));
-		this.uniforms.sunScreenPos.value = new THREE.Vector3(0, 0, 0);
-		this.labelGroup.lookAt(orrery.camera.position);
+	// is overwritten by child classes
+	intervalCheck() {}
+
+	updateRaycaster() {
+		// TODO: This should only run when in range of a planet?
+		// or just run it against the Sun if not in range...
+		if (this.CSSObj.inFrustum) {
+			const cameraPos = orrery.camera.position;
+			const thisPos = new THREE.Vector3();
+			this.labelGroup.getWorldPosition(thisPos);
+			const vDirection = new THREE.Vector3();
+			const direction = vDirection.subVectors(thisPos, cameraPos).normalize();
+			this.raycaster.set(cameraPos, direction);
+			this.raycasterArrow.position.copy(cameraPos);
+			this.raycasterArrow.setDirection(direction);
+
+			// TODO: could be more efficient?
+			const intersects = this.raycaster.intersectObjects(scene.children, true);
+			const meshIntersects = intersects.filter(
+				(i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox'
+			);
+
+			if (meshIntersects.length && meshIntersects[0].object.name !== this.data.key) {
+				this.labelDiv.classList.add('behind-planet');
+			} else {
+				this.labelDiv.classList.remove('behind-planet');
+			}
+		}
 	}
 
-	// TODO: seems to be different to moon labels
-	fadeOut() {
-		if (!this.fadingOut && this.isVisible) {
+	// setTimeout(() => {
+	// 	this.intervalCheckDistance = setInterval(() => {
+	// 		this.handleDistance();
+	// 		// if (this.CSSObj.inFrustum) {
+	// 		// 	this.updateRaycaster();
+	// 		// }
+	// 	}, 200);
+	// 	if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+	// }, 500);
+
+	remove() {
+		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.key && !this.fadingOut && this.isAdded) {
+		if (!this.fadingOut && this.isAdded) {
+			// fading out OrbitLine BEFORE entity (once the entity is gone, so is the line)
 			this.fadingOut = true;
+
 			gsap.to(this.labelDiv, {
 				opacity: 0,
-				duration: 0.25,
-				onComplete: () => {
-					this.fadingOut = false;
-					this.isVisible = false;
-					this.labelDiv.style.pointerEvents = 'none';
-				}
-			});
-		}
-	}
-
-	fadeIn() {
-		if (!this.fadingIn && !this.isVisible) {
-			this.fadingIn = true;
-			this.visible = true;
-			gsap.to(this.labelDiv, {
-				opacity: 1,
 				duration: 1,
 				onComplete: () => {
-					this.fadingIn = false;
-					this.isVisible = true;
-					this.labelDiv.style.pointerEvents = '';
+					if (this.OrbitLine) this.OrbitLine.remove();
+					// setTimeout seems to allow smoother fading? Weird...
+					setTimeout(() => {
+						clearInterval(this.intervalCheckVar);
+
+						// snap the camera back to the planet if the clicked group moon is deloaded
+						if (orrery.mouseState._clickedGroup && orrery.mouseState._clickedGroup.data.aroundPlanet) {
+							orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
+						}
+						this.labelGroup.children.forEach((child) => child.removeFromParent());
+						this.labelGroup.removeFromParent();
+						this.isAdded = false;
+						this.fadingOut = false;
+						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
+					}, 100);
 				}
 			});
 		}
 	}
+}
 
-	handleDistance() {
+// TODO: Could probably use a new class for an interval distance checker...
+
+class Planet extends Entity {
+	constructor(data) {
+		super(data);
+	}
+
+	intervalCheck() {
+		if (this.raycasterEnabled) {
+			this.updateRaycaster();
+			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+		}
+
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + 50000000;
 
@@ -675,228 +524,124 @@ class PlanetLabelClass {
 			// (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
 			// (orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
 			// ) {
-			this.OrbitLine.fadeIn();
+			this.OrbitLine.orbitLineFadeIn();
 			// } else {
 			// this.OrbitLine.fadeOut();
 			// }
 		}
-
-		if (this.data.englishName === 'Sun') {
-			orrery.cameraState._currentZoomDistanceThreshold =
-				distance < settings.systemZoomDistanceThresholds[0]
-					? 0
-					: distance < settings.systemZoomDistanceThresholds[1]
-					? 1
-					: 2;
-		}
-	}
-
-	// gross duplicated code
-	updateRaycaster() {
-		// TODO: This should only run when in range of a planet
-		// or just run it against the Sun if not in range?
-		const cameraPos = orrery.camera.position;
-		const thisPos = new THREE.Vector3();
-		this.labelGroup.getWorldPosition(thisPos);
-		const vDirection = new THREE.Vector3();
-		const direction = vDirection.subVectors(thisPos, cameraPos).normalize();
-		this.raycaster.set(cameraPos, direction);
-		this.raycasterArrow.position.copy(cameraPos);
-		this.raycasterArrow.setDirection(direction);
-
-		// TODO: could be more efficient?
-		const intersects = this.raycaster.intersectObjects(scene.children, true);
-		const meshIntersects = intersects.filter((i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox');
-
-		if (meshIntersects.length && meshIntersects[0].object.name !== this.data.key) {
-			this.labelDiv.classList.add('behind-planet');
-		} else {
-			this.labelDiv.classList.remove('behind-planet');
-		}
-	}
-
-	remove() {
-		clearInterval(this.intervalCheckDistance);
-		this.OrbitLine.remove();
-
-		this.labelGroup.children.forEach((child) => child.removeFromParent());
-		if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
-		scene.remove(this.labelGroup);
 	}
 }
 
-const labelLine = {
-	build: (item) => {
-		if (!item.includeLabelLine) return;
+class DwarfPlanet extends Planet {
+	constructor(data) {
+		super(data);
+		this.planetTypeKey = '_dwarfPlanets';
+	}
+}
 
-		const labelGeometry = {
-			origInnerRadius: item.diameter * 1.01,
-			origSegments: 90
+class Sun extends Planet {
+	constructor(data) {
+		super(data);
+		this.uniforms = {
+			aspectRatio: { type: 'f', value: window.innerWidth / window.innerHeight },
+			sunPos: { type: 'v3', value: new THREE.Vector3() },
+			sunScreenPos: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
+			sunSize: { type: 'f', value: 0.1 },
+			randAngle: { type: 'f', value: 0.1 },
+			camAngle: { type: 'f', value: 0.26 }
 		};
-		const labelLine = new THREE.Mesh(
-			new THREE.RingBufferGeometry(
-				labelGeometry.origInnerRadius,
-				labelGeometry.origOuterRadius,
-				labelGeometry.origSegments,
-				1,
-				labelGeometry.origThetaStart,
-				labelGeometry.origThetaLength
-			),
-			new THREE.MeshBasicMaterial({
-				color: item.labelColour,
-				transparent: true,
-				opacity: 0.8,
-				blending: THREE.AdditiveBlending,
-				side: THREE.FrontSide
-				// depthTest: false,
-				// depthWrite: false
-			})
-		);
-		labelLine.name = `${item.name} group label line`;
-		labelLine.data = labelLine.data || {};
-		labelLine.data.labelGeometryOriginal = labelGeometry;
-		labelLine.data.planetIsTargeted = false;
-		// labelLine.renderOrder = 998;
-
-		return labelLine;
-	},
-
-	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.labelLine) return;
-		const labelLine = planetGroup.labelLine;
-
-		labelLine.lookAt(orrery.camera.position);
-		let innerRadius = labelLine.geometry.parameters.innerRadius;
-		let outerRadius = labelLine.geometry.parameters.outerRadius;
-		const { origOuterRadius, origSegments } = labelLine.data.labelGeometryOriginal;
-		let regenerate = false;
-		if (
-			orrery.mouseState._hoveredGroups.length &&
-			orrery.mouseState._hoveredGroups.some((g) => g.name === planetGroup.name)
-		) {
-			if (outerRadius < origOuterRadius * 1.1) {
-				outerRadius += easeTo({ from: outerRadius, to: origOuterRadius * 1.1, incrementer: 15 });
-				regenerate = true;
-			}
-			if (regenerate) {
-				labelLine.geometry.dispose(); // running this is recommended but seems pointless
-				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
-			}
-		} else {
-			if (outerRadius > origOuterRadius) {
-				// will interpolate linearly
-				outerRadius += easeTo({ from: outerRadius * 1.1, to: origOuterRadius, incrementer: 15 });
-				regenerate = true;
-			}
-			if (regenerate) {
-				labelLine.geometry.dispose();
-				labelLine.geometry = new THREE.RingGeometry(innerRadius, outerRadius, origSegments);
-			}
-		}
 	}
-};
 
-const rings = {
-	build: (item) => {
-		if (!item.rings) return;
-		const ringsArr = [];
-		item.rings.forEach((ring, i) => {
-			const ringMesh = new THREE.Mesh(
-				ringUVMapGeometry(ring.start, ring.end),
-				new THREE.MeshBasicMaterial({
-					...ring.material,
-					map: textureLoader.load(ring.material.map)
-				})
-			);
+	// TODO: ... it's obvious
+	// if (this.data.key === 'sun') {
+	// 	const largestOrbit = Math.max(...orrery.bodies._all.map((o) => o.aphelion));
+	// 	geometry = new THREE.PlaneBufferGeometry(largestOrbit, largestOrbit, 10);
+	// 	material = new THREE.ShaderMaterial({
+	// 		uniforms: this.uniforms,
+	// 		vertexShader: sunVertexShader,
+	// 		fragmentShader: sunFragmentShader,
+	// 		transparent: true
+	// 	});
+	// 	meshGroup.renderOrder = 1;
+	// } else {
+	// geometry = new SphereBufferGeometry(this.data.diameter, segments, segments);
+	// material = new THREE.MeshStandardMaterial(materialProps);
 
-			ringMesh.name = `${item.name} ring ${i}`;
-			ringMesh.rotation.x = THREE.MathUtils.degToRad(ring.angle);
-			ringsArr.push(ringMesh);
-		});
+	draw() {
+		// TODO: move shader stuff in here
+	}
+}
 
-		return ringsArr;
-	},
-	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.rings) return;
-		const rings = planetGroup.rings;
-		rings.forEach((ring) => {
-			ring.rotation.z += 0.01;
+class Moon extends Entity {
+	constructor(data, planetGroup) {
+		super(data);
+		this.isAdded = false;
+		this.planetGroup = planetGroup;
+		this.materialData = this.data.materialData || rawMaterialData.moon;
+		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+
+		// All entities by default have an interval check. Want this cleared for moons since they start hidden
+		clearInterval(this.intervalCheckVar);
+	}
+
+	build() {
+		if (this.isAdded) return;
+		this.isAdded = true;
+
+		this.labelGroup.add(this.CSSObj);
+		this.planetGroup.add(this.labelGroup);
+
+		this.setListeners();
+
+		this.OrbitLine.build();
+		this.createEntityMesh();
+
+		gsap.to(this.labelDiv, {
+			opacity: 1,
+			duration: 1,
+			onComplete: () => {
+				// Moon meshes build when camera is in planet orbit, and are destroyed when camera leaves orbit
+				// Need to check to see if mesh already built
+				this.intervalCheckVar = setInterval(() => {
+					this.intervalCheck();
+				}, 1000);
+			}
 		});
 	}
-};
 
-const targetLine = {
-	build: (item) => {
-		if (!item.includeTargetLine) return;
-		// the 1.01 helps offset larger bodies like Jupiter
-		const targetLineProps = createCircleFromPoints(item.diameter * 1.2);
-		const { geometry, material } = targetLineProps;
-
-		const targetLine = new THREE.Points(geometry, material);
-		targetLine.renderOrder = 999;
-		targetLine.name = `${item.name} target line`;
-
-		return targetLine;
-	},
-
-	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.targetLine) return;
-		const targetLine = planetGroup.targetLine;
-		targetLine.lookAt(orrery.camera.position);
-		fadeTargetLineOpacity(planetGroup, targetLine);
-	}
-};
-
-const clickTarget = {
-	build: (item) => {
-		const clickTargetSizeMobile = Math.min(item.diameter * 50, 8),
-			clickTargetSizeDesktop = Math.min(item.diameter * 50, item.diameter + 0.5);
-
-		const clickTargetMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(checkIfDesktop() ? clickTargetSizeDesktop : clickTargetSizeMobile, 10, 10),
-			new THREE.MeshBasicMaterial({
-				side: THREE.FrontSide,
-				visible: false, // this should allow it to be picked up by Raycaster, whilst being invisible
-				wireframe: true,
-				transparent: true,
-				opacity: 0.2
-			})
-		);
-
-		clickTargetMesh.name = `${item.name} click target`;
-		clickTargetMesh.data = clickTargetMesh.data || {};
-		clickTargetMesh.data.clickTargetSizeMobile = clickTargetSizeMobile;
-		clickTargetMesh.data.clickTargetSizeDesktop = clickTargetSizeDesktop;
-
-		return clickTargetMesh;
-	},
-
-	renderLoop: (planetGroup) => {
-		if (!planetGroup || !planetGroup.clickTarget) return;
-		if (planetGroup.data.cameraDistance - planetGroup.data.zoomTo < Math.min(30, planetGroup.data.diameter * 40)) {
-			// making sure the geometry is only redrawn once to save performance
-			if (planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.data.diameter) {
-				planetGroup.clickTarget.geometry.dispose();
-				planetGroup.clickTarget.geometry = new THREE.SphereBufferGeometry(planetGroup.data.diameter, 10, 10);
-			}
-		} else {
-			if (
-				(orrery.isDesktop &&
-					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeDesktop) ||
-				(!orrery.isDesktop &&
-					planetGroup.clickTarget.geometry.parameters.radius !== planetGroup.clickTarget.data.clickTargetSizeMobile)
-			) {
-				planetGroup.clickTarget.geometry.dispose();
-				planetGroup.clickTarget.geometry = new THREE.SphereBufferGeometry(
-					orrery.isDesktop
-						? planetGroup.clickTarget.data.clickTargetSizeDesktop
-						: planetGroup.clickTarget.data.clickTargetSizeMobile,
-					10,
-					10
-				);
-			}
+	intervalCheck() {
+		if (this.raycasterEnabled) {
+			this.updateRaycaster();
+			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 		}
-	}
-};
 
-export { setOrbitVisibility, PlanetLabelClass, OrbitLine, labelLine, targetLine, rings, clickTarget };
+		const v3 = new THREE.Vector3();
+		const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
+		this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
+		const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+
+		if (cameraZoomedToMoon) {
+			this.labelDiv.classList.add('faded');
+		} else {
+			this.labelDiv.classList.remove('faded');
+		}
+
+		// if (this.OrbitLine) {
+		// 	if (cameraZoomedToMoon) {
+		// 		this.OrbitLine.fadeOut();
+		// 	} else {
+		// 		if (
+		// 			(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
+		// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
+		// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
+		// 		) {
+		// 			this.OrbitLine.fadeIn();
+		// 		} else {
+		// 			this.OrbitLine.fadeOut();
+		// 		}
+		// 	}
+		// }
+	}
+}
+
+export { setOrbitVisibility, OrbitLine, Planet, DwarfPlanet, Sun };
