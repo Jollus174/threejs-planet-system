@@ -12,8 +12,8 @@ import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
-import { PlanetLabelClass } from './modules/objectProps';
-import { sortData } from './modules/data/api';
+import { Planet, DwarfPlanet, Sun } from './modules/objectProps';
+import { sortData, getNASAMediaData } from './modules/data/api';
 import { scene } from './modules/scene';
 import { setModalEvents } from './modules/events/modals';
 
@@ -206,4 +206,15 @@ fetch('./../solarSystemData.json')
 		setInterval(() => {
 			labelRenderer.zOrder(scene);
 		}, 200);
+
+		// const solarSystemRadius = 143730000000;
+		// const gridHelper = new THREE.GridHelper(solarSystemRadius, kmToAU(solarSystemRadius));
+		// gridHelper.color1 = new THREE.Color('red');
+		// gridHelper.colorGrid = new THREE.Color('red');
+		// scene.add(gridHelper);
 	});
+
+// console.log("Scene polycount:", renderer.info.render.triangles)
+// console.log("Active Drawcalls:", renderer.info.render.calls)
+// console.log("Textures in Memory", renderer.info.memory.textures)
+// console.log("Geometries in Memory", renderer.info.memory.geometries)

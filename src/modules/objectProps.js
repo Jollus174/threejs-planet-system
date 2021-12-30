@@ -175,7 +175,8 @@ class Entity {
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
 
-		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), 1000);
+		this.intervalCheckTime = 300;
+		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
 
 		this.orbitLineVisibleAtBuild = true;
 		this.OrbitLine = new OrbitLine(data, this);
@@ -309,78 +310,78 @@ class Entity {
 		});
 	}
 
+	async constructEntityMesh() {
+		if (this.meshGroup) return this.meshGroup;
+
+		const segments = this.materialData.segments || 32;
+		const materialProps = {
+			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
+			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
+			transparent: false,
+			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
+			emissive: this.materialData.emissive || null,
+			emissiveIntensity: this.materialData.emissiveIntensity || null
+		};
+
+		const meshGroup = new THREE.Group();
+		meshGroup.class = this;
+		meshGroup.name = this.data.key;
+
+		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
+		const material = new THREE.MeshStandardMaterial(materialProps);
+
+		const entityMesh = new THREE.Mesh(geometry, material);
+		entityMesh.name = this.data.key;
+		entityMesh.class = this;
+		entityMesh.castShadow = true;
+		entityMesh.receiveShadow = false;
+
+		meshGroup.add(entityMesh);
+
+		return meshGroup;
+	}
+
+	async constructRingMeshes(ring, i) {
+		if (!ring) return;
+		const ringMaterial = {
+			map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
+			normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
+			transparent: false,
+			emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
+			emissive: ring.emissive || null,
+			emissiveIntensity: ring.emissiveIntensity || null,
+			side: THREE.DoubleSide,
+			blending: THREE.CustomBlending
+		};
+
+		ringMaterial.blendEquation = THREE.MaxEquation;
+		ringMaterial.blendSrc = THREE.OneFactor;
+		ringMaterial.blendDst = THREE.DstAlphaFactor;
+
+		const ringMesh = new THREE.Mesh(
+			ringUVMapGeometry(
+				this.data.meanRadius + this.data.rings[i].inner,
+				this.data.meanRadius + this.data.rings[i].outer
+			),
+			new THREE.MeshStandardMaterial(ringMaterial)
+		);
+
+		ringMesh.name = `${this.data.key} ring ${i}`;
+		ringMesh.receiveShadow = true;
+
+		return ringMesh;
+	}
+
+	// TODO: set distance checker to fade label when zoomed in
+
 	createEntityMesh() {
-		const constructEntityMesh = async () => {
-			if (this.meshGroup) return this.meshGroup;
-
-			const segments = this.materialData.segments || 32;
-			const materialProps = {
-				map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
-				normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
-				transparent: false,
-				emissiveMap: this.materialData.emissiveMap
-					? await textureLoader.loadAsync(this.materialData.emissiveMap)
-					: null,
-				emissive: this.materialData.emissive || null,
-				emissiveIntensity: this.materialData.emissiveIntensity || null
-			};
-
-			const meshGroup = new THREE.Group();
-			meshGroup.class = this;
-			meshGroup.name = this.data.key;
-
-			const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-			const material = new THREE.MeshStandardMaterial(materialProps);
-
-			const entityMesh = new THREE.Mesh(geometry, material);
-			entityMesh.name = this.data.key;
-			entityMesh.class = this;
-			entityMesh.castShadow = true;
-			entityMesh.receiveShadow = false;
-
-			meshGroup.add(entityMesh);
-
-			return meshGroup;
-		};
-
-		const constructRingMeshes = async (ring, i) => {
-			if (!ring) return;
-			const ringMaterial = {
-				map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
-				normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
-				transparent: false,
-				emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
-				emissive: ring.emissive || null,
-				emissiveIntensity: ring.emissiveIntensity || null,
-				side: THREE.DoubleSide,
-				blending: THREE.CustomBlending
-			};
-
-			ringMaterial.blendEquation = THREE.MaxEquation;
-			ringMaterial.blendSrc = THREE.OneFactor;
-			ringMaterial.blendDst = THREE.DstAlphaFactor;
-
-			const ringMesh = new THREE.Mesh(
-				ringUVMapGeometry(
-					this.data.meanRadius + this.data.rings[i].inner,
-					this.data.meanRadius + this.data.rings[i].outer
-				),
-				new THREE.MeshStandardMaterial(ringMaterial)
-			);
-
-			ringMesh.name = `${this.data.key} ring ${i}`;
-			ringMesh.receiveShadow = true;
-
-			return ringMesh;
-		};
-
-		constructEntityMesh().then((meshGroup) => {
+		this.constructEntityMesh().then((meshGroup) => {
 			this.meshGroup = meshGroup;
 			this.labelGroup.add(meshGroup);
 
 			if (this.materialData.rings) {
 				const ringMeshPromises = this.materialData.rings.map((ring, i) => {
-					return constructRingMeshes(ring, i);
+					return this.constructRingMeshes(ring, i);
 				});
 
 				Promise.all(ringMeshPromises).then((ringMeshes) => {
@@ -415,7 +416,9 @@ class Entity {
 
 			// TODO: could be more efficient?
 			const intersects = this.raycaster.intersectObjects(scene.children, true);
+			// temporarily skipping sun since plane is huge
 			const meshIntersects = intersects.filter(
+				// (i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox' && i.object.name !== 'sun'
 				(i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox'
 			);
 
@@ -550,25 +553,60 @@ class Sun extends Planet {
 			randAngle: { type: 'f', value: 0.1 },
 			camAngle: { type: 'f', value: 0.26 }
 		};
+		// this.raycasterEnabled = false;
 	}
 
-	// TODO: ... it's obvious
-	// if (this.data.key === 'sun') {
+	// intervalCheck() {
+	// 	if (this.raycasterEnabled) {
+	// 		this.updateRaycaster();
+	// 		if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+	// 	}
+	// }
+
+	// async constructEntityMesh() {
+	// 	if (this.meshGroup) return this.meshGroup;
+
+	// 	const meshGroup = new THREE.Group();
+	// 	meshGroup.class = this;
+	// 	meshGroup.name = this.data.key;
+
+	// 	// const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
 	// 	const largestOrbit = Math.max(...orrery.bodies._all.map((o) => o.aphelion));
-	// 	geometry = new THREE.PlaneBufferGeometry(largestOrbit, largestOrbit, 10);
-	// 	material = new THREE.ShaderMaterial({
+	// 	const geometry = new THREE.PlaneBufferGeometry(largestOrbit, largestOrbit, 10);
+	// 	const material = new THREE.ShaderMaterial({
 	// 		uniforms: this.uniforms,
 	// 		vertexShader: sunVertexShader,
 	// 		fragmentShader: sunFragmentShader,
 	// 		transparent: true
 	// 	});
+
 	// 	meshGroup.renderOrder = 1;
-	// } else {
-	// geometry = new SphereBufferGeometry(this.data.diameter, segments, segments);
-	// material = new THREE.MeshStandardMaterial(materialProps);
+
+	// 	const entityMesh = new THREE.Mesh(geometry, material);
+	// 	entityMesh.name = this.data.key;
+	// 	entityMesh.class = this;
+	// 	entityMesh.castShadow = true;
+	// 	entityMesh.receiveShadow = false;
+
+	// 	meshGroup.add(entityMesh);
+
+	// 	return meshGroup;
+	// }
 
 	draw() {
-		// TODO: move shader stuff in here
+		// if (!this.meshGroup) return;
+		// const camToSun = orrery.camera.position.clone().sub(this.labelGroup.position);
+		// const groupPosition = new THREE.Vector3();
+		// this.labelGroup.getWorldPosition(groupPosition);
+		// // const sunScreenPos = this.labelGroup.position.project(orrery.camera);
+		// this.uniforms.sunPos.value.copy(camToSun.multiplyScalar(-1));
+		// const visibleW = Math.tan(THREE.MathUtils.degToRad(orrery.camera.fov) / 2) * camToSun.length() * 2;
+		// const sunScreenRatio = this.data.diameter / visibleW;
+		// this.uniforms.sunSize.value = sunScreenRatio;
+		// this.uniforms.randAngle.value = this.uniforms.randAngle.value + 0.001;
+		// this.uniforms.camAngle.value = camToSun.angleTo(new THREE.Vector3(1, 1, 0));
+		// this.uniforms.sunScreenPos.value = new THREE.Vector3(0, 0, 0);
+		// this.labelGroup.lookAt(orrery.camera.position);
 	}
 }
 
@@ -604,7 +642,7 @@ class Moon extends Entity {
 				// Need to check to see if mesh already built
 				this.intervalCheckVar = setInterval(() => {
 					this.intervalCheck();
-				}, 1000);
+				}, this.intervalCheckTime);
 			}
 		});
 	}

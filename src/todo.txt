@@ -7,5 +7,14 @@
 - Fix up planet textures, so are still pinched at top/bottom (like Mercury)
 - Include grid helper?
 
+- Uranus orbits to be top to bottom!
+
+For UX/UI:
+- Include 'X Planet' system when arriving at planet
+- For Jupiter / Saturn / Uranus / Neptune with a lot of moons, have toggle switcher o---o---o for inner/outer/minor moons
+- Include list of available moons to switch to via swiper at bottom (hopefully isn't laggy)
+
+- Include time slider
+
 - Collision detection for when zooming around
 - Need better camera swinging controls

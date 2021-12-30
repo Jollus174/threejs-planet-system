@@ -7,9 +7,9 @@ const renderer = new WebGLRenderer({
 	// powerPreference: 'high-performance',
 	// powerPreference: 'low-power',
 	canvas: domTarget,
-	antialias: true
+	antialias: true,
 	// TODO: This messes up the sun shader, and will need to be accounted for
-	// logarithmicDepthBuffer: checkIfDesktop()
+	logarithmicDepthBuffer: checkIfDesktop()
 });
 
 // TODO: This isn't quite working yet

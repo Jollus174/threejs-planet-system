@@ -300,4 +300,24 @@ const getWikipediaData = async (articleTitle) => {
 		});
 };
 
-export { sortData, getWikipediaData };
+const getNASAMediaData = async (tag) => {
+	// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
+	const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
+	const queryParams = [
+		['page', '0'],
+		['per_page', '25'],
+		['order', 'created_at+desc'],
+		// ['search', ''],
+		// ['href_query_params', 'category%3Dplanets_jupiter'],
+		// ['button_class', 'big_more_button'],
+		['tags', 'jupiter'],
+		['condition_1', '1%3Ais_in_resource_list']
+		// ['category', '51']
+	];
+
+	const url = `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
+
+	return url;
+};
+
+export { sortData, getWikipediaData, getNASAMediaData };
