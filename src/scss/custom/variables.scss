@@ -1,1 +1,24 @@
-// $modal-fade-transform: translate(0, -100px);
+// FontAwesome
+$fa-font-path: "../fonts";
+
+// Custom
+// TODO: convert these to CSS vars
+$grey-medium: #b6b6b6;
+$grey-medium: #b6b6b6;
+$white: #fff;
+$black: #000;
+$black-near: #0c0c0c;
+
+$input-border: #3d3d3d;
+$input-border-hover: #595959;
+
+$btn-disabled: #333;
+
+// -------------------------
+// Bootstrap overrides
+// -------------------------
+
+$font-family-sans-serif: $source-sans;
+// $primary: #595959;
+$component-active-bg: $input-border-hover;
+// $input-btn-focus-color: #595959;

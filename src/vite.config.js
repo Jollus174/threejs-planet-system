@@ -1,10 +1,11 @@
 'use strict';
 import vitePluginString from 'vite-plugin-string';
+import { createVuePlugin } from 'vite-plugin-vue2';
 
 export default {
 	// config options
 	base: './', // to ensure relative path is used, not absolute (I want to host this anywhere)
-	plugins: [vitePluginString()],
+	plugins: [vitePluginString(), createVuePlugin()],
 	// css: {
 	// 	preprocessorOptions: {
 	// 		scss: {
