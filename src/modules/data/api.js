@@ -1,7 +1,7 @@
 'use strict';
 import { Vector3 } from 'three';
 import { settings } from '../settings';
-import { getRandomArbitrary, calculateOrbit, currentDateTime, convertToCamelCase } from '../utils';
+import { getRandomArbitrary, calculateOrbit, currentDateTime } from '../utils';
 import { orrery } from '../orrery';
 import { materialData } from './solarSystem';
 
@@ -109,6 +109,37 @@ const innerMoons = [
 	'Vanth'
 ];
 
+const dwarfPlanetList = ['Pluto', 'Ceres', 'Eris', 'Makemake', 'Haumea', 'Orcus', '50000 Quaoar'];
+
+const asteroidsList = [
+	'4 Vesta',
+	'433 Eros',
+	'101955 Bennu',
+	'243 Ida',
+	'6 Hebe',
+	'762 Pulcova',
+	'47171 Lempo',
+	'951 Gaspra',
+	'4179 Toutatis',
+	'2867 Steins',
+	'5 Astraea',
+	'5145 Pholus',
+	'2 Pallas',
+	'4769 Castalia',
+	'624 Hektor',
+	'216 Kleopatra',
+	'3753 Cruithne',
+	'3 Juno',
+	'10 Hygiea',
+	'16 Psyche',
+	'25143 Itokawa',
+	'21 Lutetia',
+	'253 Mathilde',
+	'87 Sylvia'
+];
+
+const asteroidMoonsList = ['Remus', 'Petit-Prince'];
+
 // manually adding own ring data, API does not have this
 const ringData = {
 	saturn: [
@@ -163,8 +194,7 @@ const sortData = (data) => {
 		// E // Eccentric Anomaly, this is an auxiliary angle used in Kepler's Equation, when computing the True Anomaly from the Mean Anomaly and the orbital eccentricity.
 		item.obliquityOfEcliptic = 23.4293 - 3.563e-7 * currentDateTime();
 
-		item.key = convertToCamelCase(item.englishName);
-		item.materialData = materialData[item.key] || null;
+		item.materialData = materialData[item.id] || null;
 		item.diameter = item.meanRadius * 2;
 		// Math.min to account for huge bodies like Sun
 		item.zoomTo = Math.min(item.meanRadius * 16, item.meanRadius + 7000000);
@@ -173,11 +203,14 @@ const sortData = (data) => {
 	const sun = orrery.bodies._all.find((item) => item.englishName === 'Sun');
 	sun.labelColour = settings.planetColours.sun;
 	sun.isSun = true;
+	sun.type = 'Sun'; // TODO: this is to be baked into the API data itself
 
-	const moons = orrery.bodies._all.filter(
-		(item) =>
-			item.aroundPlanet !== undefined && item.aroundPlanet !== null && item.perihelion !== 0 && item.aphelion !== 0
-	);
+	const moons = orrery.bodies._all
+		.filter(
+			(item) =>
+				item.aroundPlanet !== undefined && item.aroundPlanet !== null && item.perihelion !== 0 && item.aphelion !== 0
+		)
+		.sort((a, b) => a.englishName < b.englishName);
 
 	moons.forEach((moon) => {
 		// all the moons will be default grey for now
@@ -185,19 +218,20 @@ const sortData = (data) => {
 		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
-		moon.materialData = materialData[moon.key] || null;
+		moon.materialData = materialData[moon.id] || null;
 		moon.startingPosition = new Vector3();
 		moon.startingPosition.copy(startingOrbitPosition(moon));
+		moon.type = 'Moon';
 	});
 
-	const dwarfPlanetList = ['Pluto', 'Ceres', 'Eris', 'Makemake', 'Haumea', 'Orcus'];
-	const dwarfPlanets = dwarfPlanetList.map((dPlanet) =>
-		orrery.bodies._all.find((item) => item.englishName.includes(dPlanet))
-	);
+	const dwarfPlanets = dwarfPlanetList
+		.sort()
+		.map((dPlanet) => orrery.bodies._all.find((item) => item.englishName.includes(dPlanet)));
 	dwarfPlanets.forEach((dwarfPlanet) => {
 		dwarfPlanet.isPlanet = false;
 		dwarfPlanet.isDwarfPlanet = true;
 		dwarfPlanet.labelColour = settings.planetColours.default;
+		dwarfPlanet.type = 'Dwarf Planet';
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
@@ -210,13 +244,24 @@ const sortData = (data) => {
 		}
 	});
 
-	const planets = orrery.bodies._all.filter((item) => item.isPlanet);
+	// const asteroids = asteroidsList.map((asteroid) =>
+	// 	orrery.bodies._all.find((item) => item.englishName.includes(asteroid))
+	// );
+	// asteroids.forEach((asteroid) => {
+	// 	asteroid.labelColour = settings.planetColours.default;
+	// 	asteroid.type = 'Asteroid';
+	// 	asteroid.startingPosition = new Vector3();
+	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
+	// });
+
+	const planets = orrery.bodies._all.filter((item) => item.isPlanet).sort((a, b) => a.englishName < b.englishName);
 	planets.forEach((planet) => {
 		// firstly get the moon names then clear the pre-existing moon array from the API of garbage
 		planet.labelColour = settings.planetColours[planet.englishName.toLowerCase()] || settings.planetColours.default;
 		planet.isInnerPlanet = innerPlanets.indexOf(planet.englishName) !== -1;
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
+		planet.type = 'Planet';
 		if (planet.moons && planet.moons.length) {
 			const moonNames = planet.moons.map((moonData) => moonData.moon); // is called 'moon' not 'name' in the data! Whack
 			planet.moons = [];
@@ -226,19 +271,24 @@ const sortData = (data) => {
 			});
 		}
 
-		if (ringData[planet.key]) {
+		if (ringData[planet.id]) {
 			planet.rings = [];
-			ringData[planet.key].forEach((ring) => planet.rings.push(ring));
+			ringData[planet.id].forEach((ring) => planet.rings.push(ring));
 		}
 	});
 
-	const satellites = orrery.bodies._all.filter(
-		(item) =>
-			item.englishName !== 'Sun' &&
-			item.isPlanet === false &&
-			item.aroundPlanet === null &&
-			!dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
-	);
+	const satellites = [];
+
+	// const satellites = orrery.bodies._all.filter(
+	// 	(item) =>
+	// 		item.englishName !== 'Sun' &&
+	// 		item.isPlanet === false &&
+	// 		item.aroundPlanet === null &&
+	// 		!dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
+	// );
+	// satellites.forEach((satellite) => {
+	// 	satellite.type = 'Satellite or Comet';
+	// });
 
 	return {
 		sun,
@@ -246,6 +296,7 @@ const sortData = (data) => {
 		dwarfPlanets,
 		planets,
 		satellites
+		// asteroids
 	};
 };
 

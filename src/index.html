@@ -25,56 +25,66 @@
 				</figure>
 			</div>
 
-			<div class="controls-container d-none">
-				<div class="controls controls-primary d-none d-md-block">
-					<div class="title">Keyboard Controls</div>
-					<div>
-						<span class="key">W</span>
-						<span>Pan Up</span>
-					</div>
-					<div>
-						<span class="key">A</span>
-						<span>Pan Left</span>
-					</div>
-					<div>
-						<span class="key">S</span>
-						<span>Pan Down</span>
-					</div>
-					<div>
-						<span class="key">D</span>
-						<span>Pan Right</span>
-					</div>
-					<div>
-						<span class="key">F</span>
-						<span>Dolly In</span>
-					</div>
-					<div>
-						<span class="key">V</span>
-						<span>Dolly Out</span>
-					</div>
-					<div>
-						<span class="key">Z</span>
-						<span>Prev Target</span>
-					</div>
-					<div>
-						<span class="key">C</span>
-						<span>Next Target</span>
+			<div class="container-fluid ui">
+				<div class="ui-top">
+					<div class="row">
+						<div class="col-2 col-lg-3">
+							<div class="time-container">
+								<button class="btn">
+									<i class="fas fa-clock"></i>
+								</button>
+								<button class="btn d-none d-lg-inline-block">
+									<i class="fas fa-backward"></i>
+								</button>
+								<button class="btn d-none d-lg-inline-block">
+									<i class="fas fa-pause"></i>
+								</button>
+								<button class="btn d-none d-lg-inline-block">
+									<i class="fas fa-forward"></i>
+								</button>
+							</div>
+						</div>
+						<div class="col">
+							<div class="system-container">
+								<button class="btn" @click="goToPreviousSystem()">
+									<i class="fas fa-angle-left"></i>
+								</button>
+								<h2 class="h2" v-html="currentSystem"></h2>
+								<button class="btn" @click="goToNextSystem()">
+									<i class="fas fa-angle-right"></i>
+								</button>
+							</div>
+						</div>
+						<div class="col-2 col-lg-3">
+							<div class="search-container" :class="{'active': searchQuery.length && searchResults.length}">
+								<button class="btn">
+									<i class="fas fa-search d-lg-none"></i>
+								</button>
+
+								<div id="search" class="search d-none d-lg-block">
+									<i class="fas fa-search"></i>
+									<input
+										class="form-control"
+										type="seach"
+										placeholder="Search"
+										v-model="searchQuery"
+										@keyup="updateSearch"
+									/>
+									<div class="search-dropdown" v-if="searchResults.length">
+										<ul>
+											<li v-for="(result, i) in searchResults">
+												<a :href="'/#/' + result.id" @click="updateEntityTarget(i)">
+													<span v-html="result.englishName"></span> <span class="text-type">{{ result.type }}</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<!-- <div class="controls controls-secondary">
-					<div>
-						<label>
-							<input type="checkbox" id="orbit-lines" checked />
-							<span>Toggle Orbit Lines</span>
-						</label>
-					</div>
-				</div> -->
-			</div>
-
-			<div class="buttons-container">
-				<button id="btn-back" type="button" disabled>Back</button>
-				<!-- Button trigger modal -->
-				<button type="button" id="btn-modal-info" disabled>Show Info</button>
+				<div class="ui-bottom"></div>
 			</div>
 
 			<!-- Modal -->

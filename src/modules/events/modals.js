@@ -16,7 +16,7 @@ const setModalEvents = () => {
 		window.renderLoop = requestAnimationFrame(window.animate);
 	});
 
-	modalInfoButton.addEventListener('click', () => {
+	/* modalInfoButton.addEventListener('click', () => {
 		modalInfoModal.show();
 
 		const { title, content, image, wikipediaKey, englishName } = orrery.mouseState._clickedClass.data;
@@ -29,7 +29,7 @@ const setModalEvents = () => {
 			wikipediaKey || englishName
 		}`;
 		console.log(content);
-	});
+	}); */
 };
 
 export { setModalEvents };

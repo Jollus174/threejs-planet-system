@@ -28,49 +28,11 @@ const initMousePointerEvents = () => {
 		orrery.cameraState._zoomToTarget = false;
 	});
 
-	document.querySelector('#btn-back').addEventListener('click', () => {
-		orrery.cameraState._zoomToTarget = false;
-		document.querySelector('#btn-modal-info').disabled = true;
-		orrery.controls.reset();
-	});
+	// document.querySelector('#btn-back').addEventListener('click', () => {
+	// 	orrery.cameraState._zoomToTarget = false;
+	// 	document.querySelector('#btn-modal-info').disabled = true;
+	// 	orrery.controls.reset();
+	// });
 };
 
-const handleLabelClick = (classRef) => {
-	orrery.controls.saveState(); // saving state so can use the [Back] button
-	// document.querySelector('#btn-back').disabled = false;
-
-	// TODO: this should probably be on :focus, not click
-	const labelSelected = document.querySelector('.label.label-selected');
-	if (labelSelected) labelSelected.classList.remove('label-selected');
-	classRef.labelDiv.classList.add('label-selected');
-
-	// checking to see if the item has already been clicked
-	// if it has, then zoom to it
-	if (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === classRef.data.key) {
-		orrery.cameraState._zoomToTarget = true; // to get the camera moving
-		orrery.cameraState._zoomedClass = classRef;
-		controls.minDistance = classRef.data.meanRadius * 8;
-	} else {
-		orrery.cameraState._zoomToTarget = false;
-		orrery.cameraState._zoomedClass = null;
-		orrery.mouseState._clickedClass = classRef; // TODO: this should be 'focused class'!
-	}
-
-	document.querySelector('#btn-modal-info').disabled = false;
-
-	// updating modal with Wikipedia data
-	if (!classRef.data.content) {
-		const wikiKey = classRef.data.wikipediaKey || classRef.data.englishName;
-		getWikipediaData(wikiKey)
-			.then((response) => {
-				classRef.data.title = response.title;
-				classRef.data.content = response.content;
-				classRef.data.image = response.image;
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	}
-};
-
-export { initMousePointerEvents, handleLabelClick };
+export { initMousePointerEvents };

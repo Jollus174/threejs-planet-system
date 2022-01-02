@@ -16,4 +16,7 @@ const renderer = new WebGLRenderer({
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = BasicShadowMap;
 
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+
 export { renderer };

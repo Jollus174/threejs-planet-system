@@ -25,7 +25,8 @@ const orrery = {
 		_all: {},
 		_planets: {},
 		_dwarfPlanets: {},
-		_moons: {}
+		_moons: {},
+		_navigable: {}
 	},
 	bodies: {
 		_all: [],
@@ -50,7 +51,8 @@ const orrery = {
 		_spotLights: [],
 		_ambientLights: []
 	},
-	isDesktop: false
+	isDesktop: false,
+	vueTarget: document.querySelector('#app-orrery')
 };
 
 window.orrery = orrery;

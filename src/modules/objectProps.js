@@ -19,6 +19,7 @@ import sunVertexShader from './shaders/sun/vertexShader.glsl';
 import simpleFragmentShader from './shaders/debug/simpleFragmentShader.glsl';
 import simpleVertexShader from './shaders/debug/simpleVertexShader.glsl';
 import { materialData as rawMaterialData } from './data/solarSystem';
+import { customEventNames } from './events/customEvents';
 
 const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
 // TODO: set it at this range only for the planet/moon that's targeted
@@ -163,13 +164,13 @@ class OrbitLine {
 class Entity {
 	constructor(data) {
 		this.data = data;
-		this.labelDiv = document.createElement('div');
-		this.labelGroup = new THREE.Group();
-		this.meshGroup = null;
+		this.labelLink = document.createElement('a');
+		this.labelGroup = new THREE.Group({ name: `${this.data.id} group label` });
+		this.meshGroup = new THREE.Group({ name: `${this.data.id} mesh group` });
 		this.fadingIn = false;
 		this.fadingOut = false;
 		this.isVisible = false;
-		this.CSSObj = new CSS2DObject(this.labelDiv, this);
+		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.moonClasses = {};
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
@@ -186,9 +187,13 @@ class Entity {
 		// for debugging
 		this.raycasterArrowEnabled = false;
 		// ---
+	}
+
+	build() {
+		this.setListeners();
 
 		const entityTypeClasses = [
-			this.data.key === 'sun' ? 'is-sun' : '',
+			this.data.id === 'sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
 			this.data.isPlanet ? 'is-planet' : '',
 			this.data.isDwarfPlanet ? 'is-dwarf-planet' : '',
@@ -198,11 +203,12 @@ class Entity {
 			.join(' ')
 			.trim();
 
-		this.labelDiv.className = `label behind-label ${entityTypeClasses}`;
-		this.labelDiv.dataset.selector = 'label';
-		this.labelDiv.style.color = this.data.labelColour;
-		this.labelDiv.style.opacity = 0;
-		this.labelDiv.innerHTML = `
+		this.labelLink.href = `/#/${this.data.id}`;
+		this.labelLink.className = `label behind-label ${entityTypeClasses}`;
+		this.labelLink.dataset.selector = 'label';
+		this.labelLink.style.color = this.data.labelColour;
+		this.labelLink.style.opacity = 0;
+		this.labelLink.innerHTML = `
 			<div class="label-content">
 				<div class="label-circle"></div>
 				<div class="label-text" style="color: ${
@@ -210,32 +216,19 @@ class Entity {
 				};">${this.data.englishName}</div>
 			</div>
 			`;
-		this.CSSObj.name = this.data.key;
+		this.CSSObj.name = this.data.id;
 		this.CSSObj.position.set(0, 0, 0);
 
-		this.labelGroup.name = `${this.data.key} group label`;
+		this.labelGroup.name = `${this.data.id} group label`;
 		this.labelGroup.data = this.data;
 
-		orrery.bodies._planetLabels[this.data.key] = this.labelGroup;
+		orrery.bodies._planetLabels[this.data.id] = this.labelGroup;
 
 		if (this.data.startingPosition) {
 			this.labelGroup.position.copy(this.data.startingPosition);
 		} else {
 			this.labelGroup.position.set(0, 0, 0);
 		}
-
-		if (this.data.moons && this.data.moons.length) {
-			this.data.moons.forEach((moon) => {
-				// now rather than pushing to an array, using key/value pairs for easier referencing
-				// is scoped to the planet so can more easily run them through like an array if need be
-				this.moonClasses[moon.key] = new Moon(moon, this.labelGroup);
-				orrery.classes._moons[moon.key] = this.moonClasses[moon.key];
-			});
-		}
-	}
-
-	build() {
-		this.setListeners();
 
 		this.labelGroup.add(this.CSSObj);
 		scene.add(this.labelGroup);
@@ -250,68 +243,48 @@ class Entity {
 		if (!this.fadingIn && !this.isVisible) {
 			this.fadingIn = true;
 			this.visible = true;
-			gsap.to(this.labelDiv, {
+			gsap.to(this.labelLink, {
 				opacity: 1,
 				duration: 1,
 				onComplete: () => {
 					this.fadingIn = false;
 					this.isVisible = true;
-					this.labelDiv.style.pointerEvents = '';
+					this.labelLink.style.pointerEvents = '';
 				}
+			});
+		}
+
+		if (this.data.moons && this.data.moons.length) {
+			this.data.moons.forEach((moon) => {
+				// now rather than pushing to an array, using key/value pairs for easier referencing
+				// is scoped to the planet so can more easily run them through like an array if need be
+
+				// TODO: reference Moons from orrery.classes._all so we aren't building them twice
+				this.moonClasses[moon.id] = new Moon(moon, this.labelGroup);
+				orrery.classes._moons[moon.id] = this.moonClasses[moon.id];
 			});
 		}
 	}
 
 	setListeners() {
-		this.labelDiv.addEventListener('pointerdown', () => {
-			orrery.controls.saveState(); // saving state so can use the [Back] button
-			// document.querySelector('#btn-back').disabled = false;
-
-			// TODO: this should probably be on :focus, not click
-			const labelSelected = document.querySelector('.label.label-selected');
-			if (labelSelected) labelSelected.classList.remove('label-selected');
-			this.labelDiv.classList.add('label-selected');
-
-			// checking to see if the item has already been clicked
-			// if it has, then zoom to it
-			if (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) {
-				orrery.cameraState._zoomToTarget = true; // to get the camera moving
-				orrery.cameraState._zoomedClass = this;
-				controls.minDistance = this.data.meanRadius * 8;
-			} else {
-				orrery.cameraState._zoomToTarget = false;
-				orrery.cameraState._zoomedClass = null;
-				orrery.mouseState._clickedClass = this; // TODO: this should be 'focused class'!
-			}
-
-			document.querySelector('#btn-modal-info').disabled = false;
-
-			// updating modal with Wikipedia data
-			if (!this.data.content) {
-				const wikiKey = this.data.wikipediaKey || this.data.englishName;
-				getWikipediaData(wikiKey)
-					.then((response) => {
-						this.data.title = response.title;
-						this.data.content = response.content;
-						this.data.image = response.image;
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-			}
+		this.labelLink.addEventListener('pointerdown', () => {
+			window.location = this.labelLink.href; // OrbitControls eats the native click events :(
+			document.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: this }));
+			orrery.vueTarget.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: this }));
 		});
 
-		this.labelDiv.addEventListener('mouseover', () => {
+		this.labelLink.addEventListener('mouseover', () => {
 			orrery.mouseState._hoveredClass = this;
 		});
 
-		this.labelDiv.addEventListener('mouseleave', () => {
+		this.labelLink.addEventListener('mouseleave', () => {
 			orrery.mouseState._hoveredClass = '';
 		});
 	}
 
 	async constructEntityMesh() {
-		if (this.meshGroup) return this.meshGroup;
+		// TODO: Am unsure about this
+		if (this.meshGroup && this.meshGroup.children.length) return;
 
 		const segments = this.materialData.segments || 32;
 		const materialProps = {
@@ -323,22 +296,18 @@ class Entity {
 			emissiveIntensity: this.materialData.emissiveIntensity || null
 		};
 
-		const meshGroup = new THREE.Group();
-		meshGroup.class = this;
-		meshGroup.name = this.data.key;
+		this.meshGroup.class = this;
 
 		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
 		const material = new THREE.MeshStandardMaterial(materialProps);
 
 		const entityMesh = new THREE.Mesh(geometry, material);
-		entityMesh.name = this.data.key;
+		entityMesh.name = this.data.id;
 		entityMesh.class = this;
 		entityMesh.castShadow = true;
 		entityMesh.receiveShadow = false;
 
-		meshGroup.add(entityMesh);
-
-		return meshGroup;
+		return entityMesh;
 	}
 
 	async constructRingMeshes(ring, i) {
@@ -366,7 +335,7 @@ class Entity {
 			new THREE.MeshStandardMaterial(ringMaterial)
 		);
 
-		ringMesh.name = `${this.data.key} ring ${i}`;
+		ringMesh.name = `${this.data.id} ring ${i}`;
 		ringMesh.receiveShadow = true;
 
 		return ringMesh;
@@ -375,9 +344,9 @@ class Entity {
 	// TODO: set distance checker to fade label when zoomed in
 
 	createEntityMesh() {
-		this.constructEntityMesh().then((meshGroup) => {
-			this.meshGroup = meshGroup;
-			this.labelGroup.add(meshGroup);
+		this.constructEntityMesh().then((mesh) => {
+			this.meshGroup.add(mesh);
+			this.labelGroup.add(this.meshGroup);
 
 			if (this.materialData.rings) {
 				const ringMeshPromises = this.materialData.rings.map((ring, i) => {
@@ -422,10 +391,10 @@ class Entity {
 				(i) => i.object && i.object.type === 'Mesh' && i.object.name !== 'skybox'
 			);
 
-			if (meshIntersects.length && meshIntersects[0].object.name !== this.data.key) {
-				this.labelDiv.classList.add('behind-planet');
+			if (meshIntersects.length && meshIntersects[0].object.name !== this.data.id) {
+				this.labelLink.classList.add('behind-planet');
 			} else {
-				this.labelDiv.classList.remove('behind-planet');
+				this.labelLink.classList.remove('behind-planet');
 			}
 		}
 	}
@@ -441,12 +410,12 @@ class Entity {
 	// }, 500);
 
 	remove() {
-		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.key && !this.fadingOut && this.isAdded) {
+		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isAdded) {
 		if (!this.fadingOut && this.isAdded) {
 			// fading out OrbitLine BEFORE entity (once the entity is gone, so is the line)
 			this.fadingOut = true;
 
-			gsap.to(this.labelDiv, {
+			gsap.to(this.labelLink, {
 				opacity: 0,
 				duration: 1,
 				onComplete: () => {
@@ -478,7 +447,7 @@ class Planet extends Entity {
 		super(data);
 	}
 
-	intervalCheck() {
+	/* intervalCheck() {
 		if (this.raycasterEnabled) {
 			this.updateRaycaster();
 			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
@@ -488,8 +457,8 @@ class Planet extends Entity {
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + 50000000;
 
 		if (cameraZoomedToPlanet) {
-			orrery.cameraState._currentPlanetInRange = this.data.key;
-			// this.labelDiv.classList.add('faded');
+			orrery.cameraState._currentPlanetInRange = this.data.id;
+			// this.labelLink.classList.add('faded');
 
 			// staggering the building of moon classes to help with performance
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -503,9 +472,9 @@ class Planet extends Entity {
 			}
 		} else {
 			// TODO: Need a fix for if a second planet immediately replaces the previous one
-			if (orrery.cameraState._currentPlanetInRange === this.data.key) {
+			if (orrery.cameraState._currentPlanetInRange === this.data.id) {
 				orrery.cameraState._currentPlanetInRange = '';
-				// this.labelDiv.classList.remove('faded');
+				// this.labelLink.classList.remove('faded');
 			}
 
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -522,23 +491,30 @@ class Planet extends Entity {
 		if (this.OrbitLine) {
 			// if (
 			// !orrery.cameraState._currentPlanetInRange ||
-			// (orrery.cameraState._currentPlanetInRange && orrery.cameraState._currentPlanetInRange === this.data.key) ||
+			// (orrery.cameraState._currentPlanetInRange && orrery.cameraState._currentPlanetInRange === this.data.id) ||
 			// !orrery.cameraState._isInPlaneOfReference ||
-			// (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
-			// (orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
+			// (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
+			// (orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
 			// ) {
 			this.OrbitLine.orbitLineFadeIn();
 			// } else {
 			// this.OrbitLine.fadeOut();
 			// }
 		}
-	}
+	} */
 }
 
 class DwarfPlanet extends Planet {
 	constructor(data) {
 		super(data);
 		this.planetTypeKey = '_dwarfPlanets';
+	}
+}
+
+class Asteroid extends Planet {
+	constructor(data) {
+		super(data);
+		this.planetTypeKey = '_asteroid';
 	}
 }
 
@@ -568,7 +544,7 @@ class Sun extends Planet {
 
 	// 	const meshGroup = new THREE.Group();
 	// 	meshGroup.class = this;
-	// 	meshGroup.name = this.data.key;
+	// 	meshGroup.name = this.data.id;
 
 	// 	// const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
 	// 	const largestOrbit = Math.max(...orrery.bodies._all.map((o) => o.aphelion));
@@ -583,7 +559,7 @@ class Sun extends Planet {
 	// 	meshGroup.renderOrder = 1;
 
 	// 	const entityMesh = new THREE.Mesh(geometry, material);
-	// 	entityMesh.name = this.data.key;
+	// 	entityMesh.name = this.data.id;
 	// 	entityMesh.class = this;
 	// 	entityMesh.castShadow = true;
 	// 	entityMesh.receiveShadow = false;
@@ -611,12 +587,13 @@ class Sun extends Planet {
 }
 
 class Moon extends Entity {
-	constructor(data, planetGroup) {
+	constructor(data, planetClass) {
 		super(data);
 		this.isAdded = false;
-		this.planetGroup = planetGroup;
+		this.planetClass = planetClass;
+		this.planetGroup = this.planetClass.labelGroup;
 		this.materialData = this.data.materialData || rawMaterialData.moon;
-		this.orbitLineVisibleAtBuild = this.planetGroup.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+		this.orbitLineVisibleAtBuild = this.planetClass.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
 
 		// All entities by default have an interval check. Want this cleared for moons since they start hidden
 		clearInterval(this.intervalCheckVar);
@@ -634,7 +611,7 @@ class Moon extends Entity {
 		this.OrbitLine.build();
 		this.createEntityMesh();
 
-		gsap.to(this.labelDiv, {
+		gsap.to(this.labelLink, {
 			opacity: 1,
 			duration: 1,
 			onComplete: () => {
@@ -647,7 +624,7 @@ class Moon extends Entity {
 		});
 	}
 
-	intervalCheck() {
+	/* 	intervalCheck() {
 		if (this.raycasterEnabled) {
 			this.updateRaycaster();
 			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
@@ -659,9 +636,9 @@ class Moon extends Entity {
 		const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
 
 		if (cameraZoomedToMoon) {
-			this.labelDiv.classList.add('faded');
+			this.labelLink.classList.add('faded');
 		} else {
-			this.labelDiv.classList.remove('faded');
+			this.labelLink.classList.remove('faded');
 		}
 
 		// if (this.OrbitLine) {
@@ -670,8 +647,8 @@ class Moon extends Entity {
 		// 	} else {
 		// 		if (
 		// 			(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
-		// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.key === this.data.key) ||
-		// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.key === this.data.key)
+		// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
+		// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
 		// 		) {
 		// 			this.OrbitLine.fadeIn();
 		// 		} else {
@@ -679,7 +656,7 @@ class Moon extends Entity {
 		// 		}
 		// 	}
 		// }
-	}
+	} */
 }
 
-export { setOrbitVisibility, OrbitLine, Planet, DwarfPlanet, Sun };
+export { setOrbitVisibility, OrbitLine, Planet, DwarfPlanet, Asteroid, Sun, Moon };

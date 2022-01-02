@@ -1,0 +1,23 @@
+a,
+button {
+	&:focus {
+		outline: 1px dotted; // override ugly Chrome outlines
+	}
+}
+
+.btn {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: $white;
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
+
+	&:disabled {
+		color: $btn-disabled;
+	}
+}

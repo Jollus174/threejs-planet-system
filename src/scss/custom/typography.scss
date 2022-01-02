@@ -1,0 +1,51 @@
+::placeholder {
+	/* Chrome, Firefox, Opera, Safari 10.1+ */
+	color: $grey-medium;
+	opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder {
+	/* Internet Explorer 10-11 */
+	color: $grey-medium;
+}
+
+::-ms-input-placeholder {
+	/* Microsoft Edge */
+	color: $grey-medium;
+}
+
+::selection {
+	background: rgba($white, 0.9); /* WebKit/Blink Browsers */
+	color: $black-near;
+}
+
+::-moz-selection {
+	background: rgba($white, 0.9); /* Gecko Browsers */
+	color: $black-near;
+}
+
+h2,
+.h2 {
+	font-size: 24px;
+}
+
+a {
+	color: $white;
+
+	&:hover {
+		color: $white;
+	}
+}
+
+.text-type {
+	text-transform: uppercase;
+	font-size: 12px;
+	color: #828282;
+
+	&::before {
+		content: "/";
+		display: inline-block;
+		margin-left: 5px;
+		margin-right: 5px;
+	}
+}

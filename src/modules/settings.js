@@ -10,7 +10,7 @@ const settings = {
 		_maxDistance: 100000000000,
 		_enableDamping: true,
 		_dampingFactor: 0.05,
-		_enableKeys: true,
+		_enableKeys: false, // could potentially eat search inputs...
 		_minPolarAngle: 0.5,
 		_maxPolarAngle: 2.5,
 

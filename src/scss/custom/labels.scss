@@ -2,6 +2,11 @@
 	display: none;
 	user-select: none;
 	cursor: pointer;
+	font-weight: 400;
+
+	&:focus {
+		outline: 0;
+	}
 
 	&[data-label-name="sun"] {
 		background-color: transparent;
@@ -132,7 +137,6 @@
 		margin-top: 3px;
 		padding: 3px 4px;
 		color: rgb(162, 162, 162);
-		font-weight: 700;
 		white-space: nowrap;
 		text-shadow: 1px 1px 0 black, -1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, 0 0 3px black;
 		transition: border-width 0.2s ease, color 0.2s ease, opacity 0.2s ease;

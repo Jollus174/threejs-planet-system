@@ -9,8 +9,13 @@
 @import "../node_modules/bootstrap/scss/reboot";
 @import "../node_modules/bootstrap/scss/grid";
 @import "../node_modules/bootstrap/scss/utilities";
+@import "../node_modules/bootstrap/scss/containers";
 @import "../node_modules/bootstrap/scss/modal";
 @import "../node_modules/bootstrap/scss/close";
+@import "../node_modules/bootstrap/scss/buttons";
+@import "../node_modules/bootstrap/scss/forms/form-control";
+@import "../node_modules/bootstrap/scss/utilities/api";
+
 @import "../node_modules/fontawesome-free/scss/fontawesome";
 @import "../node_modules/fontawesome-free/scss/solid";
 
@@ -18,6 +23,10 @@
 @import "custom/z";
 @import "custom/labels";
 @import "custom/loader";
+@import "custom/typography";
+@import "custom/buttons";
+@import "custom/ui";
+@import "custom/search";
 @import "custom/modals";
 @import "custom/controls";
 

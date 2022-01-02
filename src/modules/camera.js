@@ -8,4 +8,7 @@ const camera = new PerspectiveCamera(
 	settings.camera._far
 );
 
+camera.position.y = 120000000;
+camera.position.z = 700000000;
+
 export { camera };

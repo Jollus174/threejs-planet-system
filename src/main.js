@@ -4,6 +4,7 @@ import './scss/styles.scss';
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
 import { settings } from './modules/settings';
+import { controls } from './modules/controls';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo, checkIfDesktop } from './modules/utils';
@@ -12,10 +13,14 @@ import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
-import { Planet, DwarfPlanet, Sun } from './modules/objectProps';
+import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, getNASAMediaData } from './modules/data/api';
 import { scene } from './modules/scene';
 import { setModalEvents } from './modules/events/modals';
+import { customEventNames } from './modules/events/customEvents';
+import { getWikipediaData } from './modules/data/api';
+
+import Vue from 'vue/dist/vue.js';
 
 window.settings = settings;
 window.renderLoop;
@@ -28,6 +33,53 @@ const orbitCentroid = new THREE.Object3D();
 orbitCentroid.name = 'orbit centroid';
 const clock = new THREE.Clock();
 const vectorPosition = new THREE.Vector3();
+
+document.addEventListener(customEventNames.updateEntityTarget, (e) => {
+	const clickedClass = e.detail;
+	const newClickedClassSameAsOld = orrery.mouseState._clickedClass
+		? clickedClass.data.id === orrery.mouseState._clickedClass.data.id
+		: false;
+	orrery.mouseState._clickedClass = clickedClass;
+
+	const labelSelected = document.querySelector('.label.label-selected');
+	if (labelSelected) labelSelected.classList.remove('label-selected');
+
+	clickedClass.labelLink.classList.add('label-selected');
+
+	// updating modal with Wikipedia data
+	/* if (!clickedClass.data.content) {
+		const wikiKey = clickedClass.data.wikipediaKey || clickedClass.data.englishName;
+		getWikipediaData(wikiKey)
+			.then((response) => {
+				clickedClass.data.title = response.title;
+				clickedClass.data.content = response.content;
+				clickedClass.data.image = response.image;
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	} */
+
+	// checking to see if the item has already been clicked
+	// if it has, then zoom to it
+	if (newClickedClassSameAsOld) {
+		document.dispatchEvent(new CustomEvent(customEventNames.updateZoomTarget, { detail: clickedClass }));
+	} else {
+		orrery.cameraState._zoomToTarget = false;
+		orrery.mouseState._zoomedClass = null;
+		// orrery.mouseState._clickedClass = null; // TODO: this should be 'focused class'!
+	}
+});
+
+document.addEventListener(customEventNames.updateZoomTarget, (e) => {
+	const zoomedClass = e.detail;
+	orrery.mouseState._zoomedClass = zoomedClass;
+
+	orrery.cameraState._zoomToTarget = true; // to get the camera moving
+	controls.minDistance = zoomedClass.data.meanRadius * 8;
+
+	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateZoomTargetVue));
+});
 
 const render = () => {
 	delta = 5 * clock.getDelta();
@@ -61,11 +113,11 @@ const render = () => {
 		clickedGroup.getWorldPosition(vectorPosition);
 	}
 
-	if (orrery.mouseState._clickedClass && orrery.cameraState._zoomToTarget) {
+	if (orrery.mouseState._zoomedClass && orrery.cameraState._zoomToTarget) {
 		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
 		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
 		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
-		const zoomTo = orrery.mouseState._clickedClass.data.zoomTo;
+		const zoomTo = orrery.mouseState._zoomedClass.data.zoomTo;
 		const distanceToTarget = orrery.controls.getDistance();
 
 		if (distanceToTarget > zoomTo) {
@@ -123,7 +175,7 @@ window.animate = () => {
 	window.renderLoop = requestAnimationFrame(window.animate);
 };
 
-fetch('./../solarSystemData.json')
+fetch('./solarSystemData.json')
 	.then((response) => {
 		if (!response.ok) throw new Error('Error retrieving Solar System data');
 		return response.json();
@@ -135,6 +187,7 @@ fetch('./../solarSystemData.json')
 		orrery.bodies._moons = sortedData.moons;
 		orrery.bodies._dwarfPlanets = sortedData.dwarfPlanets;
 		orrery.bodies._satellites = sortedData.satellites;
+		orrery.bodies._asteroids = sortedData.asteroids;
 		orrery.bodies._allPlanets = sortedData.planets.concat(sortedData.dwarfPlanets);
 
 		scene.add(skybox(skyboxTexturePaths));
@@ -146,72 +199,200 @@ fetch('./../solarSystemData.json')
 		orrery.classes._sun = new Sun(orrery.bodies._sun);
 
 		orrery.bodies._planets.forEach((planet) => {
-			orrery.classes._planets[planet.key] = new Planet(planet);
+			orrery.classes._planets[planet.id] = new Planet(planet);
 		});
 
 		orrery.bodies._dwarfPlanets.forEach((dPlanet) => {
-			orrery.classes._dwarfPlanets[dPlanet.key] = new DwarfPlanet(dPlanet);
+			orrery.classes._dwarfPlanets[dPlanet.id] = new DwarfPlanet(dPlanet);
 		});
 
-		// this will also include moons during the class build process
+		orrery.classes._all.sun = orrery.classes._sun;
+		// temp
+		// TODO: When 'Type' is implemented into the original API data, then we build _all and filter down from there
 		orrery.classes._all = {
 			...orrery.classes._planets,
 			...orrery.classes._dwarfPlanets
 		};
-		orrery.classes._all.sun = orrery.classes._sun;
-		Object.values(orrery.classes._all).forEach((c) => c.build());
+		//
 
-		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(window.innerWidth, window.innerHeight);
-
-		document.querySelector('main').prepend(labelRenderer.domElement);
-
-		labelRenderer.render(scene, orrery.camera);
-
-		orrery.camera.position.y = 120000000;
-		orrery.camera.position.z = 700000000;
-
-		// --------------------
-		// Setting Events
-		// --------------------
-		initMousePointerEvents();
-		setModalEvents();
-
-		orrery.isDesktop = checkIfDesktop();
-
-		// --------------------
-		// Lighting
-		// --------------------
-		orrery.lights._pointLights = pointLights();
-		// orrery.lights._spotLights = spotLights();
-		orrery.lights._ambientLights = ambientLights();
-
-		// add all lights at once because I cbf doing them individually
-		const lightTypeKeys = Object.keys(orrery.lights);
-		lightTypeKeys.forEach((lightType) => {
-			orrery.lights[lightType].forEach((lightObjsArr) => {
-				lightObjsArr.forEach((lightObj) => scene.add(lightObj));
-			});
+		orrery.bodies._moons.forEach((moon) => {
+			if (!orrery.classes._all[moon.aroundPlanet.planet]) return;
+			orrery.classes._moons[moon.id] = new Moon(moon, orrery.classes._all[moon.aroundPlanet.planet]);
 		});
 
-		window.animate();
+		Object.entries(orrery.classes._moons).forEach((entry) => (orrery.classes._all[entry[0]] = entry[1]));
 
-		// scene.add(orrery.bodies._starField);
-		// scene.add(orrery.bodies._asteroidBelt);
+		orrery.classes._navigable = {
+			sun: orrery.classes._sun,
 
-		// sets z-indexing of planets to be correct
-		// checking for overlapping labels (and eventually labels behind planets...)
-		// the former needs to be done in the DOM
-		// the latter... I'm not completely sure yet
-		setInterval(() => {
-			labelRenderer.zOrder(scene);
-		}, 200);
+			mercury: orrery.classes._planets.mercury,
+			venus: orrery.classes._planets.venus,
+			earth: orrery.classes._planets.earth,
+			mars: orrery.classes._planets.mars,
+			jupiter: orrery.classes._planets.jupiter,
+			saturn: orrery.classes._planets.saturn,
+			uranus: orrery.classes._planets.uranus,
+			neptune: orrery.classes._planets.neptune,
 
-		// const solarSystemRadius = 143730000000;
-		// const gridHelper = new THREE.GridHelper(solarSystemRadius, kmToAU(solarSystemRadius));
-		// gridHelper.color1 = new THREE.Color('red');
-		// gridHelper.colorGrid = new THREE.Color('red');
-		// scene.add(gridHelper);
+			pluto: orrery.classes._dwarfPlanets.pluto,
+			ceres: orrery.classes._dwarfPlanets.ceres,
+			eris: orrery.classes._dwarfPlanets.eris,
+			makemake: orrery.classes._dwarfPlanets.makemake,
+			haumea: orrery.classes._dwarfPlanets.haumea,
+			orcus: orrery.classes._dwarfPlanets.orcus,
+			quaoar: orrery.classes._dwarfPlanets.quaoar
+		};
+
+		// MESH BUILDING
+		orrery.classes._sun.build();
+		Object.values(orrery.classes._planets).forEach((item) => item.build());
+		Object.values(orrery.classes._dwarfPlanets).forEach((item) => item.build());
+
+		new Vue({
+			el: orrery.vueTarget,
+			data: {
+				searchQuery: '',
+				searchResults: [],
+				bottomBar: {},
+				content: {},
+				moonSections: [],
+				moons: [],
+				comparisons: [],
+				media: [],
+				zoomedClassData: null
+			},
+			computed: {
+				currentSystem() {
+					if (this.zoomedClassData && this.zoomedClassData.id === 'sun') {
+						return `The <span style="color: ${this.zoomedClassData.labelColour};">${this.zoomedClassData.englishName}</span>`;
+					} else {
+						const entity = this.zoomedClassData
+							? `<span style="color: ${this.zoomedClassData.labelColour};">${this.zoomedClassData.system}</span>`
+							: 'Solar';
+						return `${entity} System`;
+					}
+				}
+			},
+			methods: {
+				highlightMatchSubstring(str) {
+					const regex = new RegExp(this.searchQuery, 'gi');
+					return str.toString().replace(regex, (replacedStr) => `<span class="highlight">${replacedStr}</span>`);
+				},
+
+				updateSearch() {
+					if (!this.searchQuery) return;
+
+					this.searchResults.splice(0); // clear previous set of results
+
+					// filter the _all based on the 'searchQuery'
+					const filteredResults = Object.values(orrery.classes._all)
+						.filter((item) => item.data.englishName.toLowerCase().includes(this.searchQuery.toLowerCase()))
+						.map((result) => result.data);
+
+					// splitting the results by Type, then recombining into the final Search Results
+					const planets = filteredResults.filter((r) => r.type === 'Planet');
+					const dwarfPlanets = filteredResults.filter((r) => r.type === 'Dwarf Planet');
+					const satellites = filteredResults.filter((r) => r.type === 'Satellite');
+					// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever')
+					const namedMoons = filteredResults.filter((r) => r.type === 'Moon' && !r.englishName.includes('S/2'));
+					const unnamedMoons = filteredResults.filter((r) => r.type === 'Moon' && r.englishName.includes('S/2'));
+					// const asteroids = filteredResults
+					// 	.filter((r) => r.type === 'Asteroid')
+					// 	.sort((a, b) => a.englishName < b.englishName);
+					const asteroids = [];
+
+					const sortedResults = []
+						.concat(planets, dwarfPlanets, satellites, namedMoons, unnamedMoons, asteroids)
+						.map((result) => {
+							return {
+								id: result.id,
+								englishName: this.highlightMatchSubstring(result.englishName),
+								type: result.type,
+								system: result.system
+							};
+						})
+						.slice(0, checkIfDesktop() ? 12 : 6); // cap the results for UX
+
+					this.searchResults = [...sortedResults];
+				},
+
+				goToPreviousSystem() {
+					const keys = Object.keys(orrery.classes._navigable);
+					const currentIndex = this.zoomedClassData ? keys.indexOf(this.zoomedClassData.id) : 0;
+					const prevIndex = this.zoomedClassData && currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
+					this.zoomedClassData = orrery.classes._navigable[keys[prevIndex]].data;
+				},
+
+				goToNextSystem() {
+					const keys = Object.keys(orrery.classes._navigable);
+					const currentIndex = this.zoomedClassData ? keys.indexOf(this.zoomedClassData.id) : 0;
+					const nextIndex = this.zoomedClassData && currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
+					this.zoomedClassData = orrery.classes._navigable[keys[nextIndex]].data;
+				},
+
+				resetSearch() {
+					this.searchQuery = '';
+					this.searchResults.splice(0);
+				},
+
+				updateEntityTarget(i) {
+					const clickedClass = orrery.classes._all[this.searchResults[i].id];
+					document.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: clickedClass }));
+					this.resetSearch();
+				}
+			},
+			mounted() {
+				document.querySelector('main').prepend(labelRenderer.domElement);
+
+				document.addEventListener('click', (e) => {
+					if (!e.target.closest('#search')) {
+						this.resetSearch();
+					}
+				});
+
+				orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {
+					this.zoomedClassData = orrery.mouseState._zoomedClass.data;
+				});
+
+				labelRenderer.render(scene, orrery.camera);
+
+				// --------------------
+				// Setting Events
+				// --------------------
+				initMousePointerEvents();
+				setModalEvents();
+
+				orrery.isDesktop = checkIfDesktop();
+
+				// --------------------
+				// Lighting
+				// --------------------
+				orrery.lights._pointLights = pointLights();
+				// orrery.lights._spotLights = spotLights();
+				orrery.lights._ambientLights = ambientLights();
+
+				// add all lights at once because I cbf doing them individually
+				const lightTypeKeys = Object.keys(orrery.lights);
+				lightTypeKeys.forEach((lightType) => {
+					orrery.lights[lightType].forEach((lightObjsArr) => {
+						lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+					});
+				});
+
+				window.animate();
+
+				// scene.add(orrery.bodies._starField);
+				// scene.add(orrery.bodies._asteroidBelt);
+
+				// sets z-indexing of planets to be correct
+				// checking for overlapping labels (and eventually labels behind planets...)
+				// the former needs to be done in the DOM
+				// the latter... I'm not completely sure yet
+				setInterval(() => {
+					labelRenderer.zOrder(scene);
+				}, 200);
+			}
+		});
 	});
 
 // console.log("Scene polycount:", renderer.info.render.triangles)
