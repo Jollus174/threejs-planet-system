@@ -25,22 +25,23 @@ const orrery = {
 		_all: {},
 		_planets: {},
 		_dwarfPlanets: {},
+		_asteroids: {},
 		_moons: {},
 		_navigable: {}
 	},
 	bodies: {
 		_all: [],
-		_sun: {},
-		_dwarfPlanets: [],
+		_star: [],
+		_dwarfPlanet: [],
 		_starField: null,
 		_asteroidBelt: null,
 		_planetLabels: {},
 		_moonLabels: {},
 		_dwarfPlanetLabels: {},
-		_planets: {},
+		_planet: [],
 		_allPlanets: [],
-		_moons: [],
-		_satellites: [],
+		_moon: [],
+		_asteroid: [],
 		_orbitLines: []
 	},
 	orbitLines: {

@@ -1,0 +1,39 @@
+.ui-top {
+	.time-container {
+	}
+
+	.system-container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		text-transform: uppercase;
+		text-align: center;
+
+		@include media-breakpoint-up(md) {
+			letter-spacing: 0.2em;
+		}
+
+		.h2 {
+			margin: 0;
+			user-select: none;
+			color: #cec3c7;
+		}
+
+		.fas {
+			font-size: 20px;
+		}
+
+		.btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+
+	.search-container {
+		display: flex;
+		justify-content: flex-end;
+		pointer-events: all;
+		flex-grow: 1;
+	}
+}

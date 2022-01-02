@@ -1,7 +1,7 @@
 'use strict';
 import { Vector3 } from 'three';
 import { settings } from '../settings';
-import { getRandomArbitrary, calculateOrbit, currentDateTime } from '../utils';
+import { getRandomArbitrary, calculateOrbit, currentDateTime, convertToCamelCase } from '../utils';
 import { orrery } from '../orrery';
 import { materialData } from './solarSystem';
 
@@ -198,40 +198,32 @@ const sortData = (data) => {
 		item.diameter = item.meanRadius * 2;
 		// Math.min to account for huge bodies like Sun
 		item.zoomTo = Math.min(item.meanRadius * 16, item.meanRadius + 7000000);
+
+		item.labelColour =
+			settings.planetColours[item.id] || settings.planetColours[item.type] || settings.planetColours.default;
+
+		// setting the 'entity types' here rather than further down and redoing the loop
+		const key = '_' + convertToCamelCase(item.type);
+		orrery.bodies[key] = orrery.bodies[key] || [];
+		orrery.bodies[key].push(item);
 	});
 
-	const sun = orrery.bodies._all.find((item) => item.englishName === 'Sun');
-	sun.labelColour = settings.planetColours.sun;
-	sun.isSun = true;
-	sun.type = 'Sun'; // TODO: this is to be baked into the API data itself
+	const sun = orrery.bodies._star[0];
 
-	const moons = orrery.bodies._all
-		.filter(
-			(item) =>
-				item.aroundPlanet !== undefined && item.aroundPlanet !== null && item.perihelion !== 0 && item.aphelion !== 0
-		)
-		.sort((a, b) => a.englishName < b.englishName);
-
+	const moons = orrery.bodies._all.filter((m) => m.type === 'Moon').sort((a, b) => a.englishName < b.englishName);
 	moons.forEach((moon) => {
-		// all the moons will be default grey for now
-		moon.labelColour = settings.planetColours[moon.englishName.toLowerCase()] || settings.planetColours.default;
 		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
 		moon.materialData = materialData[moon.id] || null;
 		moon.startingPosition = new Vector3();
 		moon.startingPosition.copy(startingOrbitPosition(moon));
-		moon.type = 'Moon';
 	});
 
-	const dwarfPlanets = dwarfPlanetList
-		.sort()
-		.map((dPlanet) => orrery.bodies._all.find((item) => item.englishName.includes(dPlanet)));
+	const dwarfPlanets = orrery.bodies._all
+		.filter((d) => d.type === 'Dwarf Planet')
+		.sort((a, b) => a.englishName < b.englishName);
 	dwarfPlanets.forEach((dwarfPlanet) => {
-		dwarfPlanet.isPlanet = false;
-		dwarfPlanet.isDwarfPlanet = true;
-		dwarfPlanet.labelColour = settings.planetColours.default;
-		dwarfPlanet.type = 'Dwarf Planet';
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
 		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
@@ -254,10 +246,8 @@ const sortData = (data) => {
 	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
 	// });
 
-	const planets = orrery.bodies._all.filter((item) => item.isPlanet).sort((a, b) => a.englishName < b.englishName);
+	const planets = orrery.bodies._all.filter((p) => p.type === 'Planet').sort((a, b) => a.englishName < b.englishName);
 	planets.forEach((planet) => {
-		// firstly get the moon names then clear the pre-existing moon array from the API of garbage
-		planet.labelColour = settings.planetColours[planet.englishName.toLowerCase()] || settings.planetColours.default;
 		planet.isInnerPlanet = innerPlanets.indexOf(planet.englishName) !== -1;
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
@@ -277,8 +267,6 @@ const sortData = (data) => {
 		}
 	});
 
-	const satellites = [];
-
 	// const satellites = orrery.bodies._all.filter(
 	// 	(item) =>
 	// 		item.englishName !== 'Sun' &&
@@ -294,8 +282,7 @@ const sortData = (data) => {
 		sun,
 		moons,
 		dwarfPlanets,
-		planets,
-		satellites
+		planets
 		// asteroids
 	};
 };

@@ -18,7 +18,16 @@ $btn-disabled: #333;
 // Bootstrap overrides
 // -------------------------
 
+$primary: $white;
+
+$body-color: $primary;
+
 $font-family-sans-serif: $source-sans;
 // $primary: #595959;
 $component-active-bg: $input-border-hover;
 // $input-btn-focus-color: #595959;
+
+$badge-color: $black;
+$badge-padding-y: 0.25em;
+$badge-padding-x: 0.5em;
+$badge-border-radius: 50%;

@@ -28,12 +28,12 @@
 		appearance: none;
 		border-radius: 20px;
 		padding-left: 42px;
+		color: $white;
 		transition: color 0.2s ease;
 
 		&:hover,
 		&:focus,
 		&:active {
-			color: $white;
 			background-color: rgba($black, 0.5);
 			border-color: $input-border-hover;
 		}
@@ -54,12 +54,19 @@
 		}
 
 		li {
-			a {
+			a,
+			.no-results {
 				display: flex;
 				align-items: flex-end;
 				padding: 10px 15px;
 				text-decoration: none;
+			}
 
+			.no-results {
+				user-select: none;
+			}
+
+			a {
 				&:hover,
 				&:focus {
 					background-color: #323232;

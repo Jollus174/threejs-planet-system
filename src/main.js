@@ -197,51 +197,28 @@ fetch('./solarSystemData.json')
 		// --------------------
 
 		orrery.classes._sun = new Sun(orrery.bodies._sun);
-
-		orrery.bodies._planets.forEach((planet) => {
-			orrery.classes._planets[planet.id] = new Planet(planet);
-		});
-
-		orrery.bodies._dwarfPlanets.forEach((dPlanet) => {
-			orrery.classes._dwarfPlanets[dPlanet.id] = new DwarfPlanet(dPlanet);
-		});
-
 		orrery.classes._all.sun = orrery.classes._sun;
-		// temp
-		// TODO: When 'Type' is implemented into the original API data, then we build _all and filter down from there
-		orrery.classes._all = {
-			...orrery.classes._planets,
-			...orrery.classes._dwarfPlanets
-		};
-		//
+
+		orrery.bodies._planet.forEach((planet) => {
+			orrery.classes._planets[planet.id] = new Planet(planet);
+			orrery.classes._all[planet.id] = orrery.classes._planets[planet.id];
+		});
+
+		orrery.bodies._dwarfPlanet.forEach((dPlanet) => {
+			orrery.classes._dwarfPlanets[dPlanet.id] = new DwarfPlanet(dPlanet);
+			orrery.classes._all[dPlanet.id] = orrery.classes._dwarfPlanets[dPlanet.id];
+		});
+
+		orrery.bodies._asteroid.forEach((asteroid) => {
+			orrery.classes._asteroids[asteroid.id] = new Asteroid(asteroid);
+			orrery.classes._all[asteroid.id] = orrery.classes._asteroids[asteroid.id];
+		});
 
 		orrery.bodies._moons.forEach((moon) => {
-			if (!orrery.classes._all[moon.aroundPlanet.planet]) return;
-			orrery.classes._moons[moon.id] = new Moon(moon, orrery.classes._all[moon.aroundPlanet.planet]);
+			const parentEntity = orrery.classes._all[moon.aroundPlanet.planet];
+			orrery.classes._moons[moon.id] = new Moon(moon, parentEntity);
+			orrery.classes._all[moon.id] = orrery.classes._moons[moon.id];
 		});
-
-		Object.entries(orrery.classes._moons).forEach((entry) => (orrery.classes._all[entry[0]] = entry[1]));
-
-		orrery.classes._navigable = {
-			sun: orrery.classes._sun,
-
-			mercury: orrery.classes._planets.mercury,
-			venus: orrery.classes._planets.venus,
-			earth: orrery.classes._planets.earth,
-			mars: orrery.classes._planets.mars,
-			jupiter: orrery.classes._planets.jupiter,
-			saturn: orrery.classes._planets.saturn,
-			uranus: orrery.classes._planets.uranus,
-			neptune: orrery.classes._planets.neptune,
-
-			pluto: orrery.classes._dwarfPlanets.pluto,
-			ceres: orrery.classes._dwarfPlanets.ceres,
-			eris: orrery.classes._dwarfPlanets.eris,
-			makemake: orrery.classes._dwarfPlanets.makemake,
-			haumea: orrery.classes._dwarfPlanets.haumea,
-			orcus: orrery.classes._dwarfPlanets.orcus,
-			quaoar: orrery.classes._dwarfPlanets.quaoar
-		};
 
 		// MESH BUILDING
 		orrery.classes._sun.build();
@@ -253,6 +230,7 @@ fetch('./solarSystemData.json')
 			data: {
 				searchQuery: '',
 				searchResults: [],
+				searchLoaded: false,
 				bottomBar: {},
 				content: {},
 				moonSections: [],
@@ -263,11 +241,16 @@ fetch('./solarSystemData.json')
 			},
 			computed: {
 				currentSystem() {
-					if (this.zoomedClassData && this.zoomedClassData.id === 'sun') {
+					if (!this.zoomedClassData) return 'Solar System';
+					if (this.zoomedClassData.type === 'Star') {
 						return `The <span style="color: ${this.zoomedClassData.labelColour};">${this.zoomedClassData.englishName}</span>`;
 					} else {
+						// checking if Moon or Entity
+						const labelColour = this.zoomedClassData.aroundPlanet
+							? orrery.classes._all[this.zoomedClassData.aroundPlanet.planet].data.labelColour
+							: this.zoomedClassData.labelColour;
 						const entity = this.zoomedClassData
-							? `<span style="color: ${this.zoomedClassData.labelColour};">${this.zoomedClassData.system}</span>`
+							? `<span style="color: ${labelColour};">${this.zoomedClassData.system}</span>`
 							: 'Solar';
 						return `${entity} System`;
 					}
@@ -280,6 +263,7 @@ fetch('./solarSystemData.json')
 				},
 
 				updateSearch() {
+					this.searchLoaded = false;
 					if (!this.searchQuery) return;
 
 					this.searchResults.splice(0); // clear previous set of results
@@ -290,19 +274,19 @@ fetch('./solarSystemData.json')
 						.map((result) => result.data);
 
 					// splitting the results by Type, then recombining into the final Search Results
+					const stars = filteredResults.filter((r) => r.type === 'Star');
 					const planets = filteredResults.filter((r) => r.type === 'Planet');
 					const dwarfPlanets = filteredResults.filter((r) => r.type === 'Dwarf Planet');
-					const satellites = filteredResults.filter((r) => r.type === 'Satellite');
-					// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever')
+					// const asteroids = filteredResults.filter((r) => r.type === 'Asteroids');
+					// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
 					const namedMoons = filteredResults.filter((r) => r.type === 'Moon' && !r.englishName.includes('S/2'));
 					const unnamedMoons = filteredResults.filter((r) => r.type === 'Moon' && r.englishName.includes('S/2'));
 					// const asteroids = filteredResults
 					// 	.filter((r) => r.type === 'Asteroid')
 					// 	.sort((a, b) => a.englishName < b.englishName);
-					const asteroids = [];
 
 					const sortedResults = []
-						.concat(planets, dwarfPlanets, satellites, namedMoons, unnamedMoons, asteroids)
+						.concat(stars, planets, dwarfPlanets, namedMoons, unnamedMoons)
 						.map((result) => {
 							return {
 								id: result.id,
@@ -314,20 +298,31 @@ fetch('./solarSystemData.json')
 						.slice(0, checkIfDesktop() ? 12 : 6); // cap the results for UX
 
 					this.searchResults = [...sortedResults];
+					this.$nextTick(() => {
+						this.searchLoaded = true;
+					});
 				},
 
 				goToPreviousSystem() {
-					const keys = Object.keys(orrery.classes._navigable);
-					const currentIndex = this.zoomedClassData ? keys.indexOf(this.zoomedClassData.id) : 0;
+					const keys = settings.systemNavigation;
+					const currentIndex =
+						this.zoomedClassData && this.zoomedClassData.type !== 'Star'
+							? keys.indexOf(this.zoomedClassData.system.toLowerCase())
+							: 0;
 					const prevIndex = this.zoomedClassData && currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
-					this.zoomedClassData = orrery.classes._navigable[keys[prevIndex]].data;
+					this.zoomedClassData = orrery.classes._all[keys[prevIndex]].data;
 				},
 
 				goToNextSystem() {
-					const keys = Object.keys(orrery.classes._navigable);
-					const currentIndex = this.zoomedClassData ? keys.indexOf(this.zoomedClassData.id) : 0;
+					const keys = settings.systemNavigation;
+					const currentIndex =
+						this.zoomedClassData && this.zoomedClassData.type !== 'Star'
+							? keys.indexOf(this.zoomedClassData.system.toLowerCase())
+							: 0;
 					const nextIndex = this.zoomedClassData && currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
-					this.zoomedClassData = orrery.classes._navigable[keys[nextIndex]].data;
+					this.zoomedClassData = orrery.classes._all[keys[nextIndex]].data;
+				},
+
 				},
 
 				resetSearch() {
@@ -337,6 +332,7 @@ fetch('./solarSystemData.json')
 
 				updateEntityTarget(i) {
 					const clickedClass = orrery.classes._all[this.searchResults[i].id];
+					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
 					document.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: clickedClass }));
 					this.resetSearch();
 				}

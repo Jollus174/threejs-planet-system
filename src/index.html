@@ -30,35 +30,35 @@
 					<div class="row">
 						<div class="col-2 col-lg-3">
 							<div class="time-container">
-								<button class="btn">
+								<button type="button" class="btn btn-rounded">
 									<i class="fas fa-clock"></i>
 								</button>
-								<button class="btn d-none d-lg-inline-block">
+								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
 									<i class="fas fa-backward"></i>
 								</button>
-								<button class="btn d-none d-lg-inline-block">
+								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
 									<i class="fas fa-pause"></i>
 								</button>
-								<button class="btn d-none d-lg-inline-block">
+								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
 									<i class="fas fa-forward"></i>
 								</button>
 							</div>
 						</div>
 						<div class="col">
 							<div class="system-container">
-								<button class="btn" @click="goToPreviousSystem()">
+								<button type="button" class="btn btn-rounded" @click="goToPreviousSystem()">
 									<i class="fas fa-angle-left"></i>
 								</button>
 								<h2 class="h2" v-html="currentSystem"></h2>
-								<button class="btn" @click="goToNextSystem()">
+								<button type="button" class="btn btn-rounded" @click="goToNextSystem()">
 									<i class="fas fa-angle-right"></i>
 								</button>
 							</div>
 						</div>
 						<div class="col-2 col-lg-3">
-							<div class="search-container" :class="{'active': searchQuery.length && searchResults.length}">
-								<button class="btn">
-									<i class="fas fa-search d-lg-none"></i>
+							<div class="search-container" :class="{'active': searchQuery && searchLoaded}">
+								<button type="button" class="btn btn-rounded d-lg-none">
+									<i class="fas fa-search"></i>
 								</button>
 
 								<div id="search" class="search d-none d-lg-block">
@@ -69,13 +69,17 @@
 										placeholder="Search"
 										v-model="searchQuery"
 										@keyup="updateSearch"
+										@keyup.enter="updateEntityTarget(0)"
 									/>
-									<div class="search-dropdown" v-if="searchResults.length">
+									<div class="search-dropdown" v-if="searchLoaded">
 										<ul>
 											<li v-for="(result, i) in searchResults">
 												<a :href="'/#/' + result.id" @click="updateEntityTarget(i)">
 													<span v-html="result.englishName"></span> <span class="text-type">{{ result.type }}</span>
 												</a>
+											</li>
+											<li v-if="!searchResults.length">
+												<span class="no-results">No results found.</span>
 											</li>
 										</ul>
 									</div>
@@ -93,7 +97,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<h5 class="modal-title" id="modal-info-label">Info</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							<button type="button" class="btn-close btn-rounded" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body"></div>
 						<div class="modal-footer">
