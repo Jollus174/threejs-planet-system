@@ -1170,7 +1170,7 @@
 	},
 	{
 		"id": "praxidike",
-		"name": "Praxidyke",
+		"name": "Praxidike",
 		"englishName": "Praxidike",
 		"type": "Moon",
 		"moons": null,
@@ -6889,8 +6889,8 @@
 		"wikipediaKey": "Hiʻiaka_(moon)"
 	},
 	{
-		"id": "dysnomie",
-		"name": "Dysnomie",
+		"id": "dysnomia",
+		"name": "Dysnomia",
 		"englishName": "Dysnomia",
 		"type": "Moon",
 		"moons": null,
@@ -7478,13 +7478,13 @@
 	},
 	{
 		"id": "eris",
-		"name": "(136199) eris",
+		"name": "(136199) Eris",
 		"englishName": "136199 Eris",
 		"system": "Eris",
-		"type": "Asteroid",
+		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "Dysnomie"
+				"moon": "Dysnomia"
 			}
 		],
 		"semimajorAxis": 10180122852,
@@ -8847,7 +8847,7 @@
 				"moon": "Triton"
 			},
 			{
-				"moon": "Nereïde"
+				"moon": "Nereid"
 			},
 			{
 				"moon": "Naiade"
@@ -9004,7 +9004,7 @@
 				"moon": "Namaka"
 			},
 			{
-				"moon": "Hi'iaka"
+				"moon": "Hiiaka"
 			}
 		],
 		"semimajorAxis": 6432011461,
@@ -9534,7 +9534,7 @@
 		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "S/2015 (136472) 1"
+				"moon": "mk2"
 			}
 		],
 		"semimajorAxis": 6783345606,
@@ -9694,7 +9694,7 @@
 				"moon": "Isonoe"
 			},
 			{
-				"moon": "Praxidyke"
+				"moon": "Praxidike"
 			},
 			{
 				"moon": "Autonoe"
