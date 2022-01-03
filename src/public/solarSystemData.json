@@ -5330,7 +5330,7 @@
 	},
 	{
 		"id": "ophelia",
-		"name": "Ophelie",
+		"name": "Ophelia",
 		"displayName": "Ophelia",
 		"type": "Moon",
 		"moons": null,
@@ -5450,7 +5450,7 @@
 	},
 	{
 		"id": "desdemona",
-		"name": "Desdemone",
+		"name": "Desdemona",
 		"displayName": "Desdemona",
 		"type": "Moon",
 		"moons": null,
@@ -5490,7 +5490,7 @@
 	},
 	{
 		"id": "juliet",
-		"name": "Juliette",
+		"name": "Juliet",
 		"displayName": "Juliet",
 		"type": "Moon",
 		"moons": null,
@@ -5570,7 +5570,7 @@
 	},
 	{
 		"id": "rosalind",
-		"name": "Rosalinde",
+		"name": "Rosalind",
 		"displayName": "Rosalind",
 		"type": "Moon",
 		"moons": null,
@@ -7994,7 +7994,7 @@
 				"moon": "cordelia"
 			},
 			{
-				"moon": "ophelie"
+				"moon": "ophelia"
 			},
 			{
 				"moon": "bianca"
@@ -8003,16 +8003,16 @@
 				"moon": "cressida"
 			},
 			{
-				"moon": "desdemone"
+				"moon": "desdemona"
 			},
 			{
-				"moon": "juliette"
+				"moon": "juliet"
 			},
 			{
 				"moon": "portia"
 			},
 			{
-				"moon": "rosalinde"
+				"moon": "rosalind"
 			},
 			{
 				"moon": "belinda"
@@ -8850,7 +8850,7 @@
 				"moon": "nereid"
 			},
 			{
-				"moon": "naiade"
+				"moon": "naiad"
 			},
 			{
 				"moon": "thalassa"
@@ -10285,8 +10285,6 @@
 		"polarRadius": 0,
 		"flattening": 0.00009,
 		"dimension": "",
-		"sideralOrbit": 2.74,
-		"sideralRotation": 0,
 		"aroundPlanet": null,
 		"discoveredBy": "",
 		"discoveryDate": "",
