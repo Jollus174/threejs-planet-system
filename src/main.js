@@ -7,7 +7,7 @@ import { settings } from './modules/settings';
 import { controls } from './modules/controls';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
-import { easeTo, checkIfDesktop } from './modules/utils';
+import { easeTo, checkIfDesktop, kmToAU, AUToKm } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
@@ -34,7 +34,7 @@ orbitCentroid.name = 'orbit centroid';
 const clock = new THREE.Clock();
 const vectorPosition = new THREE.Vector3();
 
-document.addEventListener(customEventNames.updateEntityTarget, (e) => {
+document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const clickedClass = e.detail;
 	const newClickedClassSameAsOld = orrery.mouseState._clickedClass
 		? clickedClass.data.id === orrery.mouseState._clickedClass.data.id
@@ -48,7 +48,7 @@ document.addEventListener(customEventNames.updateEntityTarget, (e) => {
 
 	// updating modal with Wikipedia data
 	/* if (!clickedClass.data.content) {
-		const wikiKey = clickedClass.data.wikipediaKey || clickedClass.data.englishName;
+		const wikiKey = clickedClass.data.wikipediaKey || clickedClass.data.displayName;
 		getWikipediaData(wikiKey)
 			.then((response) => {
 				clickedClass.data.title = response.title;
@@ -59,6 +59,8 @@ document.addEventListener(customEventNames.updateEntityTarget, (e) => {
 				console.error(err);
 			});
 	} */
+
+	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateClickTargetVue));
 
 	// checking to see if the item has already been clicked
 	// if it has, then zoom to it
@@ -232,31 +234,78 @@ fetch('./solarSystemData.json')
 				searchResults: [],
 				searchLoaded: false,
 				bottomBar: {},
+				showMoons: true, // TODO: will need to be controlled by 3D Orrery then passed to this
 				content: {},
 				moonSections: [],
 				moons: [],
 				comparisons: [],
 				media: [],
+				clickedClassData: null,
 				zoomedClassData: null
 			},
 			computed: {
+				systemColour() {
+					return this.clickedClassData.aroundPlanet
+						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.labelColour
+						: this.clickedClassData.labelColour;
+				},
 				currentSystem() {
-					if (!this.zoomedClassData) return 'Solar System';
-					if (this.zoomedClassData.type === 'Star') {
-						return `The <span style="color: ${this.zoomedClassData.labelColour};">${this.zoomedClassData.englishName}</span>`;
+					if (!this.clickedClassData) return 'Solar System';
+					if (this.clickedClassData.type === 'Star') {
+						return `The <span class="text-system-color">${this.clickedClassData.displayName}</span>`;
 					} else {
 						// checking if Moon or Entity
-						const labelColour = this.zoomedClassData.aroundPlanet
-							? orrery.classes._all[this.zoomedClassData.aroundPlanet.planet].data.labelColour
-							: this.zoomedClassData.labelColour;
-						const entity = this.zoomedClassData
-							? `<span style="color: ${labelColour};">${this.zoomedClassData.system}</span>`
+						const entity = this.clickedClassData
+							? `<span class="text-system-color">${this.clickedClassData.system}</span>`
 							: 'Solar';
 						return `${entity} System`;
 					}
+				},
+
+				distanceFromParentEntity() {
+					if (!this.clickedClassData) return;
+					// to be in km or AU depending on amount
+					// also shouldn't be more than 2 floating points
+					const kmToAUConverter = 149598000;
+					const isClose = this.clickedClassData.semimajorAxis < kmToAUConverter / 3;
+					const parentEntity =
+						this.clickedClassData.type === 'Moon'
+							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
+							: 'Sun';
+					if (isClose) {
+						return `<span class="label-color">${this.clickedClassData.semimajorAxis}</span> km from ${parentEntity}`;
+					} else {
+						const distanceNumber = this.convertToAU(this.clickedClassData.semimajorAxis).toFixed(2).split('.');
+						// also, if floating points are '.00', then disclude them
+						const floatingPoints = distanceNumber[1].toString() !== '00' ? '.' + distanceNumber[1] : '';
+						return `<span class="label-color">${distanceNumber[0] + floatingPoints}</span> AU from ${parentEntity}`;
+					}
+				},
+
+				sideralOrbit() {
+					if (!this.clickedClassData) return;
+					// siderals more than a year should return years rather than days
+					const sideralConversion =
+						this.clickedClassData.sideralOrbit > 366
+							? this.clickedClassData.sideralOrbit / 365.26
+							: this.clickedClassData.sideralOrbit;
+					// sideral orbit to be to max of 2 floating points (or none if it's .00)
+					const sideral = sideralConversion.toFixed(2).split('.');
+					const floatingPoints = sideral[1].toString() !== '00' ? '.' + sideral[1] : '';
+					return sideral[0] + floatingPoints;
+				},
+
+				showMoonsArrowClass() {
+					return this.showMoons ? 'fa-angle-down' : 'fa-angle-up';
 				}
 			},
 			methods: {
+				convertToAU(km) {
+					return kmToAU(km);
+				},
+				// convertToKm(au){
+				// 	return AUToKm(au);
+				// },
 				highlightMatchSubstring(str) {
 					const regex = new RegExp(this.searchQuery, 'gi');
 					return str.toString().replace(regex, (replacedStr) => `<span class="highlight">${replacedStr}</span>`);
@@ -270,7 +319,7 @@ fetch('./solarSystemData.json')
 
 					// filter the _all based on the 'searchQuery'
 					const filteredResults = Object.values(orrery.classes._all)
-						.filter((item) => item.data.englishName.toLowerCase().includes(this.searchQuery.toLowerCase()))
+						.filter((item) => item.data.displayName.toLowerCase().includes(this.searchQuery.toLowerCase()))
 						.map((result) => result.data);
 
 					// splitting the results by Type, then recombining into the final Search Results
@@ -279,23 +328,23 @@ fetch('./solarSystemData.json')
 					const dwarfPlanets = filteredResults.filter((r) => r.type === 'Dwarf Planet');
 					// const asteroids = filteredResults.filter((r) => r.type === 'Asteroids');
 					// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
-					const namedMoons = filteredResults.filter((r) => r.type === 'Moon' && !r.englishName.includes('S/2'));
-					const unnamedMoons = filteredResults.filter((r) => r.type === 'Moon' && r.englishName.includes('S/2'));
+					const namedMoons = filteredResults.filter((r) => r.type === 'Moon' && !r.displayName.includes('S/2'));
+					const unnamedMoons = filteredResults.filter((r) => r.type === 'Moon' && r.displayName.includes('S/2'));
 					// const asteroids = filteredResults
 					// 	.filter((r) => r.type === 'Asteroid')
-					// 	.sort((a, b) => a.englishName < b.englishName);
+					// 	.sort((a, b) => a.displayName < b.displayName);
 
 					const sortedResults = []
 						.concat(stars, planets, dwarfPlanets, namedMoons, unnamedMoons)
 						.map((result) => {
 							return {
 								id: result.id,
-								englishName: this.highlightMatchSubstring(result.englishName),
+								displayName: this.highlightMatchSubstring(result.displayName),
 								type: result.type,
 								system: result.system
 							};
 						})
-						.slice(0, checkIfDesktop() ? 12 : 6); // cap the results for UX
+						.slice(0, checkIfDesktop() ? 12 : 6); // cap the results depending on display-size for UX
 
 					this.searchResults = [...sortedResults];
 					this.$nextTick(() => {
@@ -304,25 +353,45 @@ fetch('./solarSystemData.json')
 				},
 
 				goToPreviousSystem() {
-					const keys = settings.systemNavigation;
+					const systemKeys = settings.systemNavigation;
 					const currentIndex =
-						this.zoomedClassData && this.zoomedClassData.type !== 'Star'
-							? keys.indexOf(this.zoomedClassData.system.toLowerCase())
+						this.clickedClassData && this.clickedClassData.type !== 'Star'
+							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
 							: 0;
-					const prevIndex = this.zoomedClassData && currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
-					this.zoomedClassData = orrery.classes._all[keys[prevIndex]].data;
+					const prevIndex = this.clickedClassData && currentIndex !== 0 ? currentIndex - 1 : systemKeys.length - 1;
+					this.updateEntity(orrery.classes._all[systemKeys[prevIndex]].data);
 				},
 
 				goToNextSystem() {
-					const keys = settings.systemNavigation;
+					const systemKeys = settings.systemNavigation;
 					const currentIndex =
-						this.zoomedClassData && this.zoomedClassData.type !== 'Star'
-							? keys.indexOf(this.zoomedClassData.system.toLowerCase())
+						this.clickedClassData && this.clickedClassData.type !== 'Star'
+							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
 							: 0;
-					const nextIndex = this.zoomedClassData && currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
-					this.zoomedClassData = orrery.classes._all[keys[nextIndex]].data;
+					const nextIndex = this.clickedClassData && currentIndex + 1 < systemKeys.length ? currentIndex + 1 : 0;
+					this.updateEntity(orrery.classes._all[systemKeys[nextIndex]].data);
 				},
 
+				updateEntity(data) {
+					const newClickedClassData = data;
+					const isNewSystem = !this.clickedClassData || this.clickedClassData.system !== newClickedClassData.system;
+					this.clickedClassData = newClickedClassData;
+					document.querySelector(':root').style.setProperty('--entity-color', this.clickedClassData.labelColour);
+					if (isNewSystem) document.querySelector(':root').style.setProperty('--system-color', this.systemColour);
+				},
+
+				goToPreviousEntity() {
+					const keys = settings.entityNavigation;
+					const currentIndex = keys.indexOf(this.clickedClassData.id);
+					const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
+					this.updateEntity(orrery.classes._all[keys[prevIndex]].data);
+				},
+
+				goToNextEntity() {
+					const keys = settings.entityNavigation;
+					const currentIndex = keys.indexOf(this.clickedClassData.id);
+					const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
+					this.updateEntity(orrery.classes._all[keys[nextIndex]].data);
 				},
 
 				resetSearch() {
@@ -330,10 +399,15 @@ fetch('./solarSystemData.json')
 					this.searchResults.splice(0);
 				},
 
-				updateEntityTarget(i) {
+				updateClickTarget(i) {
+					const clickedClass = orrery.classes._all[this.searchResults[i].id];
+					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
+				},
+
+				updateZoomTarget(i) {
 					const clickedClass = orrery.classes._all[this.searchResults[i].id];
 					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
-					document.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: clickedClass }));
+					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();
 				}
 			},
@@ -344,6 +418,10 @@ fetch('./solarSystemData.json')
 					if (!e.target.closest('#search')) {
 						this.resetSearch();
 					}
+				});
+
+				orrery.vueTarget.addEventListener(customEventNames.updateClickTargetVue, () => {
+					this.updateEntity(orrery.mouseState._clickedClass.data);
 				});
 
 				orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {

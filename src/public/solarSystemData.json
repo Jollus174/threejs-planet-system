@@ -2,7 +2,7 @@
 	{
 		"id": "luna",
 		"name": "Luna",
-		"englishName": "Luna",
+		"displayName": "Luna",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 384400,
@@ -45,7 +45,7 @@
 	{
 		"id": "phobos",
 		"name": "Phobos",
-		"englishName": "Phobos",
+		"displayName": "Phobos",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 9376,
@@ -88,7 +88,7 @@
 	{
 		"id": "deimos",
 		"name": "Deimos",
-		"englishName": "Deimos",
+		"displayName": "Deimos",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23458,
@@ -131,7 +131,7 @@
 	{
 		"id": "io",
 		"name": "Io",
-		"englishName": "Io",
+		"displayName": "Io",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 421700,
@@ -171,7 +171,7 @@
 	{
 		"id": "europa",
 		"name": "Europa",
-		"englishName": "Europa",
+		"displayName": "Europa",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 671100,
@@ -211,7 +211,7 @@
 	{
 		"id": "ganymede",
 		"name": "Ganymede",
-		"englishName": "Ganymede",
+		"displayName": "Ganymede",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 1070400,
@@ -251,7 +251,7 @@
 	{
 		"id": "callisto",
 		"name": "Callisto",
-		"englishName": "Callisto",
+		"displayName": "Callisto",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 1882700,
@@ -291,7 +291,7 @@
 	{
 		"id": "amalthea",
 		"name": "Amalthea",
-		"englishName": "Amalthea",
+		"displayName": "Amalthea",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 181400,
@@ -331,7 +331,7 @@
 	{
 		"id": "himalia",
 		"name": "Himalia",
-		"englishName": "Himalia",
+		"displayName": "Himalia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11461000,
@@ -371,7 +371,7 @@
 	{
 		"id": "elara",
 		"name": "Elara",
-		"englishName": "Elara",
+		"displayName": "Elara",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11741000,
@@ -411,7 +411,7 @@
 	{
 		"id": "pasiphae",
 		"name": "Pasiphae",
-		"englishName": "Pasiphae",
+		"displayName": "Pasiphae",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23624000,
@@ -451,7 +451,7 @@
 	{
 		"id": "sinope",
 		"name": "Sinope",
-		"englishName": "Sinope",
+		"displayName": "Sinope",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23939000,
@@ -491,7 +491,7 @@
 	{
 		"id": "lysithea",
 		"name": "Lysithea",
-		"englishName": "Lysithea",
+		"displayName": "Lysithea",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11717000,
@@ -531,7 +531,7 @@
 	{
 		"id": "carme",
 		"name": "Carme",
-		"englishName": "Carme",
+		"displayName": "Carme",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23404000,
@@ -571,7 +571,7 @@
 	{
 		"id": "ananke",
 		"name": "Ananke",
-		"englishName": "Ananke",
+		"displayName": "Ananke",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21276000,
@@ -611,7 +611,7 @@
 	{
 		"id": "leda",
 		"name": "Leda",
-		"englishName": "Leda",
+		"displayName": "Leda",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11165000,
@@ -651,7 +651,7 @@
 	{
 		"id": "thebe",
 		"name": "Thebe",
-		"englishName": "Thebe",
+		"displayName": "Thebe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 221900,
@@ -691,7 +691,7 @@
 	{
 		"id": "adrastee",
 		"name": "Adrastee",
-		"englishName": "Adrastea",
+		"displayName": "Adrastea",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 129000,
@@ -731,7 +731,7 @@
 	{
 		"id": "metis",
 		"name": "Metis",
-		"englishName": "Metis",
+		"displayName": "Metis",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 128000,
@@ -771,7 +771,7 @@
 	{
 		"id": "callirrhoe",
 		"name": "Callirrhoe",
-		"englishName": "Callirrhoe",
+		"displayName": "Callirrhoe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 24102000,
@@ -811,7 +811,7 @@
 	{
 		"id": "themisto",
 		"name": "Themisto",
-		"englishName": "Themisto",
+		"displayName": "Themisto",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 7507000,
@@ -851,7 +851,7 @@
 	{
 		"id": "megaclite",
 		"name": "Megaclite",
-		"englishName": "Megaclite",
+		"displayName": "Megaclite",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 14146700,
@@ -891,7 +891,7 @@
 	{
 		"id": "taygete",
 		"name": "Taygete",
-		"englishName": "Taygete",
+		"displayName": "Taygete",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23363000,
@@ -931,7 +931,7 @@
 	{
 		"id": "chaldene",
 		"name": "Chaldene",
-		"englishName": "Chaldene",
+		"displayName": "Chaldene",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23179000,
@@ -971,7 +971,7 @@
 	{
 		"id": "harpalyke",
 		"name": "Harpalyke",
-		"englishName": "Harpalyke",
+		"displayName": "Harpalyke",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21104000,
@@ -1011,7 +1011,7 @@
 	{
 		"id": "kalyke",
 		"name": "Kalyke",
-		"englishName": "Kalyke",
+		"displayName": "Kalyke",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23564000,
@@ -1051,7 +1051,7 @@
 	{
 		"id": "iocaste",
 		"name": "Iocaste",
-		"englishName": "Iocaste",
+		"displayName": "Iocaste",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21272000,
@@ -1091,7 +1091,7 @@
 	{
 		"id": "erinome",
 		"name": "Erinome",
-		"englishName": "Erinome",
+		"displayName": "Erinome",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23283000,
@@ -1131,7 +1131,7 @@
 	{
 		"id": "isonoe",
 		"name": "Isonoe",
-		"englishName": "Isonoe",
+		"displayName": "Isonoe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23231000,
@@ -1171,7 +1171,7 @@
 	{
 		"id": "praxidike",
 		"name": "Praxidike",
-		"englishName": "Praxidike",
+		"displayName": "Praxidike",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21148000,
@@ -1211,7 +1211,7 @@
 	{
 		"id": "autonoe",
 		"name": "Autonoe",
-		"englishName": "Autonoe",
+		"displayName": "Autonoe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 24033000,
@@ -1251,7 +1251,7 @@
 	{
 		"id": "thyone",
 		"name": "Thyone",
-		"englishName": "Thyone",
+		"displayName": "Thyone",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21192000,
@@ -1291,7 +1291,7 @@
 	{
 		"id": "hermippe",
 		"name": "Hermippe",
-		"englishName": "Hermippe",
+		"displayName": "Hermippe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21300000,
@@ -1331,7 +1331,7 @@
 	{
 		"id": "aitne",
 		"name": "Aitne",
-		"englishName": "Aitne",
+		"displayName": "Aitne",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23315000,
@@ -1371,7 +1371,7 @@
 	{
 		"id": "eurydome",
 		"name": "Eurydome",
-		"englishName": "Eurydome",
+		"displayName": "Eurydome",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23148000,
@@ -1411,7 +1411,7 @@
 	{
 		"id": "euanthe",
 		"name": "Euanthe",
-		"englishName": "Euanthe",
+		"displayName": "Euanthe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21038000,
@@ -1451,7 +1451,7 @@
 	{
 		"id": "euporie",
 		"name": "Euporie",
-		"englishName": "Euporie",
+		"displayName": "Euporie",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19339000,
@@ -1491,7 +1491,7 @@
 	{
 		"id": "orthosie",
 		"name": "Orthosie",
-		"englishName": "Orthosie",
+		"displayName": "Orthosie",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21164000,
@@ -1531,7 +1531,7 @@
 	{
 		"id": "sponde",
 		"name": "Sponde",
-		"englishName": "Sponde",
+		"displayName": "Sponde",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23790000,
@@ -1571,7 +1571,7 @@
 	{
 		"id": "cale",
 		"name": "Cale",
-		"englishName": "Kale",
+		"displayName": "Kale",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23302000,
@@ -1611,7 +1611,7 @@
 	{
 		"id": "pasithee",
 		"name": "Pasithee",
-		"englishName": "Pasithee",
+		"displayName": "Pasithee",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23090000,
@@ -1651,7 +1651,7 @@
 	{
 		"id": "hegemone",
 		"name": "Hegemone",
-		"englishName": "Hegemone",
+		"displayName": "Hegemone",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23566000,
@@ -1691,7 +1691,7 @@
 	{
 		"id": "mneme",
 		"name": "Mneme",
-		"englishName": "Mneme",
+		"displayName": "Mneme",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21036000,
@@ -1731,7 +1731,7 @@
 	{
 		"id": "aoede",
 		"name": "Aoede",
-		"englishName": "Aoede",
+		"displayName": "Aoede",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23969000,
@@ -1771,7 +1771,7 @@
 	{
 		"id": "thelxinoe",
 		"name": "Thelxinoe",
-		"englishName": "Thelxinoe",
+		"displayName": "Thelxinoe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21165000,
@@ -1811,7 +1811,7 @@
 	{
 		"id": "arche",
 		"name": "Arche",
-		"englishName": "Arche",
+		"displayName": "Arche",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23355000,
@@ -1851,7 +1851,7 @@
 	{
 		"id": "callichore",
 		"name": "Callichore",
-		"englishName": "Kallichore",
+		"displayName": "Kallichore",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23273000,
@@ -1891,7 +1891,7 @@
 	{
 		"id": "helice",
 		"name": "Helice",
-		"englishName": "Helike",
+		"displayName": "Helike",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21064000,
@@ -1931,7 +1931,7 @@
 	{
 		"id": "carpo",
 		"name": "Carpo",
-		"englishName": "Carpo",
+		"displayName": "Carpo",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17078000,
@@ -1971,7 +1971,7 @@
 	{
 		"id": "eukelade",
 		"name": "Eukelade",
-		"englishName": "Eukelade",
+		"displayName": "Eukelade",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23322000,
@@ -2011,7 +2011,7 @@
 	{
 		"id": "cyllene",
 		"name": "Cyllene",
-		"englishName": "Cyllene",
+		"displayName": "Cyllene",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23787000,
@@ -2051,7 +2051,7 @@
 	{
 		"id": "core",
 		"name": "Core",
-		"englishName": "Kore",
+		"displayName": "Kore",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 24486000,
@@ -2091,7 +2091,7 @@
 	{
 		"id": "herse",
 		"name": "Herse",
-		"englishName": "Herse",
+		"displayName": "Herse",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23405000,
@@ -2131,7 +2131,7 @@
 	{
 		"id": "s2003j2",
 		"name": "S/2003 J 2",
-		"englishName": "S/2003 J 2",
+		"displayName": "S/2003 J 2",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 28332000,
@@ -2171,7 +2171,7 @@
 	{
 		"id": "eupheme",
 		"name": "Eupheme",
-		"englishName": "Eupheme",
+		"displayName": "Eupheme",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20230000,
@@ -2211,7 +2211,7 @@
 	{
 		"id": "s2003j4",
 		"name": "S/2003 J 4",
-		"englishName": "S/2003 J 4",
+		"displayName": "S/2003 J 4",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23928000,
@@ -2251,7 +2251,7 @@
 	{
 		"id": "eirene",
 		"name": "Eirene",
-		"englishName": "Eirene",
+		"displayName": "Eirene",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23493000,
@@ -2291,7 +2291,7 @@
 	{
 		"id": "s2003j9",
 		"name": "S/2003 J 9",
-		"englishName": "S/2003 J 9",
+		"displayName": "S/2003 J 9",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23385000,
@@ -2331,7 +2331,7 @@
 	{
 		"id": "s2003j10",
 		"name": "S/2003 J 10",
-		"englishName": "S/2003 J 10",
+		"displayName": "S/2003 J 10",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23042000,
@@ -2371,7 +2371,7 @@
 	{
 		"id": "s2003j12",
 		"name": "S/2003 J 12",
-		"englishName": "S/2003 J 12",
+		"displayName": "S/2003 J 12",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17835000,
@@ -2411,7 +2411,7 @@
 	{
 		"id": "philophrosyne",
 		"name": "Philophrosyne",
-		"englishName": "Philophrosyne",
+		"displayName": "Philophrosyne",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22622000,
@@ -2451,7 +2451,7 @@
 	{
 		"id": "s2003j16",
 		"name": "S/2003 J 16",
-		"englishName": "S/2003 J 16",
+		"displayName": "S/2003 J 16",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20948000,
@@ -2491,7 +2491,7 @@
 	{
 		"id": "s2003j18",
 		"name": "S/2003 J 18",
-		"englishName": "S/2003 J 18",
+		"displayName": "S/2003 J 18",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20494000,
@@ -2531,7 +2531,7 @@
 	{
 		"id": "s2003j19",
 		"name": "S/2003 J 19",
-		"englishName": "S/2003 J 19",
+		"displayName": "S/2003 J 19",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23532000,
@@ -2571,7 +2571,7 @@
 	{
 		"id": "s2003j23",
 		"name": "S/2003 J 23",
-		"englishName": "S/2003 J 23",
+		"displayName": "S/2003 J 23",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23549000,
@@ -2611,7 +2611,7 @@
 	{
 		"id": "mimas",
 		"name": "Mimas",
-		"englishName": "Mimas",
+		"displayName": "Mimas",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 185539,
@@ -2651,7 +2651,7 @@
 	{
 		"id": "encelade",
 		"name": "Encelade",
-		"englishName": "Enceladus",
+		"displayName": "Enceladus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 238037,
@@ -2691,7 +2691,7 @@
 	{
 		"id": "tethys",
 		"name": "Tethys",
-		"englishName": "Tethys",
+		"displayName": "Tethys",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 294672,
@@ -2731,7 +2731,7 @@
 	{
 		"id": "dione",
 		"name": "Dione",
-		"englishName": "Dione",
+		"displayName": "Dione",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 377415,
@@ -2771,7 +2771,7 @@
 	{
 		"id": "rhea",
 		"name": "Rhea",
-		"englishName": "Rhea",
+		"displayName": "Rhea",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 527068,
@@ -2811,7 +2811,7 @@
 	{
 		"id": "titan",
 		"name": "Titan",
-		"englishName": "Titan",
+		"displayName": "Titan",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 1221865,
@@ -2851,7 +2851,7 @@
 	{
 		"id": "hyperion",
 		"name": "Hyperion",
-		"englishName": "Hyperion",
+		"displayName": "Hyperion",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 1500934,
@@ -2891,7 +2891,7 @@
 	{
 		"id": "japet",
 		"name": "Japet",
-		"englishName": "Iapetus",
+		"displayName": "Iapetus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 3560851,
@@ -2931,7 +2931,7 @@
 	{
 		"id": "phoebe",
 		"name": "Phoebe",
-		"englishName": "Phoebe",
+		"displayName": "Phoebe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 12947913,
@@ -2971,7 +2971,7 @@
 	{
 		"id": "janus",
 		"name": "Janus",
-		"englishName": "Janus",
+		"displayName": "Janus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 151460,
@@ -3011,7 +3011,7 @@
 	{
 		"id": "epimethee",
 		"name": "Epimethee",
-		"englishName": "Epimetheus",
+		"displayName": "Epimetheus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 151410,
@@ -3051,7 +3051,7 @@
 	{
 		"id": "helene",
 		"name": "Helene",
-		"englishName": "Helene",
+		"displayName": "Helene",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 377396,
@@ -3091,7 +3091,7 @@
 	{
 		"id": "telesto",
 		"name": "Telesto",
-		"englishName": "Telesto",
+		"displayName": "Telesto",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 294619,
@@ -3131,7 +3131,7 @@
 	{
 		"id": "calypso",
 		"name": "Calypso",
-		"englishName": "Calypso",
+		"displayName": "Calypso",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 294619,
@@ -3171,7 +3171,7 @@
 	{
 		"id": "atlas",
 		"name": "Atlas",
-		"englishName": "Atlas",
+		"displayName": "Atlas",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 137670,
@@ -3211,7 +3211,7 @@
 	{
 		"id": "promethee",
 		"name": "Promethee",
-		"englishName": "Prometheus",
+		"displayName": "Prometheus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 139380,
@@ -3251,7 +3251,7 @@
 	{
 		"id": "pandore",
 		"name": "Pandore",
-		"englishName": "Pandora",
+		"displayName": "Pandora",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 141720,
@@ -3291,7 +3291,7 @@
 	{
 		"id": "pan",
 		"name": "Pan",
-		"englishName": "Pan",
+		"displayName": "Pan",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 133580,
@@ -3331,7 +3331,7 @@
 	{
 		"id": "ymir",
 		"name": "Ymir",
-		"englishName": "Ymir",
+		"displayName": "Ymir",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23140400,
@@ -3371,7 +3371,7 @@
 	{
 		"id": "paaliaq",
 		"name": "Paaliaq",
-		"englishName": "Paaliaq",
+		"displayName": "Paaliaq",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 15024000,
@@ -3411,7 +3411,7 @@
 	{
 		"id": "tarvos",
 		"name": "Tarvos",
-		"englishName": "Tarvos",
+		"displayName": "Tarvos",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18263200,
@@ -3451,7 +3451,7 @@
 	{
 		"id": "ijiraq",
 		"name": "Ijiraq",
-		"englishName": "Ijiraq",
+		"displayName": "Ijiraq",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11367400,
@@ -3491,7 +3491,7 @@
 	{
 		"id": "suttungr",
 		"name": "Suttungr",
-		"englishName": "Suttungr",
+		"displayName": "Suttungr",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19476700,
@@ -3531,7 +3531,7 @@
 	{
 		"id": "kiviuq",
 		"name": "Kiviuq",
-		"englishName": "Kiviuq",
+		"displayName": "Kiviuq",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11311100,
@@ -3571,7 +3571,7 @@
 	{
 		"id": "mundilfari",
 		"name": "Mundilfari",
-		"englishName": "Mundilfari",
+		"displayName": "Mundilfari",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18667900,
@@ -3611,7 +3611,7 @@
 	{
 		"id": "albiorix",
 		"name": "Albiorix",
-		"englishName": "Albiorix",
+		"displayName": "Albiorix",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 16401100,
@@ -3651,7 +3651,7 @@
 	{
 		"id": "skathi",
 		"name": "Skathi",
-		"englishName": "Skathi",
+		"displayName": "Skathi",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 15614300,
@@ -3691,7 +3691,7 @@
 	{
 		"id": "erriapo",
 		"name": "Erriapo",
-		"englishName": "Erriapus",
+		"displayName": "Erriapus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17611400,
@@ -3731,7 +3731,7 @@
 	{
 		"id": "siarnaq",
 		"name": "Siarnaq",
-		"englishName": "Siarnaq",
+		"displayName": "Siarnaq",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18015400,
@@ -3771,7 +3771,7 @@
 	{
 		"id": "thrymr",
 		"name": "Thrymr",
-		"englishName": "Thrymr",
+		"displayName": "Thrymr",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20439600,
@@ -3811,7 +3811,7 @@
 	{
 		"id": "narvi",
 		"name": "Narvi",
-		"englishName": "Narvi",
+		"displayName": "Narvi",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19417300,
@@ -3851,7 +3851,7 @@
 	{
 		"id": "methone",
 		"name": "Methone",
-		"englishName": "Methone",
+		"displayName": "Methone",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 194440,
@@ -3891,7 +3891,7 @@
 	{
 		"id": "pallene",
 		"name": "Pallene",
-		"englishName": "Pallene",
+		"displayName": "Pallene",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 212280,
@@ -3931,7 +3931,7 @@
 	{
 		"id": "pollux",
 		"name": "Pollux",
-		"englishName": "Polydeuces",
+		"displayName": "Polydeuces",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 377200,
@@ -3971,7 +3971,7 @@
 	{
 		"id": "daphnis",
 		"name": "Daphnis",
-		"englishName": "Daphnis",
+		"displayName": "Daphnis",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 136500,
@@ -4011,7 +4011,7 @@
 	{
 		"id": "aegir",
 		"name": "Aegir",
-		"englishName": "Aegir",
+		"displayName": "Aegir",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20749800,
@@ -4051,7 +4051,7 @@
 	{
 		"id": "bebhionn",
 		"name": "Bebhionn",
-		"englishName": "Bebhionn",
+		"displayName": "Bebhionn",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17117800,
@@ -4091,7 +4091,7 @@
 	{
 		"id": "bergelmir",
 		"name": "Bergelmir",
-		"englishName": "Bergelmir",
+		"displayName": "Bergelmir",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19338300,
@@ -4131,7 +4131,7 @@
 	{
 		"id": "bestla",
 		"name": "Bestla",
-		"englishName": "Bestla",
+		"displayName": "Bestla",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20278000,
@@ -4171,7 +4171,7 @@
 	{
 		"id": "farbauti",
 		"name": "Farbauti",
-		"englishName": "Farbauti",
+		"displayName": "Farbauti",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20387000,
@@ -4211,7 +4211,7 @@
 	{
 		"id": "fenrir",
 		"name": "Fenrir",
-		"englishName": "Fenrir",
+		"displayName": "Fenrir",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22454800,
@@ -4251,7 +4251,7 @@
 	{
 		"id": "fornjot",
 		"name": "Fornjot",
-		"englishName": "Fornjot",
+		"displayName": "Fornjot",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 25151200,
@@ -4291,7 +4291,7 @@
 	{
 		"id": "hati",
 		"name": "Hati",
-		"englishName": "Hati",
+		"displayName": "Hati",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19775000,
@@ -4331,7 +4331,7 @@
 	{
 		"id": "hyrrokkin",
 		"name": "Hyrrokkin",
-		"englishName": "Hyrrokkin",
+		"displayName": "Hyrrokkin",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18437300,
@@ -4371,7 +4371,7 @@
 	{
 		"id": "kari",
 		"name": "Kari",
-		"englishName": "Kari",
+		"displayName": "Kari",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22077100,
@@ -4411,7 +4411,7 @@
 	{
 		"id": "loge",
 		"name": "Loge",
-		"englishName": "Loge",
+		"displayName": "Loge",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23065500,
@@ -4451,7 +4451,7 @@
 	{
 		"id": "skoll",
 		"name": "Skoll",
-		"englishName": "Skoll",
+		"displayName": "Skoll",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17663300,
@@ -4491,7 +4491,7 @@
 	{
 		"id": "surtur",
 		"name": "Surtur",
-		"englishName": "Surtur",
+		"displayName": "Surtur",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22920400,
@@ -4531,7 +4531,7 @@
 	{
 		"id": "anthe",
 		"name": "Anthe",
-		"englishName": "Anthe",
+		"displayName": "Anthe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 197700,
@@ -4571,7 +4571,7 @@
 	{
 		"id": "jarnsaxa",
 		"name": "Jarnsaxa",
-		"englishName": "Jarnsaxa",
+		"displayName": "Jarnsaxa",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19356400,
@@ -4611,7 +4611,7 @@
 	{
 		"id": "greip",
 		"name": "Greip",
-		"englishName": "Greip",
+		"displayName": "Greip",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18442200,
@@ -4651,7 +4651,7 @@
 	{
 		"id": "tarqeq",
 		"name": "Tarqeq",
-		"englishName": "Tarqeq",
+		"displayName": "Tarqeq",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17909900,
@@ -4691,7 +4691,7 @@
 	{
 		"id": "egeon",
 		"name": "egeon",
-		"englishName": "Aegaeon",
+		"displayName": "Aegaeon",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 167500,
@@ -4731,7 +4731,7 @@
 	{
 		"id": "s2004s7",
 		"name": "S/2004 S 7",
-		"englishName": "S/2004 S 7",
+		"displayName": "S/2004 S 7",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21005800,
@@ -4771,7 +4771,7 @@
 	{
 		"id": "s2004s12",
 		"name": "S/2004 S 12",
-		"englishName": "S/2004 S 12",
+		"displayName": "S/2004 S 12",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19867500,
@@ -4811,7 +4811,7 @@
 	{
 		"id": "s2004s13",
 		"name": "S/2004 S 13",
-		"englishName": "S/2004 S 13",
+		"displayName": "S/2004 S 13",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18408700,
@@ -4851,7 +4851,7 @@
 	{
 		"id": "s2004s17",
 		"name": "S/2004 S 17",
-		"englishName": "S/2004 S 17",
+		"displayName": "S/2004 S 17",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19449900,
@@ -4891,7 +4891,7 @@
 	{
 		"id": "s2006s1",
 		"name": "S/2006 S 1",
-		"englishName": "S/2006 S 1",
+		"displayName": "S/2006 S 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18797400,
@@ -4931,7 +4931,7 @@
 	{
 		"id": "s2006s3",
 		"name": "S/2006 S 3",
-		"englishName": "S/2006 S 3",
+		"displayName": "S/2006 S 3",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22100100,
@@ -4971,7 +4971,7 @@
 	{
 		"id": "s2007s2",
 		"name": "S/2007 S 2",
-		"englishName": "S/2007 S 2",
+		"displayName": "S/2007 S 2",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 16723300,
@@ -5011,7 +5011,7 @@
 	{
 		"id": "s2007s3",
 		"name": "S/2007 S 3",
-		"englishName": "S/2007 S 3",
+		"displayName": "S/2007 S 3",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18981900,
@@ -5051,7 +5051,7 @@
 	{
 		"id": "s2009s1",
 		"name": "S/2009 S 1",
-		"englishName": "S/2009 S 1",
+		"displayName": "S/2009 S 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 117000,
@@ -5091,7 +5091,7 @@
 	{
 		"id": "ariel",
 		"name": "Ariel",
-		"englishName": "Ariel",
+		"displayName": "Ariel",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 190900,
@@ -5131,7 +5131,7 @@
 	{
 		"id": "umbriel",
 		"name": "Umbriel",
-		"englishName": "Umbriel",
+		"displayName": "Umbriel",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 266000,
@@ -5171,7 +5171,7 @@
 	{
 		"id": "titania",
 		"name": "Titania",
-		"englishName": "Titania",
+		"displayName": "Titania",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 436300,
@@ -5211,7 +5211,7 @@
 	{
 		"id": "oberon",
 		"name": "Oberon",
-		"englishName": "Oberon",
+		"displayName": "Oberon",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 583500,
@@ -5251,7 +5251,7 @@
 	{
 		"id": "miranda",
 		"name": "Miranda",
-		"englishName": "Miranda",
+		"displayName": "Miranda",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 129900,
@@ -5291,7 +5291,7 @@
 	{
 		"id": "cordelia",
 		"name": "Cordelia",
-		"englishName": "Cordelia",
+		"displayName": "Cordelia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 49800,
@@ -5331,7 +5331,7 @@
 	{
 		"id": "ophelia",
 		"name": "Ophelie",
-		"englishName": "Ophelia",
+		"displayName": "Ophelia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 53800,
@@ -5371,7 +5371,7 @@
 	{
 		"id": "bianca",
 		"name": "Bianca",
-		"englishName": "Bianca",
+		"displayName": "Bianca",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 59200,
@@ -5411,7 +5411,7 @@
 	{
 		"id": "cressida",
 		"name": "Cressida",
-		"englishName": "Cressida",
+		"displayName": "Cressida",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 61800,
@@ -5451,7 +5451,7 @@
 	{
 		"id": "desdemona",
 		"name": "Desdemone",
-		"englishName": "Desdemona",
+		"displayName": "Desdemona",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 62700,
@@ -5491,7 +5491,7 @@
 	{
 		"id": "juliet",
 		"name": "Juliette",
-		"englishName": "Juliet",
+		"displayName": "Juliet",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 64400,
@@ -5531,7 +5531,7 @@
 	{
 		"id": "portia",
 		"name": "Portia",
-		"englishName": "Portia",
+		"displayName": "Portia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 66100,
@@ -5571,7 +5571,7 @@
 	{
 		"id": "rosalind",
 		"name": "Rosalinde",
-		"englishName": "Rosalind",
+		"displayName": "Rosalind",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 69900,
@@ -5611,7 +5611,7 @@
 	{
 		"id": "belinda",
 		"name": "Belinda",
-		"englishName": "Belinda",
+		"displayName": "Belinda",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 75300,
@@ -5651,7 +5651,7 @@
 	{
 		"id": "puck",
 		"name": "Puck",
-		"englishName": "Puck",
+		"displayName": "Puck",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 86000,
@@ -5691,7 +5691,7 @@
 	{
 		"id": "caliban",
 		"name": "Caliban",
-		"englishName": "Caliban",
+		"displayName": "Caliban",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 7231100,
@@ -5731,7 +5731,7 @@
 	{
 		"id": "sycorax",
 		"name": "Sycorax",
-		"englishName": "Sycorax",
+		"displayName": "Sycorax",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 12179400,
@@ -5771,7 +5771,7 @@
 	{
 		"id": "prospero",
 		"name": "Prospero",
-		"englishName": "Prospero",
+		"displayName": "Prospero",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 16276800,
@@ -5811,7 +5811,7 @@
 	{
 		"id": "setebos",
 		"name": "Setebos",
-		"englishName": "Setebos",
+		"displayName": "Setebos",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17420400,
@@ -5851,7 +5851,7 @@
 	{
 		"id": "stephano",
 		"name": "Stephano",
-		"englishName": "Stephano",
+		"displayName": "Stephano",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 8007400,
@@ -5891,7 +5891,7 @@
 	{
 		"id": "trinculo",
 		"name": "Trinculo",
-		"englishName": "Trinculo",
+		"displayName": "Trinculo",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 8505200,
@@ -5931,7 +5931,7 @@
 	{
 		"id": "francisco",
 		"name": "Francisco",
-		"englishName": "Francisco",
+		"displayName": "Francisco",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 4282900,
@@ -5971,7 +5971,7 @@
 	{
 		"id": "margaret",
 		"name": "Margaret",
-		"englishName": "Margaret",
+		"displayName": "Margaret",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23808000,
@@ -6011,7 +6011,7 @@
 	{
 		"id": "ferdinand",
 		"name": "Ferdinand",
-		"englishName": "Ferdinand",
+		"displayName": "Ferdinand",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20430000,
@@ -6051,7 +6051,7 @@
 	{
 		"id": "perdita",
 		"name": "Perdita",
-		"englishName": "Perdita",
+		"displayName": "Perdita",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 76417,
@@ -6091,7 +6091,7 @@
 	{
 		"id": "mab",
 		"name": "Mab",
-		"englishName": "Mab",
+		"displayName": "Mab",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 97736,
@@ -6131,7 +6131,7 @@
 	{
 		"id": "cupid",
 		"name": "Cupid",
-		"englishName": "Cupid",
+		"displayName": "Cupid",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 74392,
@@ -6171,7 +6171,7 @@
 	{
 		"id": "triton",
 		"name": "Triton",
-		"englishName": "Triton",
+		"displayName": "Triton",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 354759,
@@ -6211,7 +6211,7 @@
 	{
 		"id": "nereid",
 		"name": "Nereid",
-		"englishName": "Nereid",
+		"displayName": "Nereid",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 5513818,
@@ -6251,7 +6251,7 @@
 	{
 		"id": "naiad",
 		"name": "Naiad",
-		"englishName": "Naiad",
+		"displayName": "Naiad",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 48227,
@@ -6291,7 +6291,7 @@
 	{
 		"id": "thalassa",
 		"name": "Thalassa",
-		"englishName": "Thalassa",
+		"displayName": "Thalassa",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 50074,
@@ -6331,7 +6331,7 @@
 	{
 		"id": "despina",
 		"name": "Despina",
-		"englishName": "Despina",
+		"displayName": "Despina",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 52526,
@@ -6371,7 +6371,7 @@
 	{
 		"id": "galatee",
 		"name": "Galatee",
-		"englishName": "Galatea",
+		"displayName": "Galatea",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 61953,
@@ -6411,7 +6411,7 @@
 	{
 		"id": "larissa",
 		"name": "Larissa",
-		"englishName": "Larissa",
+		"displayName": "Larissa",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 73548,
@@ -6451,7 +6451,7 @@
 	{
 		"id": "protee",
 		"name": "Protee",
-		"englishName": "Proteus",
+		"displayName": "Proteus",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 117646,
@@ -6491,7 +6491,7 @@
 	{
 		"id": "halimede",
 		"name": "Halimede",
-		"englishName": "Halimede",
+		"displayName": "Halimede",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 16611000,
@@ -6531,7 +6531,7 @@
 	{
 		"id": "psamathee",
 		"name": "Psamathee",
-		"englishName": "Psamathe",
+		"displayName": "Psamathe",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 48096000,
@@ -6571,7 +6571,7 @@
 	{
 		"id": "sao",
 		"name": "Sao",
-		"englishName": "Sao",
+		"displayName": "Sao",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22228000,
@@ -6611,7 +6611,7 @@
 	{
 		"id": "laomedie",
 		"name": "Laomedie",
-		"englishName": "Laomedeia",
+		"displayName": "Laomedeia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23567000,
@@ -6651,7 +6651,7 @@
 	{
 		"id": "neso",
 		"name": "Neso",
-		"englishName": "Neso",
+		"displayName": "Neso",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 49285000,
@@ -6691,7 +6691,7 @@
 	{
 		"id": "charon",
 		"name": "Charon",
-		"englishName": "Charon",
+		"displayName": "Charon",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17536,
@@ -6731,7 +6731,7 @@
 	{
 		"id": "nix",
 		"name": "Nix",
-		"englishName": "Nix",
+		"displayName": "Nix",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 48708,
@@ -6771,7 +6771,7 @@
 	{
 		"id": "hydra",
 		"name": "Hydra",
-		"englishName": "Hydra",
+		"displayName": "Hydra",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 64749,
@@ -6811,7 +6811,7 @@
 	{
 		"id": "namaka",
 		"name": "Namaka",
-		"englishName": "Namaka",
+		"displayName": "Namaka",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 39300,
@@ -6851,7 +6851,7 @@
 	{
 		"id": "hiiaka",
 		"name": "Hi'iaka",
-		"englishName": "Hiʻiaka",
+		"displayName": "Hiʻiaka",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 49500,
@@ -6891,7 +6891,7 @@
 	{
 		"id": "dysnomia",
 		"name": "Dysnomia",
-		"englishName": "Dysnomia",
+		"displayName": "Dysnomia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 30000,
@@ -6931,7 +6931,7 @@
 	{
 		"id": "dia",
 		"name": "Dia",
-		"englishName": "Dia",
+		"displayName": "Dia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 12555000,
@@ -6971,7 +6971,7 @@
 	{
 		"id": "s2004s3",
 		"name": "S/2004 S 3",
-		"englishName": "S/2004 S 3",
+		"displayName": "S/2004 S 3",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 141000,
@@ -7011,7 +7011,7 @@
 	{
 		"id": "s2004s4",
 		"name": "S/2004 S 4",
-		"englishName": "S/2004 S 4",
+		"displayName": "S/2004 S 4",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 140100,
@@ -7051,7 +7051,7 @@
 	{
 		"id": "s2004s6",
 		"name": "S/2004 S 6",
-		"englishName": "S/2004 S 6",
+		"displayName": "S/2004 S 6",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 140000,
@@ -7091,7 +7091,7 @@
 	{
 		"id": "s2010j1",
 		"name": "S/2010 J 1",
-		"englishName": "S/2010 J 1",
+		"displayName": "S/2010 J 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23314335,
@@ -7131,7 +7131,7 @@
 	{
 		"id": "s2010j2",
 		"name": "S/2010 J 2",
-		"englishName": "S/2010 J 2",
+		"displayName": "S/2010 J 2",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20320000,
@@ -7171,7 +7171,7 @@
 	{
 		"id": "ceres",
 		"name": "(1) Ceres",
-		"englishName": "1 Ceres",
+		"displayName": "Ceres",
 		"system": "Ceres",
 		"type": "Dwarf Planet",
 		"moons": null,
@@ -7212,7 +7212,7 @@
 	{
 		"id": "hebe",
 		"name": "(6) Hebe",
-		"englishName": "6 Hebe",
+		"displayName": "6 Hebe",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 362959000,
@@ -7249,7 +7249,7 @@
 	{
 		"id": "lempo",
 		"name": "(47171) Lempo",
-		"englishName": "47171 Lempo",
+		"displayName": "47171 Lempo",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 5884000000,
@@ -7286,7 +7286,7 @@
 	{
 		"id": "petitprince",
 		"name": "Petit-Prince",
-		"englishName": "Petit-Prince",
+		"displayName": "Petit-Prince",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 1190,
@@ -7326,7 +7326,7 @@
 	{
 		"id": "pulcova",
 		"name": "(762) Pulcova",
-		"englishName": "762 Pulcova",
+		"displayName": "762 Pulcova",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 472579673,
@@ -7363,7 +7363,7 @@
 	{
 		"id": "toutatis",
 		"name": "(4179) Toutatis",
-		"englishName": "4179 Toutatis",
+		"displayName": "4179 Toutatis",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 377326000,
@@ -7400,7 +7400,7 @@
 	{
 		"id": "quaoar",
 		"name": "(50000) Quaoar",
-		"englishName": "50000 Quaoar",
+		"displayName": "Quaoar",
 		"system": "Quaoar",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -7442,7 +7442,7 @@
 	{
 		"id": "steins",
 		"name": "(2867) Šteins",
-		"englishName": "2867 Šteins",
+		"displayName": "2867 Šteins",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 353495000,
@@ -7479,7 +7479,7 @@
 	{
 		"id": "eris",
 		"name": "(136199) Eris",
-		"englishName": "136199 Eris",
+		"displayName": "Eris",
 		"system": "Eris",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -7524,7 +7524,7 @@
 	{
 		"id": "astree",
 		"name": "(5) Astree",
-		"englishName": "5 Astraea",
+		"displayName": "5 Astraea",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 384877000,
@@ -7561,7 +7561,7 @@
 	{
 		"id": "pholus",
 		"name": "(5145) Pholus",
-		"englishName": "5145 Pholus",
+		"displayName": "5145 Pholus",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 3055227000,
@@ -7598,7 +7598,7 @@
 	{
 		"id": "castalia",
 		"name": "(4769) Castalia",
-		"englishName": "4769 Castalia",
+		"displayName": "4769 Castalia",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 159053000,
@@ -7635,7 +7635,7 @@
 	{
 		"id": "remus",
 		"name": "Remus",
-		"englishName": "Remus",
+		"displayName": "Remus",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 706,
@@ -7675,7 +7675,7 @@
 	{
 		"id": "hector",
 		"name": "(624) Hector",
-		"englishName": "624 Hektor",
+		"displayName": "624 Hektor",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 781183000,
@@ -7712,7 +7712,7 @@
 	{
 		"id": "kleopatra",
 		"name": "(216) Kleopatra",
-		"englishName": "216 Kleopatra",
+		"displayName": "216 Kleopatra",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 417796000,
@@ -7749,7 +7749,7 @@
 	{
 		"id": "cruithne",
 		"name": "(3753) Cruithne",
-		"englishName": "3753 Cruithne",
+		"displayName": "3753 Cruithne",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 149260000,
@@ -7786,7 +7786,7 @@
 	{
 		"id": "juno",
 		"name": "(3) Juno",
-		"englishName": "3 Juno",
+		"displayName": "3 Juno",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 399480000,
@@ -7823,7 +7823,7 @@
 	{
 		"id": "hygie",
 		"name": "(10) Hygie",
-		"englishName": "10 Hygiea",
+		"displayName": "10 Hygiea",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 469345000,
@@ -7860,7 +7860,7 @@
 	{
 		"id": "psyche",
 		"name": "(16) Psyche",
-		"englishName": "16 Psyche",
+		"displayName": "16 Psyche",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 436975758,
@@ -7897,7 +7897,7 @@
 	{
 		"id": "lutetia",
 		"name": "(21) Lutetia",
-		"englishName": "21 Lutetia",
+		"displayName": "21 Lutetia",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 364277000,
@@ -7934,7 +7934,7 @@
 	{
 		"id": "mathilde",
 		"name": "(253) Mathilde",
-		"englishName": "253 Mathilde",
+		"displayName": "253 Mathilde",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 395900000,
@@ -7971,7 +7971,7 @@
 	{
 		"id": "uranus",
 		"name": "Uranus",
-		"englishName": "Uranus",
+		"displayName": "Uranus",
 		"system": "Uranus",
 		"type": "Planet",
 		"moons": [
@@ -8094,7 +8094,7 @@
 	{
 		"id": "iris",
 		"name": "(7) Iris",
-		"englishName": "7 Iris",
+		"displayName": "7 Iris",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 357019000,
@@ -8131,7 +8131,7 @@
 	{
 		"id": "eros",
 		"name": "(433) eros",
-		"englishName": "433 Eros",
+		"displayName": "433 Eros",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 218155000,
@@ -8168,7 +8168,7 @@
 	{
 		"id": "vanth",
 		"name": "Vanth",
-		"englishName": "Vanth",
+		"displayName": "Vanth",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 8980,
@@ -8208,7 +8208,7 @@
 	{
 		"id": "sedna",
 		"name": "(90377) Sedna",
-		"englishName": "90377 Sedna",
+		"displayName": "90377 Sedna",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 75659770000,
@@ -8245,7 +8245,7 @@
 	{
 		"id": "chariklo",
 		"name": "(10199) Chariklo",
-		"englishName": "10199 Chariklo",
+		"displayName": "10199 Chariklo",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 2380000000,
@@ -8282,7 +8282,7 @@
 	{
 		"id": "sylvia",
 		"name": "(87) Sylvia",
-		"englishName": "87 Sylvia",
+		"displayName": "87 Sylvia",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 522135000,
@@ -8319,7 +8319,7 @@
 	{
 		"id": "dactyl",
 		"name": "Dactyl",
-		"englishName": "Dactyl",
+		"displayName": "Dactyl",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 108,
@@ -8359,7 +8359,7 @@
 	{
 		"id": "orcus",
 		"name": "(90482) Orcus",
-		"englishName": "90482 Orcus",
+		"displayName": "Orcus",
 		"system": "Orcus",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -8401,7 +8401,7 @@
 	{
 		"id": "pluto",
 		"name": "Pluto",
-		"englishName": "Pluto",
+		"displayName": "Pluto",
 		"system": "Pluto",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -8457,7 +8457,7 @@
 	{
 		"id": "damocles",
 		"name": "(5335) Damocles",
-		"englishName": "5335 Damocles",
+		"displayName": "5335 Damocles",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 8368303000,
@@ -8494,7 +8494,7 @@
 	{
 		"id": "romulus",
 		"name": "Romulus",
-		"englishName": "Romulus",
+		"displayName": "Romulus",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 1356,
@@ -8534,7 +8534,7 @@
 	{
 		"id": "alexhelios",
 		"name": "Alexhelios",
-		"englishName": "Alexhelios",
+		"displayName": "Alexhelios",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 775,
@@ -8574,7 +8574,7 @@
 	{
 		"id": "cleoselene",
 		"name": "Cleoselene",
-		"englishName": "Cleoselene",
+		"displayName": "Cleoselene",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 380,
@@ -8614,7 +8614,7 @@
 	{
 		"id": "flore",
 		"name": "(8) Flore",
-		"englishName": "8 Flora",
+		"displayName": "8 Flora",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 329313000,
@@ -8651,7 +8651,7 @@
 	{
 		"id": "chiron",
 		"name": "(2060) Chiron",
-		"englishName": "2060 Chiron",
+		"displayName": "2060 Chiron",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 2042652000,
@@ -8688,7 +8688,7 @@
 	{
 		"id": "eureka",
 		"name": "(5261) Eureka",
-		"englishName": "5261 Eureka",
+		"displayName": "5261 Eureka",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 227908000,
@@ -8725,7 +8725,7 @@
 	{
 		"id": "achille",
 		"name": "(588) Achille",
-		"englishName": "588 Achilles",
+		"displayName": "588 Achilles",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 776669000,
@@ -8762,7 +8762,7 @@
 	{
 		"id": "weywot",
 		"name": "Weywot",
-		"englishName": "Weywot",
+		"displayName": "Weywot",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 10000,
@@ -8802,7 +8802,7 @@
 	{
 		"id": "ixion",
 		"name": "(28978) Ixion",
-		"englishName": "28978 Ixion",
+		"displayName": "28978 Ixion",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 5910896000,
@@ -8839,7 +8839,7 @@
 	{
 		"id": "neptune",
 		"name": "Neptune",
-		"englishName": "Neptune",
+		"displayName": "Neptune",
 		"system": "Neptune",
 		"type": "Planet",
 		"moons": [
@@ -8922,7 +8922,7 @@
 	{
 		"id": "sl9",
 		"name": "Shoemaker-Levy 9",
-		"englishName": "Shoemaker-Levy 9",
+		"displayName": "Shoemaker-Levy 9",
 		"type": "Comet",
 		"moons": null,
 		"semimajorAxis": 0,
@@ -8959,7 +8959,7 @@
 	{
 		"id": "9metis",
 		"name": "(9) Metis",
-		"englishName": "9 Metis",
+		"displayName": "9 Metis",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 357052000,
@@ -8996,7 +8996,7 @@
 	{
 		"id": "haumea",
 		"name": "(136108) Haumea",
-		"englishName": "136108 Haumea",
+		"displayName": "Haumea",
 		"system": "Haumea",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -9044,7 +9044,7 @@
 	{
 		"id": "nessus",
 		"name": "(7066) Nessus",
-		"englishName": "7066 Nessus",
+		"displayName": "7066 Nessus",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 3689000000,
@@ -9081,7 +9081,7 @@
 	{
 		"id": "itokawa",
 		"name": "(25143) Itokawa",
-		"englishName": "25143 Itokawa",
+		"displayName": "25143 Itokawa",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 198049628,
@@ -9118,7 +9118,7 @@
 	{
 		"id": "hylonome",
 		"name": "(10370) Hylonome",
-		"englishName": "10370 Hylonome",
+		"displayName": "10370 Hylonome",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 3779000000,
@@ -9155,7 +9155,7 @@
 	{
 		"id": "eugenia",
 		"name": "(45) Eugenia",
-		"englishName": "45 Eugenia",
+		"displayName": "45 Eugenia",
 		"type": "Asteroid",
 		"moons": [
 			{
@@ -9196,7 +9196,7 @@
 	{
 		"id": "2006sq372",
 		"name": "(308933) 2006 SQ372",
-		"englishName": "(308933) 2006 SQ372",
+		"displayName": "(308933) 2006 SQ372",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 151692240180,
@@ -9233,7 +9233,7 @@
 	{
 		"id": "pallas",
 		"name": "(2) Pallas",
-		"englishName": "2 Pallas",
+		"displayName": "2 Pallas",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 414717000,
@@ -9270,7 +9270,7 @@
 	{
 		"id": "asbolus",
 		"name": "(8405) Asbolus",
-		"englishName": "8405 Asbolus",
+		"displayName": "8405 Asbolus",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 2694000000,
@@ -9307,7 +9307,7 @@
 	{
 		"id": "varuna",
 		"name": "(20000) Varuna",
-		"englishName": "20000 Varuna",
+		"displayName": "20000 Varuna",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 6451398000,
@@ -9344,7 +9344,7 @@
 	{
 		"id": "vesta",
 		"name": "(4) Vesta",
-		"englishName": "4 Vesta",
+		"displayName": "4 Vesta",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 353343000,
@@ -9381,7 +9381,7 @@
 	{
 		"id": "ida",
 		"name": "(243) Ida",
-		"englishName": "243 Ida",
+		"displayName": "243 Ida",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 428000000,
@@ -9418,7 +9418,7 @@
 	{
 		"id": "hyakutake",
 		"name": "Hyakutake",
-		"englishName": "Comet Hyakutake",
+		"displayName": "Comet Hyakutake",
 		"type": "Comet",
 		"moons": null,
 		"semimajorAxis": 0,
@@ -9455,7 +9455,7 @@
 	{
 		"id": "gaspra",
 		"name": "(951) Gaspra",
-		"englishName": "951 Gaspra",
+		"displayName": "951 Gaspra",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 330513000,
@@ -9492,7 +9492,7 @@
 	{
 		"id": "albion",
 		"name": "(15760) Albion",
-		"englishName": "15760 Albion",
+		"displayName": "15760 Albion",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 6547379000,
@@ -9529,7 +9529,7 @@
 	{
 		"id": "makemake",
 		"name": "(136472) Makemake",
-		"englishName": "Makemake",
+		"displayName": "Makemake",
 		"system": "Makemake",
 		"type": "Dwarf Planet",
 		"moons": [
@@ -9574,7 +9574,7 @@
 	{
 		"id": "halley",
 		"name": "Comete de Halley",
-		"englishName": "Halley's Comet",
+		"displayName": "Halley's Comet",
 		"type": "Comet",
 		"moons": null,
 		"semimajorAxis": 2677801885,
@@ -9611,7 +9611,7 @@
 	{
 		"id": "jupiter",
 		"name": "Jupiter",
-		"englishName": "Jupiter",
+		"displayName": "Jupiter",
 		"system": "Jupiter",
 		"type": "Planet",
 		"moons": [
@@ -9889,7 +9889,7 @@
 	{
 		"id": "mars",
 		"name": "Mars",
-		"englishName": "Mars",
+		"displayName": "Mars",
 		"system": "Mars",
 		"type": "Planet",
 		"moons": [
@@ -9936,7 +9936,7 @@
 	{
 		"id": "mercury",
 		"name": "Mercury",
-		"englishName": "Mercury",
+		"displayName": "Mercury",
 		"system": "Mercury",
 		"type": "Planet",
 		"moons": null,
@@ -9977,7 +9977,7 @@
 	{
 		"id": "saturn",
 		"name": "Saturn",
-		"englishName": "Saturn",
+		"displayName": "Saturn",
 		"system": "Saturn",
 		"type": "Planet",
 		"moons": [
@@ -10264,7 +10264,7 @@
 	{
 		"id": "sun",
 		"name": "Sun",
-		"englishName": "Sun",
+		"displayName": "Sun",
 		"type": "Star",
 		"moons": null,
 		"semimajorAxis": 0,
@@ -10300,7 +10300,7 @@
 	{
 		"id": "earth",
 		"name": "Earth",
-		"englishName": "Earth",
+		"displayName": "Earth",
 		"system": "Earth",
 		"type": "Planet",
 		"moons": [
@@ -10344,7 +10344,7 @@
 	{
 		"id": "venus",
 		"name": "Venus",
-		"englishName": "Venus",
+		"displayName": "Venus",
 		"system": "Venus",
 		"type": "Planet",
 		"moons": null,
@@ -10384,7 +10384,7 @@
 	{
 		"id": "kerberos",
 		"name": "Kerberos",
-		"englishName": "Kerberos",
+		"displayName": "Kerberos",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 59000,
@@ -10424,7 +10424,7 @@
 	{
 		"id": "s2011j1",
 		"name": "S/2011 J 1",
-		"englishName": "S/2011 J 1",
+		"displayName": "S/2011 J 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20155290,
@@ -10464,7 +10464,7 @@
 	{
 		"id": "s2011j2",
 		"name": "S/2011 J 2",
-		"englishName": "S/2011 J 2",
+		"displayName": "S/2011 J 2",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23329710,
@@ -10504,7 +10504,7 @@
 	{
 		"id": "styx",
 		"name": "Styx",
-		"englishName": "Styx",
+		"displayName": "Styx",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 45000,
@@ -10544,7 +10544,7 @@
 	{
 		"id": "hippocamp",
 		"name": "Hippocamp",
-		"englishName": "Hippocamp",
+		"displayName": "Hippocamp",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 105200,
@@ -10584,7 +10584,7 @@
 	{
 		"id": "mk2",
 		"name": "S/2015 (136472) 1",
-		"englishName": "S/2015 (136472) 1",
+		"displayName": "S/2015 (136472) 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21100,
@@ -10624,7 +10624,7 @@
 	{
 		"id": "s2017j1",
 		"name": "S/2017 J 1",
-		"englishName": "S/2017 J 1",
+		"displayName": "S/2017 J 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23587000,
@@ -10664,7 +10664,7 @@
 	{
 		"id": "s2016j1",
 		"name": "S/2016 J 1",
-		"englishName": "S/2016 J 1",
+		"displayName": "S/2016 J 1",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20651000,
@@ -10704,7 +10704,7 @@
 	{
 		"id": "valetudo",
 		"name": "Valetudo",
-		"englishName": "Valetudo",
+		"displayName": "Valetudo",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 18980000,
@@ -10744,7 +10744,7 @@
 	{
 		"id": "s2017j2",
 		"name": "S/2017 J 2",
-		"englishName": "S/2017 J 2",
+		"displayName": "S/2017 J 2",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23303000,
@@ -10784,7 +10784,7 @@
 	{
 		"id": "s2017j3",
 		"name": "S/2017 J 3",
-		"englishName": "S/2017 J 3",
+		"displayName": "S/2017 J 3",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20694000,
@@ -10824,7 +10824,7 @@
 	{
 		"id": "pandia",
 		"name": "Pandia",
-		"englishName": "Pandia",
+		"displayName": "Pandia",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11525000,
@@ -10864,7 +10864,7 @@
 	{
 		"id": "s2017j5",
 		"name": "S/2017 J 5",
-		"englishName": "S/2017 J 5",
+		"displayName": "S/2017 J 5",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23232000,
@@ -10904,7 +10904,7 @@
 	{
 		"id": "s2017j6",
 		"name": "S/2017 J 6",
-		"englishName": "S/2017 J 6",
+		"displayName": "S/2017 J 6",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22455000,
@@ -10944,7 +10944,7 @@
 	{
 		"id": "s2017j7",
 		"name": "S/2017 J 7",
-		"englishName": "S/2017 J 7",
+		"displayName": "S/2017 J 7",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20627000,
@@ -10984,7 +10984,7 @@
 	{
 		"id": "s2017j8",
 		"name": "S/2017 J 8",
-		"englishName": "S/2017 J 8",
+		"displayName": "S/2017 J 8",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23233000,
@@ -11024,7 +11024,7 @@
 	{
 		"id": "s2017j9",
 		"name": "S/2017 J 9",
-		"englishName": "S/2017 J 9",
+		"displayName": "S/2017 J 9",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21487000,
@@ -11064,7 +11064,7 @@
 	{
 		"id": "ersa",
 		"name": "Ersa",
-		"englishName": "Ersa",
+		"displayName": "Ersa",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 11483000,
@@ -11104,7 +11104,7 @@
 	{
 		"id": "arrokoth",
 		"name": "(486958) Arrokoth",
-		"englishName": "Arrokoth",
+		"displayName": "Arrokoth",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 6633400000,
@@ -11141,7 +11141,7 @@
 	{
 		"id": "benou",
 		"name": "(101955) Benou",
-		"englishName": "101955 Bennu",
+		"displayName": "101955 Bennu",
 		"type": "Asteroid",
 		"moons": null,
 		"semimajorAxis": 168400000,
@@ -11178,7 +11178,7 @@
 	{
 		"id": "s2004s22",
 		"name": "S/2004 S 22",
-		"englishName": "S/2004 S 22",
+		"displayName": "S/2004 S 22",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20379900,
@@ -11215,7 +11215,7 @@
 	{
 		"id": "s2004s21",
 		"name": "S/2004 S 21",
-		"englishName": "S/2004 S 21",
+		"displayName": "S/2004 S 21",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23810400,
@@ -11252,7 +11252,7 @@
 	{
 		"id": "s2004s20",
 		"name": "S/2004 S 20",
-		"englishName": "S/2004 S 20",
+		"displayName": "S/2004 S 20",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19211000,
@@ -11289,7 +11289,7 @@
 	{
 		"id": "s2004s23",
 		"name": "S/2004 S 23",
-		"englishName": "S/2004 S 23",
+		"displayName": "S/2004 S 23",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21427000,
@@ -11326,7 +11326,7 @@
 	{
 		"id": "s2004s24",
 		"name": "S/2004 S 24",
-		"englishName": "S/2004 S 24",
+		"displayName": "S/2004 S 24",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23231300,
@@ -11363,7 +11363,7 @@
 	{
 		"id": "s2004s25",
 		"name": "S/2004 S 25",
-		"englishName": "S/2004 S 25",
+		"displayName": "S/2004 S 25",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20544500,
@@ -11400,7 +11400,7 @@
 	{
 		"id": "s2004s26",
 		"name": "S/2004 S 26",
-		"englishName": "S/2004 S 26",
+		"displayName": "S/2004 S 26",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 26737800,
@@ -11437,7 +11437,7 @@
 	{
 		"id": "s2004s27",
 		"name": "S/2004 S 27",
-		"englishName": "S/2004 S 27",
+		"displayName": "S/2004 S 27",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 19776700,
@@ -11474,7 +11474,7 @@
 	{
 		"id": "s2004s28",
 		"name": "S/2004 S 28",
-		"englishName": "S/2004 S 28",
+		"displayName": "S/2004 S 28",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21791300,
@@ -11511,7 +11511,7 @@
 	{
 		"id": "s2004s29",
 		"name": "S/2004 S 29",
-		"englishName": "S/2004 S 29",
+		"displayName": "S/2004 S 29",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17470700,
@@ -11548,7 +11548,7 @@
 	{
 		"id": "s2004s30",
 		"name": "S/2004 S 30",
-		"englishName": "S/2004 S 30",
+		"displayName": "S/2004 S 30",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 20424000,
@@ -11585,7 +11585,7 @@
 	{
 		"id": "s2004s31",
 		"name": "S/2004 S 31",
-		"englishName": "S/2004 S 31",
+		"displayName": "S/2004 S 31",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 17402800,
@@ -11622,7 +11622,7 @@
 	{
 		"id": "s2004s32",
 		"name": "S/2004 S 32",
-		"englishName": "S/2004 S 32",
+		"displayName": "S/2004 S 32",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21564200,
@@ -11659,7 +11659,7 @@
 	{
 		"id": "s2004s33",
 		"name": "S/2004 S 33",
-		"englishName": "S/2004 S 33",
+		"displayName": "S/2004 S 33",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23764800,
@@ -11696,7 +11696,7 @@
 	{
 		"id": "s2004s34",
 		"name": "S/2004 S 34",
-		"englishName": "S/2004 S 34",
+		"displayName": "S/2004 S 34",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 24358900,
@@ -11733,7 +11733,7 @@
 	{
 		"id": "s2004s35",
 		"name": "S/2004 S 35",
-		"englishName": "S/2004 S 35",
+		"displayName": "S/2004 S 35",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 21953200,
@@ -11770,7 +11770,7 @@
 	{
 		"id": "s2004s36",
 		"name": "S/2004 S 36",
-		"englishName": "S/2004 S 36",
+		"displayName": "S/2004 S 36",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23698700,
@@ -11807,7 +11807,7 @@
 	{
 		"id": "s2004s37",
 		"name": "S/2004 S 37",
-		"englishName": "S/2004 S 37",
+		"displayName": "S/2004 S 37",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 16003300,
@@ -11844,7 +11844,7 @@
 	{
 		"id": "s2004s38",
 		"name": "S/2004 S 38",
-		"englishName": "S/2004 S 38",
+		"displayName": "S/2004 S 38",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 23006200,
@@ -11881,7 +11881,7 @@
 	{
 		"id": "s2004s39",
 		"name": "S/2004 S 39",
-		"englishName": "S/2004 S 39",
+		"displayName": "S/2004 S 39",
 		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 22790400,
@@ -11918,7 +11918,7 @@
 	{
 		"id": "c2020f3Neowise",
 		"name": "C/2020 F3 (NEOWISE)",
-		"englishName": "C/2020 F3 (NEOWISE)",
+		"displayName": "C/2020 F3 (NEOWISE)",
 		"type": "Comet",
 		"moons": null,
 		"semimajorAxis": 40690620830.4,

@@ -75,7 +75,8 @@ const settings = {
 		'haumea',
 		'orcus',
 		'quaoar'
-	]
+	],
+	entityNavigation: [] // filled by API
 };
 
 export { settings };

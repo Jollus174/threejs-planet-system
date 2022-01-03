@@ -19,21 +19,19 @@
 	}
 
 	.ui-bottom {
-		height: 100px;
-	}
-
-	.btn {
-		padding: 0;
-		color: $white;
-		width: 40px;
-		height: 40px;
-
-		&:hover {
-			background-color: rgba($white, 0.15);
-		}
+		padding-top: 25px;
+		padding-bottom: 25px;
+		background-color: rgba($black, 0.85);
 	}
 }
 
 .badge {
 	background-color: $white;
+}
+
+hr {
+	opacity: 1;
+	border: 0;
+	background: url(/img/dotted-line-circle.svg) repeat-x 2px center;
+	padding: 10px;
 }

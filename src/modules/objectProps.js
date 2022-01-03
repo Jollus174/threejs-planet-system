@@ -36,7 +36,7 @@ class OrbitLine {
 	constructor(data, classRef) {
 		this.data = data;
 		this.classRef = classRef;
-		this.orbitLineName = `${this.data.englishName} orbit line`;
+		this.orbitLineName = `${this.data.id} orbit line`;
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
@@ -45,7 +45,7 @@ class OrbitLine {
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
-		this.parentPlanetId = this.parentPlanetData ? convertToCamelCase(this.parentPlanetData.englishName) : null;
+		this.parentPlanetId = this.parentPlanetData ? this.parentPlanetData.id : null;
 		this.parentPlanetType = this.parentPlanetData
 			? this.parentPlanetData.isDwarfPlanet
 				? '_dwarfPlanets'
@@ -213,7 +213,7 @@ class Entity {
 				<div class="label-circle"></div>
 				<div class="label-text" style="color: ${
 					this.data.labelColour !== settings.planetColours.default ? this.data.labelColour : ''
-				};">${this.data.englishName}</div>
+				};">${this.data.displayName}</div>
 			</div>
 			`;
 		this.CSSObj.name = this.data.id;
@@ -269,8 +269,7 @@ class Entity {
 	setListeners() {
 		this.labelLink.addEventListener('pointerdown', () => {
 			window.location = this.labelLink.href; // OrbitControls eats the native click events :(
-			document.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: this }));
-			orrery.vueTarget.dispatchEvent(new CustomEvent(customEventNames.updateEntityTarget, { detail: this }));
+			document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: this }));
 		});
 
 		this.labelLink.addEventListener('mouseover', () => {

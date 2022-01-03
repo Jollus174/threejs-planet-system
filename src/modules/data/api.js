@@ -210,10 +210,10 @@ const sortData = (data) => {
 
 	const sun = orrery.bodies._star[0];
 
-	const moons = orrery.bodies._all.filter((m) => m.type === 'Moon').sort((a, b) => a.englishName < b.englishName);
+	const moons = orrery.bodies._all.filter((m) => m.type === 'Moon').sort((a, b) => a.displayName < b.displayName);
 	moons.forEach((moon) => {
-		moon.isMajorMoon = majorMoons.indexOf(moon.englishName) !== -1;
-		moon.isInnerMoon = innerMoons.indexOf(moon.englishName) !== -1;
+		moon.isMajorMoon = majorMoons.indexOf(moon.displayName) !== -1;
+		moon.isInnerMoon = innerMoons.indexOf(moon.displayName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
 		moon.materialData = materialData[moon.id] || null;
 		moon.startingPosition = new Vector3();
@@ -222,22 +222,14 @@ const sortData = (data) => {
 
 	const dwarfPlanets = orrery.bodies._all
 		.filter((d) => d.type === 'Dwarf Planet')
-		.sort((a, b) => a.englishName < b.englishName);
+		.sort((a, b) => a.displayName < b.displayName);
 	dwarfPlanets.forEach((dwarfPlanet) => {
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
-		if (dwarfPlanet.moons && dwarfPlanet.moons.length) {
-			const moonNames = dwarfPlanet.moons.map((moonData) => moonData.moon);
-			dwarfPlanet.moons = [];
-			moonNames.forEach((moonName) => {
-				const moonData = moons.find((moon) => moonName === moon.name);
-				if (moonData) dwarfPlanet.moons.push(moonData);
-			});
-		}
 	});
 
 	// const asteroids = asteroidsList.map((asteroid) =>
-	// 	orrery.bodies._all.find((item) => item.englishName.includes(asteroid))
+	// 	orrery.bodies._all.find((item) => item.displayName.includes(asteroid))
 	// );
 	// asteroids.forEach((asteroid) => {
 	// 	asteroid.labelColour = settings.planetColours.default;
@@ -246,20 +238,12 @@ const sortData = (data) => {
 	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
 	// });
 
-	const planets = orrery.bodies._all.filter((p) => p.type === 'Planet').sort((a, b) => a.englishName < b.englishName);
+	const planets = orrery.bodies._all.filter((p) => p.type === 'Planet').sort((a, b) => a.displayName < b.displayName);
 	planets.forEach((planet) => {
-		planet.isInnerPlanet = innerPlanets.indexOf(planet.englishName) !== -1;
+		planet.isInnerPlanet = innerPlanets.indexOf(planet.displayName) !== -1;
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
 		planet.type = 'Planet';
-		if (planet.moons && planet.moons.length) {
-			const moonNames = planet.moons.map((moonData) => moonData.moon); // is called 'moon' not 'name' in the data! Whack
-			planet.moons = [];
-			moonNames.forEach((moonName) => {
-				const moonData = moons.find((moon) => moonName === moon.name);
-				if (moonData) planet.moons.push(moonData);
-			});
-		}
 
 		if (ringData[planet.id]) {
 			planet.rings = [];
@@ -269,7 +253,7 @@ const sortData = (data) => {
 
 	// const satellites = orrery.bodies._all.filter(
 	// 	(item) =>
-	// 		item.englishName !== 'Sun' &&
+	// 		item.displayName !== 'Sun' &&
 	// 		item.isPlanet === false &&
 	// 		item.aroundPlanet === null &&
 	// 		!dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
@@ -277,6 +261,15 @@ const sortData = (data) => {
 	// satellites.forEach((satellite) => {
 	// 	satellite.type = 'Satellite or Comet';
 	// });
+
+	// Building 'Entity Nav' ids with:
+	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
+	settings.systemNavigation.forEach((navItem) => {
+		const entityItem = orrery.bodies._all.find((allItem) => allItem.id === navItem);
+		settings.entityNavigation.push(entityItem.id);
+		if (entityItem.moons) entityItem.moons.forEach((m) => settings.entityNavigation.push(m.moon));
+	});
+	// TODO: asteroids n stuff
 
 	return {
 		sun,

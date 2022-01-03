@@ -10,6 +10,10 @@ button {
 	background: transparent;
 	color: $white;
 
+	&:hover {
+		background-color: rgba($white, 0.15);
+	}
+
 	&:hover,
 	&:focus,
 	&:active {
@@ -22,13 +26,34 @@ button {
 }
 
 .btn-underline {
+	position: relative;
 	border: 2px solid transparent;
 	background-color: transparent;
 	font-weight: 600;
+	border-radius: 0;
 	box-shadow: none !important;
 
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 0.1em;
+		background-color: $white;
+		opacity: 0;
+		transition: opacity 0.2s ease, transform 0.2s ease;
+	}
+
+	&:hover,
+	&:focus,
 	&.active {
-		border-bottom-color: $white;
+		background-color: transparent;
+
+		&::after {
+			opacity: 1;
+			transform: translate3d(0, 0.2em, 0);
+		}
 	}
 }
 
@@ -41,5 +66,41 @@ button {
 }
 
 .btn-rounded {
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
+}
+
+.btn-show-moons {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 5px;
+
+	img {
+		margin-right: 8px;
+	}
+
+	i {
+		&::before {
+			position: relative;
+			top: 1.5px;
+			margin-left: 4px;
+		}
+	}
+}
+
+.btn-readmore {
+	padding: 3px 8px 3px 5px;
+
+	img {
+		position: relative;
+		margin-left: 5px;
+		transition: transform 0.2s ease;
+	}
+
+	&:hover {
+		img {
+			transform: translateX(2px);
+		}
+	}
 }

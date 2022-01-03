@@ -54,3 +54,11 @@ a {
 		margin-right: 5px;
 	}
 }
+
+.text-system-color {
+	color: var(--system-color);
+}
+
+.text-entity-color {
+	color: var(--entity-color);
+}

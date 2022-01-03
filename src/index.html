@@ -60,7 +60,6 @@
 								<button type="button" class="btn btn-rounded d-lg-none">
 									<i class="fas fa-search"></i>
 								</button>
-
 								<div id="search" class="search d-none d-lg-block">
 									<i class="fas fa-search"></i>
 									<input
@@ -69,13 +68,13 @@
 										placeholder="Search"
 										v-model="searchQuery"
 										@keyup="updateSearch"
-										@keyup.enter="updateEntityTarget(0)"
+										@keyup.enter="updateZoomTarget(0)"
 									/>
 									<div class="search-dropdown" v-if="searchLoaded">
 										<ul>
 											<li v-for="(result, i) in searchResults">
-												<a :href="'/#/' + result.id" @click="updateEntityTarget(i)">
-													<span v-html="result.englishName"></span> <span class="text-type">{{ result.type }}</span>
+												<a :href="'/#/' + result.id" @click="updateZoomTarget(i)">
+													<span v-html="result.displayName"></span> <span class="text-type">{{ result.type }}</span>
 												</a>
 											</li>
 											<li v-if="!searchResults.length">
@@ -88,7 +87,118 @@
 						</div>
 					</div>
 				</div>
-				<div class="ui-bottom"></div>
+				<div class="ui-bottom" :class="{'hide-moons': !showMoons}" v-if="clickedClassData">
+					<div class="row">
+						<div class="col-12 col-md-6 offset-md-3">
+							<div class="title-container">
+								<button type="button" class="btn btn-rounded" @click="goToPreviousEntity()">
+									<i class="fas fa-angle-left"></i>
+								</button>
+								<div class="title-wrapper">
+									<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
+									<span class="text-type">{{ clickedClassData.type }}</span>
+								</div>
+								<button type="button" class="btn btn-rounded" @click="goToNextEntity()">
+									<i class="fas fa-angle-right"></i>
+								</button>
+							</div>
+							<div class="key-data-container">
+								<ul>
+									<li v-if="clickedClassData.type !== 'Star'">
+										<span class="heading">Distance</span>
+										<span v-html="distanceFromParentEntity"></span>
+									</li>
+									<li>
+										<span class="heading">Mean Radius</span>
+										<span class="label-color"
+											>{{ new Intl.NumberFormat('en-US').format(clickedClassData.meanRadius) }}</span
+										>
+										km
+									</li>
+									<li>
+										<span class="heading">Orbit Time</span>
+										<span class="label-color">{{ sideralOrbit }}</span> Earth {{ clickedClassData.sideralOrbit < 366 ?
+										'Days' : 'Years' }}
+									</li>
+									<li>
+										<span class="heading">Surface Temp</span>
+										<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
+									</li>
+									<li v-if="clickedClassData.mass">
+										<span class="heading">Mass</span>
+										<span class="label-color">
+											{{ clickedClassData.mass.massValue.toFixed(2) }}
+											<span style="text-transform: none">x</span> 10<sup>{{ clickedClassData.mass.massExponent }}</sup>
+										</span>
+										kg
+									</li>
+									<li v-if="clickedClassData.moons">
+										<span class="heading">Moons</span>
+										<span class="label-color">{{ clickedClassData.moons.length }}</span>
+									</li>
+								</ul>
+								<div class="row">
+									<div class="col-4">
+										<button type="button" class="btn btn-show-moons" @click="showMoons = !showMoons">
+											<img src="img/moon.svg" width="16" />
+											<span v-if="showMoons">
+												Hide Moons
+												<i class="fas fa-angle-down"></i>
+											</span>
+											<span v-else>
+												Show Moons
+												<i class="fas fa-angle-up"></i>
+											</span>
+										</button>
+									</div>
+									<div class="col-4 text-center">
+										<button type="button" class="btn btn-readmore">
+											Read More
+											<img src="img/arrow-right.svg" width="16" />
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="moons-container">
+								<hr />
+
+								<div class="label-moons animate-in">Moons</div>
+
+								<div class="btn-group-wrapper">
+									<div class="btn-group animate-in" role="group">
+										<input
+											type="radio"
+											class="btn-check"
+											name="moon-group"
+											id="moon-group-1"
+											autocomplete="off"
+											checked
+										/>
+										<label class="btn btn-outline-primary" for="moon-group-1">
+											Major <span class="badge">4</span>
+										</label>
+
+										<input type="radio" class="btn-check" name="moon-group" id="moon-group-2" autocomplete="off" />
+										<label class="btn btn-outline-primary" for="moon-group-2">
+											Himalia <span class="badge">7</span>
+										</label>
+									</div>
+								</div>
+
+								<div class="btn-group-wrapper">
+									<div class="btn-group-custom animate-in" role="group">
+										<input type="radio" class="btn-check" name="moon" id="moon-1" autocomplete="off" checked />
+										<label class="btn btn-underline" for="moon-1">Metis</label>
+
+										<input type="radio" class="btn-check" name="moon" id="moon-2" autocomplete="off" />
+										<label class="btn btn-underline" for="moon-2">Adrastea</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<!-- Modal -->
