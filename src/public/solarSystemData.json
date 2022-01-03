@@ -7484,7 +7484,7 @@
 		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "Dysnomia"
+				"moon": "dysnomia"
 			}
 		],
 		"semimajorAxis": 10180122852,
@@ -7976,85 +7976,85 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Ariel"
+				"moon": "ariel"
 			},
 			{
-				"moon": "Umbriel"
+				"moon": "umbriel"
 			},
 			{
-				"moon": "Titania"
+				"moon": "titania"
 			},
 			{
-				"moon": "Oberon"
+				"moon": "oberon"
 			},
 			{
-				"moon": "Miranda"
+				"moon": "miranda"
 			},
 			{
-				"moon": "Cordelia"
+				"moon": "cordelia"
 			},
 			{
-				"moon": "Ophelie"
+				"moon": "ophelie"
 			},
 			{
-				"moon": "Bianca"
+				"moon": "bianca"
 			},
 			{
-				"moon": "Cressida"
+				"moon": "cressida"
 			},
 			{
-				"moon": "Desdemone"
+				"moon": "desdemone"
 			},
 			{
-				"moon": "Juliette"
+				"moon": "juliette"
 			},
 			{
-				"moon": "Portia"
+				"moon": "portia"
 			},
 			{
-				"moon": "Rosalinde"
+				"moon": "rosalinde"
 			},
 			{
-				"moon": "Belinda"
+				"moon": "belinda"
 			},
 			{
-				"moon": "Puck"
+				"moon": "puck"
 			},
 			{
-				"moon": "Caliban"
+				"moon": "caliban"
 			},
 			{
-				"moon": "Sycorax"
+				"moon": "sycorax"
 			},
 			{
-				"moon": "Prospero"
+				"moon": "prospero"
 			},
 			{
-				"moon": "Setebos"
+				"moon": "setebos"
 			},
 			{
-				"moon": "Stephano"
+				"moon": "stephano"
 			},
 			{
-				"moon": "Trinculo"
+				"moon": "trinculo"
 			},
 			{
-				"moon": "Francisco"
+				"moon": "francisco"
 			},
 			{
-				"moon": "Margaret"
+				"moon": "margaret"
 			},
 			{
-				"moon": "Ferdinand"
+				"moon": "ferdinand"
 			},
 			{
-				"moon": "Perdita"
+				"moon": "perdita"
 			},
 			{
-				"moon": "Mab"
+				"moon": "mab"
 			},
 			{
-				"moon": "Cupid"
+				"moon": "cupid"
 			}
 		],
 		"semimajorAxis": 2870658186,
@@ -8364,7 +8364,7 @@
 		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "Vanth"
+				"moon": "vanth"
 			}
 		],
 		"semimajorAxis": 5862440000,
@@ -8406,19 +8406,19 @@
 		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "Charon"
+				"moon": "charon"
 			},
 			{
-				"moon": "Nix"
+				"moon": "nix"
 			},
 			{
-				"moon": "Hydra"
+				"moon": "hydra"
 			},
 			{
-				"moon": "Kerberos"
+				"moon": "kerberos"
 			},
 			{
-				"moon": "Styx"
+				"moon": "styx"
 			}
 		],
 		"semimajorAxis": 5906440628,
@@ -8844,46 +8844,46 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Triton"
+				"moon": "triton"
 			},
 			{
-				"moon": "Nereid"
+				"moon": "nereid"
 			},
 			{
-				"moon": "Naiade"
+				"moon": "naiade"
 			},
 			{
-				"moon": "Thalassa"
+				"moon": "thalassa"
 			},
 			{
-				"moon": "Despina"
+				"moon": "despina"
 			},
 			{
-				"moon": "Galatee"
+				"moon": "galatee"
 			},
 			{
-				"moon": "Larissa"
+				"moon": "larissa"
 			},
 			{
-				"moon": "Protee"
+				"moon": "protee"
 			},
 			{
-				"moon": "Halimede"
+				"moon": "halimede"
 			},
 			{
-				"moon": "Psamathee"
+				"moon": "psamathee"
 			},
 			{
-				"moon": "Sao"
+				"moon": "sao"
 			},
 			{
-				"moon": "Laomedie"
+				"moon": "laomedie"
 			},
 			{
-				"moon": "Neso"
+				"moon": "neso"
 			},
 			{
-				"moon": "Hippocamp"
+				"moon": "hippocamp"
 			}
 		],
 		"semimajorAxis": 4498396441,
@@ -9001,10 +9001,10 @@
 		"type": "Dwarf Planet",
 		"moons": [
 			{
-				"moon": "Namaka"
+				"moon": "namaka"
 			},
 			{
-				"moon": "Hiiaka"
+				"moon": "hiiaka"
 			}
 		],
 		"semimajorAxis": 6432011461,
@@ -9194,7 +9194,7 @@
 		"wikipediaKey": "45_Eugenia"
 	},
 	{
-		"id": "2006SQ372",
+		"id": "2006sq372",
 		"name": "(308933) 2006 SQ372",
 		"englishName": "(308933) 2006 SQ372",
 		"type": "Asteroid",
@@ -9616,241 +9616,241 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Io"
+				"moon": "io"
 			},
 			{
-				"moon": "Europa"
+				"moon": "europa"
 			},
 			{
-				"moon": "Ganymede"
+				"moon": "ganymede"
 			},
 			{
-				"moon": "Callisto"
+				"moon": "callisto"
 			},
 			{
-				"moon": "Amalthea"
+				"moon": "amalthea"
 			},
 			{
-				"moon": "Himalia"
+				"moon": "himalia"
 			},
 			{
-				"moon": "Elara"
+				"moon": "elara"
 			},
 			{
-				"moon": "Pasiphae"
+				"moon": "pasiphae"
 			},
 			{
-				"moon": "Sinope"
+				"moon": "sinope"
 			},
 			{
-				"moon": "Lysithea"
+				"moon": "lysithea"
 			},
 			{
-				"moon": "Carme"
+				"moon": "carme"
 			},
 			{
-				"moon": "Ananke"
+				"moon": "ananke"
 			},
 			{
-				"moon": "Leda"
+				"moon": "leda"
 			},
 			{
-				"moon": "Thebe"
+				"moon": "thebe"
 			},
 			{
-				"moon": "Adrastee"
+				"moon": "adrastee"
 			},
 			{
-				"moon": "Metis"
+				"moon": "metis"
 			},
 			{
-				"moon": "Callirrhoe"
+				"moon": "callirrhoe"
 			},
 			{
-				"moon": "Themisto"
+				"moon": "themisto"
 			},
 			{
-				"moon": "Megaclite"
+				"moon": "megaclite"
 			},
 			{
-				"moon": "Taygete"
+				"moon": "taygete"
 			},
 			{
-				"moon": "Chaldene"
+				"moon": "chaldene"
 			},
 			{
-				"moon": "Harpalyke"
+				"moon": "harpalyke"
 			},
 			{
-				"moon": "Kalyke"
+				"moon": "kalyke"
 			},
 			{
-				"moon": "Iocaste"
+				"moon": "iocaste"
 			},
 			{
-				"moon": "Erinome"
+				"moon": "erinome"
 			},
 			{
-				"moon": "Isonoe"
+				"moon": "isonoe"
 			},
 			{
-				"moon": "Praxidike"
+				"moon": "praxidike"
 			},
 			{
-				"moon": "Autonoe"
+				"moon": "autonoe"
 			},
 			{
-				"moon": "Thyone"
+				"moon": "thyone"
 			},
 			{
-				"moon": "Hermippe"
+				"moon": "hermippe"
 			},
 			{
-				"moon": "Aitne"
+				"moon": "aitne"
 			},
 			{
-				"moon": "Eurydome"
+				"moon": "eurydome"
 			},
 			{
-				"moon": "Euanthe"
+				"moon": "euanthe"
 			},
 			{
-				"moon": "Euporie"
+				"moon": "euporie"
 			},
 			{
-				"moon": "Orthosie"
+				"moon": "orthosie"
 			},
 			{
-				"moon": "Sponde"
+				"moon": "sponde"
 			},
 			{
-				"moon": "Cale"
+				"moon": "cale"
 			},
 			{
-				"moon": "Pasithee"
+				"moon": "pasithee"
 			},
 			{
-				"moon": "Hegemone"
+				"moon": "hegemone"
 			},
 			{
-				"moon": "Mneme"
+				"moon": "mneme"
 			},
 			{
-				"moon": "Aoede"
+				"moon": "aoede"
 			},
 			{
-				"moon": "Thelxinoe"
+				"moon": "thelxinoe"
 			},
 			{
-				"moon": "Arche"
+				"moon": "arche"
 			},
 			{
-				"moon": "Callichore"
+				"moon": "callichore"
 			},
 			{
-				"moon": "Helice"
+				"moon": "helice"
 			},
 			{
-				"moon": "Carpo"
+				"moon": "carpo"
 			},
 			{
-				"moon": "Eukelade"
+				"moon": "eukelade"
 			},
 			{
-				"moon": "Cyllene"
+				"moon": "cyllene"
 			},
 			{
-				"moon": "Core"
+				"moon": "core"
 			},
 			{
-				"moon": "Herse"
+				"moon": "herse"
 			},
 			{
-				"moon": "S/2003 J 2"
+				"moon": "s2003j2"
 			},
 			{
-				"moon": "Eupheme"
+				"moon": "eupheme"
 			},
 			{
-				"moon": "S/2003 J 4"
+				"moon": "s2003j4"
 			},
 			{
-				"moon": "Eirene"
+				"moon": "eirene"
 			},
 			{
-				"moon": "S/2003 J 9"
+				"moon": "s2003j9"
 			},
 			{
-				"moon": "S/2003 J 10"
+				"moon": "s2003j10"
 			},
 			{
-				"moon": "S/2003 J 12"
+				"moon": "s2003j12"
 			},
 			{
-				"moon": "Philophrosyne"
+				"moon": "philophrosyne"
 			},
 			{
-				"moon": "S/2003 J 16"
+				"moon": "s2003j16"
 			},
 			{
-				"moon": "S/2003 J 18"
+				"moon": "s2003j18"
 			},
 			{
-				"moon": "S/2003 J 19"
+				"moon": "s2003j19"
 			},
 			{
-				"moon": "S/2003 J 23"
+				"moon": "s2003j23"
 			},
 			{
-				"moon": "Dia"
+				"moon": "dia"
 			},
 			{
-				"moon": "S/2010 J 1"
+				"moon": "s2010j1"
 			},
 			{
-				"moon": "S/2010 J 2"
+				"moon": "s2010j2"
 			},
 			{
-				"moon": "S/2011 J 1"
+				"moon": "s2011j1"
 			},
 			{
-				"moon": "S/2011 J 2"
+				"moon": "s2011j2"
 			},
 			{
-				"moon": "S/2017 J 1"
+				"moon": "s2017j1"
 			},
 			{
-				"moon": "S/2016 J 1"
+				"moon": "s2016j1"
 			},
 			{
-				"moon": "Valetudo"
+				"moon": "valetudo"
 			},
 			{
-				"moon": "S/2017 J 2"
+				"moon": "s2017j2"
 			},
 			{
-				"moon": "S/2017 J 3"
+				"moon": "s2017j3"
 			},
 			{
-				"moon": "Pandia"
+				"moon": "pandia"
 			},
 			{
-				"moon": "S/2017 J 5"
+				"moon": "s2017j5"
 			},
 			{
-				"moon": "S/2017 J 6"
+				"moon": "s2017j6"
 			},
 			{
-				"moon": "S/2017 J 7"
+				"moon": "s2017j7"
 			},
 			{
-				"moon": "S/2017 J 8"
+				"moon": "s2017j8"
 			},
 			{
-				"moon": "S/2017 J 9"
+				"moon": "s2017j9"
 			},
 			{
-				"moon": "Ersa"
+				"moon": "ersa"
 			}
 		],
 		"semimajorAxis": 778340821,
@@ -9894,10 +9894,10 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Phobos"
+				"moon": "phobos"
 			},
 			{
-				"moon": "Deimos"
+				"moon": "deimos"
 			}
 		],
 		"semimajorAxis": 227943824,
@@ -9982,250 +9982,250 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Mimas"
+				"moon": "mimas"
 			},
 			{
-				"moon": "Encelade"
+				"moon": "encelade"
 			},
 			{
-				"moon": "Tethys"
+				"moon": "tethys"
 			},
 			{
-				"moon": "Dione"
+				"moon": "dione"
 			},
 			{
-				"moon": "Rhea"
+				"moon": "rhea"
 			},
 			{
-				"moon": "Titan"
+				"moon": "titan"
 			},
 			{
-				"moon": "Hyperion"
+				"moon": "hyperion"
 			},
 			{
-				"moon": "Japet"
+				"moon": "japet"
 			},
 			{
-				"moon": "Phoebe"
+				"moon": "phoebe"
 			},
 			{
-				"moon": "Janus"
+				"moon": "janus"
 			},
 			{
-				"moon": "Epimethee"
+				"moon": "epimethee"
 			},
 			{
-				"moon": "Helene"
+				"moon": "helene"
 			},
 			{
-				"moon": "Telesto"
+				"moon": "telesto"
 			},
 			{
-				"moon": "Calypso"
+				"moon": "calypso"
 			},
 			{
-				"moon": "Atlas"
+				"moon": "atlas"
 			},
 			{
-				"moon": "Promethee"
+				"moon": "promethee"
 			},
 			{
-				"moon": "Pandore"
+				"moon": "pandore"
 			},
 			{
-				"moon": "Pan"
+				"moon": "pan"
 			},
 			{
-				"moon": "Ymir"
+				"moon": "ymir"
 			},
 			{
-				"moon": "Paaliaq"
+				"moon": "paaliaq"
 			},
 			{
-				"moon": "Tarvos"
+				"moon": "tarvos"
 			},
 			{
-				"moon": "Ijiraq"
+				"moon": "ijiraq"
 			},
 			{
-				"moon": "Suttungr"
+				"moon": "suttungr"
 			},
 			{
-				"moon": "Kiviuq"
+				"moon": "kiviuq"
 			},
 			{
-				"moon": "Mundilfari"
+				"moon": "mundilfari"
 			},
 			{
-				"moon": "Albiorix"
+				"moon": "albiorix"
 			},
 			{
-				"moon": "Skathi"
+				"moon": "skathi"
 			},
 			{
-				"moon": "Erriapo"
+				"moon": "erriapo"
 			},
 			{
-				"moon": "Siarnaq"
+				"moon": "siarnaq"
 			},
 			{
-				"moon": "Thrymr"
+				"moon": "thrymr"
 			},
 			{
-				"moon": "Narvi"
+				"moon": "narvi"
 			},
 			{
-				"moon": "Methone"
+				"moon": "methone"
 			},
 			{
-				"moon": "Pallene"
+				"moon": "pallene"
 			},
 			{
-				"moon": "Pollux"
+				"moon": "pollux"
 			},
 			{
-				"moon": "Daphnis"
+				"moon": "daphnis"
 			},
 			{
-				"moon": "Aegir"
+				"moon": "aegir"
 			},
 			{
-				"moon": "Bebhionn"
+				"moon": "bebhionn"
 			},
 			{
-				"moon": "Bergelmir"
+				"moon": "bergelmir"
 			},
 			{
-				"moon": "Bestla"
+				"moon": "bestla"
 			},
 			{
-				"moon": "Farbauti"
+				"moon": "farbauti"
 			},
 			{
-				"moon": "Fenrir"
+				"moon": "fenrir"
 			},
 			{
-				"moon": "Fornjot"
+				"moon": "fornjot"
 			},
 			{
-				"moon": "Hati"
+				"moon": "hati"
 			},
 			{
-				"moon": "Hyrrokkin"
+				"moon": "hyrrokkin"
 			},
 			{
-				"moon": "Kari"
+				"moon": "kari"
 			},
 			{
-				"moon": "Loge"
+				"moon": "loge"
 			},
 			{
-				"moon": "Skoll"
+				"moon": "skoll"
 			},
 			{
-				"moon": "Surtur"
+				"moon": "surtur"
 			},
 			{
-				"moon": "Anthe"
+				"moon": "anthe"
 			},
 			{
-				"moon": "Jarnsaxa"
+				"moon": "jarnsaxa"
 			},
 			{
-				"moon": "Greip"
+				"moon": "greip"
 			},
 			{
-				"moon": "Tarqeq"
+				"moon": "tarqeq"
 			},
 			{
 				"moon": "egeon"
 			},
 			{
-				"moon": "S/2004 S 7"
+				"moon": "s2004s7"
 			},
 			{
-				"moon": "S/2004 S 12"
+				"moon": "s2004s12"
 			},
 			{
-				"moon": "S/2004 S 13"
+				"moon": "s2004s13"
 			},
 			{
-				"moon": "S/2004 S 17"
+				"moon": "s2004s17"
 			},
 			{
-				"moon": "S/2006 S 1"
+				"moon": "s2006s1"
 			},
 			{
-				"moon": "S/2006 S 3"
+				"moon": "s2006s3"
 			},
 			{
-				"moon": "S/2007 S 2"
+				"moon": "s2007s2"
 			},
 			{
-				"moon": "S/2007 S 3"
+				"moon": "s2007s3"
 			},
 			{
-				"moon": "S/2009 S 1"
+				"moon": "s2009s1"
 			},
 			{
-				"moon": "S/2004 S 22"
+				"moon": "s2004s22"
 			},
 			{
-				"moon": "S/2004 S 21"
+				"moon": "s2004s21"
 			},
 			{
-				"moon": "S/2004 S 20"
+				"moon": "s2004s20"
 			},
 			{
-				"moon": "S/2004 S 23"
+				"moon": "s2004s23"
 			},
 			{
-				"moon": "S/2004 S 24"
+				"moon": "s2004s24"
 			},
 			{
-				"moon": "S/2004 S 25"
+				"moon": "s2004s25"
 			},
 			{
-				"moon": "S/2004 S 26"
+				"moon": "s2004s26"
 			},
 			{
-				"moon": "S/2004 S 27"
+				"moon": "s2004s27"
 			},
 			{
-				"moon": "S/2004 S 28"
+				"moon": "s2004s28"
 			},
 			{
-				"moon": "S/2004 S 29"
+				"moon": "s2004s29"
 			},
 			{
-				"moon": "S/2004 S 30"
+				"moon": "s2004s30"
 			},
 			{
-				"moon": "S/2004 S 31"
+				"moon": "s2004s31"
 			},
 			{
-				"moon": "S/2004 S 32"
+				"moon": "s2004s32"
 			},
 			{
-				"moon": "S/2004 S 33"
+				"moon": "s2004s33"
 			},
 			{
-				"moon": "S/2004 S 34"
+				"moon": "s2004s34"
 			},
 			{
-				"moon": "S/2004 S 35"
+				"moon": "s2004s35"
 			},
 			{
-				"moon": "S/2004 S 36"
+				"moon": "s2004s36"
 			},
 			{
-				"moon": "S/2004 S 37"
+				"moon": "s2004s37"
 			},
 			{
-				"moon": "S/2004 S 38"
+				"moon": "s2004s38"
 			},
 			{
-				"moon": "S/2004 S 39"
+				"moon": "s2004s39"
 			}
 		],
 		"semimajorAxis": 1426666422,
@@ -10305,7 +10305,7 @@
 		"type": "Planet",
 		"moons": [
 			{
-				"moon": "Luna"
+				"moon": "luna"
 			}
 		],
 		"semimajorAxis": 149598262,
@@ -11916,7 +11916,7 @@
 		"wikipediaKey": "S/2004_S_39"
 	},
 	{
-		"id": "c2020f3-neowise",
+		"id": "c2020f3Neowise",
 		"name": "C/2020 F3 (NEOWISE)",
 		"englishName": "C/2020 F3 (NEOWISE)",
 		"type": "Comet",
