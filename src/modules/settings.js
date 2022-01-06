@@ -21,21 +21,11 @@ const settings = {
 		_mouseHoverTimeoutDefault: 5, // for queueing up planet hovers
 		_mouseClickTimeoutDefault: 500 // for determining whether it's a click mouse press or a held one
 	},
-	text: {
-		_textOpacityDefault: 0,
-		_fontSettings: {
-			bevelEnabled: false,
-			curveSegments: 4,
-			bevelThickness: 2,
-			bevelSize: 1.5,
-			height: 0
-		}
-	},
 	orbitLines: {
 		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
 	},
 	domTarget: document.querySelector('#bg'),
-	// shoutouts to F-Zero
+	// shoutouts to F-Zero GX
 	planetColours: {
 		default: '#e4e4e4',
 		dwarfPlanet: '#c8c8c8',
@@ -43,7 +33,7 @@ const settings = {
 		mercury: '#b78668',
 		venus: '#ff7d00',
 		earth: '#6dcbe7',
-		mars: '#ff531c',
+		mars: '#fc6f43',
 		jupiter: '#e0ab79',
 		saturn: '#ffe577',
 		uranus: '#c8ecef',
@@ -56,7 +46,7 @@ const settings = {
 		triton: '#cec3c7'
 	},
 	systemZoomDistanceThresholds: [1800000000, 5000000000],
-	systemNavigation: [
+	navigationSystems: [
 		'sun',
 
 		'mercury',
@@ -74,9 +64,10 @@ const settings = {
 		'makemake',
 		'haumea',
 		'orcus',
+		'gonggong',
 		'quaoar'
 	],
-	entityNavigation: [] // filled by API
+	navigationEntities: [] // hydrated by API
 };
 
 export { settings };

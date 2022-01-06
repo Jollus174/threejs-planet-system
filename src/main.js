@@ -7,7 +7,7 @@ import { settings } from './modules/settings';
 import { controls } from './modules/controls';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
-import { easeTo, checkIfDesktop, kmToAU, AUToKm } from './modules/utils';
+import { easeTo, checkIfDesktop, kmToAU, AUToKm, convertToCamelCase, randomString } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
@@ -232,19 +232,24 @@ fetch('./solarSystemData.json')
 			data: {
 				searchQuery: '',
 				searchResults: [],
+				navigationSystems: settings.navigationSystems,
+				navigationEntities: settings.navigationEntities,
 				searchLoaded: false,
 				bottomBar: {},
 				showMoons: true, // TODO: will need to be controlled by 3D Orrery then passed to this
 				content: {},
-				moonSections: [],
-				moons: [],
-				comparisons: [],
-				media: [],
+				// comparisons: [],
+				// media: [],
 				clickedClassData: null,
-				zoomedClassData: null
+				zoomedClassData: null,
+				modelSystemSelection: {}, // for keeping track of what's selected between systems
+				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
+				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
+				moonGroupRefresh: 12345 // needing to force an update on the rendered moons when Moon Group button interacted with, doing this via :key and a random int [0-10000]
 			},
 			computed: {
 				systemColour() {
+					if (!this.clickedClassData) return;
 					return this.clickedClassData.aroundPlanet
 						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.labelColour
 						: this.clickedClassData.labelColour;
@@ -273,7 +278,9 @@ fetch('./solarSystemData.json')
 							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
 							: 'Sun';
 					if (isClose) {
-						return `<span class="label-color">${this.clickedClassData.semimajorAxis}</span> km from ${parentEntity}`;
+						return `<span class="label-color">${new Intl.NumberFormat('en-US').format(
+							this.clickedClassData.semimajorAxis
+						)}</span> km from ${parentEntity}`;
 					} else {
 						const distanceNumber = this.convertToAU(this.clickedClassData.semimajorAxis).toFixed(2).split('.');
 						// also, if floating points are '.00', then disclude them
@@ -283,7 +290,7 @@ fetch('./solarSystemData.json')
 				},
 
 				sideralOrbit() {
-					if (!this.clickedClassData) return;
+					if (!this.clickedClassData || !this.clickedClassData.sideralOrbit) return;
 					// siderals more than a year should return years rather than days
 					const sideralConversion =
 						this.clickedClassData.sideralOrbit > 366
@@ -297,6 +304,53 @@ fetch('./solarSystemData.json')
 
 				showMoonsArrowClass() {
 					return this.showMoons ? 'fa-angle-down' : 'fa-angle-up';
+				},
+
+				moonGroups() {
+					if (!this.clickedClassData) return {};
+					const moonKeys =
+						this.clickedClassData.type === 'Moon'
+							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.moons
+							: this.clickedClassData.moons;
+					if (!moonKeys) return {};
+					const moonGroups = {};
+					moonKeys.forEach((moonKey) => {
+						const moonGroupName = orrery.classes._all[moonKey.moon].data.moonGroup;
+						const moonGroupKey = convertToCamelCase(moonGroupName);
+						moonGroups[moonGroupKey] = moonGroups[moonGroupKey] || {
+							name: moonGroupName,
+							count: 0,
+							id: convertToCamelCase(moonGroupName),
+							moons: [],
+							systemId: convertToCamelCase(orrery.classes._all[moonKey.moon].data.system)
+						};
+						moonGroups[moonGroupKey].count++;
+						moonGroups[moonGroupKey].moons.push(moonKey.moon);
+					});
+					return moonGroups;
+				},
+
+				moons() {
+					if (!this.clickedClassData) return [];
+					const moonKeys =
+						this.clickedClassData.type === 'Moon'
+							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.moons
+							: this.clickedClassData.moons;
+					if (!moonKeys) return [];
+					return moonKeys.map((moonKey) => {
+						const moonClassData = orrery.classes._all[moonKey.moon].data;
+						return {
+							displayName: moonClassData.displayName,
+							id: moonClassData.id,
+							index: this.navigationEntities.indexOf(moonClassData.id),
+							moonGroupId: moonClassData.moonGroupId
+						};
+					});
+				},
+
+				activeMoonGroupId() {
+					if (!this.clickedClassData || !this.clickedClassData.moonGroup) return '';
+					return convertToCamelCase(this.clickedClassData.moonGroup);
 				}
 			},
 			methods: {
@@ -339,6 +393,7 @@ fetch('./solarSystemData.json')
 						.map((result) => {
 							return {
 								id: result.id,
+								index: this.navigationEntities.indexOf(result.id),
 								displayName: this.highlightMatchSubstring(result.displayName),
 								type: result.type,
 								system: result.system
@@ -353,42 +408,79 @@ fetch('./solarSystemData.json')
 				},
 
 				goToPreviousSystem() {
-					const systemKeys = settings.systemNavigation;
+					const systemKeys = this.navigationSystems;
 					const currentIndex =
 						this.clickedClassData && this.clickedClassData.type !== 'Star'
 							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
 							: 0;
 					const prevIndex = this.clickedClassData && currentIndex !== 0 ? currentIndex - 1 : systemKeys.length - 1;
-					this.updateEntity(orrery.classes._all[systemKeys[prevIndex]].data);
+					let prevSystemKey = systemKeys[prevIndex].toLowerCase();
+					// checking to see if entity in prev system was already previously selected
+					prevSystemKey = this.modelSystemSelection[prevSystemKey] || prevSystemKey;
+					this.updateEntity(orrery.classes._all[prevSystemKey].data);
 				},
 
 				goToNextSystem() {
-					const systemKeys = settings.systemNavigation;
+					const systemKeys = this.navigationSystems;
 					const currentIndex =
 						this.clickedClassData && this.clickedClassData.type !== 'Star'
 							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
 							: 0;
 					const nextIndex = this.clickedClassData && currentIndex + 1 < systemKeys.length ? currentIndex + 1 : 0;
-					this.updateEntity(orrery.classes._all[systemKeys[nextIndex]].data);
+					let nextSystemKey = systemKeys[nextIndex].toLowerCase();
+					// checking to see if entity in next system was already previously selected
+					nextSystemKey = this.modelSystemSelection[nextSystemKey] || nextSystemKey;
+					this.updateEntity(orrery.classes._all[nextSystemKey].data);
+				},
+
+				updateMoonGroup(id) {
+					this.$set(this.modelMoonGroupSelection, this.clickedClassData.systemId, id);
+					this.moonGroupRefresh = randomString(8);
 				},
 
 				updateEntity(data) {
 					const newClickedClassData = data;
-					const isNewSystem = !this.clickedClassData || this.clickedClassData.system !== newClickedClassData.system;
 					this.clickedClassData = newClickedClassData;
 					document.querySelector(':root').style.setProperty('--entity-color', this.clickedClassData.labelColour);
-					if (isNewSystem) document.querySelector(':root').style.setProperty('--system-color', this.systemColour);
+					document.querySelector(':root').style.setProperty('--system-color', this.systemColour);
+
+					// keeping track of what's been selected between each system
+					this.modelSystemSelection[this.clickedClassData.systemId] = newClickedClassData.id;
+
+					// also keeping track of what's been selected between each moon group for :checked
+					if (!this.clickedClassData.moonGroupId) {
+						// if moonGroup doesn't exist in selection model, always select the first moon group by default
+						if (this.clickedClassData.moons) {
+							const firstMoonKey = this.clickedClassData.moons[0].moon;
+							this.modelMoonGroupSelection[this.clickedClassData.systemId] =
+								orrery.classes._all[firstMoonKey].data.moonGroupId;
+						}
+					} else {
+						this.modelMoonGroupSelection[this.clickedClassData.systemId] = this.clickedClassData.moonGroupId;
+					}
+
+					// finally, keeping track of which moon is selected in each moon group
+					this.modelMoonSelection[this.clickedClassData.moonGroupId] =
+						this.clickedClassData.type === 'Moon' ? newClickedClassData.id : '';
+
+					// manually setting the :checked here
+					// changing a moon group should not update the entity
+					this.$nextTick(() => {
+						[...document.querySelectorAll('#moon-groups-wrapper input')].forEach((moonGroup) => {
+							moonGroup.checked = this.modelMoonGroupSelection[this.clickedClassData.systemId] === moonGroup.id;
+						});
+					});
 				},
 
 				goToPreviousEntity() {
-					const keys = settings.entityNavigation;
+					const keys = this.navigationEntities;
 					const currentIndex = keys.indexOf(this.clickedClassData.id);
 					const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
 					this.updateEntity(orrery.classes._all[keys[prevIndex]].data);
 				},
 
 				goToNextEntity() {
-					const keys = settings.entityNavigation;
+					const keys = this.navigationEntities;
 					const currentIndex = keys.indexOf(this.clickedClassData.id);
 					const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
 					this.updateEntity(orrery.classes._all[keys[nextIndex]].data);
@@ -400,12 +492,12 @@ fetch('./solarSystemData.json')
 				},
 
 				updateClickTarget(i) {
-					const clickedClass = orrery.classes._all[this.searchResults[i].id];
+					const clickedClass = orrery.classes._all[this.navigationEntities[i]];
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 				},
 
 				updateZoomTarget(i) {
-					const clickedClass = orrery.classes._all[this.searchResults[i].id];
+					const clickedClass = orrery.classes._all[this.navigationEntities[i]];
 					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();

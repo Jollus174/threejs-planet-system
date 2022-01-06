@@ -23,6 +23,10 @@ button {
 	&:disabled {
 		color: $btn-disabled;
 	}
+
+	.badge {
+		top: 0; // undo-ing Bootstrap's 'quick-fix'
+	}
 }
 
 .btn-underline {
@@ -87,6 +91,12 @@ button {
 			margin-left: 4px;
 		}
 	}
+}
+
+.btn-moon-group {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
 }
 
 .btn-readmore {

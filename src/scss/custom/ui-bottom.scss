@@ -82,6 +82,10 @@
 		text-align: center;
 
 		.label-moons {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: center;
 			transform: translateY(0);
 			color: #5a5a5a;
 			text-transform: uppercase;

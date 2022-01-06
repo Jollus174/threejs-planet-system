@@ -68,12 +68,12 @@
 										placeholder="Search"
 										v-model="searchQuery"
 										@keyup="updateSearch"
-										@keyup.enter="updateZoomTarget(0)"
+										@keyup.enter="updateZoomTarget(searchResults[0].index)"
 									/>
 									<div class="search-dropdown" v-if="searchLoaded">
 										<ul>
 											<li v-for="(result, i) in searchResults">
-												<a :href="'/#/' + result.id" @click="updateZoomTarget(i)">
+												<a :href="'/#/' + result.id" @click="updateZoomTarget(result.index)">
 													<span v-html="result.displayName"></span> <span class="text-type">{{ result.type }}</span>
 												</a>
 											</li>
@@ -115,7 +115,7 @@
 										>
 										km
 									</li>
-									<li>
+									<li v-if="sideralOrbit">
 										<span class="heading">Orbit Time</span>
 										<span class="label-color">{{ sideralOrbit }}</span> Earth {{ clickedClassData.sideralOrbit < 366 ?
 										'Days' : 'Years' }}
@@ -124,7 +124,7 @@
 										<span class="heading">Surface Temp</span>
 										<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
 									</li>
-									<li v-if="clickedClassData.mass">
+									<li v-if="clickedClassData.mass && clickedClassData.massValue">
 										<span class="heading">Mass</span>
 										<span class="label-color">
 											{{ clickedClassData.mass.massValue.toFixed(2) }}
@@ -132,14 +132,15 @@
 										</span>
 										kg
 									</li>
-									<li v-if="clickedClassData.moons">
-										<span class="heading">Moons</span>
-										<span class="label-color">{{ clickedClassData.moons.length }}</span>
-									</li>
 								</ul>
 								<div class="row">
 									<div class="col-4">
-										<button type="button" class="btn btn-show-moons" @click="showMoons = !showMoons">
+										<button
+											type="button"
+											class="btn btn-show-moons"
+											@click="showMoons = !showMoons"
+											v-show="moons.length"
+										>
 											<img src="img/moon.svg" width="16" />
 											<span v-if="showMoons">
 												Hide Moons
@@ -160,39 +161,50 @@
 								</div>
 							</div>
 
-							<div class="moons-container">
+							<div class="moons-container" v-show="moons.length">
 								<hr />
 
-								<div class="label-moons animate-in">Moons</div>
+								<div class="label-moons animate-in">
+									<span>Moon<span v-if="moons.length > 1">s</span></span>
+									&nbsp;<span v-if="moons.length > 1">({{ moons.length }})</span>
+								</div>
 
-								<div class="btn-group-wrapper">
+								<div id="moon-groups-wrapper" class="btn-group-wrapper" v-show="Object.keys(moonGroups).length > 1">
 									<div class="btn-group animate-in" role="group">
-										<input
-											type="radio"
-											class="btn-check"
-											name="moon-group"
-											id="moon-group-1"
-											autocomplete="off"
-											checked
-										/>
-										<label class="btn btn-outline-primary" for="moon-group-1">
-											Major <span class="badge">4</span>
-										</label>
-
-										<input type="radio" class="btn-check" name="moon-group" id="moon-group-2" autocomplete="off" />
-										<label class="btn btn-outline-primary" for="moon-group-2">
-											Himalia <span class="badge">7</span>
-										</label>
+										<template v-for="moonGroup in Object.values(moonGroups)">
+											<input
+												type="radio"
+												class="btn-check"
+												name="moon-group"
+												:id="moonGroup.id"
+												autocomplete="off"
+												@change="updateMoonGroup(moonGroup.id)"
+											/>
+											<label class="btn btn-outline-primary btn-moon-group" :for="moonGroup.id">
+												{{ moonGroup.name }} <span class="badge">{{ moonGroup.count }}</span>
+											</label>
+										</template>
 									</div>
 								</div>
 
-								<div class="btn-group-wrapper">
+								<div class="btn-group-wrapper" :key="moonGroupRefresh">
 									<div class="btn-group-custom animate-in" role="group">
-										<input type="radio" class="btn-check" name="moon" id="moon-1" autocomplete="off" checked />
-										<label class="btn btn-underline" for="moon-1">Metis</label>
-
-										<input type="radio" class="btn-check" name="moon" id="moon-2" autocomplete="off" />
-										<label class="btn btn-underline" for="moon-2">Adrastea</label>
+										<span
+											v-for="moon in moons"
+											v-show="modelMoonGroupSelection[clickedClassData.systemId] === moon.moonGroupId"
+										>
+											<input
+												type="radio"
+												class="btn-check"
+												name="moon"
+												:id="moon.id"
+												autocomplete="off"
+												:checked="modelSystemSelection[clickedClassData.systemId] === moon.id"
+											/>
+											<label class="btn btn-underline" :for="moon.id" @click="updateClickTarget(moon.index)">
+												{{ moon.displayName }}
+											</label>
+										</span>
 									</div>
 								</div>
 							</div>

@@ -181,6 +181,16 @@ const currentDateTime = () => {
 	return d;
 };
 
+const randomString = (length) => {
+	let result = '';
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+};
+
 const kmToAU = (km) => km / 149598000;
 const AUToKm = (au) => au * 149598000;
 
@@ -200,6 +210,7 @@ export {
 	convertToKebabCase,
 	convertToCamelCase,
 	currentDateTime,
+	randomString,
 	kmToAU,
 	AUToKm
 };

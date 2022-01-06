@@ -109,35 +109,6 @@ const innerMoons = [
 	'Vanth'
 ];
 
-const dwarfPlanetList = ['Pluto', 'Ceres', 'Eris', 'Makemake', 'Haumea', 'Orcus', '50000 Quaoar'];
-
-const asteroidsList = [
-	'4 Vesta',
-	'433 Eros',
-	'101955 Bennu',
-	'243 Ida',
-	'6 Hebe',
-	'762 Pulcova',
-	'47171 Lempo',
-	'951 Gaspra',
-	'4179 Toutatis',
-	'2867 Steins',
-	'5 Astraea',
-	'5145 Pholus',
-	'2 Pallas',
-	'4769 Castalia',
-	'624 Hektor',
-	'216 Kleopatra',
-	'3753 Cruithne',
-	'3 Juno',
-	'10 Hygiea',
-	'16 Psyche',
-	'25143 Itokawa',
-	'21 Lutetia',
-	'253 Mathilde',
-	'87 Sylvia'
-];
-
 const asteroidMoonsList = ['Remus', 'Petit-Prince'];
 
 // manually adding own ring data, API does not have this
@@ -166,14 +137,80 @@ const sortData = (data) => {
 		);
 	};
 
+	data.forEach((item) => {
+		if (item.type === 'Moon') {
+			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) item.moonGroup = 'Inner';
+			if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) item.moonGroup = 'Galilean';
+			if (['leda', 'himalia', 'lysithea', 'elara', 'dia', 'ersa', 'pandia'].indexOf(item.id) !== -1)
+				item.moonGroup = 'Himalia';
+			// const carmeGroup =
+			if (
+				[
+					'carme',
+					'taygete',
+					'eukelade',
+					'chaldene',
+					'isonoe',
+					'kalyke',
+					'erinome',
+					'herse',
+					's/2011 j 1',
+					's/2017 j 5',
+					's/2017 j 2'
+				]
+					.map((i) => convertToCamelCase(i.replace(' ', '')))
+					.indexOf(item.id) !== -1
+			)
+				item.moonGroup = 'Carme';
+
+			if (
+				[
+					'ananke',
+					'iocaste',
+					'harpalyke',
+					'thyone',
+					'euanthe',
+					'euporie',
+					'helike',
+					'hermippe',
+					'mneme',
+					'orthosie',
+					'thelxinoe'
+				].indexOf(item.id) !== -1
+			)
+				item.moonGroup = 'Ananke';
+
+			if (
+				[
+					'pasiphae',
+					'sinope',
+					'callirrhoe',
+					'megaclite',
+					'autonoe',
+					'eurydome',
+					'sponde',
+					'hegemone',
+					'cyllene',
+					'aoede',
+					'kore',
+					'philophrosyne'
+				].indexOf(item.id) !== -1
+			)
+				item.moonGroup = 'Pasiphae';
+
+			if (!item.moonGroup) item.moonGroup = item.system;
+			item.moonGroupId = item.moonGroup.toLowerCase();
+		}
+	});
+
 	// adding additional measurement fields to data
 	orrery.bodies._all = [...data];
 	orrery.bodies._all.forEach((item) => {
 		// temp setting
 		// TODO: Set these values manually, as the API is incomplete
-		item.longAscNode = item.longAscNode !== 0 ? item.longAscNode : getRandomArbitrary(0, 360);
-		item.argPeriapsis = item.argPeriapsis !== 0 ? item.argPeriapsis : getRandomArbitrary(0, 360);
-		item.meanAnomaly = item.meanAnomaly !== 0 ? item.meanAnomaly : getRandomArbitrary(0, 360);
+		item.longAscNode = item.longAscNode || getRandomArbitrary(0, 360);
+		item.argPeriapsis = item.argPeriapsis || getRandomArbitrary(0, 360);
+		item.meanAnomaly = item.meanAnomaly || getRandomArbitrary(0, 360);
 		//
 
 		// N = longitude of the ascending node
@@ -264,10 +301,10 @@ const sortData = (data) => {
 
 	// Building 'Entity Nav' ids with:
 	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
-	settings.systemNavigation.forEach((navItem) => {
+	settings.navigationSystems.forEach((navItem) => {
 		const entityItem = orrery.bodies._all.find((allItem) => allItem.id === navItem);
-		settings.entityNavigation.push(entityItem.id);
-		if (entityItem.moons) entityItem.moons.forEach((m) => settings.entityNavigation.push(m.moon));
+		settings.navigationEntities.push(entityItem.id);
+		if (entityItem.moons) entityItem.moons.forEach((m) => settings.navigationEntities.push(m.moon));
 	});
 	// TODO: asteroids n stuff
 
