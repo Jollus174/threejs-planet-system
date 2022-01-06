@@ -141,22 +141,63 @@ const sortData = (data) => {
 		if (item.type === 'Moon') {
 			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) item.moonGroup = 'Inner';
 			if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) item.moonGroup = 'Galilean';
-			if (['leda', 'himalia', 'lysithea', 'elara', 'dia', 'ersa', 'pandia'].indexOf(item.id) !== -1)
+			if (['leda', 'ersa', 'pandia', 'himalia', 'lysithea', 'elara', 'dia'].indexOf(item.id) !== -1)
 				item.moonGroup = 'Himalia';
-			// const carmeGroup =
+
 			if (
 				[
-					'carme',
-					'taygete',
-					'eukelade',
-					'chaldene',
-					'isonoe',
-					'kalyke',
+					'euporie',
+					'eupheme',
+					's2003j18',
+					's2010j2',
+					'helike',
+					's2003j16',
+					's2003j2',
+					'euanthe',
+					's2017j7',
+					'hermippe',
+					'praxidike',
+					'thyone',
+					'thelxinoe',
+					's2017j3',
+					'ananke',
+					'mneme',
+					's2016j1',
+					'orthosie',
+					'harpalyke',
+					'iocaste',
+					's2017j9',
+					's2003j12'
+				].indexOf(item.id) !== -1
+			)
+				item.moonGroup = 'Ananke';
+
+			if (
+				[
 					'erinome',
+					'aitne',
 					'herse',
-					's/2011 j 1',
-					's/2017 j 5',
-					's/2017 j 2'
+					'taygete',
+					's2017j2',
+					'eukelade',
+					'carme',
+					's2003j19',
+					'isonoe',
+					'pasithee',
+					's2010j1',
+					's2003j24',
+					's2017j8',
+					's2017j5',
+					'kalyke',
+					'kale',
+					'kallichore',
+					's2011j1',
+					'chaldene',
+					'arche',
+					'eirene',
+					's2003j9',
+					's2003j10',
+					'carpo'
 				]
 					.map((i) => convertToCamelCase(i.replace(' ', '')))
 					.indexOf(item.id) !== -1
@@ -165,38 +206,154 @@ const sortData = (data) => {
 
 			if (
 				[
-					'ananke',
-					'iocaste',
-					'harpalyke',
-					'thyone',
-					'euanthe',
-					'euporie',
-					'helike',
-					'hermippe',
-					'mneme',
-					'orthosie',
-					'thelxinoe'
-				].indexOf(item.id) !== -1
-			)
-				item.moonGroup = 'Ananke';
-
-			if (
-				[
 					'pasiphae',
-					'sinope',
-					'callirrhoe',
-					'megaclite',
+					's2017j6',
 					'autonoe',
-					'eurydome',
-					'sponde',
-					'hegemone',
+					'philophrosyne',
 					'cyllene',
-					'aoede',
+					'pasiphae',
+					'sponde',
+					'eurydome',
+					'hegemone',
+					's2017j1',
 					'kore',
-					'philophrosyne'
+					's2011j2',
+					'megaclite',
+					'aoede',
+					's2003j4',
+					's2003j23',
+					'callirrhoe',
+					'sinope'
 				].indexOf(item.id) !== -1
 			)
 				item.moonGroup = 'Pasiphae';
+
+			if (['themisto', 'carpo', 'valetudo'].indexOf(item.id) !== -1) item.moonGroup = 'Misc';
+
+			// Saturn moon groups...
+			if (
+				[
+					'skathi',
+					'skoll',
+					'hyrrokkin',
+					's2006s1',
+					'bergelmir',
+					'farbauti',
+					's2004s30',
+					's2004s32',
+					's2006s3',
+					'kari',
+					's2004s38',
+					's2004s21'
+				].indexOf(item.id) !== -1
+			) {
+				item.moonGroup = 'Skathi';
+				item.direction = 'retrograde';
+			}
+
+			if (['narvi', 'bestla', 's2004s36'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Narvi';
+				item.direction = 'retrograde';
+			}
+
+			if (
+				[
+					'phoebe',
+					's2004s37',
+					's2007s2',
+					'greip',
+					'mundilfari',
+					's2004s13',
+					's2007s3',
+					'suttungr',
+					's2004s20',
+					'jarnsaxa',
+					'hati',
+					's2004s17',
+					's2004s12',
+					's2004s27',
+					'thrymr',
+					's2004s7',
+					'aegir',
+					's2004s22',
+					's2004s25',
+					's2004s23',
+					's2004s35',
+					's2004s28',
+					'loge',
+					'fenrir',
+					'ymir',
+					'surtur',
+					's2004s33',
+					's2004s39',
+					'fornjot',
+					's2004s34',
+					's2004s26'
+				].indexOf(item.id) !== -1
+			) {
+				item.moonGroup = 'Norse';
+				item.direction = 'retrograde';
+			}
+
+			if (['albiorix', 'bebhionn', 'erriapus', 'tarvos'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Gallic';
+				item.direction = 'prograde';
+			}
+
+			if (['prometheus', 'daphnis', 'pan', 'janus', 'epimetheus', 'atlas', 'pandora'].indexOf(item.id) !== -1)
+				item.moonGroup = 'ShepherdMoons';
+			if (['tethys', 'telesto', 'calypso'].indexOf(item.id) !== -1) item.moonGroup = 'Tethys';
+			if (['dione', 'helene', 'polydeuces'].indexOf(item.id) !== -1) item.moonGroup = 'Dione';
+			if (['methone', 'anthe', 'pallene'].indexOf(item.id) !== -1) item.moonGroup = 'Alkyonides';
+			if (['ijiraq', 'kiviuq', 'paaliaq', 'siarnaq', 'tarqeq'].indexOf(item.id) !== -1) item.moonGroup = 'Inuit';
+			if (['hyperion', 'rhea', 'titan', 'iapetus'].indexOf(item.id) !== -1) item.moonGroup = 'OuterLarge';
+			if (['mimas', 'enceladus', 'aegaeon', 's2009s1', 's2004s24', 's2004s29', 's2004s31'].indexOf(item.id) !== -1)
+				item.moonGroup = 'Misc';
+
+			// Uranus moon groups...
+			if (
+				[
+					'cordelia',
+					'ophelia',
+					'bianca',
+					'cressida',
+					'desdemona',
+					'juliet',
+					'portia',
+					'rosalind',
+					'cupid',
+					'belinda',
+					'perdita',
+					'puck',
+					'mab'
+				].indexOf(item.id) !== -1
+			)
+				item.moonGroup = 'Inner';
+			if (['ariel', 'miranda', 'umbriel', 'titania', 'oberon'].indexOf(item.id) !== -1) item.moonGroup = 'Major';
+			if (
+				[
+					'francisco',
+					'caliban',
+					'stephano',
+					'trinculo',
+					'sycorax',
+					'margaret',
+					'prospero',
+					'setebos',
+					'ferdinand'
+				].indexOf(item.id) !== -1
+			) {
+				item.moonGroup = 'Irregular';
+				item.direction = item.id === 'margaret' ? 'Prograde' : 'Retrograde';
+			}
+
+			// Neptune moon groups...
+			if (['naiad', 'thalassa', 'despina', 'galatea', 'larissa', 'hippocamp', 'proteus'].indexOf(item.id) !== -1)
+				item.moonGroup = 'Regular';
+			if (['triton', 'nereid', 'halimede', 'sao', 'laomedeia', 'psamathe', 'neso'].indexOf(item.id) !== -1)
+				item.moonGroup = 'Irregular';
+			if (['triton', 'halimede', 'psamathe', 'neso'].indexOf(item.id) !== -1) item.direction = 'Retrograde';
+			if (['nereid', 'sao', 'laomedeia'].indexOf(item.id) !== -1) item.direction = 'Prograde';
 
 			if (!item.moonGroup) item.moonGroup = item.system;
 			item.moonGroupId = item.moonGroup.toLowerCase();

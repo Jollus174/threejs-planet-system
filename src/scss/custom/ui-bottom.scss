@@ -125,6 +125,8 @@
 		}
 
 		.btn-group-custom {
+			display: flex;
+			flex-flow: row nowrap;
 			transform: translateY(0);
 			transition: transform 0.3s ease;
 
@@ -142,6 +144,10 @@
 						}
 					}
 				}
+			}
+
+			label {
+				white-space: nowrap;
 			}
 		}
 	}

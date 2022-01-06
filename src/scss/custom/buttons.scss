@@ -61,12 +61,10 @@ button {
 	}
 }
 
-.btn-check {
-	&:active {
-		& + .btn-outline-primary {
-			color: $white;
-		}
-	}
+.btn-check:active + .btn-outline-primary,
+.btn-outline-primary:active {
+	background-color: rgba($white, 0.15);
+	color: $white;
 }
 
 .btn-rounded {
