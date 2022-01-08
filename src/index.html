@@ -44,7 +44,7 @@
 					</div>
 				</div>
 				<div class="ui-details" :class="{'hide-moons': !showMoons}" v-if="clickedClassData">
-					<div class="col-12 col-lg-4 offset-lg-8">
+					<div class="col-ui-details">
 						<div class="ui-details-container">
 							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
 							<div class="title-container">
@@ -105,49 +105,131 @@
 									</div>
 								</div>
 							</div>
-							<div class="content-container container-fluid container-extra-gutter order-lg-4">
-								<div id="content-desc" class="content">
-									<p>
-										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
-										a mass more than two and a half times that of all the other planets in the Solar System combined,
-										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
-										object in the Earth's night sky after the Moon and Venus. People have been observing it since
-										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
-										observed size.
-									</p>
-									<p>
-										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
-										a mass more than two and a half times that of all the other planets in the Solar System combined,
-										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
-										object in the Earth's night sky after the Moon and Venus. People have been observing it since
-										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
-										observed size.
-									</p>
-									<p>
-										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
-										a mass more than two and a half times that of all the other planets in the Solar System combined,
-										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
-										object in the Earth's night sky after the Moon and Venus. People have been observing it since
-										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
-										observed size.
-									</p>
-									<p>
-										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
-										a mass more than two and a half times that of all the other planets in the Solar System combined,
-										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
-										object in the Earth's night sky after the Moon and Venus. People have been observing it since
-										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
-										observed size.
-									</p>
-									<p>
-										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
-										a mass more than two and a half times that of all the other planets in the Solar System combined,
-										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
-										object in the Earth's night sky after the Moon and Venus. People have been observing it since
-										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
-										observed size.
-									</p>
+							<div class="content-container order-lg-4">
+								<div class="content" v-if="tabGroup === 'tab-desc'">
+									<div class="container-fluid container-extra-gutter">
+										<p>
+											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
+											with a mass more than two and a half times that of all the other planets in the Solar System
+											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
+											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
+											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
+											gods, because of its observed size.
+										</p>
+										<p>
+											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
+											with a mass more than two and a half times that of all the other planets in the Solar System
+											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
+											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
+											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
+											gods, because of its observed size.
+										</p>
+										<p>
+											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
+											with a mass more than two and a half times that of all the other planets in the Solar System
+											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
+											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
+											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
+											gods, because of its observed size.
+										</p>
+										<p>
+											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
+											with a mass more than two and a half times that of all the other planets in the Solar System
+											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
+											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
+											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
+											gods, because of its observed size.
+										</p>
+										<p>
+											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
+											with a mass more than two and a half times that of all the other planets in the Solar System
+											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
+											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
+											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
+											gods, because of its observed size.
+										</p>
+									</div>
 								</div>
+
+								<div class="content content-system" v-if="tabGroup === 'tab-system'">
+									<div class="container-fluid">
+										<table>
+											<tbody>
+												<tr>
+													<td class="td-wrapper">
+														<table>
+															<tbody class="jupiter active-entity-group">
+																<tr class="active-entity" tabindex="0">
+																	<th scope="row">Jupiter</th>
+																</tr>
+															</tbody>
+														</table>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+										<table>
+											<tr>
+												<td class="td-wrapper">
+													<table>
+														<thead>
+															<tr>
+																<th class="item-key">Moons</th>
+																<th class="item-key">Distance</th>
+																<th class="item-key">Radius</th>
+																<th class="item-key">Mass</th>
+															</tr>
+														</thead>
+														<tbody class="major active-entity-group">
+															<tr class="active-entity" tabindex="0">
+																<th scope="row">Io</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+															<tr tabindex="0">
+																<th scope="row">Europa</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+															<tr tabindex="0">
+																<th scope="row">Ganymede</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+														</tbody>
+														<tbody class="himalia">
+															<tr tabindex="0">
+																<th scope="row">Amalthea</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+															<tr tabindex="0">
+																<th scope="row">Thebe</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+															<tr tabindex="0">
+																<th scope="row">Adrastea</th>
+																<td>69911 km</td>
+																<td>343000 km</td>
+																<td>6.3 x 10<sup>12</sup> km</td>
+															</tr>
+														</tbody>
+													</table>
+												</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+
+								<div class="content" v-if="tabGroup === 'tab-stats'">Stats info to go here!</div>
+
+								<div class="content" v-if="tabGroup === 'tab-media'">Media info to go here!</div>
 							</div>
 
 							<div class="btn-group-wrapper tabs-details order-lg-3">

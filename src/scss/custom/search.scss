@@ -24,7 +24,7 @@
 
 	input,
 	.search-dropdown {
-		background-color: rgba($black, 0.5);
+		background-color: $black;
 		border: 1px $input-border solid;
 		color: $grey-medium;
 	}
@@ -95,11 +95,6 @@
 	}
 
 	&.active {
-		input,
-		.search-dropdown {
-			background-color: transparent;
-		}
-
 		.search-dropdown {
 			display: block;
 		}
