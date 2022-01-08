@@ -1,4 +1,9 @@
 .search-container {
+	display: flex;
+	justify-content: flex-end;
+	pointer-events: all;
+	flex-grow: 1;
+
 	.search {
 		position: relative;
 		max-width: 280px;
@@ -26,16 +31,17 @@
 
 	input {
 		appearance: none;
-		border-radius: 20px;
-		padding-left: 42px;
+		padding-left: 46px;
 		color: $white;
+		border: 0;
+		background-color: transparent;
+		box-shadow: none !important;
 		transition: color 0.2s ease;
 
 		&:hover,
 		&:focus,
 		&:active {
-			background-color: rgba($black, 0.5);
-			border-color: $input-border-hover;
+			background-color: transparent;
 		}
 	}
 
@@ -43,9 +49,8 @@
 		position: absolute;
 		width: 100%;
 		display: none;
-		border-bottom-left-radius: 5px;
-		border-bottom-right-radius: 5px;
 		overflow: hidden;
+		bottom: 37px; // TODO: temp
 
 		ul {
 			list-style: none;
@@ -92,13 +97,7 @@
 	&.active {
 		input,
 		.search-dropdown {
-			background-color: rgba($black, 0.75);
-		}
-
-		input {
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-			border-bottom-color: transparent;
+			background-color: transparent;
 		}
 
 		.search-dropdown {

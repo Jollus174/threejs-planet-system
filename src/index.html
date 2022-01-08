@@ -25,186 +25,229 @@
 				</figure>
 			</div>
 
-			<div class="container-fluid ui">
-				<div class="ui-top">
-					<div class="row">
-						<div class="col-2 col-lg-3">
-							<div class="time-container">
-								<button type="button" class="btn btn-rounded">
-									<i class="fas fa-clock"></i>
-								</button>
-								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
-									<i class="fas fa-backward"></i>
-								</button>
-								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
-									<i class="fas fa-pause"></i>
-								</button>
-								<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
-									<i class="fas fa-forward"></i>
-								</button>
-							</div>
-						</div>
-						<div class="col">
-							<div class="system-container">
-								<button type="button" class="btn btn-rounded" @click="goToPreviousSystem()">
-									<i class="fas fa-angle-left"></i>
-								</button>
-								<h2 class="h2" v-html="currentSystem"></h2>
-								<button type="button" class="btn btn-rounded" @click="goToNextSystem()">
-									<i class="fas fa-angle-right"></i>
-								</button>
-							</div>
-						</div>
-						<div class="col-2 col-lg-3">
-							<div class="search-container" :class="{'active': searchQuery && searchLoaded}">
-								<button type="button" class="btn btn-rounded d-lg-none">
-									<i class="fas fa-search"></i>
-								</button>
-								<div id="search" class="search d-none d-lg-block">
-									<i class="fas fa-search"></i>
-									<input
-										class="form-control"
-										type="seach"
-										placeholder="Search"
-										v-model="searchQuery"
-										@keyup="updateSearch"
-										@keyup.enter="updateZoomTarget(searchResults[0].index)"
-									/>
-									<div class="search-dropdown" v-if="searchLoaded">
-										<ul>
-											<li v-for="(result, i) in searchResults">
-												<a :href="'/#/' + result.id" @click="updateZoomTarget(result.index)">
-													<span v-html="result.displayName"></span> <span class="text-type">{{ result.type }}</span>
-												</a>
-											</li>
-											<li v-if="!searchResults.length">
-												<span class="no-results">No results found.</span>
-											</li>
-										</ul>
-									</div>
+			<div class="ui">
+				<div class="ui-top col-md-6 offset-md-3">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col">
+								<div class="system-container">
+									<button type="button" class="btn btn-rounded" @click="goToPreviousSystem()">
+										<i class="fas fa-angle-left"></i>
+									</button>
+									<h2 class="h2" v-html="currentSystem"></h2>
+									<button type="button" class="btn btn-rounded" @click="goToNextSystem()">
+										<i class="fas fa-angle-right"></i>
+									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="ui-bottom" :class="{'hide-moons': !showMoons}" v-if="clickedClassData">
-					<div class="row">
-						<div class="col-12 col-md-6 offset-md-3">
+				<div class="ui-details" :class="{'hide-moons': !showMoons}" v-if="clickedClassData">
+					<div class="col-12 col-lg-4 offset-lg-8">
+						<div class="ui-details-container">
+							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
 							<div class="title-container">
-								<button type="button" class="btn btn-rounded" @click="goToPreviousEntity()">
+								<button type="button" class="btn" @click="goToPreviousEntity()">
 									<i class="fas fa-angle-left"></i>
 								</button>
 								<div class="title-wrapper">
 									<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
 									<span class="text-type">{{ clickedClassData.type }}</span>
 								</div>
-								<button type="button" class="btn btn-rounded" @click="goToNextEntity()">
+								<button type="button" class="btn" @click="goToNextEntity()">
 									<i class="fas fa-angle-right"></i>
 								</button>
 							</div>
 							<div class="key-data-container">
-								<ul>
-									<li v-if="clickedClassData.type !== 'Star'">
-										<span class="heading">Distance</span>
-										<span v-html="distanceFromParentEntity"></span>
-									</li>
-									<li>
-										<span class="heading">Mean Radius</span>
-										<span class="label-color"
-											>{{ new Intl.NumberFormat('en-US').format(clickedClassData.meanRadius) }}</span
-										>
-										km
-									</li>
-									<li v-if="sideralOrbit">
-										<span class="heading">Orbit Time</span>
-										<span class="label-color">{{ sideralOrbit }}</span> Earth {{ clickedClassData.sideralOrbit < 366 ?
-										'Days' : 'Years' }}
-									</li>
-									<li>
-										<span class="heading">Surface Temp</span>
-										<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
-									</li>
-									<li v-if="clickedClassData.mass && clickedClassData.massValue">
-										<span class="heading">Mass</span>
-										<span class="label-color">
-											{{ clickedClassData.mass.massValue.toFixed(2) }}
-											<span style="text-transform: none">x</span> 10<sup>{{ clickedClassData.mass.massExponent }}</sup>
-										</span>
-										kg
-									</li>
-								</ul>
-								<div class="row">
-									<div class="col-4">
-										<button
-											type="button"
-											class="btn btn-show-moons"
-											@click="showMoons = !showMoons"
-											v-show="moons.length"
-										>
-											<img src="img/moon.svg" width="16" />
-											<span v-if="showMoons">
-												Hide Moons
-												<i class="fas fa-angle-down"></i>
-											</span>
-											<span v-else>
-												Show Moons
-												<i class="fas fa-angle-up"></i>
-											</span>
-										</button>
-									</div>
-									<div class="col-4 text-center">
-										<button type="button" class="btn btn-readmore">
-											Read More
-											<img src="img/arrow-right.svg" width="16" />
-										</button>
+								<div class="container-fluid">
+									<div class="row">
+										<div class="col-4" v-if="clickedClassData.type !== 'Star'">
+											<div class="key-data">
+												<span class="heading">Distance</span>
+												<span v-html="distanceFromParentEntity"></span>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="key-data">
+												<span class="heading">Mean Radius</span>
+												<span class="label-color"
+													>{{ new Intl.NumberFormat('en-US').format(clickedClassData.meanRadius) }}</span
+												>
+												km
+											</div>
+										</div>
+										<div class="col-4" v-if="sideralOrbit">
+											<div class="key-data">
+												<span class="heading">Orbit Time</span>
+												<span class="label-color">{{ sideralOrbit }}</span> Earth {{ clickedClassData.sideralOrbit < 366
+												? 'Days' : 'Years' }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="key-data">
+												<span class="heading">Surface Temp</span>
+												<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
+											</div>
+										</div>
+										<div class="col-4" v-if="clickedClassData.mass && clickedClassData.massValue">
+											<div class="key-data">
+												<span class="heading">Mass</span>
+												<span class="label-color">
+													{{ clickedClassData.mass.massValue.toFixed(2) }}
+													<span style="text-transform: none">x</span> 10<sup
+														>{{ clickedClassData.mass.massExponent }}</sup
+													>
+												</span>
+												kg
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
-
-							<div class="moons-container" v-show="moons.length">
-								<hr />
-
-								<div class="label-moons animate-in">
-									<span>Moon<span v-if="moons.length > 1">s</span></span>
-									&nbsp;<span v-if="moons.length > 1">({{ moons.length }})</span>
+							<div class="content-container container-fluid container-extra-gutter order-lg-4">
+								<div id="content-desc" class="content">
+									<p>
+										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
+										a mass more than two and a half times that of all the other planets in the Solar System combined,
+										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
+										object in the Earth's night sky after the Moon and Venus. People have been observing it since
+										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
+										observed size.
+									</p>
+									<p>
+										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
+										a mass more than two and a half times that of all the other planets in the Solar System combined,
+										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
+										object in the Earth's night sky after the Moon and Venus. People have been observing it since
+										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
+										observed size.
+									</p>
+									<p>
+										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
+										a mass more than two and a half times that of all the other planets in the Solar System combined,
+										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
+										object in the Earth's night sky after the Moon and Venus. People have been observing it since
+										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
+										observed size.
+									</p>
+									<p>
+										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
+										a mass more than two and a half times that of all the other planets in the Solar System combined,
+										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
+										object in the Earth's night sky after the Moon and Venus. People have been observing it since
+										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
+										observed size.
+									</p>
+									<p>
+										Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with
+										a mass more than two and a half times that of all the other planets in the Solar System combined,
+										but slightly less than one-thousandth the mass of the Sun. Jupiter is the third brightest natural
+										object in the Earth's night sky after the Moon and Venus. People have been observing it since
+										prehistoric times; it was named after the Roman god Jupiter, the king of the gods, because of its
+										observed size.
+									</p>
 								</div>
+							</div>
 
-								<div id="moon-groups-wrapper" class="btn-group-wrapper" v-show="Object.keys(moonGroups).length > 1">
-									<div class="btn-group animate-in" role="group">
-										<template v-for="moonGroup in Object.values(moonGroups)">
-											<input
-												type="radio"
-												class="btn-check"
-												name="moon-group"
-												:id="moonGroup.id"
-												autocomplete="off"
-												@change="updateMoonGroup(moonGroup.id)"
-											/>
-											<label class="btn btn-outline-primary btn-moon-group" :for="moonGroup.id">
-												{{ moonGroup.name }} <span class="badge">{{ moonGroup.count }}</span>
-											</label>
-										</template>
-									</div>
+							<div class="btn-group-wrapper tabs-details order-lg-3">
+								<div class="btn-group" role="group">
+									<input
+										type="radio"
+										class="btn-check"
+										name="tab-group"
+										id="tab-desc"
+										value="tab-desc"
+										autocomplete="off"
+										v-model="tabGroup"
+									/>
+									<label class="btn" for="tab-desc"><span class="fas fa-align-left"></span>Desc</label>
+									<input
+										type="radio"
+										class="btn-check"
+										name="tab-group"
+										id="tab-system"
+										value="tab-system"
+										autocomplete="off"
+										v-model="tabGroup"
+									/>
+									<label class="btn" for="tab-system"
+										><span><img src="/img/icon-orbit.svg" width="18" /></span>System</label
+									>
+									<input
+										type="radio"
+										class="btn-check"
+										name="tab-group"
+										id="tab-stats"
+										value="tab-stats"
+										autocomplete="off"
+										v-model="tabGroup"
+									/>
+									<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
+									<input
+										type="radio"
+										class="btn-check"
+										name="tab-group"
+										id="tab-media"
+										value="tab-media"
+										autocomplete="off"
+										v-model="tabGroup"
+									/>
+									<label class="btn" for="tab-media"><span class="fas fa-images"></span>Media</label>
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="ui-bottom-bar">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-2 col-lg-3">
+								<div class="time-container">
+									<button type="button" class="btn btn-rounded">
+										<i class="fas fa-clock"></i>
+									</button>
+									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
+										<i class="fas fa-backward"></i>
+									</button>
+									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
+										<i class="fas fa-pause"></i>
+									</button>
+									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
+										<i class="fas fa-forward"></i>
+									</button>
+								</div>
+							</div>
 
-								<div class="btn-group-wrapper" :key="moonGroupRefresh">
-									<div class="btn-group-custom animate-in" role="group">
-										<span
-											v-for="moon in moons"
-											v-show="modelMoonGroupSelection[clickedClassData.systemId] === moon.moonGroupId"
-										>
-											<input
-												type="radio"
-												class="btn-check"
-												name="moon"
-												:id="moon.id"
-												autocomplete="off"
-												:checked="modelSystemSelection[clickedClassData.systemId] === moon.id"
-											/>
-											<label class="btn btn-underline" :for="moon.id" @click="updateClickTarget(moon.index)">
-												{{ moon.displayName }}
-											</label>
-										</span>
+							<div class="col"></div>
+
+							<div class="col-2 col-lg-3">
+								<div class="search-container" :class="{'active': searchQuery && searchLoaded}">
+									<button type="button" class="btn btn-rounded d-lg-none">
+										<i class="fas fa-search"></i>
+									</button>
+									<div id="search" class="search d-none d-lg-block">
+										<i class="fas fa-search"></i>
+										<input
+											class="form-control"
+											type="seach"
+											placeholder="Search"
+											v-model="searchQuery"
+											@keyup="updateSearch"
+											@keyup.enter="updateZoomTarget(searchResults[0].index)"
+										/>
+										<div class="search-dropdown" v-if="searchLoaded">
+											<ul>
+												<li v-for="(result, i) in searchResults">
+													<a :href="'/#/' + result.id" @click="updateZoomTarget(result.index)">
+														<span v-html="result.displayName"></span> <span class="text-type">{{ result.type }}</span>
+													</a>
+												</li>
+												<li v-if="!searchResults.length">
+													<span class="no-results">No results found.</span>
+												</li>
+											</ul>
+										</div>
 									</div>
 								</div>
 							</div>

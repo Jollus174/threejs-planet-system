@@ -1,7 +1,4 @@
 .ui-top {
-	.time-container {
-	}
-
 	.system-container {
 		display: flex;
 		align-items: center;
@@ -28,12 +25,5 @@
 			align-items: center;
 			justify-content: center;
 		}
-	}
-
-	.search-container {
-		display: flex;
-		justify-content: flex-end;
-		pointer-events: all;
-		flex-grow: 1;
 	}
 }

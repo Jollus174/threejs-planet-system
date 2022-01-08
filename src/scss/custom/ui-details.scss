@@ -1,0 +1,175 @@
+.ui-details {
+	flex-grow: 1;
+	overflow-y: hidden;
+	position: relative;
+
+	> .col-12 {
+		@include media-breakpoint-up(md) {
+			position: absolute;
+			height: 100%;
+		}
+	}
+
+	.ui-details-container {
+		position: absolute;
+		height: 100%;
+		display: flex;
+		flex-flow: column nowrap;
+		background: #111;
+		overflow: hidden;
+		pointer-events: all;
+	}
+
+	.title-container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		text-transform: uppercase;
+
+		.title-wrapper {
+			display: flex;
+			align-items: flex-end;
+		}
+
+		.h3 {
+			margin: 0;
+			user-select: none;
+			display: inline-block;
+		}
+
+		.text-type {
+			margin-left: 5px;
+		}
+
+		.btn {
+			border-radius: 0;
+		}
+	}
+
+	.key-data-container {
+		color: $white;
+		margin-top: 10px;
+		margin-bottom: 10px;
+
+		.key-data {
+			border-left: solid 2px var(--entity-color);
+			font-size: 12px;
+			line-height: 1;
+			margin-bottom: 10px;
+			padding-left: 10px;
+			text-transform: uppercase;
+		}
+
+		.heading,
+		.label-color {
+			font-size: 16px;
+		}
+
+		.heading {
+			display: block;
+			color: #9f9f9f;
+		}
+
+		.label-color {
+			color: var(--entity-color);
+		}
+	}
+
+	.tabs-details {
+		.btn-group {
+			width: 100%;
+
+			.btn {
+				border-radius: 0;
+				background-color: #1e1e1e;
+				padding-top: 15px;
+				padding-bottom: 15px;
+				border: 1px solid rgba($white, 0.1);
+				border-top-color: transparent;
+				border-bottom: 2px solid transparent;
+				box-shadow: none;
+
+				&:not(:last-child) {
+					border-right: 1px solid #2e2e2e;
+				}
+
+				&:hover,
+				&:focus,
+				&:active {
+					background-color: #212121;
+					border-bottom-color: rgba($white, 0.5);
+				}
+			}
+
+			:checked {
+				+ label {
+					background-color: #272727;
+					border-bottom-color: $white;
+					cursor: default;
+
+					&:hover,
+					&:focus,
+					&:active {
+						background-color: #272727;
+						border-bottom-color: $white;
+					}
+				}
+			}
+		}
+
+		span {
+			display: inline-block;
+			margin-right: 5px;
+		}
+	}
+
+	.moons-container {
+		text-align: center;
+
+		.btn-group {
+			.btn {
+				padding: 0.375rem 0.75rem;
+				width: auto;
+				height: auto;
+				box-shadow: none;
+			}
+
+			.badge {
+				margin-left: 5px;
+			}
+
+			input {
+				&:checked {
+					& + .btn-outline-primary {
+						color: $black;
+						background-color: $white;
+
+						.badge {
+							color: $white;
+							background-color: $black;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.img-details {
+		width: 100%;
+		height: 130px;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	.content-container {
+		flex-grow: 1;
+		overflow-y: auto;
+	}
+
+	.content {
+		margin-top: 1.5rem;
+		margin-bottom: 1.5rem;
+		font-size: 18px;
+		line-height: 1.7;
+	}
+}

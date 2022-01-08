@@ -18,10 +18,9 @@
 		}
 	}
 
-	.ui-bottom {
-		padding-top: 25px;
-		padding-bottom: 25px;
-		background-color: rgba($black, 0.85);
+	.ui-bottom-bar {
+		pointer-events: all;
+		background-color: #111;
 	}
 }
 
@@ -35,4 +34,9 @@ hr {
 	border: 0;
 	background: url(/img/dotted-line-circle.svg) repeat-x 2px center;
 	padding: 10px;
+}
+
+.container-extra-gutter {
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
 }

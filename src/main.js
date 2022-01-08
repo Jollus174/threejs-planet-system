@@ -1,3 +1,4 @@
+/* globals bootstrap */
 'use strict';
 import './scss/styles.scss';
 
@@ -245,7 +246,8 @@ fetch('./solarSystemData.json')
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				moonGroupRefresh: 12345 // needing to force an update on the rendered moons when Moon Group button interacted with, doing this via :key and a random int [0-10000]
+				moonGroupRefresh: 12345, // needing to force an update on the rendered moons when Moon Group button interacted with, doing this via :key and a random int [0-10000]
+				tabGroup: 'tab-desc',
 			},
 			computed: {
 				systemColour() {
