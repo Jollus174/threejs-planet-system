@@ -237,21 +237,25 @@ fetch('./solarSystemData.json')
 				navigationEntities: settings.navigationEntities,
 				searchLoaded: false,
 				bottomBar: {},
-				showMoons: true, // TODO: will need to be controlled by 3D Orrery then passed to this
-				content: {},
-				// comparisons: [],
-				// media: [],
 				clickedClassData: null,
 				zoomedClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				moonGroupRefresh: 12345, // needing to force an update on the rendered moons when Moon Group button interacted with, doing this via :key and a random int [0-10000]
-				tabGroup: 'tab-desc',
+				tabGroup: 'tab-desc'
 			},
 			computed: {
+				nameApoapsis() {
+					if (this.clickedClassData.aroundPlanet && this.clickedClassData.aroundPlanet.planet === 'earth')
+						return 'Apogee';
+					return this.clickedClassData.aroundPlanet ? 'Apoapsis' : 'Aphelion';
+				},
+				namePeriapsis() {
+					if (this.clickedClassData.aroundPlanet && this.clickedClassData.aroundPlanet.planet === 'earth')
+						return 'Perigee';
+					return this.clickedClassData.aroundPlanet ? 'Periapsis' : 'Perihelion';
+				},
 				systemColour() {
-					if (!this.clickedClassData) return;
 					return this.clickedClassData.aroundPlanet
 						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.labelColour
 						: this.clickedClassData.labelColour;
@@ -270,25 +274,19 @@ fetch('./solarSystemData.json')
 				},
 
 				distanceFromParentEntity() {
-					if (!this.clickedClassData) return;
 					// to be in km or AU depending on amount
-					// also shouldn't be more than 2 floating points
-					const kmToAUConverter = 149598000;
-					const isClose = this.clickedClassData.semimajorAxis < kmToAUConverter / 3;
 					const parentEntity =
 						this.clickedClassData.type === 'Moon'
 							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
 							: 'Sun';
-					if (isClose) {
-						return `<span class="label-color">${new Intl.NumberFormat('en-US').format(
-							this.clickedClassData.semimajorAxis
-						)}</span> km from ${parentEntity}`;
-					} else {
-						const distanceNumber = this.convertToAU(this.clickedClassData.semimajorAxis).toFixed(2).split('.');
-						// also, if floating points are '.00', then disclude them
-						const floatingPoints = distanceNumber[1].toString() !== '00' ? '.' + distanceNumber[1] : '';
-						return `<span class="label-color">${distanceNumber[0] + floatingPoints}</span> AU from ${parentEntity}`;
+
+					if (!this.clickedClassData.semimajorAxis) {
+						console.warn('Semi-Major Axis required.');
+						return;
 					}
+					return `<span class="label-color">${
+						this.distanceConverter(this.clickedClassData.semimajorAxis, true).value
+					}</span> ${this.distanceConverter(this.clickedClassData.semimajorAxis, true).unit} from ${parentEntity}`;
 				},
 
 				sideralOrbit() {
@@ -309,12 +307,11 @@ fetch('./solarSystemData.json')
 				},
 
 				moonGroups() {
-					if (!this.clickedClassData) return {};
 					const moonKeys =
 						this.clickedClassData.type === 'Moon'
 							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.moons
 							: this.clickedClassData.moons;
-					if (!moonKeys) return {};
+					if (!moonKeys) return [];
 					const moonGroups = {};
 					moonKeys.forEach((moonKey) => {
 						const moonGroupName = orrery.classes._all[moonKey.moon].data.moonGroup;
@@ -359,9 +356,179 @@ fetch('./solarSystemData.json')
 				convertToAU(km) {
 					return kmToAU(km);
 				},
-				// convertToKm(au){
-				// 	return AUToKm(au);
-				// },
+
+				plurialise(word, value) {
+					if (!word || !value) {
+						console.warn('Word and Value required.');
+						return '';
+					}
+
+					return `${word}${value !== 1 ? 's' : ''}`;
+				},
+
+				valueWithCommas(value) {
+					return new Intl.NumberFormat('en-US').format(value);
+				},
+
+				valueToFixedFloatingPoints(value, amountPoints) {
+					if (!value) return;
+					const distanceNumber = value.toFixed(amountPoints || 2).split('.');
+					const floatingPoints = distanceNumber[1].toString() !== '00' ? '.' + distanceNumber[1] : '';
+					return parseFloat(distanceNumber[0] + floatingPoints);
+				},
+
+				distanceConverter(value, unitIncludedSeparately) {
+					if (!value) {
+						console.warn('Distance required.');
+						return {};
+					}
+					// convert from km to AU if distance more than 0.66 AU
+					const kmToAUThreshold = 149598000;
+					const isClose = value < kmToAUThreshold / 2;
+					const returnedUnit = isClose ? 'km' : 'AU';
+
+					if (unitIncludedSeparately) {
+						return {
+							value: this.valueWithCommas(this.valueToFixedFloatingPoints(isClose ? value : this.convertToAU(value))),
+							unit: returnedUnit
+						};
+					} else {
+						return `${this.valueWithCommas(
+							this.valueToFixedFloatingPoints(isClose ? value : this.convertToAU(value))
+						)} ${returnedUnit}`;
+					}
+				},
+
+				// data from the API is in hours OR days
+				// if it's many hours, return days
+				// if it's many, many days, return years
+				timeConversion(value, unit) {
+					if (!value || !unit) {
+						console.warn('Value and Unit required.');
+						return;
+					}
+
+					if (unit === 'hours') {
+						// TODO: these could come from a global 'conversions' source
+						const days = value / 24;
+						const years = value / 365.256 / 24;
+						if (value < 48)
+							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(value))} Earth ${this.plurialise(
+								'hour',
+								value
+							)}`;
+						if (value < 7200)
+							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(days))} Earth ${this.plurialise(
+								'day',
+								days
+							)}`;
+						return `${this.valueWithCommas(this.valueToFixedFloatingPoints(years))} Earth ${this.plurialise(
+							'year',
+							years
+						)}`;
+					}
+					if (unit === 'days') {
+						const hours = value / 24;
+						const days = value;
+						const years = value / 365.256;
+						if (value < 2)
+							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(hours))} Earth ${this.plurialise(
+								'hour',
+								hours
+							)}`;
+						if (value < 320)
+							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(days))} Earth ${this.plurialise(
+								'day',
+								days
+							)}`;
+						return `${this.valueWithCommas(this.valueToFixedFloatingPoints(years))} Earth ${this.plurialise(
+							'year',
+							years
+						)}`;
+					}
+				},
+
+				getContentData() {
+					this.clickedClassData.description.errors.splice(0);
+					// TODO: do the formatting here
+					getWikipediaData(this.clickedClassData.wikipediaKey).then((data) => {
+						const desc = this.clickedClassData.description;
+						desc.hasLoaded = true;
+						if (data.errors.length) {
+							desc.hasError = true;
+							console.log(data.errors);
+							for (const error of data.errors) {
+								desc.errors.push(error);
+							}
+							return;
+						}
+
+						if (!data.results.length) {
+							desc.noResults = true;
+							return;
+						}
+
+						const { title, content, image } = data.results[0];
+						desc.title = title;
+						desc.content = content;
+						desc.image = image;
+					});
+				},
+
+				getMediaData(isLoadingMore) {
+					if (isLoadingMore) this.clickedClassData.media.loadingMore = true;
+					this.clickedClassData.media.errors.splice(0);
+					const pageRequestNumber = this.clickedClassData.media.items.length
+						? this.clickedClassData.media.items.length / this.clickedClassData.media.per_page
+						: 0;
+					getNASAMediaData(this.clickedClassData.id, pageRequestNumber).then((data) => {
+						const media = this.clickedClassData.media;
+						media.hasLoaded = true;
+						if (data.errors.length) {
+							media.hasError = true;
+							for (const error of data.errors) {
+								media.errors.push(error);
+							}
+							return;
+						}
+
+						if (!data.results[0].items.length) {
+							media.noResults = true;
+							return;
+						}
+
+						this.clickedClassData.media.loadingMore = false;
+
+						// media.results[0] = [...data.results[0]];
+						const { total, more, page, items, per_page } = data.results[0];
+						media.total = total;
+						media.more = more;
+						media.page = page;
+						media.per_page = per_page;
+						for (const item of items) {
+							item.list_image_src = `https://solarsystem.nasa.gov${item.list_image_src}`;
+							media.items.push(item);
+						}
+					});
+					// short_description
+					// link
+					// title
+
+					// list_image_src
+					// detail_image
+					// /system/resources/list_images/2677_Whats_Up_Jan_2022-640x480.jpg
+				},
+
+				switchDetailTabs() {
+					if (this.tabGroup === 'tab-desc') {
+						if (!this.clickedClassData.description.content) this.getContentData();
+					}
+
+					if (this.tabGroup === 'tab-media') {
+						if (!this.clickedClassData.media.items.length) this.getMediaData();
+					}
+				},
+
 				highlightMatchSubstring(str) {
 					const regex = new RegExp(this.searchQuery, 'gi');
 					return str.toString().replace(regex, (replacedStr) => `<span class="highlight">${replacedStr}</span>`);
@@ -435,10 +602,10 @@ fetch('./solarSystemData.json')
 					this.updateEntity(orrery.classes._all[nextSystemKey].data);
 				},
 
-				updateMoonGroup(id) {
-					this.$set(this.modelMoonGroupSelection, this.clickedClassData.systemId, id);
-					this.moonGroupRefresh = randomString(8);
-				},
+				// updateMoonGroup(id) {
+				// 	this.$set(this.modelMoonGroupSelection, this.clickedClassData.systemId, id);
+				// 	this.moonGroupRefresh = randomString(8);
+				// },
 
 				updateEntity(data) {
 					const newClickedClassData = data;
@@ -464,6 +631,8 @@ fetch('./solarSystemData.json')
 					// finally, keeping track of which moon is selected in each moon group
 					this.modelMoonSelection[this.clickedClassData.moonGroupId] =
 						this.clickedClassData.type === 'Moon' ? newClickedClassData.id : '';
+
+					this.switchDetailTabs(); // to trigger the API loader for content (is it's needed)
 
 					// manually setting the :checked here
 					// changing a moon group should not update the entity
@@ -528,7 +697,6 @@ fetch('./solarSystemData.json')
 				// Setting Events
 				// --------------------
 				initMousePointerEvents();
-				setModalEvents();
 
 				orrery.isDesktop = checkIfDesktop();
 

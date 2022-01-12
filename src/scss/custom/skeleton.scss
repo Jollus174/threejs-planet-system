@@ -6,8 +6,8 @@ $skeleton-element-color: rgba(0, 0, 0, 0.17) !default;
 
 $skeleton-loading-animation-time: 1.3s !default;
 
-$skeleton-margin-standart: 16px !default;
-$skeleton-margin-small: $skeleton-margin-standart / 2 !default;
+$skeleton-margin-standard: 16px !default;
+$skeleton-margin-small: $skeleton-margin-standard * 0.5 !default;
 
 $skeleton-card-box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.17) !default;
 $skeleton-card-background-color: #ffffff !default;
@@ -24,6 +24,8 @@ $skeleton-line-margin-bottom: 8px !default;
 $skeleton-headline-height: $skeleton-line-height * 2 !default;
 
 $skeleton-square-height: 150px !default;
+
+$skeleton-animation-gradient: hsla(0, 0%, 100%, 0.3) !default;
 
 /* Animation */
 @keyframes ssc-loading {
@@ -50,7 +52,7 @@ $skeleton-square-height: 150px !default;
 		top: 0;
 		transform: translateX(-100%);
 		z-index: 1;
-		background: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.3), transparent);
+		background: linear-gradient(90deg, transparent, $skeleton-animation-gradient, transparent);
 	}
 }
 
@@ -63,19 +65,19 @@ $skeleton-square-height: 150px !default;
 /** Helpers classes */
 .ssc {
 	.mb {
-		margin-bottom: $skeleton-margin-standart;
+		margin-bottom: $skeleton-margin-standard;
 	}
 
 	.mt {
-		margin-top: $skeleton-margin-standart;
+		margin-top: $skeleton-margin-standard;
 	}
 
 	.mr {
-		margin-right: $skeleton-margin-standart;
+		margin-right: $skeleton-margin-standard;
 	}
 
 	.ml {
-		margin-left: $skeleton-margin-standart;
+		margin-left: $skeleton-margin-standard;
 	}
 
 	.mbs {
@@ -180,7 +182,7 @@ $skeleton-square-height: 150px !default;
 
 /** Wrapper class */
 .ssc-wrapper {
-	padding: $skeleton-margin-standart;
+	padding: $skeleton-margin-standard;
 }
 
 /* Figures, Objects */

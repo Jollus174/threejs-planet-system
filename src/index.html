@@ -43,8 +43,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="ui-details" :class="{'hide-moons': !showMoons}" v-if="clickedClassData">
-					<div class="col-ui-details">
+				<div class="ui-details" v-if="clickedClassData">
+					<aside class="col-ui-details">
 						<div class="ui-details-container">
 							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
 							<div class="title-container">
@@ -84,7 +84,7 @@
 												? 'Days' : 'Years' }}
 											</div>
 										</div>
-										<div class="col-4">
+										<div class="col-4" v-if="clickedClassData.avgTemp">
 											<div class="key-data">
 												<span class="heading">Surface Temp</span>
 												<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
@@ -102,65 +102,73 @@
 												kg
 											</div>
 										</div>
+										<div class="col-4" v-if="clickedClassData.moonGroup">
+											<div class="key-data">
+												<span class="heading">Moon Group</span>
+												<span class="label-color">{{ clickedClassData.moonGroup }}</span>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
 							<div class="content-container order-lg-4">
-								<div class="content" v-if="tabGroup === 'tab-desc'">
-									<div class="container-fluid container-extra-gutter">
-										<p>
-											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
-											with a mass more than two and a half times that of all the other planets in the Solar System
-											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
-											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
-											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
-											gods, because of its observed size.
-										</p>
-										<p>
-											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
-											with a mass more than two and a half times that of all the other planets in the Solar System
-											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
-											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
-											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
-											gods, because of its observed size.
-										</p>
-										<p>
-											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
-											with a mass more than two and a half times that of all the other planets in the Solar System
-											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
-											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
-											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
-											gods, because of its observed size.
-										</p>
-										<p>
-											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
-											with a mass more than two and a half times that of all the other planets in the Solar System
-											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
-											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
-											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
-											gods, because of its observed size.
-										</p>
-										<p>
-											Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant
-											with a mass more than two and a half times that of all the other planets in the Solar System
-											combined, but slightly less than one-thousandth the mass of the Sun. Jupiter is the third
-											brightest natural object in the Earth's night sky after the Moon and Venus. People have been
-											observing it since prehistoric times; it was named after the Roman god Jupiter, the king of the
-											gods, because of its observed size.
-										</p>
+								<section class="content content-desc" v-if="tabGroup === 'tab-desc'">
+									<div
+										class="content-wrapper container-fluid container-extra-gutter"
+										:class="{ 'loaded': clickedClassData.description.hasLoaded }"
+									>
+										<template v-if="clickedClassData.description.hasLoaded">
+											<div
+												v-html="clickedClassData.description.content"
+												v-if="!clickedClassData.description.noResults && !clickedClassData.description.hasError"
+											></div>
+											<div v-else-if="clickedClassData.description.hasError">
+												<div class="alert alert-warning" role="alert">
+													<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
+														{{ error }}
+													</p>
+													<button type="button" class="btn btn-primary" @click="getContentData">Try again</button>
+												</div>
+											</div>
+											<div v-else>
+												<div class="alert alert-warning" role="alert">No results found.</div>
+											</div>
+										</template>
+										<div class="ssc" v-else>
+											<div class="flex align-start">
+												<div class="w-100">
+													<div class="ssc-line mts mb w-90"></div>
+													<div class="ssc-line mb w-80"></div>
+													<div class="ssc-line mb w-90"></div>
+													<div class="ssc-line mb w-60"></div>
+													<div class="ssc-line mb wp-80"></div>
+													<br />
+													<div class="ssc-line mb w-70"></div>
+													<div class="ssc-line mb w-80"></div>
+													<div class="ssc-line mb w-90"></div>
+													<div class="ssc-line mb w-60"></div>
+													<br />
+													<div class="ssc-line mb w-90"></div>
+													<div class="ssc-line mb w-80"></div>
+													<div class="ssc-line mb w-90"></div>
+													<div class="ssc-line mb w-60"></div>
+													<div class="ssc-line mb wp-80"></div>
+												</div>
+											</div>
+										</div>
 									</div>
-								</div>
+								</section>
 
-								<div class="content content-system" v-if="tabGroup === 'tab-system'">
-									<div class="container-fluid">
+								<section class="content content-system" v-if="tabGroup === 'tab-system'">
+									<div class="content-wrapper container-fluid">
 										<table>
 											<tbody>
 												<tr>
 													<td class="td-wrapper">
 														<table>
 															<tbody class="jupiter active-entity-group">
-																<tr class="active-entity" tabindex="0">
-																	<th scope="row">Jupiter</th>
+																<tr tabindex="0">
+																	<th scope="row"><span>Jupiter</span></th>
 																</tr>
 															</tbody>
 														</table>
@@ -182,7 +190,9 @@
 														</thead>
 														<tbody class="major active-entity-group">
 															<tr class="active-entity" tabindex="0">
-																<th scope="row">Io</th>
+																<th scope="row">
+																	<span>Io</span>
+																</th>
 																<td>69911 km</td>
 																<td>343000 km</td>
 																<td>6.3 x 10<sup>12</sup> km</td>
@@ -225,15 +235,155 @@
 											</tr>
 										</table>
 									</div>
-								</div>
+								</section>
 
-								<div class="content" v-if="tabGroup === 'tab-stats'">Stats info to go here!</div>
+								<section class="content content-stats" v-if="tabGroup === 'tab-stats'">
+									<div class="content-wrapper container-fluid container-extra-gutter">
+										<table>
+											<tbody>
+												<tr v-if="clickedClassData.discoveredBy">
+													<td>Discovered By</td>
+													<td>{{ clickedClassData.discoveredBy }}</td>
+												</tr>
+												<tr v-if="clickedClassData.discoveryDate">
+													<td>Discovery Date</td>
+													<td>{{ clickedClassData.discoveryDate }}</td>
+												</tr>
+												<tr v-if="clickedClassData.avgTemp">
+													<td>Surface Temp</td>
+													<td>{{ clickedClassData.avgTemp }} °C</td>
+												</tr>
+												<tr v-if="clickedClassData.mass.massValue">
+													<td>Mass</td>
+													<td>
+														{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
+															>{{ clickedClassData.mass.massExponent }}</sup
+														>
+														kg
+													</td>
+												</tr>
+												<tr v-if="clickedClassData.semimajorAxis">
+													<td>Semi-Major Axis</td>
+													<td>{{ distanceConverter(clickedClassData.semimajorAxis) }}</td>
+												</tr>
+												<tr v-if="clickedClassData.perihelion">
+													<td>{{ namePeriapsis }}</td>
+													<td>{{ distanceConverter(clickedClassData.perihelion) }}</td>
+												</tr>
+												<tr v-if="clickedClassData.aphelion">
+													<td>{{ nameApoapsis }}</td>
+													<td>{{ distanceConverter(clickedClassData.aphelion) }}</td>
+												</tr>
+												<tr v-if="clickedClassData.eccentricity">
+													<td>Eccentricity</td>
+													<td>{{ clickedClassData.eccentricity }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.inclination">
+													<td>Inclination</td>
+													<td>{{ clickedClassData.inclination }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.diameter">
+													<td>Mean Diameter</td>
+													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.diameter)) }} km</td>
+												</tr>
+												<tr v-if="clickedClassData.meanRadius">
+													<td>Mean Radius</td>
+													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.meanRadius)) }} km</td>
+												</tr>
+												<tr v-if="clickedClassData.equaRadius">
+													<td>Equatorial Radius</td>
+													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.equaRadius)) }} km</td>
+												</tr>
+												<tr v-if="clickedClassData.polarRadius">
+													<td>Polar Radius</td>
+													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.polarRadius)) }} km</td>
+												</tr>
+												<tr v-if="clickedClassData.axialTilt">
+													<td>Axial Tilt</td>
+													<td>{{ valueToFixedFloatingPoints(clickedClassData.axialTilt) }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.sideralOrbit">
+													<td>Sideral Orbit</td>
+													<td>{{ timeConversion(clickedClassData.sideralOrbit, 'days') }}</td>
+												</tr>
+												<tr v-if="clickedClassData.sideralRotation">
+													<td>Sideral Rotation</td>
+													<td>{{ timeConversion(clickedClassData.sideralRotation, 'hours') }}</td>
+												</tr>
 
-								<div class="content" v-if="tabGroup === 'tab-media'">Media info to go here!</div>
+												<tr v-if="clickedClassData.meanAnomaly">
+													<td>Mean Anomaly</td>
+													<td>{{ valueToFixedFloatingPoints(clickedClassData.meanAnomaly) }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.argPeriapsis">
+													<td>Argument of {{namePeriapsis}}</td>
+													<td>{{ valueToFixedFloatingPoints(clickedClassData.argPeriapsis) }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.longAscNode">
+													<td>Longitude of Ascending Node</td>
+													<td>{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °</td>
+												</tr>
+												<tr v-if="clickedClassData.longOfPeriapsis">
+													<td>Longitude of {{namePeriapsis}}</td>
+													<td>{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</section>
+
+								<section class="content content-media" v-if="tabGroup === 'tab-media'">
+									<div
+										class="content-wrapper container-fluid container-extra-gutter text-center"
+										:class="{ 'loaded': clickedClassData.media.hasLoaded }"
+									>
+										<template v-if="clickedClassData.media.hasLoaded">
+											<div v-if="!clickedClassData.media.noResults && !clickedClassData.media.hasError">
+												<div class="row">
+													<div class="col-media col-6 col-md-4" v-for="item in clickedClassData.media.items">
+														<figure>
+															<a class="media" href="#">
+																<img :src="item.list_image_src" width="100%" :alt="item.alt_text" />
+																<div class="overlay" v-html="item.title"></div>
+															</a>
+														</figure>
+													</div>
+												</div>
+												<button
+													type="button"
+													class="btn btn-primary"
+													@click="getMediaData(true)"
+													v-if="clickedClassData.media.more && !clickedClassData.media.loadingMore"
+												>
+													Load More
+												</button>
+												<div class="spinner-border" role="status" v-if="clickedClassData.media.loadingMore">
+													<span class="sr-only">Loading...</span>
+												</div>
+											</div>
+											<div v-else-if="clickedClassData.media.hasError">
+												<div class="alert alert-warning" role="alert">
+													<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
+													<button type="button" class="btn btn-primary" @click="getMediaData">Try again</button>
+												</div>
+											</div>
+											<div v-else>
+												<div class="alert alert-warning" role="alert">No results found.</div>
+											</div>
+										</template>
+										<div class="ssc" v-if="!clickedClassData.media.hasLoaded && !clickedClassData.media.loadingMore">
+											<div class="row">
+												<div class="col-media col-6 col-md-4" v-for="i in 12">
+													<div class="ssc-square w-100"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
 							</div>
 
 							<div class="btn-group-wrapper tabs-details order-lg-3">
-								<div class="btn-group" role="group">
+								<nav class="btn-group" role="group">
 									<input
 										type="radio"
 										class="btn-check"
@@ -242,6 +392,7 @@
 										value="tab-desc"
 										autocomplete="off"
 										v-model="tabGroup"
+										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-desc"><span class="fas fa-align-left"></span>Desc</label>
 									<input
@@ -252,6 +403,7 @@
 										value="tab-system"
 										autocomplete="off"
 										v-model="tabGroup"
+										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-system"
 										><span><img src="/img/icon-orbit.svg" width="18" /></span>System</label
@@ -264,6 +416,7 @@
 										value="tab-stats"
 										autocomplete="off"
 										v-model="tabGroup"
+										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
 									<input
@@ -274,12 +427,13 @@
 										value="tab-media"
 										autocomplete="off"
 										v-model="tabGroup"
+										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-media"><span class="fas fa-images"></span>Media</label>
-								</div>
+								</nav>
 							</div>
 						</div>
-					</div>
+					</aside>
 				</div>
 				<div class="ui-bottom-bar">
 					<div class="container-fluid">
@@ -339,11 +493,17 @@
 			</div>
 
 			<!-- Modal -->
-			<div class="modal fade" id="modal-info" tabindex="-1" aria-labelledby="modal-info-label" aria-hidden="true">
+			<div
+				class="modal fade"
+				id="modal-readmore"
+				tabindex="-1"
+				aria-labelledby="modal-readmore-label"
+				aria-hidden="true"
+			>
 				<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="modal-info-label">Info</h5>
+							<h5 class="modal-title" id="modal-readmore-label">Info</h5>
 							<button type="button" class="btn-close btn-rounded" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body"></div>

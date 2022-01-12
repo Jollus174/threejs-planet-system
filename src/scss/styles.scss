@@ -12,9 +12,11 @@
 @import "../node_modules/bootstrap/scss/containers";
 @import "../node_modules/bootstrap/scss/modal";
 @import "../node_modules/bootstrap/scss/close";
+@import "../node_modules/bootstrap/scss/alert";
 @import "../node_modules/bootstrap/scss/button-group";
 @import "../node_modules/bootstrap/scss/buttons";
-@import "../node_modules/bootstrap/scss/badge";
+// @import "../node_modules/bootstrap/scss/badge";
+@import "../node_modules/bootstrap/scss/spinners";
 @import "../node_modules/bootstrap/scss/forms/form-control";
 
 @import "../node_modules/bootstrap/scss/forms/form-check";
@@ -22,6 +24,8 @@
 
 @import "../node_modules/fontawesome-free/scss/fontawesome";
 @import "../node_modules/fontawesome-free/scss/solid";
+
+@import "custom/skeleton";
 
 @import "custom/breakpoints";
 @import "custom/z";
@@ -35,9 +39,13 @@
 @import "custom/search";
 @import "custom/modals";
 @import "custom/controls";
+@import "custom/alert";
 
 :root {
 	--progress-amount: 0%;
+
+	--bs-body-color: #{$white};
+	--bs-body-bg: #{$black};
 }
 
 body {

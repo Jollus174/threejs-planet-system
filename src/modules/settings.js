@@ -67,7 +67,10 @@ const settings = {
 		'gonggong',
 		'quaoar'
 	],
-	navigationEntities: [] // hydrated by API
+	navigationEntities: [], // hydrated by API
+	content: {
+		mediaTotal: 15 // TODO: move this
+	}
 };
 
 export { settings };

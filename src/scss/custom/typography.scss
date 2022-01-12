@@ -66,3 +66,8 @@ a {
 .text-entity-color {
 	color: var(--entity-color);
 }
+
+// Wikipedia raw content fixes
+.mw-empty-elt {
+	display: none;
+}

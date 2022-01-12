@@ -109,8 +109,6 @@ const innerMoons = [
 	'Vanth'
 ];
 
-const asteroidMoonsList = ['Remus', 'Petit-Prince'];
-
 // manually adding own ring data, API does not have this
 const ringData = {
 	saturn: [
@@ -138,6 +136,28 @@ const sortData = (data) => {
 	};
 
 	data.forEach((item) => {
+		item.media = {
+			hasLoaded: false,
+			noResults: false,
+			hasError: false,
+			errors: [],
+			items: [],
+			total: null,
+			more: false,
+			loadingMore: false,
+			per_page: null
+		};
+
+		item.description = {
+			hasLoaded: false,
+			noResults: false,
+			hasError: false,
+			errors: [],
+			title: '',
+			content: '',
+			image: ''
+		};
+
 		if (item.type === 'Moon') {
 			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) item.moonGroup = 'Inner';
 			if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) item.moonGroup = 'Galilean';
@@ -445,17 +465,6 @@ const sortData = (data) => {
 		}
 	});
 
-	// const satellites = orrery.bodies._all.filter(
-	// 	(item) =>
-	// 		item.displayName !== 'Sun' &&
-	// 		item.isPlanet === false &&
-	// 		item.aroundPlanet === null &&
-	// 		!dwarfPlanets.find((dPlanet) => dPlanet.name.includes(item.name))
-	// );
-	// satellites.forEach((satellite) => {
-	// 	satellite.type = 'Satellite or Comet';
-	// });
-
 	// Building 'Entity Nav' ids with:
 	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
 	settings.navigationSystems.forEach((navItem) => {
@@ -474,10 +483,20 @@ const sortData = (data) => {
 	};
 };
 
+const apiResponse = ({ errors = [], results = [] } = {}) => {
+	return { errors, results };
+};
+
+const handleErrors = (response) => {
+	if (!response.ok) {
+		throw Error(response.statusText);
+	}
+	return response;
+};
+
 const getWikipediaData = async (articleTitle) => {
 	// example URL: https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=Jupiter
 	const baseUrl = 'https://en.wikipedia.org/w/api.php';
-	const imgUrl = 'https://upload.wikimedia.org/wikipedia/commons/';
 	const queryParams = [
 		['format', 'json'],
 		['action', 'query'],
@@ -491,12 +510,18 @@ const getWikipediaData = async (articleTitle) => {
 	];
 
 	const url = `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
-	return await fetch(url)
-		.then((response) => {
-			if (!response.ok) throw new Error('Error retrieving Wikipedia data');
-			return response.json();
-		})
+
+	// for timeouts
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => {
+		controller.abort();
+	}, settings.content.timeout);
+
+	return await fetch(url, { signal: controller.signal })
+		.then(handleErrors)
+		.then((response) => response.json())
 		.then((rJSON) => {
+			clearTimeout(timeoutId);
 			if (rJSON.query && rJSON.query.pages) {
 				const content = Object.values(rJSON.query.pages)[0];
 				let formattedContent;
@@ -514,35 +539,61 @@ const getWikipediaData = async (articleTitle) => {
 
 				// TODO: if not enough content, can we grab more?
 
-				return {
-					title: content.title,
-					content: formattedContent,
-					image
-				};
+				return apiResponse({ results: [{ title: content.title, content: formattedContent, image }] });
 			} else {
 				console.error('Missing Wikipedia page keys');
+				return apiResponse({ errors: [{ code: 'badUrl', message: 'No results found.' }] });
 			}
+		})
+		.catch((e) => {
+			console.error(e);
+			return apiResponse({ errors: [{ code: 'timeout', message: 'The response timed out.' }] });
 		});
 };
 
-const getNASAMediaData = async (tag) => {
+const getNASAMediaData = async (tag, pageNumber) => {
 	// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
+	// ?order=pub_date+desc&per_page=50&page=0&search=venus&condition_1=1%3Ais_in_resource_list&fs=&fc=51&ft=&dp=&category=51
 	const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
 	const queryParams = [
-		['page', '0'],
-		['per_page', '25'],
+		['page', pageNumber || '0'],
+		['per_page', settings.content.mediaTotal],
 		['order', 'created_at+desc'],
 		// ['search', ''],
 		// ['href_query_params', 'category%3Dplanets_jupiter'],
 		// ['button_class', 'big_more_button'],
-		['tags', 'jupiter'],
-		['condition_1', '1%3Ais_in_resource_list']
-		// ['category', '51']
+		['tags', tag],
+		['condition_1', '1%3Ais_in_resource_list'],
+		// for images
+		['category', '51'],
+		['fc', '51']
 	];
 
 	const url = `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
 
-	return url;
+	// for timeouts
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => {
+		controller.abort();
+	}, settings.content.timeout);
+
+	return await fetch(url, { signal: controller.signal })
+		.then(handleErrors)
+		.then((response) => response.json())
+		.then((rJSON) => {
+			clearTimeout(timeoutId);
+			if (rJSON.items) {
+				// console.log(( const { total, items, page, more } = rJSON));
+				return apiResponse({ results: [{ ...rJSON }] });
+			} else {
+				console.error('Invalid NASA media tag');
+				return apiResponse({ errors: [{ code: 'badUrl', message: 'Invalid NASA media tag.' }] });
+			}
+		})
+		.catch((e) => {
+			console.error(e);
+			return apiResponse({ errors: [{ code: 'timeout', message: 'The response timed out.' }] });
+		});
 };
 
 export { sortData, getWikipediaData, getNASAMediaData };

@@ -3,19 +3,16 @@
 import { orrery } from '../orrery';
 
 const setModalEvents = () => {
-	const modalInfoEl = document.querySelector('#modal-info');
-	const modalInfoModal = new bootstrap.Modal(modalInfoEl, {});
-	const modalInfoButton = document.querySelector('#btn-modal-info');
-
+	// const modalInfoEl = document.querySelector('#modal-info');
+	// const modalInfoButton = document.querySelector('#btn-modal-info');
 	// suspend render animations while modal is open to save performance (at least in theory)
-	modalInfoEl.addEventListener('show.bs.modal', () => {
-		cancelAnimationFrame(window.renderLoop);
-	});
-
-	modalInfoEl.addEventListener('hide.bs.modal', () => {
-		window.renderLoop = requestAnimationFrame(window.animate);
-	});
-
+	// const modalInfoModal = new bootstrap.Modal(modalInfoEl, {});
+	// modalInfoEl.addEventListener('show.bs.modal', () => {
+	// 	cancelAnimationFrame(window.renderLoop);
+	// });
+	// modalInfoEl.addEventListener('hide.bs.modal', () => {
+	// 	window.renderLoop = requestAnimationFrame(window.animate);
+	// });
 	/* modalInfoButton.addEventListener('click', () => {
 		modalInfoModal.show();
 

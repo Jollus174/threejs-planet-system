@@ -20,10 +20,21 @@ $btn-disabled: #333;
 }
 
 // -------------------------
+// Skeleton CSS
+// -------------------------
+$skeleton-element-color: rgba(255, 255, 255, 0.07);
+$skeleton-animation-gradient: rgba(0, 0, 0, 0.3);
+
+// -------------------------
 // Bootstrap overrides
 // -------------------------
 
-$primary: $white;
+$body-bg: $black;
+$body-color: $white;
+
+// $primary: $white;
+$primary: $black-near;
+// $warning: #212121;
 
 $body-color: $primary;
 
@@ -36,3 +47,5 @@ $badge-color: $black;
 $badge-padding-y: 0.25em;
 $badge-padding-x: 0.5em;
 $badge-border-radius: 50%;
+
+$alert-border-radius: 3px;

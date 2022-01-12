@@ -81,6 +81,7 @@
 
 			span {
 				white-space: nowrap;
+				color: rgb(228, 228, 228);
 				text-overflow: ellipsis;
 
 				&.text-type {
@@ -88,6 +89,7 @@
 				}
 
 				&.highlight {
+					color: $white;
 					text-shadow: 0 0 3px rgba($white, 0.5);
 				}
 			}
