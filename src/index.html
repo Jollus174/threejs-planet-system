@@ -127,7 +127,7 @@
 													<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
 														{{ error }}
 													</p>
-													<button type="button" class="btn btn-primary" @click="getContentData">Try again</button>
+													<button type="button" class="btn btn-primary" @click="getWikipediaData">Try again</button>
 												</div>
 											</div>
 											<div v-else>
@@ -352,7 +352,7 @@
 												<button
 													type="button"
 													class="btn btn-primary"
-													@click="getMediaData(true)"
+													@click="getNASAMediaData(true)"
 													v-if="clickedClassData.media.more && !clickedClassData.media.loadingMore"
 												>
 													Load More
@@ -364,7 +364,7 @@
 											<div v-else-if="clickedClassData.media.hasError">
 												<div class="alert alert-warning" role="alert">
 													<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
-													<button type="button" class="btn btn-primary" @click="getMediaData">Try again</button>
+													<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
 												</div>
 											</div>
 											<div v-else>

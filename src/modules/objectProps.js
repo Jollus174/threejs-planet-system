@@ -9,7 +9,6 @@ import { settings } from './settings';
 import { checkIfDesktop, easeTo, fadeTargetLineOpacity, calculateOrbit, convertToCamelCase } from './utils';
 import { textureLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
-import { getWikipediaData } from './data/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import fragmentShader from './shaders/glow/fragmentShader.glsl';

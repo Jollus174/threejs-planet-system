@@ -15,11 +15,10 @@ import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
-import { sortData, getNASAMediaData } from './modules/data/api';
+import { sortData, APIRequest } from './modules/data/api';
 import { scene } from './modules/scene';
 import { setModalEvents } from './modules/events/modals';
 import { customEventNames } from './modules/events/customEvents';
-import { getWikipediaData } from './modules/data/api';
 
 import Vue from 'vue/dist/vue.js';
 
@@ -242,7 +241,8 @@ fetch('./solarSystemData.json')
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				tabGroup: 'tab-desc'
+				tabGroup: 'tab-desc',
+				apiRequest: new APIRequest()
 			},
 			computed: {
 				nameApoapsis() {
@@ -448,59 +448,107 @@ fetch('./solarSystemData.json')
 					}
 				},
 
-				getContentData() {
+				generateWikipediaUrl(articleTitle) {
+					const baseUrl = 'https://en.wikipedia.org/w/api.php';
+					const queryParams = [
+						['format', 'json'],
+						['action', 'query'],
+						['prop', 'extracts|pageimages'],
+						['exintro', '1'],
+						// ['explaintext', '1'], // we want the HTML, so just text content. Saves needing to do extra formatting.
+						['redirects', '1'],
+						['titles', articleTitle],
+						['origin', '*'],
+						['pithumbsize', 100]
+					];
+
+					return `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
+				},
+
+				async getWikipediaData() {
 					this.clickedClassData.description.errors.splice(0);
-					// TODO: do the formatting here
-					getWikipediaData(this.clickedClassData.wikipediaKey).then((data) => {
+
+					const url = this.generateWikipediaUrl(this.clickedClassData.wikipediaKey);
+					this.apiRequest.GET(url).then((response) => {
 						const desc = this.clickedClassData.description;
 						desc.hasLoaded = true;
-						if (data.errors.length) {
+						if (response.errors.length) {
 							desc.hasError = true;
-							console.log(data.errors);
-							for (const error of data.errors) {
-								desc.errors.push(error);
-							}
+							for (const error of response.errors) desc.errors.push(error);
 							return;
 						}
 
-						if (!data.results.length) {
+						const result = response.result;
+						if (!Object.keys(response.result).length) {
 							desc.noResults = true;
 							return;
 						}
 
-						const { title, content, image } = data.results[0];
-						desc.title = title;
-						desc.content = content;
-						desc.image = image;
+						const content = Object.values(result.query.pages)[0];
+						let formattedContent,
+							image = null;
+						if (content.extract) {
+							formattedContent = content.extract;
+							formattedContent = formattedContent.replace('<span></span>', '');
+							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',');
+						}
+
+						if (content.thumbnail) {
+							image = content.thumbnail;
+							image.alt = content.pageimage;
+						}
+
+						desc.title = content.title;
+						desc.content = formattedContent;
+						desc.image = content.image;
 					});
 				},
 
-				getMediaData(isLoadingMore) {
+				generateNASAMediaUrl(tag, pageNumber) {
+					// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
+					// ?order=pub_date+desc&per_page=50&page=0&search=venus&condition_1=1%3Ais_in_resource_list&fs=&fc=51&ft=&dp=&category=51
+					const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
+					const queryParams = [
+						['page', pageNumber || '0'],
+						['per_page', settings.content.mediaTotal],
+						['order', 'created_at+desc'],
+						// ['search', ''],
+						// ['href_query_params', 'category%3Dplanets_jupiter'],
+						['tags', tag],
+						['condition_1', '1%3Ais_in_resource_list'],
+						// for images
+						['category', '51'],
+						['fc', '51']
+					];
+
+					return `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
+				},
+
+				getNASAMediaData(isLoadingMore) {
 					if (isLoadingMore) this.clickedClassData.media.loadingMore = true;
 					this.clickedClassData.media.errors.splice(0);
 					const pageRequestNumber = this.clickedClassData.media.items.length
 						? this.clickedClassData.media.items.length / this.clickedClassData.media.per_page
 						: 0;
-					getNASAMediaData(this.clickedClassData.id, pageRequestNumber).then((data) => {
+
+					const url = this.generateNASAMediaUrl(this.clickedClassData.id, pageRequestNumber);
+					this.apiRequest.GET(url).then((response) => {
 						const media = this.clickedClassData.media;
 						media.hasLoaded = true;
-						if (data.errors.length) {
+						if (response.errors.length) {
 							media.hasError = true;
-							for (const error of data.errors) {
-								media.errors.push(error);
-							}
+							for (const error of response.errors) media.errors.push(error);
 							return;
 						}
 
-						if (!data.results[0].items.length) {
+						if (!response.result || !response.result.items || !response.result.items.length) {
 							media.noResults = true;
 							return;
 						}
 
 						this.clickedClassData.media.loadingMore = false;
 
-						// media.results[0] = [...data.results[0]];
-						const { total, more, page, items, per_page } = data.results[0];
+						const { total, more, page, items, per_page } = response.result;
 						media.total = total;
 						media.more = more;
 						media.page = page;
@@ -509,23 +557,23 @@ fetch('./solarSystemData.json')
 							item.list_image_src = `https://solarsystem.nasa.gov${item.list_image_src}`;
 							media.items.push(item);
 						}
-					});
-					// short_description
-					// link
-					// title
 
-					// list_image_src
-					// detail_image
-					// /system/resources/list_images/2677_Whats_Up_Jan_2022-640x480.jpg
+						// short_description
+						// link
+						// title
+
+						// list_image_src
+						// detail_image
+					});
 				},
 
 				switchDetailTabs() {
 					if (this.tabGroup === 'tab-desc') {
-						if (!this.clickedClassData.description.content) this.getContentData();
+						if (!this.clickedClassData.description.content) this.getWikipediaData();
 					}
 
 					if (this.tabGroup === 'tab-media') {
-						if (!this.clickedClassData.media.items.length) this.getMediaData();
+						if (!this.clickedClassData.media.items.length) this.getNASAMediaData();
 					}
 				},
 

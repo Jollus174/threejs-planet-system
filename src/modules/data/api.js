@@ -483,117 +483,40 @@ const sortData = (data) => {
 	};
 };
 
-const apiResponse = ({ errors = [], results = [] } = {}) => {
-	return { errors, results };
-};
-
-const handleErrors = (response) => {
-	if (!response.ok) {
-		throw Error(response.statusText);
+// TODO: when (if) Typescript is set up, would be good to type these
+class APIRequest {
+	constructor() {
+		this.AbortController = new AbortController();
+		this.requestTimeout = 15000;
 	}
-	return response;
-};
 
-const getWikipediaData = async (articleTitle) => {
-	// example URL: https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=Jupiter
-	const baseUrl = 'https://en.wikipedia.org/w/api.php';
-	const queryParams = [
-		['format', 'json'],
-		['action', 'query'],
-		['prop', 'extracts|pageimages'],
-		['exintro', '1'],
-		// ['explaintext', '1'], // we want the HTML, so just text content. Saves needing to do extra formatting.
-		['redirects', '1'],
-		['titles', articleTitle],
-		['origin', '*'],
-		['pithumbsize', 100]
-	];
+	apiResponse({ errors = [], result = [] } = {}) {
+		return { errors, result };
+	}
 
-	const url = `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
+	handleErrors(response) {
+		if (!response.ok) {
+			throw Error(response.statusText);
+		}
+		return response;
+	}
 
-	// for timeouts
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => {
-		controller.abort();
-	}, settings.content.timeout);
+	async GET(url) {
+		const timeoutId = setTimeout(() => {
+			this.AbortController.abort();
+		}, this.requestTimeout);
+		return await fetch(url, { signal: this.AbortController.signal })
+			.then(this.handleErrors)
+			.then((response) => response.json())
+			.then((rJSON) => {
+				clearTimeout(timeoutId);
+				return this.apiResponse({ result: rJSON });
+			})
+			.catch((e) => {
+				console.error(e);
+				return this.apiResponse({ errors: [{ code: 'timeout', message: 'The response timed out.' }] });
+			});
+	}
+}
 
-	return await fetch(url, { signal: controller.signal })
-		.then(handleErrors)
-		.then((response) => response.json())
-		.then((rJSON) => {
-			clearTimeout(timeoutId);
-			if (rJSON.query && rJSON.query.pages) {
-				const content = Object.values(rJSON.query.pages)[0];
-				let formattedContent;
-				let image = null;
-				if (content.extract) {
-					formattedContent = content.extract;
-					formattedContent = formattedContent.replace('<span></span>', '');
-					formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',');
-				}
-
-				if (content.thumbnail) {
-					image = content.thumbnail;
-					image.alt = content.pageimage;
-				}
-
-				// TODO: if not enough content, can we grab more?
-
-				return apiResponse({ results: [{ title: content.title, content: formattedContent, image }] });
-			} else {
-				console.error('Missing Wikipedia page keys');
-				return apiResponse({ errors: [{ code: 'badUrl', message: 'No results found.' }] });
-			}
-		})
-		.catch((e) => {
-			console.error(e);
-			return apiResponse({ errors: [{ code: 'timeout', message: 'The response timed out.' }] });
-		});
-};
-
-const getNASAMediaData = async (tag, pageNumber) => {
-	// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
-	// ?order=pub_date+desc&per_page=50&page=0&search=venus&condition_1=1%3Ais_in_resource_list&fs=&fc=51&ft=&dp=&category=51
-	const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
-	const queryParams = [
-		['page', pageNumber || '0'],
-		['per_page', settings.content.mediaTotal],
-		['order', 'created_at+desc'],
-		// ['search', ''],
-		// ['href_query_params', 'category%3Dplanets_jupiter'],
-		// ['button_class', 'big_more_button'],
-		['tags', tag],
-		['condition_1', '1%3Ais_in_resource_list'],
-		// for images
-		['category', '51'],
-		['fc', '51']
-	];
-
-	const url = `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
-
-	// for timeouts
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => {
-		controller.abort();
-	}, settings.content.timeout);
-
-	return await fetch(url, { signal: controller.signal })
-		.then(handleErrors)
-		.then((response) => response.json())
-		.then((rJSON) => {
-			clearTimeout(timeoutId);
-			if (rJSON.items) {
-				// console.log(( const { total, items, page, more } = rJSON));
-				return apiResponse({ results: [{ ...rJSON }] });
-			} else {
-				console.error('Invalid NASA media tag');
-				return apiResponse({ errors: [{ code: 'badUrl', message: 'Invalid NASA media tag.' }] });
-			}
-		})
-		.catch((e) => {
-			console.error(e);
-			return apiResponse({ errors: [{ code: 'timeout', message: 'The response timed out.' }] });
-		});
-};
-
-export { sortData, getWikipediaData, getNASAMediaData };
+export { sortData, APIRequest };
