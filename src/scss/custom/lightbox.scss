@@ -3,7 +3,22 @@
 		cursor: default;
 	}
 
-	p {
-		margin-bottom: 0;
+	.vib-footer {
+		background-color: rgba($black, 0.8);
+
+		@include media-breakpoint-between(0, sm) {
+			max-height: 275px;
+		}
+
+		> div:first-child {
+			*:last-child,
+			p:nth-child(3) {
+				margin-bottom: 0;
+			}
+
+			p:nth-child(n + 4) {
+				display: none;
+			}
+		}
 	}
 }

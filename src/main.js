@@ -242,8 +242,7 @@ fetch('./solarSystemData.json')
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				tabGroup: 'tab-desc',
-				lightboxKey: randomString(8)
+				tabGroup: 'tab-desc'
 			},
 			computed: {
 				nameApoapsis() {
@@ -362,11 +361,19 @@ fetch('./solarSystemData.json')
 					)
 						return [];
 					return this.clickedClassData.media.items.map((media) => {
+						const formattedDetails = media.short_description
+							// splitting desc by paragraphs so can work with it
+							// removing paragraphs with links back to NASA's FAQs and such, looks weird
+							.replaceAll('\n', '')
+							.trim()
+							.split('</p>')
+							.filter((p) => !p.toLowerCase().includes('href'))
+							.join('</p>');
 						return {
 							type: 'image',
 							thumb: media.list_image_src,
 							src: media.detail_image,
-							caption: media.short_description
+							caption: formattedDetails
 						};
 					});
 				}
@@ -485,6 +492,9 @@ fetch('./solarSystemData.json')
 				},
 
 				getWikipediaData() {
+					// to stop making repeated requests to endpoints that return no results
+					if (this.clickedClassData.description.noResults) return;
+
 					this.clickedClassData.description.errors.splice(0);
 
 					const url = this.generateWikipediaUrl(this.clickedClassData.wikipediaKey);
@@ -545,6 +555,9 @@ fetch('./solarSystemData.json')
 				},
 
 				getNASAMediaData(isLoadingMore) {
+					// to stop making repeated requests to endpoints that return no results
+					if (this.clickedClassData.media.noResults) return;
+
 					if (isLoadingMore) this.clickedClassData.media.loadingMore = true;
 					this.clickedClassData.media.errors.splice(0);
 					const pageRequestNumber = this.clickedClassData.media.items.length
