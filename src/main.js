@@ -1,6 +1,6 @@
-/* globals bootstrap */
 'use strict';
 import './scss/styles.scss';
+import './node_modules/vue-it-bigger/dist/vue-it-bigger.min.css';
 
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
@@ -17,13 +17,13 @@ import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, APIRequest } from './modules/data/api';
 import { scene } from './modules/scene';
-import { setModalEvents } from './modules/events/modals';
 import { customEventNames } from './modules/events/customEvents';
 
 import Vue from 'vue/dist/vue.js';
+import LightBox from 'vue-it-bigger';
 
 window.settings = settings;
-window.renderLoop;
+window.renderLoop = '';
 
 let delta;
 
@@ -227,6 +227,7 @@ fetch('./solarSystemData.json')
 		Object.values(orrery.classes._planets).forEach((item) => item.build());
 		Object.values(orrery.classes._dwarfPlanets).forEach((item) => item.build());
 
+		Vue.component('lightbox', LightBox);
 		new Vue({
 			el: orrery.vueTarget,
 			data: {
@@ -242,7 +243,7 @@ fetch('./solarSystemData.json')
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
 				tabGroup: 'tab-desc',
-				apiRequest: new APIRequest()
+				lightboxKey: randomString(8)
 			},
 			computed: {
 				nameApoapsis() {
@@ -350,6 +351,24 @@ fetch('./solarSystemData.json')
 				activeMoonGroupId() {
 					if (!this.clickedClassData || !this.clickedClassData.moonGroup) return '';
 					return convertToCamelCase(this.clickedClassData.moonGroup);
+				},
+
+				media() {
+					if (
+						!this.clickedClassData ||
+						!this.clickedClassData.media ||
+						!this.clickedClassData.media.items ||
+						!this.clickedClassData.media.items.length
+					)
+						return [];
+					return this.clickedClassData.media.items.map((media) => {
+						return {
+							type: 'image',
+							thumb: media.list_image_src,
+							src: media.detail_image,
+							caption: media.short_description
+						};
+					});
 				}
 			},
 			methods: {
@@ -465,11 +484,12 @@ fetch('./solarSystemData.json')
 					return `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
 				},
 
-				async getWikipediaData() {
+				getWikipediaData() {
 					this.clickedClassData.description.errors.splice(0);
 
 					const url = this.generateWikipediaUrl(this.clickedClassData.wikipediaKey);
-					this.apiRequest.GET(url).then((response) => {
+					const apiRequest = this.clickedClassData.description.apiRequester || new APIRequest();
+					apiRequest.GET(url).then((response) => {
 						const desc = this.clickedClassData.description;
 						desc.hasLoaded = true;
 						if (response.errors.length) {
@@ -504,7 +524,7 @@ fetch('./solarSystemData.json')
 					});
 				},
 
-				generateNASAMediaUrl(tag, pageNumber) {
+				generateNASAMediaUrl(key, pageNumber) {
 					// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
 					// ?order=pub_date+desc&per_page=50&page=0&search=venus&condition_1=1%3Ais_in_resource_list&fs=&fc=51&ft=&dp=&category=51
 					const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
@@ -512,9 +532,9 @@ fetch('./solarSystemData.json')
 						['page', pageNumber || '0'],
 						['per_page', settings.content.mediaTotal],
 						['order', 'created_at+desc'],
-						// ['search', ''],
-						// ['href_query_params', 'category%3Dplanets_jupiter'],
-						['tags', tag],
+						['href_query_params', 'category%3Dplanets_jupiter'],
+						['search', key],
+						// ['tags', key],
 						['condition_1', '1%3Ais_in_resource_list'],
 						// for images
 						['category', '51'],
@@ -531,8 +551,9 @@ fetch('./solarSystemData.json')
 						? this.clickedClassData.media.items.length / this.clickedClassData.media.per_page
 						: 0;
 
-					const url = this.generateNASAMediaUrl(this.clickedClassData.id, pageRequestNumber);
-					this.apiRequest.GET(url).then((response) => {
+					const url = this.generateNASAMediaUrl(this.clickedClassData.name, pageRequestNumber);
+					const apiRequest = this.clickedClassData.media.apiRequester || new APIRequest();
+					apiRequest.GET(url).then((response) => {
 						const media = this.clickedClassData.media;
 						media.hasLoaded = true;
 						if (response.errors.length) {
@@ -555,6 +576,8 @@ fetch('./solarSystemData.json')
 						media.per_page = per_page;
 						for (const item of items) {
 							item.list_image_src = `https://solarsystem.nasa.gov${item.list_image_src}`;
+							item.detail_image = `https://solarsystem.nasa.gov${item.detail_image}`;
+							item.link = `https://solarsystem.nasa.gov${item.link}`;
 							media.items.push(item);
 						}
 
@@ -565,6 +588,10 @@ fetch('./solarSystemData.json')
 						// list_image_src
 						// detail_image
 					});
+				},
+
+				openGallery(i) {
+					this.$refs.lightbox.showImage(i);
 				},
 
 				switchDetailTabs() {

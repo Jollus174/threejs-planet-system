@@ -42,11 +42,13 @@
 		&:focus,
 		&:active {
 			background-color: transparent;
+			color: $white;
 		}
 	}
 
 	.search-dropdown {
 		position: absolute;
+		z-index: $z-search;
 		width: 100%;
 		display: none;
 		overflow: hidden;

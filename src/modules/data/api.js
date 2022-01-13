@@ -137,6 +137,7 @@ const sortData = (data) => {
 
 	data.forEach((item) => {
 		item.media = {
+			apiRequester: null,
 			hasLoaded: false,
 			noResults: false,
 			hasError: false,
@@ -149,6 +150,7 @@ const sortData = (data) => {
 		};
 
 		item.description = {
+			apiRequester: null,
 			hasLoaded: false,
 			noResults: false,
 			hasError: false,
@@ -157,6 +159,8 @@ const sortData = (data) => {
 			content: '',
 			image: ''
 		};
+
+		if (item.displayName === 'Earth') item.sideralOrbit = 365.24;
 
 		if (item.type === 'Moon') {
 			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) item.moonGroup = 'Inner';

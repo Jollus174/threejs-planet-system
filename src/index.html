@@ -340,15 +340,20 @@
 										<template v-if="clickedClassData.media.hasLoaded">
 											<div v-if="!clickedClassData.media.noResults && !clickedClassData.media.hasError">
 												<div class="row">
-													<div class="col-media col-6 col-md-4" v-for="item in clickedClassData.media.items">
+													<div
+														class="col-media col-6 col-md-4"
+														v-for="(item, i) in clickedClassData.media.items"
+														:key="i"
+													>
 														<figure>
-															<a class="media" href="#">
+															<a class="media" href="#" @click="openGallery(i)">
 																<img :src="item.list_image_src" width="100%" :alt="item.alt_text" />
 																<div class="overlay" v-html="item.title"></div>
 															</a>
 														</figure>
 													</div>
 												</div>
+
 												<button
 													type="button"
 													class="btn btn-primary"
@@ -394,7 +399,7 @@
 										v-model="tabGroup"
 										@change="switchDetailTabs"
 									/>
-									<label class="btn" for="tab-desc"><span class="fas fa-align-left"></span>Desc</label>
+									<label class="btn" for="tab-desc"><span class="fab fa-wikipedia-w"></span>Desc</label>
 									<input
 										type="radio"
 										class="btn-check"
@@ -491,6 +496,15 @@
 					</div>
 				</div>
 			</div>
+
+			<Lightbox
+				ref="lightbox"
+				:media="media"
+				:show-caption="true"
+				:show-light-box="false"
+				:n-thumbs="10"
+				:interface-hide-time="999999999"
+			/>
 
 			<!-- Modal -->
 			<div
