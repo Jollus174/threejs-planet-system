@@ -185,14 +185,7 @@ fetch('./solarSystemData.json')
 	.then((data) => {
 		const sortedData = sortData(data);
 		orrery.bodies._sun = sortedData.sun;
-		orrery.bodies._planets = sortedData.planets;
-		orrery.bodies._moons = sortedData.moons;
-		orrery.bodies._dwarfPlanets = sortedData.dwarfPlanets;
-		orrery.bodies._satellites = sortedData.satellites;
-		orrery.bodies._asteroids = sortedData.asteroids;
-		orrery.bodies._allPlanets = sortedData.planets.concat(sortedData.dwarfPlanets);
-
-		scene.add(skybox(skyboxTexturePaths));
+		orrery.bodies._allPlanets = [...sortedData.planets.concat(sortedData.dwarfPlanets)];
 
 		// --------------------
 		// Creating Classes and building Labels
@@ -201,26 +194,41 @@ fetch('./solarSystemData.json')
 		orrery.classes._sun = new Sun(orrery.bodies._sun);
 		orrery.classes._all.sun = orrery.classes._sun;
 
-		orrery.bodies._planet.forEach((planet) => {
+		const generateMoonClasses = (parentClass) => {
+			if (parentClass.data.moons && parentClass.data.moons.length) {
+				for (const moon of parentClass.data.moons) {
+					parentClass.moonClasses[moon.id] = new Moon(moon, parentClass);
+					orrery.classes._moons[moon.id] = parentClass.moonClasses[moon.id];
+					orrery.classes._all[moon.id] = parentClass.moonClasses[moon.id];
+				}
+			}
+		};
+
+		for (const planet of orrery.bodies.types._planet) {
 			orrery.classes._planets[planet.id] = new Planet(planet);
 			orrery.classes._all[planet.id] = orrery.classes._planets[planet.id];
-		});
+			generateMoonClasses(orrery.classes._planets[planet.id]);
+		}
 
-		orrery.bodies._dwarfPlanet.forEach((dPlanet) => {
+		for (const dPlanet of orrery.bodies.types._dwarfPlanet) {
 			orrery.classes._dwarfPlanets[dPlanet.id] = new DwarfPlanet(dPlanet);
 			orrery.classes._all[dPlanet.id] = orrery.classes._dwarfPlanets[dPlanet.id];
-		});
+			generateMoonClasses(orrery.classes._dwarfPlanets[dPlanet.id]);
+		}
 
-		orrery.bodies._asteroid.forEach((asteroid) => {
+		for (const asteroid of orrery.bodies.types._asteroid) {
 			orrery.classes._asteroids[asteroid.id] = new Asteroid(asteroid);
 			orrery.classes._all[asteroid.id] = orrery.classes._asteroids[asteroid.id];
-		});
+			generateMoonClasses(orrery.classes._asteroids[asteroid.id]);
+		}
 
-		orrery.bodies._moons.forEach((moon) => {
-			const parentEntity = orrery.classes._all[moon.aroundPlanet.planet];
-			orrery.classes._moons[moon.id] = new Moon(moon, parentEntity);
-			orrery.classes._all[moon.id] = orrery.classes._moons[moon.id];
-		});
+		// orrery.bodies._moons.forEach((moon) => {
+		// 	const parentEntity = orrery.classes._all[moon.aroundPlanet.planet];
+		// 	orrery.classes._moons[moon.id] = new Moon(moon, parentEntity);
+		// 	orrery.classes._all[moon.id] = orrery.classes._moons[moon.id];
+		// });
+
+		scene.add(skybox(skyboxTexturePaths));
 
 		// MESH BUILDING
 		orrery.classes._sun.build();
@@ -239,6 +247,7 @@ fetch('./solarSystemData.json')
 				bottomBar: {},
 				clickedClassData: null,
 				zoomedClassData: null,
+				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
@@ -255,11 +264,6 @@ fetch('./solarSystemData.json')
 						return 'Perigee';
 					return this.clickedClassData.aroundPlanet ? 'Periapsis' : 'Perihelion';
 				},
-				systemColour() {
-					return this.clickedClassData.aroundPlanet
-						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.labelColour
-						: this.clickedClassData.labelColour;
-				},
 				currentSystem() {
 					if (!this.clickedClassData) return 'Solar System';
 					if (this.clickedClassData.type === 'Star') {
@@ -273,12 +277,14 @@ fetch('./solarSystemData.json')
 					}
 				},
 
+				parentEntity() {
+					if (!this.clickedClass) return null;
+					return this.clickedClass.planetClass || null;
+				},
+
 				distanceFromParentEntity() {
 					// to be in km or AU depending on amount
-					const parentEntity =
-						this.clickedClassData.type === 'Moon'
-							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
-							: 'Sun';
+					const parentEntity = this.parentEntity ? this.parentEntity.data.displayName : 'Sun';
 
 					if (!this.clickedClassData.semimajorAxis) {
 						console.warn('Semi-Major Axis required.');
@@ -289,91 +295,16 @@ fetch('./solarSystemData.json')
 					}</span> ${this.distanceConverter(this.clickedClassData.semimajorAxis, true).unit} from ${parentEntity}`;
 				},
 
-				sideralOrbit() {
-					if (!this.clickedClassData || !this.clickedClassData.sideralOrbit) return;
-					// siderals more than a year should return years rather than days
-					const sideralConversion =
-						this.clickedClassData.sideralOrbit > 366
-							? this.clickedClassData.sideralOrbit / 365.26
-							: this.clickedClassData.sideralOrbit;
-					// sideral orbit to be to max of 2 floating points (or none if it's .00)
-					const sideral = sideralConversion.toFixed(2).split('.');
-					const floatingPoints = sideral[1].toString() !== '00' ? '.' + sideral[1] : '';
-					return sideral[0] + floatingPoints;
-				},
-
-				showMoonsArrowClass() {
-					return this.showMoons ? 'fa-angle-down' : 'fa-angle-up';
-				},
-
 				moonGroups() {
-					const moonKeys =
-						this.clickedClassData.type === 'Moon'
-							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.moons
-							: this.clickedClassData.moons;
-					if (!moonKeys) return [];
-					const moonGroups = {};
-					moonKeys.forEach((moonKey) => {
-						const moonGroupName = orrery.classes._all[moonKey.moon].data.moonGroup;
-						const moonGroupKey = convertToCamelCase(moonGroupName);
-						moonGroups[moonGroupKey] = moonGroups[moonGroupKey] || {
+					if (!this.systemClassData.moons) return null;
+					// using Set to remove duplicates
+					const moonGroupNames = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroup))];
+					return moonGroupNames.map((moonGroupName) => {
+						const moons = this.systemClassData.moons.filter((m) => m.moonGroup === moonGroupName);
+						return {
 							name: moonGroupName,
-							count: 0,
-							id: convertToCamelCase(moonGroupName),
-							moons: [],
-							systemId: convertToCamelCase(orrery.classes._all[moonKey.moon].data.system)
-						};
-						moonGroups[moonGroupKey].count++;
-						moonGroups[moonGroupKey].moons.push(moonKey.moon);
-					});
-					return moonGroups;
-				},
-
-				moons() {
-					if (!this.clickedClassData) return [];
-					const moonKeys =
-						this.clickedClassData.type === 'Moon'
-							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.moons
-							: this.clickedClassData.moons;
-					if (!moonKeys) return [];
-					return moonKeys.map((moonKey) => {
-						const moonClassData = orrery.classes._all[moonKey.moon].data;
-						return {
-							displayName: moonClassData.displayName,
-							id: moonClassData.id,
-							index: this.navigationEntities.indexOf(moonClassData.id),
-							moonGroupId: moonClassData.moonGroupId
-						};
-					});
-				},
-
-				activeMoonGroupId() {
-					if (!this.clickedClassData || !this.clickedClassData.moonGroup) return '';
-					return convertToCamelCase(this.clickedClassData.moonGroup);
-				},
-
-				media() {
-					if (
-						!this.clickedClassData ||
-						!this.clickedClassData.media ||
-						!this.clickedClassData.media.items ||
-						!this.clickedClassData.media.items.length
-					)
-						return [];
-					return this.clickedClassData.media.items.map((media) => {
-						const formattedDetails = media.short_description
-							// splitting desc by paragraphs so can work with it
-							// removing paragraphs with links back to NASA's FAQs and such, looks weird
-							.replaceAll('\n', '')
-							.trim()
-							.split('</p>')
-							.filter((p) => !p.toLowerCase().includes('href'))
-							.join('</p>');
-						return {
-							type: 'image',
-							thumb: media.list_image_src,
-							src: media.detail_image,
-							caption: formattedDetails
+							color: moons[0].moonGroupColor,
+							moons
 						};
 					});
 				}
@@ -383,16 +314,17 @@ fetch('./solarSystemData.json')
 					return kmToAU(km);
 				},
 
-				plurialise(word, value) {
+				pluralise(word, value) {
 					if (!word || !value) {
+						// TODO: I'd imagine Typescript could take care of this automatically
 						console.warn('Word and Value required.');
 						return '';
 					}
-
 					return `${word}${value !== 1 ? 's' : ''}`;
 				},
 
 				valueWithCommas(value) {
+					if (!value) return;
 					return new Intl.NumberFormat('en-US').format(value);
 				},
 
@@ -436,41 +368,34 @@ fetch('./solarSystemData.json')
 
 					if (unit === 'hours') {
 						// TODO: these could come from a global 'conversions' source
-						const days = value / 24;
-						const years = value / 365.256 / 24;
-						if (value < 48)
-							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(value))} Earth ${this.plurialise(
-								'hour',
-								value
-							)}`;
-						if (value < 7200)
-							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(days))} Earth ${this.plurialise(
-								'day',
-								days
-							)}`;
-						return `${this.valueWithCommas(this.valueToFixedFloatingPoints(years))} Earth ${this.plurialise(
-							'year',
-							years
-						)}`;
+						const convertedHours = value;
+						const convertedDays = value / 24;
+						const convertedYears = value / 365.256 / 24;
+						if (value < 48) {
+							const hours = this.valueToFixedFloatingPoints(convertedHours);
+							return `${this.valueWithCommas(hours)} Earth ${this.pluralise('hour', hours)}`;
+						}
+						if (value < 7200) {
+							const days = this.valueToFixedFloatingPoints(convertedDays);
+							return `${this.valueWithCommas(days)} Earth ${this.pluralise('day', days)}`;
+						}
+						const years = this.valueToFixedFloatingPoints(convertedYears);
+						return `${this.valueWithCommas(years)} Earth ${this.pluralise('year', years)}`;
 					}
 					if (unit === 'days') {
-						const hours = value / 24;
-						const days = value;
-						const years = value / 365.256;
-						if (value < 2)
-							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(hours))} Earth ${this.plurialise(
-								'hour',
-								hours
-							)}`;
-						if (value < 320)
-							return `${this.valueWithCommas(this.valueToFixedFloatingPoints(days))} Earth ${this.plurialise(
-								'day',
-								days
-							)}`;
-						return `${this.valueWithCommas(this.valueToFixedFloatingPoints(years))} Earth ${this.plurialise(
-							'year',
-							years
-						)}`;
+						const convertedHours = value * 24;
+						const convertedDays = value;
+						const convertedYears = value / 365.256;
+						if (value < 2) {
+							const hours = this.valueToFixedFloatingPoints(convertedHours);
+							return `${this.valueWithCommas(hours)} Earth ${this.pluralise('hour', hours)}`;
+						}
+						if (value < 320) {
+							const days = this.valueToFixedFloatingPoints(convertedDays);
+							return `${this.valueWithCommas(days)} Earth ${this.pluralise('day', days)}`;
+						}
+						const years = this.valueToFixedFloatingPoints(convertedYears);
+						return `${this.valueWithCommas(years)} Earth ${this.pluralise('year', years)}`;
 					}
 				},
 
@@ -520,6 +445,8 @@ fetch('./solarSystemData.json')
 						if (content.extract) {
 							formattedContent = content.extract;
 							formattedContent = formattedContent.replace('<span></span>', '');
+							// removing everything in parentheses since it's usually junk
+							formattedContent = formattedContent.replace(/ *\([^)]*\) */g, ' ');
 							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',');
 						}
 
@@ -594,6 +521,23 @@ fetch('./solarSystemData.json')
 							media.items.push(item);
 						}
 
+						for (const item of media.items) {
+							const formattedDetails = item.short_description
+								// splitting desc by paragraphs so can work with it
+								// removing paragraphs with links back to NASA's FAQs and such, looks weird
+								.replaceAll('\n', '')
+								.trim()
+								.split('</p>')
+								.filter((p) => !p.toLowerCase().includes('href'))
+								.join('</p>');
+							media.lightboxData.push({
+								type: 'image',
+								thumb: item.list_image_src,
+								src: item.detail_image,
+								caption: formattedDetails
+							});
+						}
+
 						// short_description
 						// link
 						// title
@@ -613,7 +557,7 @@ fetch('./solarSystemData.json')
 					}
 
 					if (this.tabGroup === 'tab-media') {
-						if (!this.clickedClassData.media.items.length) this.getNASAMediaData();
+						if (!this.clickedClassData.media.lightboxData.length) this.getNASAMediaData();
 					}
 				},
 
@@ -690,45 +634,25 @@ fetch('./solarSystemData.json')
 					this.updateEntity(orrery.classes._all[nextSystemKey].data);
 				},
 
-				// updateMoonGroup(id) {
-				// 	this.$set(this.modelMoonGroupSelection, this.clickedClassData.systemId, id);
-				// 	this.moonGroupRefresh = randomString(8);
-				// },
-
 				updateEntity(data) {
 					const newClickedClassData = data;
 					this.clickedClassData = newClickedClassData;
+					this.systemClassData = this.clickedClassData.aroundPlanet
+						? orrery.classes._all[this.clickedClassData.id].planetClass.data
+						: this.clickedClassData;
 					document.querySelector(':root').style.setProperty('--entity-color', this.clickedClassData.labelColour);
-					document.querySelector(':root').style.setProperty('--system-color', this.systemColour);
+					document.querySelector(':root').style.setProperty('--system-color', this.systemClassData.labelColour);
 
-					// keeping track of what's been selected between each system
-					this.modelSystemSelection[this.clickedClassData.systemId] = newClickedClassData.id;
-
-					// also keeping track of what's been selected between each moon group for :checked
-					if (!this.clickedClassData.moonGroupId) {
-						// if moonGroup doesn't exist in selection model, always select the first moon group by default
-						if (this.clickedClassData.moons) {
-							const firstMoonKey = this.clickedClassData.moons[0].moon;
-							this.modelMoonGroupSelection[this.clickedClassData.systemId] =
-								orrery.classes._all[firstMoonKey].data.moonGroupId;
+					if (this.moonGroups) {
+						for (let i = 0; i < this.moonGroups.length; i++) {
+							document.querySelector(':root').style.setProperty(`--moon-group-color-${i}`, this.moonGroups[i].color);
 						}
-					} else {
-						this.modelMoonGroupSelection[this.clickedClassData.systemId] = this.clickedClassData.moonGroupId;
 					}
 
-					// finally, keeping track of which moon is selected in each moon group
-					this.modelMoonSelection[this.clickedClassData.moonGroupId] =
-						this.clickedClassData.type === 'Moon' ? newClickedClassData.id : '';
+					// keeping track of what's been selected between each system
+					this.modelSystemSelection[this.clickedClassData.systemId] = this.clickedClassData.id;
 
-					this.switchDetailTabs(); // to trigger the API loader for content (is it's needed)
-
-					// manually setting the :checked here
-					// changing a moon group should not update the entity
-					this.$nextTick(() => {
-						[...document.querySelectorAll('#moon-groups-wrapper input')].forEach((moonGroup) => {
-							moonGroup.checked = this.modelMoonGroupSelection[this.clickedClassData.systemId] === moonGroup.id;
-						});
-					});
+					this.switchDetailTabs(); // to trigger the API loader for content (if it's needed)
 				},
 
 				goToPreviousEntity() {

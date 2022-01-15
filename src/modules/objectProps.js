@@ -170,7 +170,6 @@ class Entity {
 		this.fadingOut = false;
 		this.isVisible = false;
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
-		this.moonClasses = {};
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
@@ -250,17 +249,6 @@ class Entity {
 					this.isVisible = true;
 					this.labelLink.style.pointerEvents = '';
 				}
-			});
-		}
-
-		if (this.data.moons && this.data.moons.length) {
-			this.data.moons.forEach((moon) => {
-				// now rather than pushing to an array, using key/value pairs for easier referencing
-				// is scoped to the planet so can more easily run them through like an array if need be
-
-				// TODO: reference Moons from orrery.classes._all so we aren't building them twice
-				this.moonClasses[moon.id] = new Moon(moon, this.labelGroup);
-				orrery.classes._moons[moon.id] = this.moonClasses[moon.id];
 			});
 		}
 	}
@@ -443,6 +431,7 @@ class Entity {
 class Planet extends Entity {
 	constructor(data) {
 		super(data);
+		this.moonClasses = {};
 	}
 
 	/* intervalCheck() {
@@ -516,7 +505,7 @@ class Asteroid extends Planet {
 	}
 }
 
-class Sun extends Planet {
+class Sun extends Entity {
 	constructor(data) {
 		super(data);
 		this.uniforms = {

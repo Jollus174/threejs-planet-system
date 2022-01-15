@@ -146,7 +146,8 @@ const sortData = (data) => {
 			total: null,
 			more: false,
 			loadingMore: false,
-			per_page: null
+			per_page: null,
+			lightboxData: []
 		};
 
 		item.description = {
@@ -163,10 +164,29 @@ const sortData = (data) => {
 		if (item.displayName === 'Earth') item.sideralOrbit = 365.24;
 
 		if (item.type === 'Moon') {
-			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) item.moonGroup = 'Inner';
-			if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) item.moonGroup = 'Galilean';
-			if (['leda', 'ersa', 'pandia', 'himalia', 'lysithea', 'elara', 'dia'].indexOf(item.id) !== -1)
+			if (['moon'].indexOf(item.id) !== -1) {
+				item.moonGroup = '';
+				item.moonGroupColor = '#82898f';
+			}
+
+			if (['phobos', 'deimos'].indexOf(item.id) !== -1) {
+				item.moonGroup = '';
+				item.moonGroupColor = '#fc6f43';
+			}
+
+			if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Inner';
+				item.moonGroupColor = '#e89c47';
+			}
+
+			if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Galilean';
+				item.moonGroupColor = '#58b548';
+			}
+			if (['leda', 'ersa', 'pandia', 'himalia', 'lysithea', 'elara', 'dia'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Himalia';
+				item.moonGroupColor = '#cda434';
+			}
 
 			if (
 				[
@@ -193,8 +213,10 @@ const sortData = (data) => {
 					's2017j9',
 					's2003j12'
 				].indexOf(item.id) !== -1
-			)
+			) {
 				item.moonGroup = 'Ananke';
+				item.moonGroupColor = '#bebd7f';
+			}
 
 			if (
 				[
@@ -225,8 +247,10 @@ const sortData = (data) => {
 				]
 					.map((i) => convertToCamelCase(i.replace(' ', '')))
 					.indexOf(item.id) !== -1
-			)
+			) {
 				item.moonGroup = 'Carme';
+				item.moonGroupColor = '#ea899a';
+			}
 
 			if (
 				[
@@ -249,10 +273,15 @@ const sortData = (data) => {
 					'callirrhoe',
 					'sinope'
 				].indexOf(item.id) !== -1
-			)
+			) {
 				item.moonGroup = 'Pasiphae';
+				item.moonGroupColor = '#1b9dbe';
+			}
 
-			if (['themisto', 'carpo', 'valetudo'].indexOf(item.id) !== -1) item.moonGroup = 'Misc';
+			if (['themisto', 'carpo', 'valetudo'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Misc';
+				item.moonGroupColor = '#82898f';
+			}
 
 			// Saturn moon groups...
 			if (
@@ -273,11 +302,13 @@ const sortData = (data) => {
 			) {
 				item.moonGroup = 'Skathi';
 				item.direction = 'retrograde';
+				item.moonGroupColor = '#826c34';
 			}
 
 			if (['narvi', 'bestla', 's2004s36'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Narvi';
 				item.direction = 'retrograde';
+				item.moonGroupColor = '#ff7514';
 			}
 
 			if (
@@ -317,22 +348,42 @@ const sortData = (data) => {
 			) {
 				item.moonGroup = 'Norse';
 				item.direction = 'retrograde';
+				item.moonGroupColor = '#5c67ff';
 			}
 
 			if (['albiorix', 'bebhionn', 'erriapus', 'tarvos'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Gallic';
 				item.direction = 'prograde';
+				item.moonGroupColor = '#826c34';
 			}
 
-			if (['prometheus', 'daphnis', 'pan', 'janus', 'epimetheus', 'atlas', 'pandora'].indexOf(item.id) !== -1)
-				item.moonGroup = 'ShepherdMoons';
-			if (['tethys', 'telesto', 'calypso'].indexOf(item.id) !== -1) item.moonGroup = 'Tethys';
-			if (['dione', 'helene', 'polydeuces'].indexOf(item.id) !== -1) item.moonGroup = 'Dione';
-			if (['methone', 'anthe', 'pallene'].indexOf(item.id) !== -1) item.moonGroup = 'Alkyonides';
-			if (['ijiraq', 'kiviuq', 'paaliaq', 'siarnaq', 'tarqeq'].indexOf(item.id) !== -1) item.moonGroup = 'Inuit';
-			if (['hyperion', 'rhea', 'titan', 'iapetus'].indexOf(item.id) !== -1) item.moonGroup = 'OuterLarge';
-			if (['mimas', 'enceladus', 'aegaeon', 's2009s1', 's2004s24', 's2004s29', 's2004s31'].indexOf(item.id) !== -1)
+			if (['prometheus', 'daphnis', 'pan', 'janus', 'epimetheus', 'atlas', 'pandora'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Shepherd Moons';
+				item.moonGroupColor = '#5e2129';
+			}
+			if (['tethys', 'telesto', 'calypso'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Tethys';
+				item.moonGroupColor = '#a98307';
+			}
+			if (['dione', 'helene', 'polydeuces'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Dione';
+				item.moonGroupColor = '#256d7b';
+			}
+			if (['methone', 'anthe', 'pallene'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Alkyonides';
+				item.moonGroupColor = '#606e8c';
+			}
+			if (['ijiraq', 'kiviuq', 'paaliaq', 'siarnaq', 'tarqeq'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Inuit';
+				item.moonGroupColor = '#ff9652';
+			}
+			if (['hyperion', 'rhea', 'titan', 'iapetus'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Outer Large';
+				item.moonGroupColor = '#8673a1';
+			}
+			if (['mimas', 'enceladus', 'aegaeon', 's2009s1', 's2004s24', 's2004s29', 's2004s31'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Misc';
+			}
 
 			// Uranus moon groups...
 			if (
@@ -351,9 +402,16 @@ const sortData = (data) => {
 					'puck',
 					'mab'
 				].indexOf(item.id) !== -1
-			)
+			) {
 				item.moonGroup = 'Inner';
-			if (['ariel', 'miranda', 'umbriel', 'titania', 'oberon'].indexOf(item.id) !== -1) item.moonGroup = 'Major';
+				item.moonGroupColor = '#cf3476';
+			}
+
+			if (['ariel', 'miranda', 'umbriel', 'titania', 'oberon'].indexOf(item.id) !== -1) {
+				item.moonGroup = 'Major';
+				item.moonGroupColor = '#633a34';
+			}
+
 			if (
 				[
 					'francisco',
@@ -369,24 +427,37 @@ const sortData = (data) => {
 			) {
 				item.moonGroup = 'Irregular';
 				item.direction = item.id === 'margaret' ? 'Prograde' : 'Retrograde';
+				item.moonGroupColor = '#308446';
 			}
 
 			// Neptune moon groups...
-			if (['naiad', 'thalassa', 'despina', 'galatea', 'larissa', 'hippocamp', 'proteus'].indexOf(item.id) !== -1)
+			if (['naiad', 'thalassa', 'despina', 'galatea', 'larissa', 'hippocamp', 'proteus'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Regular';
-			if (['triton', 'nereid', 'halimede', 'sao', 'laomedeia', 'psamathe', 'neso'].indexOf(item.id) !== -1)
+				item.moonGroupColor = '#dc9d00';
+			}
+			if (['triton', 'nereid', 'halimede', 'sao', 'laomedeia', 'psamathe', 'neso'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Irregular';
+				item.moonGroupColor = '#7fb5b5';
+			}
 			if (['triton', 'halimede', 'psamathe', 'neso'].indexOf(item.id) !== -1) item.direction = 'Retrograde';
 			if (['nereid', 'sao', 'laomedeia'].indexOf(item.id) !== -1) item.direction = 'Prograde';
 
-			if (!item.moonGroup) item.moonGroup = item.system;
-			item.moonGroupId = item.moonGroup.toLowerCase();
+			if (['charon', 'nix', 'hydra', 'kerberos', 'styx'].indexOf(item.id) !== -1) {
+				item.moonGroup = '';
+				item.moonGroupColor = '#ff8333';
+			}
+
+			if (!item.moonGroupColor) {
+				item.moonGroupColor = '#82898f';
+			}
+
+			item.moonGroupId = item.moonGroup ? item.moonGroup.toLowerCase() : '';
 		}
 	});
 
 	// adding additional measurement fields to data
 	orrery.bodies._all = [...data];
-	orrery.bodies._all.forEach((item) => {
+	for (const item of orrery.bodies._all) {
 		// temp setting
 		// TODO: Set these values manually, as the API is incomplete
 		item.longAscNode = item.longAscNode || getRandomArbitrary(0, 360);
@@ -422,13 +493,14 @@ const sortData = (data) => {
 
 		// setting the 'entity types' here rather than further down and redoing the loop
 		const key = '_' + convertToCamelCase(item.type);
-		orrery.bodies[key] = orrery.bodies[key] || [];
-		orrery.bodies[key].push(item);
-	});
+		orrery.bodies.types[key] = orrery.bodies.types[key] || [];
+		orrery.bodies.types[key].push(item);
+	}
 
-	const sun = orrery.bodies._star[0];
+	const sun = orrery.bodies.types._star[0];
 
-	const moons = orrery.bodies._all.filter((m) => m.type === 'Moon').sort((a, b) => a.displayName < b.displayName);
+	// TODO: sort this out later, assign a 'moonGroup index' to keep track of order better
+	const moons = orrery.bodies.types._moon;
 	moons.forEach((moon) => {
 		moon.isMajorMoon = majorMoons.indexOf(moon.displayName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.displayName) !== -1;
@@ -438,13 +510,23 @@ const sortData = (data) => {
 		moon.startingPosition.copy(startingOrbitPosition(moon));
 	});
 
-	const dwarfPlanets = orrery.bodies._all
-		.filter((d) => d.type === 'Dwarf Planet')
-		.sort((a, b) => a.displayName < b.displayName);
-	dwarfPlanets.forEach((dwarfPlanet) => {
+	// assigning proper moon data to each entity, rather than just the ID that the API provides
+	const setMoonsToDataEntity = (entity) => {
+		if (entity.moons && entity.moons.length) {
+			const eMoons = entity.moons
+				.map((eMoon) => moons.find((m) => m.id === eMoon.moon))
+				.sort((a, b) => (a.moonGroup > b.moonGroup ? 1 : b.moonGroup > a.moonGroup ? -1 : 0));
+			entity.moons = eMoons;
+		}
+	};
+
+	const dwarfPlanets = orrery.bodies.types._dwarfPlanet;
+	for (const dwarfPlanet of dwarfPlanets) {
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
-	});
+
+		setMoonsToDataEntity(dwarfPlanet);
+	}
 
 	// const asteroids = asteroidsList.map((asteroid) =>
 	// 	orrery.bodies._all.find((item) => item.displayName.includes(asteroid))
@@ -456,8 +538,8 @@ const sortData = (data) => {
 	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
 	// });
 
-	const planets = orrery.bodies._all.filter((p) => p.type === 'Planet').sort((a, b) => a.displayName < b.displayName);
-	planets.forEach((planet) => {
+	const planets = orrery.bodies.types._planet;
+	for (const planet of planets) {
 		planet.isInnerPlanet = innerPlanets.indexOf(planet.displayName) !== -1;
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
@@ -467,15 +549,19 @@ const sortData = (data) => {
 			planet.rings = [];
 			ringData[planet.id].forEach((ring) => planet.rings.push(ring));
 		}
-	});
+
+		setMoonsToDataEntity(planet);
+	}
 
 	// Building 'Entity Nav' ids with:
 	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
-	settings.navigationSystems.forEach((navItem) => {
-		const entityItem = orrery.bodies._all.find((allItem) => allItem.id === navItem);
+	for (const navSystemName of settings.navigationSystems) {
+		const entityItem = orrery.bodies._all.find((allItem) => allItem.id === navSystemName);
 		settings.navigationEntities.push(entityItem.id);
-		if (entityItem.moons) entityItem.moons.forEach((m) => settings.navigationEntities.push(m.moon));
-	});
+		if (entityItem.moons) {
+			for (const moon of entityItem.moons) settings.navigationEntities.push(moon.id);
+		}
+	}
 	// TODO: asteroids n stuff
 
 	return {

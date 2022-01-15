@@ -30,18 +30,20 @@ const orrery = {
 		_navigable: {}
 	},
 	bodies: {
-		_all: [],
-		_star: [],
-		_dwarfPlanet: [],
+		types: {
+			_all: [],
+			_planet: [],
+			_dwarfPlanet: [],
+			_asteroid: [],
+			_moon: []
+		},
+		_sun: null,
 		_starField: null,
 		_asteroidBelt: null,
 		_planetLabels: {},
 		_moonLabels: {},
 		_dwarfPlanetLabels: {},
-		_planet: [],
 		_allPlanets: [],
-		_moon: [],
-		_asteroid: [],
 		_orbitLines: []
 	},
 	orbitLines: {

@@ -229,11 +229,7 @@
 
 					tr {
 						&::after {
-							opacity: 0.2;
-						}
-
-						th::before {
-							opacity: 0.25;
+							opacity: 0.15;
 						}
 					}
 				}
@@ -247,10 +243,13 @@
 					height: 100%;
 					font-size: 14px;
 					font-weight: 600;
-					letter-spacing: 0.3em;
-					text-align: center;
+					letter-spacing: 0.2em;
+					text-align: right;
 					text-transform: uppercase;
 					white-space: nowrap;
+					overflow: hidden;
+					padding-top: 20px;
+					text-overflow: ellipsis;
 					transition: opacity 0.2s ease;
 				}
 
@@ -301,56 +300,40 @@
 					&.active-entity {
 						cursor: default;
 
-						span {
-							position: relative;
+						th::before {
+							opacity: 0.25;
+						}
+					}
+				}
 
-							&::after {
-								content: "\f05b";
-								font-family: "Font Awesome 5 Free";
-								margin-left: 8px;
-								opacity: 0.3;
+				&.planet-group {
+					tr {
+						&::after,
+						th::before {
+							background-color: var(--system-color);
+						}
+					}
+				}
+
+				&.moon-group {
+					border-bottom: 8px solid transparent;
+
+					&::before {
+						content: attr(data-moongroup-name);
+					}
+				}
+
+				@for $i from 0 through 12 {
+					&.moon-group-#{$i} {
+						&::before {
+							color: var(--moon-group-color-#{$i});
+						}
+
+						tr {
+							&::after,
+							th::before {
+								background-color: var(--moon-group-color-#{$i});
 							}
-						}
-					}
-				}
-
-				// TODO: Fix this up
-				$jupiter: #e0ab79;
-				$major: #bd6060;
-				$himalia: #608abd;
-				&.jupiter {
-					tr {
-						&::after,
-						th::before {
-							background-color: $jupiter;
-						}
-					}
-				}
-
-				&.major {
-					&::before {
-						content: "Major";
-						color: $major;
-					}
-
-					tr {
-						&::after,
-						th::before {
-							background-color: $major;
-						}
-					}
-				}
-
-				&.himalia {
-					&::before {
-						content: "Himalia";
-						color: $himalia;
-					}
-
-					tr {
-						&::after,
-						th::before {
-							background-color: $himalia;
 						}
 					}
 				}
