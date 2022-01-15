@@ -32,7 +32,7 @@
 		align-items: center;
 		justify-content: space-between;
 		text-transform: uppercase;
-		margin-top: 10px;
+		margin-top: 8px;
 
 		.title-wrapper {
 			display: flex;
@@ -210,10 +210,10 @@
 		}
 
 		.td-wrapper {
-			padding-left: 15px;
+			padding-left: 9px;
 			padding-right: 0;
 
-			@include media-breakpoint-up(lg) {
+			@include media-breakpoint-up(md) {
 				padding-left: 15px;
 			}
 		}
@@ -236,21 +236,26 @@
 
 				&::before {
 					position: absolute;
-					left: -27px;
+					left: -19px;
 					opacity: 0.75;
+					overflow: hidden;
 					writing-mode: vertical-rl;
 					transform: rotate(180deg);
+					padding-top: 20px;
 					height: 100%;
-					font-size: 14px;
+					font-size: 11px;
 					font-weight: 600;
 					letter-spacing: 0.2em;
 					text-align: right;
 					text-transform: uppercase;
 					white-space: nowrap;
-					overflow: hidden;
-					padding-top: 20px;
 					text-overflow: ellipsis;
 					transition: opacity 0.2s ease;
+
+					@include media-breakpoint-up(md) {
+						left: -27px;
+						font-size: 14px;
+					}
 				}
 
 				th {
@@ -316,8 +321,6 @@
 				}
 
 				&.moon-group {
-					border-bottom: 8px solid transparent;
-
 					&::before {
 						content: attr(data-moongroup-name);
 					}

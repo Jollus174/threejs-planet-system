@@ -65,49 +65,44 @@
 										<div class="col-4" v-if="clickedClassData.type !== 'Star'">
 											<div class="key-data">
 												<span class="heading">Distance</span>
-												<span v-html="distanceFromParentEntity"></span>
+												<span class="label-color">{{ distanceFromParentEntity.value }}</span>
+												<sub>{{ distanceFromParentEntity.unit }}</sub>
 											</div>
 										</div>
 										<div class="col-4">
 											<div class="key-data">
 												<span class="heading">Mean Radius</span>
-												<span class="label-color"
-													>{{ new Intl.NumberFormat('en-US').format(clickedClassData.meanRadius) }}</span
-												>
-												km
+												<span class="label-color">{{ distanceConverter(clickedClassData.meanRadius).value }}</span>
+												<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
 											</div>
 										</div>
 										<div class="col-4" v-if="clickedClassData.sideralOrbit">
 											<div class="key-data">
 												<span class="heading">Orbit Time</span>
-												<!-- TODO: this is very likely incorrectly implemented -->
-												<!-- <span class="label-color">{{ clickedClassData.sideralOrbit }}</span> Earth {{
-												clickedClassData.sideralOrbit < 366 ? 'Days' : 'Years' }} -->
-												{{ timeConversion(clickedClassData.sideralOrbit, 'days') }}
+												<span class="label-color"
+													>{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}</span
+												>
+												<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
 											</div>
 										</div>
-										<div class="col-4" v-if="clickedClassData.avgTemp">
+
+										<div class="col-4" v-if="clickedClassData.moons">
 											<div class="key-data">
-												<span class="heading">Surface Temp</span>
-												<span class="label-color">{{ clickedClassData.avgTemp }}</span> °C
-											</div>
-										</div>
-										<div class="col-4" v-if="clickedClassData.mass && clickedClassData.massValue">
-											<div class="key-data">
-												<span class="heading">Mass</span>
-												<span class="label-color">
-													{{ clickedClassData.mass.massValue.toFixed(2) }}
-													<span style="text-transform: none">x</span> 10<sup
-														>{{ clickedClassData.mass.massExponent }}</sup
-													>
-												</span>
-												kg
+												<span class="heading">Moons</span>
+												<span class="label-color">{{ clickedClassData.moons.length }}</span>
 											</div>
 										</div>
 										<div class="col-4" v-if="clickedClassData.moonGroup">
 											<div class="key-data">
 												<span class="heading">Moon Group</span>
 												<span class="label-color">{{ clickedClassData.moonGroup }}</span>
+											</div>
+										</div>
+
+										<div class="col-4" v-if="clickedClassData.avgTemp">
+											<div class="key-data">
+												<span class="heading">Surface Temp</span>
+												<span class="label-color">{{ clickedClassData.avgTemp }}</span> <sub>°C</sub>
 											</div>
 										</div>
 									</div>
@@ -211,14 +206,20 @@
 																@click="updateEntity(moon)"
 															>
 																<th scope="row"><span>{{ moon.displayName }}</span></th>
-																<td>{{ distanceConverter(moon.semimajorAxis) }}</td>
-																<td>{{ valueWithCommas(valueToFixedFloatingPoints(moon.meanRadius)) }} km</td>
+																<td>
+																	{{ distanceConverter(moon.semimajorAxis).value }}
+																	<sub>{{ distanceConverter(moon.semimajorAxis).unit }}</sub>
+																</td>
+																<td>
+																	{{ distanceConverter(moon.meanRadius).value }}
+																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
+																</td>
 																<td>
 																	<template v-if="moon.mass">
 																		{{ valueToFixedFloatingPoints(moon.mass.massValue) }} x 10<sup
 																			>{{ moon.mass.massExponent }}</sup
 																		>
-																		kg
+																		<sub>kg</sub>
 																	</template>
 																</td>
 															</tr>
@@ -252,20 +253,29 @@
 														{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
 															>{{ clickedClassData.mass.massExponent }}</sup
 														>
-														kg
+														<sub>kg</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.semimajorAxis">
 													<td>Semi-Major Axis</td>
-													<td>{{ distanceConverter(clickedClassData.semimajorAxis) }}</td>
+													<td>
+														{{ distanceConverter(clickedClassData.semimajorAxis).value }}
+														<sub>{{ distanceConverter(clickedClassData.semimajorAxis).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.perihelion">
 													<td>{{ namePeriapsis }}</td>
-													<td>{{ distanceConverter(clickedClassData.perihelion) }}</td>
+													<td>
+														{{ distanceConverter(clickedClassData.perihelion).value }}
+														<sub>{{ distanceConverter(clickedClassData.perihelion).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.aphelion">
 													<td>{{ nameApoapsis }}</td>
-													<td>{{ distanceConverter(clickedClassData.aphelion) }}</td>
+													<td>
+														{{ distanceConverter(clickedClassData.aphelion).value }}
+														<sub>{{ distanceConverter(clickedClassData.aphelion).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.eccentricity">
 													<td>Eccentricity</td>
@@ -277,19 +287,31 @@
 												</tr>
 												<tr v-if="clickedClassData.diameter">
 													<td>Mean Diameter</td>
-													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.diameter)) }} km</td>
+													<td>
+														{{ distanceConverter(clickedClassData.sideralOrbit).value }}
+														<sub>{{ distanceConverter(clickedClassData.sideralOrbit).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.meanRadius">
 													<td>Mean Radius</td>
-													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.meanRadius)) }} km</td>
+													<td>
+														{{ distanceConverter(clickedClassData.meanRadius).value }}
+														<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.equaRadius">
 													<td>Equatorial Radius</td>
-													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.equaRadius)) }} km</td>
+													<td>
+														{{ distanceConverter(clickedClassData.equaRadius).value }}
+														<sub>{{ distanceConverter(clickedClassData.equaRadius).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.polarRadius">
 													<td>Polar Radius</td>
-													<td>{{ valueWithCommas(valueToFixedFloatingPoints(clickedClassData.polarRadius)) }} km</td>
+													<td>
+														{{ distanceConverter(clickedClassData.polarRadius).value }}
+														<sub>{{ distanceConverter(clickedClassData.polarRadius).unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.axialTilt">
 													<td>Axial Tilt</td>
@@ -297,11 +319,17 @@
 												</tr>
 												<tr v-if="clickedClassData.sideralOrbit">
 													<td>Sideral Orbit</td>
-													<td>{{ timeConversion(clickedClassData.sideralOrbit, 'days') }}</td>
+													<td>
+														{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}
+														<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+													</td>
 												</tr>
 												<tr v-if="clickedClassData.sideralRotation">
 													<td>Sideral Rotation</td>
-													<td>{{ timeConversion(clickedClassData.sideralRotation, 'hours') }}</td>
+													<td>
+														{{ timeConversion(clickedClassData.sideralRotation, 'hours').value }}
+														<sub>{{ timeConversion(clickedClassData.sideralRotation, 'hours').unit }}</sub>
+													</td>
 												</tr>
 
 												<tr v-if="clickedClassData.meanAnomaly">

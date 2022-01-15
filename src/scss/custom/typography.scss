@@ -59,6 +59,11 @@ a {
 	}
 }
 
+sub {
+	position: static;
+	font-size: max(0.75em, 14px);
+}
+
 .text-system-color {
 	color: var(--system-color);
 }

@@ -222,12 +222,6 @@ fetch('./solarSystemData.json')
 			generateMoonClasses(orrery.classes._asteroids[asteroid.id]);
 		}
 
-		// orrery.bodies._moons.forEach((moon) => {
-		// 	const parentEntity = orrery.classes._all[moon.aroundPlanet.planet];
-		// 	orrery.classes._moons[moon.id] = new Moon(moon, parentEntity);
-		// 	orrery.classes._all[moon.id] = orrery.classes._moons[moon.id];
-		// });
-
 		scene.add(skybox(skyboxTexturePaths));
 
 		// MESH BUILDING
@@ -277,22 +271,20 @@ fetch('./solarSystemData.json')
 					}
 				},
 
-				parentEntity() {
-					if (!this.clickedClass) return null;
-					return this.clickedClass.planetClass || null;
-				},
-
 				distanceFromParentEntity() {
 					// to be in km or AU depending on amount
-					const parentEntity = this.parentEntity ? this.parentEntity.data.displayName : 'Sun';
+					const parentEntity = this.clickedClassData.aroundPlanet
+						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
+						: 'Sun';
 
 					if (!this.clickedClassData.semimajorAxis) {
 						console.warn('Semi-Major Axis required.');
 						return;
 					}
-					return `<span class="label-color">${
-						this.distanceConverter(this.clickedClassData.semimajorAxis, true).value
-					}</span> ${this.distanceConverter(this.clickedClassData.semimajorAxis, true).unit} from ${parentEntity}`;
+					return {
+						value: this.distanceConverter(this.clickedClassData.semimajorAxis, true).value,
+						unit: `${this.distanceConverter(this.clickedClassData.semimajorAxis, true).unit} from ${parentEntity}`
+					};
 				},
 
 				moonGroups() {
@@ -335,7 +327,7 @@ fetch('./solarSystemData.json')
 					return parseFloat(distanceNumber[0] + floatingPoints);
 				},
 
-				distanceConverter(value, unitIncludedSeparately) {
+				distanceConverter(value) {
 					if (!value) {
 						console.warn('Distance required.');
 						return {};
@@ -343,18 +335,11 @@ fetch('./solarSystemData.json')
 					// convert from km to AU if distance more than 0.66 AU
 					const kmToAUThreshold = 149598000;
 					const isClose = value < kmToAUThreshold / 2;
-					const returnedUnit = isClose ? 'km' : 'AU';
 
-					if (unitIncludedSeparately) {
-						return {
-							value: this.valueWithCommas(this.valueToFixedFloatingPoints(isClose ? value : this.convertToAU(value))),
-							unit: returnedUnit
-						};
-					} else {
-						return `${this.valueWithCommas(
-							this.valueToFixedFloatingPoints(isClose ? value : this.convertToAU(value))
-						)} ${returnedUnit}`;
-					}
+					return {
+						value: this.valueWithCommas(this.valueToFixedFloatingPoints(isClose ? value : this.convertToAU(value))),
+						unit: isClose ? 'km' : 'AU'
+					};
 				},
 
 				// data from the API is in hours OR days
@@ -373,14 +358,23 @@ fetch('./solarSystemData.json')
 						const convertedYears = value / 365.256 / 24;
 						if (value < 48) {
 							const hours = this.valueToFixedFloatingPoints(convertedHours);
-							return `${this.valueWithCommas(hours)} Earth ${this.pluralise('hour', hours)}`;
+							return {
+								value: this.valueWithCommas(hours),
+								unit: `Earth ${this.pluralise('hour', hours)}`
+							};
 						}
 						if (value < 7200) {
 							const days = this.valueToFixedFloatingPoints(convertedDays);
-							return `${this.valueWithCommas(days)} Earth ${this.pluralise('day', days)}`;
+							return {
+								value: this.valueWithCommas(days),
+								unit: `Earth ${this.pluralise('day', days)}`
+							};
 						}
 						const years = this.valueToFixedFloatingPoints(convertedYears);
-						return `${this.valueWithCommas(years)} Earth ${this.pluralise('year', years)}`;
+						return {
+							value: this.valueWithCommas(years),
+							unit: `Earth ${this.pluralise('year', years)}`
+						};
 					}
 					if (unit === 'days') {
 						const convertedHours = value * 24;
@@ -388,14 +382,23 @@ fetch('./solarSystemData.json')
 						const convertedYears = value / 365.256;
 						if (value < 2) {
 							const hours = this.valueToFixedFloatingPoints(convertedHours);
-							return `${this.valueWithCommas(hours)} Earth ${this.pluralise('hour', hours)}`;
+							return {
+								value: this.valueWithCommas(hours),
+								unit: `Earth ${this.pluralise('hour', hours)}`
+							};
 						}
 						if (value < 320) {
 							const days = this.valueToFixedFloatingPoints(convertedDays);
-							return `${this.valueWithCommas(days)} Earth ${this.pluralise('day', days)}`;
+							return {
+								value: this.valueWithCommas(days),
+								unit: `Earth ${this.pluralise('day', days)}`
+							};
 						}
 						const years = this.valueToFixedFloatingPoints(convertedYears);
-						return `${this.valueWithCommas(years)} Earth ${this.pluralise('year', years)}`;
+						return {
+							value: this.valueWithCommas(years),
+							unit: `Earth ${this.pluralise('year', years)}`
+						};
 					}
 				},
 
