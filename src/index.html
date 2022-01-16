@@ -48,7 +48,7 @@
 							</div>
 
 							<div class="col-1 col-md-3">
-								<div class="search-desktop" :class="{'active': searchQuery && searchLoaded}">
+								<div class="search-desktop" :class="{'active': searchResults}">
 									<button type="button" class="btn btn-rounded d-lg-none" @click="showOrHideMobileSearch">
 										<i class="fas fa-search"></i>
 									</button>
@@ -59,7 +59,6 @@
 											type="seach"
 											placeholder="Search"
 											v-model="searchQuery"
-											@keyup="updateSearch"
 											@keyup.enter="updateZoomTarget(searchResults[0].index)"
 										/>
 									</div>
@@ -77,18 +76,17 @@
 							placeholder="Search"
 							v-model="searchQuery"
 							:class="{'active': showSearchMobile}"
-							@keyup="updateSearch"
 							@keyup.enter="updateZoomTarget(searchResults[0].index)"
 						/>
 						<!-- TODO: Get links working and remove the '.prevent' -->
-						<div class="search-dropdown" :class="{'active': searchLoaded && searchQuery}">
+						<div class="search-dropdown" :class="{'active': searchResults}">
 							<ul>
 								<li v-for="(result, i) in searchResults">
 									<a :href="'/#/' + result.id" @click.prevent="updateZoomTarget(result.index)">
 										<span v-html="result.displayName"></span> <sub class="text-type">{{ result.type }}</sub>
 									</a>
 								</li>
-								<li v-if="!searchResults.length">
+								<li v-if="searchResults && !searchResults.length">
 									<span class="no-results">No results found.</span>
 								</li>
 							</ul>
@@ -160,7 +158,7 @@
 								</div>
 							</div>
 							<div class="content-container order-lg-4">
-								<section class="content content-desc" v-if="tabGroup === 'tab-desc'">
+								<section class="content content-desc" v-show="tabGroup === 'tab-desc'">
 									<div
 										class="content-wrapper container-fluid container-extra-gutter"
 										:class="{ 'loaded': clickedClassData.description.hasLoaded }"
@@ -207,7 +205,7 @@
 									</div>
 								</section>
 
-								<section class="content content-system" v-if="tabGroup === 'tab-system'">
+								<section class="content content-system" v-show="tabGroup === 'tab-system'">
 									<div class="content-wrapper container-fluid">
 										<table>
 											<tbody>
@@ -282,7 +280,7 @@
 									</div>
 								</section>
 
-								<section class="content content-stats" v-if="tabGroup === 'tab-stats'">
+								<section class="content content-stats" v-show="tabGroup === 'tab-stats'">
 									<div class="content-wrapper container-fluid container-extra-gutter">
 										<table>
 											<tbody>
@@ -406,7 +404,7 @@
 									</div>
 								</section>
 
-								<section class="content content-media" v-if="tabGroup === 'tab-media'">
+								<section class="content content-media" v-show="tabGroup === 'tab-media'">
 									<div
 										class="content-wrapper container-fluid container-extra-gutter text-center"
 										:class="{ 'loaded': clickedClassData.media.hasLoaded }"

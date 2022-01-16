@@ -230,7 +230,6 @@ fetch('./solarSystemData.json')
 			el: orrery.vueTarget,
 			data: {
 				searchQuery: '',
-				searchResults: [],
 				navigationSystems: settings.navigationSystems,
 				navigationEntities: settings.navigationEntities,
 				searchLoaded: false,
@@ -297,6 +296,44 @@ fetch('./solarSystemData.json')
 							moons
 						};
 					});
+				},
+
+				searchResults() {
+					if (!this.searchQuery) return null;
+
+					// filter the _all based on the 'searchQuery'
+					const filteredResults = orrery.bodies._all.filter((item) =>
+						item.displayName.toLowerCase().includes(this.searchQuery.toLowerCase())
+					);
+
+					// splitting the results by Type, then recombining into the final Search Results
+					const sortedResults = filteredResults
+						.sort((a, b) => {
+							if (a.type === 'Star' || b.type === 'Star') return a.type === 'Star' ? -1 : 1;
+							else if (a.type === 'Planet' || b.type === 'Planet') return a.type === 'Planet' ? -1 : 1;
+							else if (a.type === 'Dwarf Planet' || b.type === 'Dwarf Planet')
+								return a.type === 'Dwarf Planet' ? -1 : 1;
+							else if (a.type === 'Comet' || b.type === 'Comet') return a.type === 'Comet' ? -1 : 1;
+							else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
+							else if (a.type === 'Moon' || b.type === 'Moon') {
+								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
+								return a.type === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
+							} else return -1;
+						})
+						.map((result) => {
+							return {
+								id: result.id,
+								index: this.navigationEntities.indexOf(result.id),
+								displayName: this.highlightMatchSubstring(result.displayName),
+								type: result.type,
+								system: result.system
+							};
+						})
+						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
+
+					return sortedResults;
+				}
+			},
 				}
 			},
 			methods: {
@@ -361,7 +398,8 @@ fetch('./solarSystemData.json')
 								unit: `Earth ${this.pluralise('hour', hours)}`
 							};
 						}
-						if (value < 7200) {
+						// 320 days
+						if (value < 7680) {
 							const days = this.valueToFixedFloatingPoints(convertedDays);
 							return {
 								value: this.valueWithCommas(days),
@@ -673,7 +711,6 @@ fetch('./solarSystemData.json')
 
 				resetSearch() {
 					this.searchQuery = '';
-					this.searchResults.splice(0);
 				},
 
 				showOrHideMobileSearch() {
