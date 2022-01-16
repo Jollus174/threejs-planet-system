@@ -163,7 +163,8 @@ class OrbitLine {
 class Entity {
 	constructor(data) {
 		this.data = data;
-		this.labelLink = document.createElement('a');
+		// this.labelLink = document.createElement('a');
+		this.labelLink = document.createElement('span');
 		this.labelGroup = new THREE.Group({ name: `${this.data.id} group label` });
 		this.meshGroup = new THREE.Group({ name: `${this.data.id} mesh group` });
 		this.fadingIn = false;
@@ -201,7 +202,7 @@ class Entity {
 			.join(' ')
 			.trim();
 
-		this.labelLink.href = `/#/${this.data.id}`;
+		// this.labelLink.href = `/#/${this.data.id}`;
 		this.labelLink.className = `label behind-label ${entityTypeClasses}`;
 		this.labelLink.dataset.selector = 'label';
 		this.labelLink.style.color = this.data.labelColour;
@@ -255,7 +256,8 @@ class Entity {
 
 	setListeners() {
 		this.labelLink.addEventListener('pointerdown', () => {
-			window.location = this.labelLink.href; // OrbitControls eats the native click events :(
+			// TODO: turning this off for now since it breaks on deployed build
+			// window.location = this.labelLink.href; // OrbitControls eats the native click events :(
 			document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: this }));
 		});
 

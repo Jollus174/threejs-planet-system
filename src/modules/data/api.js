@@ -359,7 +359,7 @@ const sortData = (data) => {
 
 			if (['prometheus', 'daphnis', 'pan', 'janus', 'epimetheus', 'atlas', 'pandora'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Shepherd Moons';
-				item.moonGroupColor = '#5e2129';
+				item.moonGroupColor = '#ff6075';
 			}
 			if (['tethys', 'telesto', 'calypso'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Tethys';
@@ -404,12 +404,12 @@ const sortData = (data) => {
 				].indexOf(item.id) !== -1
 			) {
 				item.moonGroup = 'Inner';
-				item.moonGroupColor = '#cf3476';
+				item.moonGroupColor = '#ff4c98';
 			}
 
 			if (['ariel', 'miranda', 'umbriel', 'titania', 'oberon'].indexOf(item.id) !== -1) {
 				item.moonGroup = 'Major';
-				item.moonGroupColor = '#633a34';
+				item.moonGroupColor = '#ff8b7b';
 			}
 
 			if (
@@ -501,14 +501,14 @@ const sortData = (data) => {
 
 	// TODO: sort this out later, assign a 'moonGroup index' to keep track of order better
 	const moons = orrery.bodies.types._moon;
-	moons.forEach((moon) => {
+	for (const moon of moons) {
 		moon.isMajorMoon = majorMoons.indexOf(moon.displayName) !== -1;
 		moon.isInnerMoon = innerMoons.indexOf(moon.displayName) !== -1;
 		moon.isOuterMoon = !moon.isMajorMoon && !moon.isInnerMoon;
 		moon.materialData = materialData[moon.id] || null;
 		moon.startingPosition = new Vector3();
 		moon.startingPosition.copy(startingOrbitPosition(moon));
-	});
+	}
 
 	// assigning proper moon data to each entity, rather than just the ID that the API provides
 	const setMoonsToDataEntity = (entity) => {
@@ -528,15 +528,13 @@ const sortData = (data) => {
 		setMoonsToDataEntity(dwarfPlanet);
 	}
 
-	// const asteroids = asteroidsList.map((asteroid) =>
-	// 	orrery.bodies._all.find((item) => item.displayName.includes(asteroid))
-	// );
-	// asteroids.forEach((asteroid) => {
-	// 	asteroid.labelColour = settings.planetColours.default;
-	// 	asteroid.type = 'Asteroid';
-	// 	asteroid.startingPosition = new Vector3();
-	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
-	// });
+	const asteroids = orrery.bodies.types._asteroid;
+	for (const asteroid of asteroids) {
+		asteroid.labelColour = settings.planetColours.default;
+		asteroid.type = 'Asteroid';
+		asteroid.startingPosition = new Vector3();
+		asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
+	}
 
 	const planets = orrery.bodies.types._planet;
 	for (const planet of planets) {
@@ -568,8 +566,8 @@ const sortData = (data) => {
 		sun,
 		moons,
 		dwarfPlanets,
-		planets
-		// asteroids
+		planets,
+		asteroids
 	};
 };
 

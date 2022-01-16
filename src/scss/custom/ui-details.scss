@@ -8,11 +8,59 @@
 		justify-content: flex-end;
 	}
 
-	.col-ui-details {
+	.sidebar-ui-details {
 		@include media-breakpoint-up(lg) {
 			position: absolute;
 			height: 100%;
 			min-width: 600px;
+		}
+	}
+
+	.btn-close-sidebar {
+		opacity: 0.9;
+		position: absolute;
+		top: 0;
+		right: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: all;
+		background-color: rgba($black, 0.75);
+		padding: 6px;
+		width: 32px;
+		height: 32px;
+		border-radius: 0;
+		transition: opacity 0.2s ease;
+
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+
+		img {
+			width: 100%;
+		}
+	}
+
+	.btn-show-details {
+		opacity: 0.75;
+		position: absolute;
+		bottom: 30px;
+		left: 50%;
+		transform: translateX(-50%);
+		color: var(--entity-color);
+		pointer-events: all;
+		padding: 3px 10px;
+		border-color: currentColor;
+		font-weight: 600;
+		text-transform: uppercase;
+		border-radius: 0;
+		transition: opacity 0.2s ease;
+
+		&:hover,
+		&:focus,
+		&:active {
+			opacity: 1;
 		}
 	}
 
@@ -34,10 +82,10 @@
 		text-transform: uppercase;
 		margin-top: 8px;
 
-		.title-wrapper {
-			display: flex;
-			align-items: flex-end;
-		}
+		// .title-wrapper {
+		// 	display: flex;
+		// 	align-items: flex-end;
+		// }
 
 		.h3 {
 			margin: 0;
@@ -47,6 +95,7 @@
 
 		.text-type {
 			margin-left: 5px;
+			display: inline-block;
 		}
 
 		.btn {
@@ -61,10 +110,14 @@
 
 		.key-data {
 			border-left: solid 2px var(--entity-color);
-			margin-bottom: 10px;
+			margin-bottom: 5px;
 			padding-left: 10px;
 			line-height: 1.1;
 			text-transform: uppercase;
+
+			@include media-breakpoint-up(md) {
+				margin-bottom: 10px;
+			}
 		}
 
 		.heading {
@@ -85,6 +138,10 @@
 
 		.btn-group {
 			width: 100%;
+
+			@include media-breakpoint-up(lg) {
+				margin-bottom: 1.5rem;
+			}
 
 			.btn {
 				padding-top: 10px;
@@ -145,7 +202,6 @@
 	.content {
 		height: 100%;
 		font-size: 18px;
-		line-height: 1.7;
 	}
 
 	.spinner-border-container {
@@ -162,12 +218,14 @@
 
 	.content-wrapper {
 		position: relative;
-		padding-top: 1.5rem;
+		padding-top: 0.5rem;
 		padding-bottom: 1.5rem;
 		min-height: 100%;
 	}
 
 	.content-desc {
+		line-height: 1.7;
+
 		.content-wrapper {
 			overflow: hidden;
 			max-height: 100%;
@@ -210,6 +268,7 @@
 		}
 
 		.td-wrapper {
+			padding-top: 0;
 			padding-left: 9px;
 			padding-right: 0;
 
@@ -235,15 +294,15 @@
 				}
 
 				&::before {
+					opacity: 0.75;
 					position: absolute;
 					left: -19px;
-					opacity: 0.75;
 					overflow: hidden;
-					writing-mode: vertical-rl;
 					transform: rotate(180deg);
-					padding-top: 20px;
 					height: 100%;
-					font-size: 11px;
+					padding-top: 20px;
+					writing-mode: vertical-rl;
+					font-size: 13px;
 					font-weight: 600;
 					letter-spacing: 0.2em;
 					text-align: right;

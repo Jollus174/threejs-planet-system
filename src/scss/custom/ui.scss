@@ -8,16 +8,6 @@
 	pointer-events: none;
 	z-index: $z-ui;
 
-	.ui-top {
-		padding-top: 15px;
-		padding-bottom: 15px;
-		pointer-events: all;
-
-		> .row {
-			align-items: center;
-		}
-	}
-
 	.ui-bottom-bar {
 		pointer-events: all;
 		background-color: #111;
@@ -31,13 +21,6 @@
 .badge {
 	background-color: $white;
 	border-radius: 20px;
-}
-
-hr {
-	opacity: 1;
-	border: 0;
-	background: url(/img/dotted-line-circle.svg) repeat-x 2px center;
-	padding: 10px;
 }
 
 .container-extra-gutter {

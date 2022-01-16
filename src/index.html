@@ -32,10 +32,10 @@
 			</div>
 
 			<div class="ui">
-				<div class="ui-top col-md-6 offset-md-3">
-					<div class="container-fluid">
+				<div class="ui-top">
+					<div class="container-ui-top container-fluid">
 						<div class="row">
-							<div class="col">
+							<div class="col-10 offset-1 col-md-6 offset-md-3">
 								<div class="system-container">
 									<button type="button" class="btn btn-rounded" @click="goToPreviousSystem()">
 										<i class="fas fa-angle-left"></i>
@@ -46,11 +46,56 @@
 									</button>
 								</div>
 							</div>
+
+							<div class="col-1 col-md-3">
+								<div class="search-desktop" :class="{'active': searchQuery && searchLoaded}">
+									<button type="button" class="btn btn-rounded d-lg-none" @click="showOrHideMobileSearch">
+										<i class="fas fa-search"></i>
+									</button>
+									<div id="search" class="search d-none d-lg-block">
+										<i class="fas fa-search"></i>
+										<input
+											class="form-control input-search"
+											type="seach"
+											placeholder="Search"
+											v-model="searchQuery"
+											@keyup="updateSearch"
+											@keyup.enter="updateZoomTarget(searchResults[0].index)"
+										/>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="ui-details" v-if="clickedClassData">
-					<aside class="col-ui-details">
+				<div class="ui-details">
+					<div id="search-results-mobile" class="search-results">
+						<input
+							id="input-search-mobile"
+							class="d-lg-none form-control input-search-mobile"
+							type="seach"
+							placeholder="Search"
+							v-model="searchQuery"
+							:class="{'active': showSearchMobile}"
+							@keyup="updateSearch"
+							@keyup.enter="updateZoomTarget(searchResults[0].index)"
+						/>
+						<!-- TODO: Get links working and remove the '.prevent' -->
+						<div class="search-dropdown" :class="{'active': searchLoaded && searchQuery}">
+							<ul>
+								<li v-for="(result, i) in searchResults">
+									<a :href="'/#/' + result.id" @click.prevent="updateZoomTarget(result.index)">
+										<span v-html="result.displayName"></span> <sub class="text-type">{{ result.type }}</sub>
+									</a>
+								</li>
+								<li v-if="!searchResults.length">
+									<span class="no-results">No results found.</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<aside id="sidebar-ui-details" class="sidebar-ui-details" v-if="sidebarOpen">
 						<div class="ui-details-container">
 							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
 							<div class="title-container">
@@ -92,13 +137,13 @@
 											</div>
 										</div>
 
-										<div class="col-4" v-if="clickedClassData.moons">
+										<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
 											<div class="key-data">
 												<span class="heading">Moons</span>
 												<span class="label-color">{{ clickedClassData.moons.length }}</span>
 											</div>
 										</div>
-										<div class="col-4" v-if="clickedClassData.moonGroup">
+										<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
 											<div class="key-data">
 												<span class="heading">Moon Group</span>
 												<span class="label-color">{{ clickedClassData.moonGroup }}</span>
@@ -195,7 +240,7 @@
 																<th class="item-key">Moons</th>
 																<th class="item-key">Distance</th>
 																<th class="item-key">Radius</th>
-																<th class="item-key">Mass</th>
+																<th class="item-key d-none d-md-table-cell">Mass</th>
 															</tr>
 														</thead>
 														<tbody
@@ -220,7 +265,7 @@
 																	{{ distanceConverter(moon.meanRadius).value }}
 																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
 																</td>
-																<td>
+																<td class="d-none d-md-table-cell">
 																	<template v-if="moon.mass">
 																		{{ valueToFixedFloatingPoints(moon.mass.massValue) }} x 10<sup
 																			>{{ moon.mass.massExponent }}</sup
@@ -251,11 +296,11 @@
 												</tr>
 												<tr v-if="clickedClassData.avgTemp">
 													<td>Surface Temp</td>
-													<td>{{ clickedClassData.avgTemp }} °C</td>
+													<td class="text-nowrap">{{ clickedClassData.avgTemp }} °C</td>
 												</tr>
 												<tr v-if="clickedClassData.mass.massValue">
 													<td>Mass</td>
-													<td>
+													<td class="text-nowrap">
 														{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
 															>{{ clickedClassData.mass.massExponent }}</sup
 														>
@@ -264,75 +309,75 @@
 												</tr>
 												<tr v-if="clickedClassData.semimajorAxis">
 													<td>Semi-Major Axis</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.semimajorAxis).value }}
 														<sub>{{ distanceConverter(clickedClassData.semimajorAxis).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.perihelion">
 													<td>{{ namePeriapsis }}</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.perihelion).value }}
 														<sub>{{ distanceConverter(clickedClassData.perihelion).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.aphelion">
 													<td>{{ nameApoapsis }}</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.aphelion).value }}
 														<sub>{{ distanceConverter(clickedClassData.aphelion).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.eccentricity">
 													<td>Eccentricity</td>
-													<td>{{ clickedClassData.eccentricity }}</td>
+													<td class="text-nowrap">{{ clickedClassData.eccentricity }}</td>
 												</tr>
 												<tr v-if="clickedClassData.inclination">
 													<td>Inclination</td>
-													<td>{{ clickedClassData.inclination }} °</td>
+													<td class="text-nowrap">{{ clickedClassData.inclination }} °</td>
 												</tr>
 												<tr v-if="clickedClassData.diameter">
 													<td>Mean Diameter</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.sideralOrbit).value }}
 														<sub>{{ distanceConverter(clickedClassData.sideralOrbit).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.meanRadius">
 													<td>Mean Radius</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.meanRadius).value }}
 														<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.equaRadius">
 													<td>Equatorial Radius</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.equaRadius).value }}
 														<sub>{{ distanceConverter(clickedClassData.equaRadius).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.polarRadius">
 													<td>Polar Radius</td>
-													<td>
+													<td class="text-nowrap">
 														{{ distanceConverter(clickedClassData.polarRadius).value }}
 														<sub>{{ distanceConverter(clickedClassData.polarRadius).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.axialTilt">
 													<td>Axial Tilt</td>
-													<td>{{ valueToFixedFloatingPoints(clickedClassData.axialTilt) }} °</td>
+													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.axialTilt) }} °</td>
 												</tr>
 												<tr v-if="clickedClassData.sideralOrbit">
 													<td>Sideral Orbit</td>
-													<td>
+													<td class="text-nowrap">
 														{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}
 														<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.sideralRotation">
 													<td>Sideral Rotation</td>
-													<td>
+													<td class="text-nowrap">
 														{{ timeConversion(clickedClassData.sideralRotation, 'hours').value }}
 														<sub>{{ timeConversion(clickedClassData.sideralRotation, 'hours').unit }}</sub>
 													</td>
@@ -340,19 +385,21 @@
 
 												<tr v-if="clickedClassData.meanAnomaly">
 													<td>Mean Anomaly</td>
-													<td>{{ valueToFixedFloatingPoints(clickedClassData.meanAnomaly) }} °</td>
+													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.meanAnomaly) }} °</td>
 												</tr>
 												<tr v-if="clickedClassData.argPeriapsis">
 													<td>Argument of {{namePeriapsis}}</td>
-													<td>{{ valueToFixedFloatingPoints(clickedClassData.argPeriapsis) }} °</td>
+													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.argPeriapsis) }} °</td>
 												</tr>
 												<tr v-if="clickedClassData.longAscNode">
 													<td>Longitude of Ascending Node</td>
-													<td>{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °</td>
+													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °</td>
 												</tr>
 												<tr v-if="clickedClassData.longOfPeriapsis">
 													<td>Longitude of {{namePeriapsis}}</td>
-													<td>{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °</td>
+													<td class="text-nowrap">
+														{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °
+													</td>
 												</tr>
 											</tbody>
 										</table>
@@ -466,6 +513,18 @@
 							</div>
 						</div>
 					</aside>
+					<button class="btn btn-close-sidebar" v-if="sidebarOpen" @click="sidebarOpen = false">
+						<img src="/img/icon-close.svg" />
+					</button>
+
+					<button
+						class="btn btn-show-details"
+						v-if="clickedClassData"
+						v-show="!sidebarOpen"
+						@click="sidebarOpen = true"
+					>
+						Info
+					</button>
 				</div>
 				<div class="ui-bottom-bar">
 					<div class="container-fluid">
@@ -489,36 +548,7 @@
 
 							<div class="col"></div>
 
-							<div class="col-2 col-lg-3">
-								<div class="search-container" :class="{'active': searchQuery && searchLoaded}">
-									<button type="button" class="btn btn-rounded d-lg-none">
-										<i class="fas fa-search"></i>
-									</button>
-									<div id="search" class="search d-none d-lg-block">
-										<i class="fas fa-search"></i>
-										<input
-											class="form-control"
-											type="seach"
-											placeholder="Search"
-											v-model="searchQuery"
-											@keyup="updateSearch"
-											@keyup.enter="updateZoomTarget(searchResults[0].index)"
-										/>
-										<div class="search-dropdown" v-if="searchLoaded">
-											<ul>
-												<li v-for="(result, i) in searchResults">
-													<a :href="'/#/' + result.id" @click="updateZoomTarget(result.index)">
-														<span v-html="result.displayName"></span> <span class="text-type">{{ result.type }}</span>
-													</a>
-												</li>
-												<li v-if="!searchResults.length">
-													<span class="no-results">No results found.</span>
-												</li>
-											</ul>
-										</div>
-									</div>
-								</div>
-							</div>
+							<div class="col-2 col-lg-3"></div>
 						</div>
 					</div>
 				</div>

@@ -1,4 +1,12 @@
 .ui-top {
+	padding-top: 8px;
+	padding-bottom: 8px;
+
+	.container-ui-top {
+		pointer-events: all;
+		align-items: center;
+	}
+
 	.system-container {
 		display: flex;
 		align-items: center;

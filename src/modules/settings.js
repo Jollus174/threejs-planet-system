@@ -37,7 +37,7 @@ const settings = {
 		jupiter: '#e0ab79',
 		saturn: '#ffe577',
 		uranus: '#c8ecef',
-		neptune: '#4793ff',
+		neptune: '#94c0ff',
 		io: '#cab852',
 		europa: '#f2e3ce',
 		ganymede: '#c4c3be',
@@ -67,10 +67,7 @@ const settings = {
 		'gonggong',
 		'quaoar'
 	],
-	navigationEntities: [], // hydrated by API
-	content: {
-		mediaTotal: 15 // TODO: move this
-	}
+	navigationEntities: [] // hydrated by API
 };
 
 export { settings };

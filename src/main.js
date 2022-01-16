@@ -1,6 +1,5 @@
 'use strict';
 import './scss/styles.scss';
-import './node_modules/vue-it-bigger/dist/vue-it-bigger.min.css';
 
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
@@ -10,7 +9,6 @@ import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo, checkIfDesktop, kmToAU, AUToKm, convertToCamelCase, randomString } from './modules/utils';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { setOrbitVisibility } from './modules/objectProps';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
@@ -29,8 +27,6 @@ let delta;
 
 window.renderer = renderer;
 
-const orbitCentroid = new THREE.Object3D();
-orbitCentroid.name = 'orbit centroid';
 const clock = new THREE.Clock();
 const vectorPosition = new THREE.Vector3();
 
@@ -238,14 +234,16 @@ fetch('./solarSystemData.json')
 				navigationSystems: settings.navigationSystems,
 				navigationEntities: settings.navigationEntities,
 				searchLoaded: false,
+				showSearchMobile: false,
 				bottomBar: {},
+				sidebarOpen: false,
 				clickedClassData: null,
 				zoomedClassData: null,
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
 				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				tabGroup: 'tab-desc'
+				tabGroup: 'tab-system'
 			},
 			computed: {
 				nameApoapsis() {
@@ -450,7 +448,7 @@ fetch('./solarSystemData.json')
 							formattedContent = formattedContent.replace('<span></span>', '');
 							// removing everything in parentheses since it's usually junk
 							formattedContent = formattedContent.replace(/ *\([^)]*\) */g, ' ');
-							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',');
+							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',').replace(',,', ',');
 						}
 
 						if (content.thumbnail) {
@@ -470,7 +468,7 @@ fetch('./solarSystemData.json')
 					const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
 					const queryParams = [
 						['page', pageNumber || '0'],
-						['per_page', settings.content.mediaTotal],
+						['per_page', '18'],
 						['order', 'created_at+desc'],
 						['href_query_params', 'category%3Dplanets_jupiter'],
 						['search', key],
@@ -522,9 +520,7 @@ fetch('./solarSystemData.json')
 							item.detail_image = `https://solarsystem.nasa.gov${item.detail_image}`;
 							item.link = `https://solarsystem.nasa.gov${item.link}`;
 							media.items.push(item);
-						}
 
-						for (const item of media.items) {
 							const formattedDetails = item.short_description
 								// splitting desc by paragraphs so can work with it
 								// removing paragraphs with links back to NASA's FAQs and such, looks weird
@@ -576,24 +572,24 @@ fetch('./solarSystemData.json')
 					this.searchResults.splice(0); // clear previous set of results
 
 					// filter the _all based on the 'searchQuery'
-					const filteredResults = Object.values(orrery.classes._all)
-						.filter((item) => item.data.displayName.toLowerCase().includes(this.searchQuery.toLowerCase()))
-						.map((result) => result.data);
+					const filteredResults = orrery.bodies._all.filter((item) =>
+						item.displayName.toLowerCase().includes(this.searchQuery.toLowerCase())
+					);
 
 					// splitting the results by Type, then recombining into the final Search Results
-					const stars = filteredResults.filter((r) => r.type === 'Star');
-					const planets = filteredResults.filter((r) => r.type === 'Planet');
-					const dwarfPlanets = filteredResults.filter((r) => r.type === 'Dwarf Planet');
-					// const asteroids = filteredResults.filter((r) => r.type === 'Asteroids');
-					// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
-					const namedMoons = filteredResults.filter((r) => r.type === 'Moon' && !r.displayName.includes('S/2'));
-					const unnamedMoons = filteredResults.filter((r) => r.type === 'Moon' && r.displayName.includes('S/2'));
-					// const asteroids = filteredResults
-					// 	.filter((r) => r.type === 'Asteroid')
-					// 	.sort((a, b) => a.displayName < b.displayName);
-
-					const sortedResults = []
-						.concat(stars, planets, dwarfPlanets, namedMoons, unnamedMoons)
+					const sortedResults = filteredResults
+						.sort((a, b) => {
+							if (a.type === 'Star' || b.type === 'Star') return a.type === 'Star' ? -1 : 1;
+							else if (a.type === 'Planet' || b.type === 'Planet') return a.type === 'Planet' ? -1 : 1;
+							else if (a.type === 'Dwarf Planet' || b.type === 'Dwarf Planet')
+								return a.type === 'Dwarf Planet' ? -1 : 1;
+							else if (a.type === 'Comet' || b.type === 'Comet') return a.type === 'Comet' ? -1 : 1;
+							else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
+							else if (a.type === 'Moon' || b.type === 'Moon') {
+								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
+								return a.type === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
+							} else return -1;
+						})
 						.map((result) => {
 							return {
 								id: result.id,
@@ -603,7 +599,7 @@ fetch('./solarSystemData.json')
 								system: result.system
 							};
 						})
-						.slice(0, checkIfDesktop() ? 12 : 6); // cap the results depending on display-size for UX
+						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
 
 					this.searchResults = [...sortedResults];
 					this.$nextTick(() => {
@@ -639,6 +635,9 @@ fetch('./solarSystemData.json')
 
 				updateEntity(data) {
 					const newClickedClassData = data;
+
+					if (!this.sidebarOpen && !this.clickedClassData) this.sidebarOpen = true; // show sidebar if it's the first time an entity has been clicked
+
 					this.clickedClassData = newClickedClassData;
 					this.systemClassData = this.clickedClassData.aroundPlanet
 						? orrery.classes._all[this.clickedClassData.id].planetClass.data
@@ -677,6 +676,17 @@ fetch('./solarSystemData.json')
 					this.searchResults.splice(0);
 				},
 
+				showOrHideMobileSearch() {
+					if (!this.showSearchMobile) {
+						this.showSearchMobile = true;
+						this.$nextTick(() => {
+							document.querySelector('#input-search-mobile').focus();
+						});
+					} else {
+						this.showSearchMobile = false;
+					}
+				},
+
 				updateClickTarget(i) {
 					const clickedClass = orrery.classes._all[this.navigationEntities[i]];
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
@@ -687,14 +697,36 @@ fetch('./solarSystemData.json')
 					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();
+					this.showSearchMobile = false;
 				}
 			},
 			mounted() {
 				document.querySelector('main').prepend(labelRenderer.domElement);
 
+				// TODO: These should be moved to a JS file that sets generic listeners
 				document.addEventListener('click', (e) => {
 					if (!e.target.closest('#search')) {
 						this.resetSearch();
+					}
+
+					// if (this.showSearchMobile && !e.target.closest('#search-results-mobile')) {
+					// 	// this.showSearchMobile = false;
+					// 	console.log('close search mobile');
+					// 	console.log(e);
+					// }
+
+					// if (!e.target.closest('#sidebar-ui-details')) {
+					// 	setTimeout(() => {
+					// 		if (this.sidebarOpen) {
+					// 			this.sidebarOpen = false;
+					// 		}
+					// 	}, 1000);
+					// }
+				});
+
+				document.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
+						this.sidebarOpen = false;
 					}
 				});
 
@@ -705,6 +737,7 @@ fetch('./solarSystemData.json')
 				orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {
 					this.zoomedClassData = orrery.mouseState._zoomedClass.data;
 				});
+				// ---
 
 				labelRenderer.render(scene, orrery.camera);
 

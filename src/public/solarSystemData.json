@@ -8901,8 +8901,8 @@
 	{
 		"id": "alexhelios",
 		"name": "Alexhelios",
-		"displayName": "Moon",
-		"type": "Asteroid",
+		"displayName": "Alexhelios",
+		"type": "Moon",
 		"moons": null,
 		"semimajorAxis": 775,
 		"perihelion": 775,
