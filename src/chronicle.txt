@@ -1,1 +1,2 @@
 - ran into shader issue with logarithmic depth buffering causing shaders to simply render fully transparent objects
+- needing to use '../' instead of './' in order for Vite to build font paths correctly, or else they end up as '/assets/fonts' instead of '/fonts'
