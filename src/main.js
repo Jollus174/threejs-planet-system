@@ -232,7 +232,6 @@ fetch('./solarSystemData.json')
 				searchQuery: '',
 				navigationSystems: settings.navigationSystems,
 				navigationEntities: settings.navigationEntities,
-				searchLoaded: false,
 				showSearchMobile: false,
 				bottomBar: {},
 				sidebarOpen: false,
@@ -332,8 +331,6 @@ fetch('./solarSystemData.json')
 						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
 
 					return sortedResults;
-				}
-			},
 				}
 			},
 			methods: {
