@@ -2,8 +2,6 @@
 import { Vector2 } from 'three';
 import { orrery } from '../orrery';
 import { settings } from '../settings';
-import { controls } from '../controls';
-import { getStandardDeviation } from './../utils';
 
 const { _mouseClickTimeoutDefault } = settings.mouse;
 const mouse = new Vector2();

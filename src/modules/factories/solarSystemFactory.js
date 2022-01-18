@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
-import { createCircleTexture } from '../utils';
+import { createCircleTexture } from '../utilities/threeJS';
 
 const asteroidBelt = () => {
 	const particles = 4000;

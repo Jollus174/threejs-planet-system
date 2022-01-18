@@ -83,7 +83,7 @@
 							<ul>
 								<li v-for="(result, i) in searchResults">
 									<a :href="'/#/' + result.id" @click.prevent="updateZoomTarget(result.index)">
-										<span v-html="result.displayName"></span> <sub class="text-type">{{ result.type }}</sub>
+										<span v-html="result.displayName"></span> <sub class="text-type">{{ result.bodyType }}</sub>
 									</a>
 								</li>
 								<li v-if="searchResults && !searchResults.length">
@@ -102,7 +102,7 @@
 								</button>
 								<div class="title-wrapper">
 									<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
-									<span class="text-type">{{ clickedClassData.type }}</span>
+									<span class="text-type">{{ clickedClassData.bodyType }}</span>
 								</div>
 								<button type="button" class="btn" @click="goToNextEntity()">
 									<i class="fas fa-angle-right"></i>
@@ -111,7 +111,7 @@
 							<div class="key-data-container">
 								<div class="container-fluid">
 									<div class="row">
-										<div class="col-4" v-if="clickedClassData.type !== 'Star'">
+										<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
 											<div class="key-data">
 												<span class="heading">Distance</span>
 												<span class="label-color">{{ distanceFromParentEntity.value }}</span>
@@ -264,7 +264,7 @@
 																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
 																</td>
 																<td class="d-none d-md-table-cell">
-																	<template v-if="moon.mass">
+																	<template v-if="moon.mass && moon.mass.massValue && moon.mass.massExponent">
 																		{{ valueToFixedFloatingPoints(moon.mass.massValue) }} x 10<sup
 																			>{{ moon.mass.massExponent }}</sup
 																		>
@@ -296,7 +296,9 @@
 													<td>Surface Temp</td>
 													<td class="text-nowrap">{{ clickedClassData.avgTemp }} °C</td>
 												</tr>
-												<tr v-if="clickedClassData.mass.massValue">
+												<tr
+													v-if="clickedClassData.mass && clickedClassData.mass.massValue && clickedClassData.mass.massExponent"
+												>
 													<td>Mass</td>
 													<td class="text-nowrap">
 														{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
@@ -337,8 +339,8 @@
 												<tr v-if="clickedClassData.diameter">
 													<td>Mean Diameter</td>
 													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.sideralOrbit).value }}
-														<sub>{{ distanceConverter(clickedClassData.sideralOrbit).unit }}</sub>
+														{{ distanceConverter(clickedClassData.diameter).value }}
+														<sub>{{ distanceConverter(clickedClassData.diameter).unit }}</sub>
 													</td>
 												</tr>
 												<tr v-if="clickedClassData.meanRadius">

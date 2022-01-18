@@ -7,7 +7,9 @@ import { settings } from './modules/settings';
 import { controls } from './modules/controls';
 import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
-import { easeTo, checkIfDesktop, kmToAU, AUToKm, convertToCamelCase, randomString } from './modules/utils';
+import { easeTo } from './modules/utilities/animation';
+import { checkIfDesktop } from './modules/utilities/dom';
+import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
@@ -179,7 +181,7 @@ fetch('./solarSystemData.json')
 		return response.json();
 	})
 	.then((data) => {
-		const sortedData = sortData(data);
+		const sortedData = sortData(data.bodies);
 		orrery.bodies._sun = sortedData.sun;
 		orrery.bodies._allPlanets = [...sortedData.planets.concat(sortedData.dwarfPlanets)];
 
@@ -256,12 +258,12 @@ fetch('./solarSystemData.json')
 				},
 				currentSystem() {
 					if (!this.clickedClassData) return 'Solar System';
-					if (this.clickedClassData.type === 'Star') {
+					if (this.clickedClassData.bodyType === 'Star') {
 						return `The <span class="text-system-color">${this.clickedClassData.displayName}</span>`;
 					} else {
 						// checking if Moon or Entity
 						const entity = this.clickedClassData
-							? `<span class="text-system-color">${this.clickedClassData.system}</span>`
+							? `<span class="text-system-color">${this.clickedClassData.systemName}</span>`
 							: 'Solar';
 						return `${entity} System`;
 					}
@@ -305,18 +307,19 @@ fetch('./solarSystemData.json')
 						item.displayName.toLowerCase().includes(this.searchQuery.toLowerCase())
 					);
 
-					// splitting the results by Type, then recombining into the final Search Results
+					// splitting the results by bodyType, then recombining into the final Search Results
 					const sortedResults = filteredResults
 						.sort((a, b) => {
-							if (a.type === 'Star' || b.type === 'Star') return a.type === 'Star' ? -1 : 1;
-							else if (a.type === 'Planet' || b.type === 'Planet') return a.type === 'Planet' ? -1 : 1;
-							else if (a.type === 'Dwarf Planet' || b.type === 'Dwarf Planet')
-								return a.type === 'Dwarf Planet' ? -1 : 1;
-							else if (a.type === 'Comet' || b.type === 'Comet') return a.type === 'Comet' ? -1 : 1;
-							else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
-							else if (a.type === 'Moon' || b.type === 'Moon') {
+							if (a.bodyType === 'Star' || b.bodyType === 'Star') return a.bodyType === 'Star' ? -1 : 1;
+							else if (a.bodyType === 'Planet' || b.bodyType === 'Planet') return a.bodyType === 'Planet' ? -1 : 1;
+							else if (a.bodyType === 'Dwarf Planet' || b.bodyType === 'Dwarf Planet')
+								return a.bodyType === 'Dwarf Planet' ? -1 : 1;
+							else if (a.bodyType === 'Comet' || b.bodyType === 'Comet') return a.bodyType === 'Comet' ? -1 : 1;
+							else if (a.bodyType === 'Asteroid' || b.bodyType === 'Asteroid')
+								return a.bodyType === 'Asteroid' ? -1 : 1;
+							else if (a.bodyType === 'Moon' || b.bodyType === 'Moon') {
 								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
-								return a.type === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
+								return a.bodyType === 'Moon' && !a.name.includes('S/2') ? -1 : 1;
 							} else return -1;
 						})
 						.map((result) => {
@@ -324,8 +327,9 @@ fetch('./solarSystemData.json')
 								id: result.id,
 								index: this.navigationEntities.indexOf(result.id),
 								displayName: this.highlightMatchSubstring(result.displayName),
-								type: result.type,
-								system: result.system
+								bodyType: result.bodyType,
+								systemName: result.systemName,
+								systemId: result.systemId
 							};
 						})
 						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
@@ -359,9 +363,9 @@ fetch('./solarSystemData.json')
 					return parseFloat(distanceNumber[0] + floatingPoints);
 				},
 
-				distanceConverter(value) {
+				distanceConverter(value, id) {
 					if (!value) {
-						console.warn('Distance required.');
+						console.warn(`Distance required for ${id}.`);
 						return {};
 					}
 					// convert from km to AU if distance more than 0.66 AU
@@ -646,7 +650,7 @@ fetch('./solarSystemData.json')
 					const systemKeys = this.navigationSystems;
 					const currentIndex =
 						this.clickedClassData && this.clickedClassData.type !== 'Star'
-							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
+							? systemKeys.indexOf(this.clickedClassData.systemId)
 							: 0;
 					const prevIndex = this.clickedClassData && currentIndex !== 0 ? currentIndex - 1 : systemKeys.length - 1;
 					let prevSystemKey = systemKeys[prevIndex].toLowerCase();
@@ -659,7 +663,7 @@ fetch('./solarSystemData.json')
 					const systemKeys = this.navigationSystems;
 					const currentIndex =
 						this.clickedClassData && this.clickedClassData.type !== 'Star'
-							? systemKeys.indexOf(this.clickedClassData.system.toLowerCase())
+							? systemKeys.indexOf(this.clickedClassData.systemId)
 							: 0;
 					const nextIndex = this.clickedClassData && currentIndex + 1 < systemKeys.length ? currentIndex + 1 : 0;
 					let nextSystemKey = systemKeys[nextIndex].toLowerCase();

@@ -1,6 +1,6 @@
 /* globals Element */
 import { Matrix4, Object3D, Vector3 } from 'three';
-import { checkDOMElementOverlap } from './../../../utils';
+import { checkDOMElementOverlap } from './../../../utilities/dom';
 
 class CSS2DObject extends Object3D {
 	constructor(element, classRef) {

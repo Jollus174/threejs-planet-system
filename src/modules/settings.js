@@ -64,7 +64,7 @@ const settings = {
 		'makemake',
 		'haumea',
 		'orcus',
-		'gonggong',
+		// 'gonggong',
 		'quaoar'
 	],
 	navigationEntities: [] // hydrated by API

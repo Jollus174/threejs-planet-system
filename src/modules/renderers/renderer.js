@@ -1,6 +1,6 @@
 import { PCFSoftShadowMap, BasicShadowMap } from 'three';
 import { WebGLRenderer } from '../custom/src/renderers/WebGLRenderer';
-import { checkIfDesktop } from '../utils';
+import { checkIfDesktop } from '../utilities/dom';
 
 const domTarget = document.querySelector('#bg');
 const renderer = new WebGLRenderer({
