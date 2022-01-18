@@ -4,6 +4,82 @@ import { currentDateTime } from '../utilities/time';
 import { getRandomArbitrary } from '../utilities/numeric';
 import { wikipediaKeys } from './wikipediaKeys';
 
+const generalUpdates = (item, items) => {
+	// misc item replacements + updates
+
+	// if (item.id === 's20151364721') {
+	// 	item.id = 'mk2';
+	// 	item.displayName = 'MK2';
+	// }
+	item.discoveredBy = item.discoveredBy.replace('S&eacute;bastien', 'Sebastien');
+	if (item.name === 'S/2017 J 9') item.semimajorAxis = 21487000;
+
+	if (item.aroundPlanet) {
+		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
+		planet.systemId = planet.systemId || convertToId(planet.displayName);
+		planet.systemName = planet.displayName;
+		item.systemId = planet.systemId;
+		item.systemName = planet.systemName;
+	} else {
+		item.systemId = item.systemId || convertToId(item.displayName);
+		item.systemName = item.displayName;
+	}
+};
+
+const idReplacements = (itemList) => {
+	// needing to replace the French planet IDs for each moon with English ones, same for planets, etc
+	// getting rid 'englishName', it's going to just be the 'name'. All in English and no French references in the data
+
+	const items = itemList;
+
+	// doing a pass for ID replacements
+	for (const item of items) {
+		item.displayName = item.englishName;
+		item.englishId = item.englishId || convertToId(item.englishName); // temp ID so can map the French Ids to the English ones
+
+		if (item.aroundPlanet) {
+			const planet = items.find((i) => i.id === item.aroundPlanet.planet);
+			planet.englishId = planet.englishId || convertToId(planet.englishName);
+			item.aroundPlanet.planet = planet.englishId;
+		}
+
+		if (item.moons && item.moons.length) {
+			for (const entityMoon of item.moons) {
+				const moonRef = items.find((i) => i.name === entityMoon.moon);
+				moonRef.englishId = moonRef.englishId || convertToId(moonRef.englishName);
+				entityMoon.moon = moonRef.englishId;
+			}
+		}
+	}
+
+	// doing a second pass to remove the 'englishXX' keys, they should be the normal keys
+	// also updating display names
+	for (const item of items) {
+		item.name = item.englishName;
+		item.id = item.englishId;
+		if (item.aroundPlanet) delete item.aroundPlanet.rel;
+		if (item.moons && item.moons.length) {
+			for (const moon of item.moons) {
+				delete moon.rel;
+			}
+		}
+		delete item.englishName;
+		delete item.englishId;
+
+		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
+		if (item.name === 'Moon') item.displayName = 'The Moon';
+		if (item.id === 'dactyl') item.displayName = 'Dactyl';
+		if (item.id === 'ceres') item.displayName = 'Ceres';
+		if (item.id === 'eris') item.displayName = 'Eris';
+		if (item.id === 'makemake') item.displayName = 'Makemake';
+		if (item.id === 'haumea') item.displayName = 'Haumea';
+		if (item.id === 'orcus') item.displayName = 'Orcus';
+		if (item.id === 'quaoar') item.displayName = 'Quaoar';
+	}
+
+	return items;
+};
+
 const addToMoonGroup = (item) => {
 	if (item.bodyType === 'Moon') {
 		if (['moon'].indexOf(item.id) !== -1) {
@@ -359,79 +435,6 @@ const setWikipediaKeys = (item) => {
 	item.wikipediaKey = wikipediaKeys.find(
 		(w) => w.name.toLowerCase() === item.name.toLowerCase().replace('(', '').replace(')', '') || w.id === item.id
 	).wikipediaKey;
-};
-
-const generalUpdates = (item, items) => {
-	// if (item.id === 's20151364721') {
-	// 	item.id = 'mk2';
-	// 	item.displayName = 'MK2';
-	// }
-	item.discoveredBy = item.discoveredBy.replace('S&eacute;bastien', 'Sebastien');
-
-	if (item.aroundPlanet) {
-		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-		planet.systemId = planet.systemId || convertToId(planet.displayName);
-		planet.systemName = planet.displayName;
-		item.systemId = planet.systemId;
-		item.systemName = planet.systemName;
-	} else {
-		item.systemId = item.systemId || convertToId(item.displayName);
-		item.systemName = item.displayName;
-	}
-};
-
-const idReplacements = (itemList) => {
-	// needing to replace the French planet IDs for each moon with English ones, same for planets, etc
-	// getting rid 'englishName', it's going to just be the 'name'. All in English and no French references in the data
-
-	const items = itemList;
-
-	// doing a pass for ID replacements
-	for (const item of items) {
-		item.displayName = item.englishName;
-		item.englishId = item.englishId || convertToId(item.englishName); // temp ID so can map the French Ids to the English ones
-
-		if (item.aroundPlanet) {
-			const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-			planet.englishId = planet.englishId || convertToId(planet.englishName);
-			item.aroundPlanet.planet = planet.englishId;
-		}
-
-		if (item.moons && item.moons.length) {
-			for (const entityMoon of item.moons) {
-				const moonRef = items.find((i) => i.name === entityMoon.moon);
-				moonRef.englishId = moonRef.englishId || convertToId(moonRef.englishName);
-				entityMoon.moon = moonRef.englishId;
-			}
-		}
-	}
-
-	// doing a second pass to remove the 'englishXX' keys, they should be the normal keys
-	// also updating display names
-	for (const item of items) {
-		item.name = item.englishName;
-		item.id = item.englishId;
-		if (item.aroundPlanet) delete item.aroundPlanet.rel;
-		if (item.moons && item.moons.length) {
-			for (const moon of item.moons) {
-				delete moon.rel;
-			}
-		}
-		delete item.englishName;
-		delete item.englishId;
-
-		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
-		if (item.name === 'Moon') item.displayName = 'The Moon';
-		if (item.id === 'dactyl') item.displayName = 'Dactyl';
-		if (item.id === 'ceres') item.displayName = 'Ceres';
-		if (item.id === 'eris') item.displayName = 'Eris';
-		if (item.id === 'makemake') item.displayName = 'Makemake';
-		if (item.id === 'haumea') item.displayName = 'Haumea';
-		if (item.id === 'orcus') item.displayName = 'Orcus';
-		if (item.id === 'quaoar') item.displayName = 'Quaoar';
-	}
-
-	return items;
 };
 
 export {
