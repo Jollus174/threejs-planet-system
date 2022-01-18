@@ -16,12 +16,12 @@ const generalUpdates = (item, items) => {
 
 	if (item.aroundPlanet) {
 		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-		planet.systemId = planet.systemId || convertToId(planet.displayName);
+		planet.systemId = planet.systemId || convertToId(planet.name); // be mindful that NAME is used here instead of DISPLAY NAME
 		planet.systemName = planet.displayName;
 		item.systemId = planet.systemId;
 		item.systemName = planet.systemName;
 	} else {
-		item.systemId = item.systemId || convertToId(item.displayName);
+		item.systemId = item.systemId || convertToId(item.name);
 		item.systemName = item.displayName;
 	}
 };
@@ -69,12 +69,10 @@ const idReplacements = (itemList) => {
 		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
 		if (item.name === 'Moon') item.displayName = 'The Moon';
 		if (item.id === 'dactyl') item.displayName = 'Dactyl';
-		if (item.id === 'ceres') item.displayName = 'Ceres';
-		if (item.id === 'eris') item.displayName = 'Eris';
-		if (item.id === 'makemake') item.displayName = 'Makemake';
-		if (item.id === 'haumea') item.displayName = 'Haumea';
-		if (item.id === 'orcus') item.displayName = 'Orcus';
-		if (item.id === 'quaoar') item.displayName = 'Quaoar';
+		if (
+			['eris', 'ceres', 'makemake', 'haumea', 'orcus', 'quaoar'].some((i) => item.displayName.toLowerCase().includes(i))
+		)
+			item.displayName = item.displayName.split(' ')[1];
 	}
 
 	return items;
@@ -82,54 +80,54 @@ const idReplacements = (itemList) => {
 
 const addToMoonGroup = (item) => {
 	if (item.bodyType === 'Moon') {
-		if (['moon'].indexOf(item.id) !== -1) {
+		if (['_moon'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
 			item.moonGroupColor = '#82898f';
 		}
 
-		if (['phobos', 'deimos'].indexOf(item.id) !== -1) {
+		if (['_phobos', '_deimos'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
 			item.moonGroupColor = '#fc6f43';
 		}
 
-		if (['metis', 'adrastea', 'amalthea', 'thebe'].indexOf(item.id) !== -1) {
+		if (['_metis', '_adrastea', '_amalthea', '_thebe'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Inner';
 			item.moonGroupColor = '#e89c47';
 		}
 
-		if (['io', 'europa', 'ganymede', 'callisto'].indexOf(item.id) !== -1) {
+		if (['_io', '_europa', '_ganymede', '_callisto'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Galilean';
 			item.moonGroupColor = '#58b548';
 		}
-		if (['leda', 'ersa', 'pandia', 'himalia', 'lysithea', 'elara', 'dia'].indexOf(item.id) !== -1) {
+		if (['_leda', '_ersa', '_pandia', '_himalia', '_lysithea', '_elara', '_dia'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Himalia';
 			item.moonGroupColor = '#cda434';
 		}
 
 		if (
 			[
-				'euporie',
-				'eupheme',
-				's2003J18',
-				's2010J2',
-				'helike',
-				's2003J16',
-				's2003J2',
-				'euanthe',
-				's2017J7',
-				'hermippe',
-				'praxidike',
-				'thyone',
-				'thelxinoe',
-				's2017J3',
-				'ananke',
-				'mneme',
-				's2016J1',
-				'orthosie',
-				'harpalyke',
-				'iocaste',
-				's2017J9',
-				's2003J12'
+				'_euporie',
+				'_eupheme',
+				'_s2003J18',
+				'_s2010J2',
+				'_helike',
+				'_s2003J16',
+				'_s2003J2',
+				'_euanthe',
+				'_s2017J7',
+				'_hermippe',
+				'_praxidike',
+				'_thyone',
+				'_thelxinoe',
+				'_s2017J3',
+				'_ananke',
+				'_mneme',
+				'_s2016J1',
+				'_orthosie',
+				'_harpalyke',
+				'_iocaste',
+				'_s2017J9',
+				'_s2003J12'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Ananke';
@@ -138,29 +136,29 @@ const addToMoonGroup = (item) => {
 
 		if (
 			[
-				'erinome',
-				'aitne',
-				'herse',
-				'taygete',
-				's2017J2',
-				'eukelade',
-				'carme',
-				's2003J19',
-				'isonoe',
-				'pasithee',
-				's2010J1',
-				's2017J8',
-				's2017J5',
-				'kalyke',
-				'kale',
-				'kallichore',
-				's2011J1',
-				'chaldene',
-				'arche',
-				'eirene',
-				's2003J9',
-				's2003J10',
-				's2003J24'
+				'_erinome',
+				'_aitne',
+				'_herse',
+				'_taygete',
+				'_s2017J2',
+				'_eukelade',
+				'_carme',
+				'_s2003J19',
+				'_isonoe',
+				'_pasithee',
+				'_s2010J1',
+				'_s2017J8',
+				'_s2017J5',
+				'_kalyke',
+				'_kale',
+				'_kallichore',
+				'_s2011J1',
+				'_chaldene',
+				'_arche',
+				'_eirene',
+				'_s2003J9',
+				'_s2003J10',
+				'_s2003J24'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Carme';
@@ -169,31 +167,31 @@ const addToMoonGroup = (item) => {
 
 		if (
 			[
-				'pasiphae',
-				's2017J6',
-				'autonoe',
-				'philophrosyne',
-				'cyllene',
-				'pasiphae',
-				'sponde',
-				'eurydome',
-				'hegemone',
-				's2017J1',
-				'kore',
-				's2011J2',
-				'megaclite',
-				'aoede',
-				's2003J4',
-				's2003J23',
-				'callirrhoe',
-				'sinope'
+				'_pasiphae',
+				'_s2017J6',
+				'_autonoe',
+				'_philophrosyne',
+				'_cyllene',
+				'_pasiphae',
+				'_sponde',
+				'_eurydome',
+				'_hegemone',
+				'_s2017J1',
+				'_kore',
+				'_s2011J2',
+				'_megaclite',
+				'_aoede',
+				'_s2003J4',
+				'_s2003J23',
+				'_callirrhoe',
+				'_sinope'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Pasiphae';
 			item.moonGroupColor = '#1b9dbe';
 		}
 
-		if (['themisto', 'carpo', 'valetudo'].indexOf(item.id) !== -1) {
+		if (['_themisto', '_carpo', '_valetudo'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Misc';
 			item.moonGroupColor = '#82898f';
 		}
@@ -201,18 +199,18 @@ const addToMoonGroup = (item) => {
 		// Saturn moon groups...
 		if (
 			[
-				'skathi',
-				'skoll',
-				'hyrrokkin',
-				's2006S1',
-				'bergelmir',
-				'farbauti',
-				's2004S30',
-				's2004S32',
-				's2006S3',
-				'kari',
-				's2004S38',
-				's2004S21'
+				'_skathi',
+				'_skoll',
+				'_hyrrokkin',
+				'_s2006S1',
+				'_bergelmir',
+				'_farbauti',
+				'_s2004S30',
+				'_s2004S32',
+				'_s2006S3',
+				'_kari',
+				'_s2004S38',
+				'_s2004S21'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Skathi';
@@ -220,7 +218,7 @@ const addToMoonGroup = (item) => {
 			item.moonGroupColor = '#826c34';
 		}
 
-		if (['narvi', 'bestla', 's2004S36'].indexOf(item.id) !== -1) {
+		if (['_narvi', '_bestla', '_s2004S36'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Narvi';
 			item.direction = 'retrograde';
 			item.moonGroupColor = '#ff7514';
@@ -228,37 +226,37 @@ const addToMoonGroup = (item) => {
 
 		if (
 			[
-				'phoebe',
-				's2004S37',
-				's2007S2',
-				'greip',
-				'mundilfari',
-				's2004S13',
-				's2007S3',
-				'suttungr',
-				's2004S20',
-				'jarnsaxa',
-				'hati',
-				's2004S17',
-				's2004S12',
-				's2004S27',
-				'thrymr',
-				's2004S7',
-				'aegir',
-				's2004S22',
-				's2004S25',
-				's2004S23',
-				's2004S35',
-				's2004S28',
-				'loge',
-				'fenrir',
-				'ymir',
-				'surtur',
-				's2004S33',
-				's2004S39',
-				'fornjot',
-				's2004S34',
-				's2004S26'
+				'_phoebe',
+				'_s2004S37',
+				'_s2007S2',
+				'_greip',
+				'_mundilfari',
+				'_s2004S13',
+				'_s2007S3',
+				'_suttungr',
+				'_s2004S20',
+				'_jarnsaxa',
+				'_hati',
+				'_s2004S17',
+				'_s2004S12',
+				'_s2004S27',
+				'_thrymr',
+				'_s2004S7',
+				'_aegir',
+				'_s2004S22',
+				'_s2004S25',
+				'_s2004S23',
+				'_s2004S35',
+				'_s2004S28',
+				'_loge',
+				'_fenrir',
+				'_ymir',
+				'_surtur',
+				'_s2004S33',
+				'_s2004S39',
+				'_fornjot',
+				'_s2004S34',
+				'_s2004S26'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Norse';
@@ -266,98 +264,100 @@ const addToMoonGroup = (item) => {
 			item.moonGroupColor = '#5c67ff';
 		}
 
-		if (['albiorix', 'bebhionn', 'erriapus', 'tarvos'].indexOf(item.id) !== -1) {
+		if (['_albiorix', '_bebhionn', '_erriapus', '_tarvos'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Gallic';
 			item.direction = 'prograde';
 			item.moonGroupColor = '#826c34';
 		}
 
-		if (['prometheus', 'daphnis', 'pan', 'janus', 'epimetheus', 'atlas', 'pandora'].indexOf(item.id) !== -1) {
+		if (['_prometheus', '_daphnis', '_pan', '_janus', '_epimetheus', '_atlas', '_pandora'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Shepherd Moons';
 			item.moonGroupColor = '#ff6075';
 		}
-		if (['tethys', 'telesto', 'calypso'].indexOf(item.id) !== -1) {
+		if (['_tethys', '_telesto', '_calypso'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Tethys';
 			item.moonGroupColor = '#a98307';
 		}
-		if (['dione', 'helene', 'polydeuces'].indexOf(item.id) !== -1) {
+		if (['_dione', '_helene', '_polydeuces'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Dione';
 			item.moonGroupColor = '#256d7b';
 		}
-		if (['methone', 'anthe', 'pallene'].indexOf(item.id) !== -1) {
+		if (['_methone', '_anthe', '_pallene'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Alkyonides';
 			item.moonGroupColor = '#606e8c';
 		}
-		if (['ijiraq', 'kiviuq', 'paaliaq', 'siarnaq', 'tarqeq'].indexOf(item.id) !== -1) {
+		if (['_ijiraq', '_kiviuq', '_paaliaq', '_siarnaq', '_tarqeq'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Inuit';
 			item.moonGroupColor = '#ff9652';
 		}
-		if (['hyperion', 'rhea', 'titan', 'iapetus'].indexOf(item.id) !== -1) {
+		if (['_hyperion', '_rhea', '_titan', '_iapetus'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Outer Large';
 			item.moonGroupColor = '#8673a1';
 		}
-		if (['mimas', 'enceladus', 'aegaeon', 's2009S1', 's2004S24', 's2004S29', 's2004S31'].indexOf(item.id) !== -1) {
+		if (
+			['_mimas', '_enceladus', '_aegaeon', '_s2009S1', '_s2004S24', '_s2004S29', '_s2004S31'].indexOf(item.id) !== -1
+		) {
 			item.moonGroup = 'Misc';
 		}
 
 		// Uranus moon groups...
 		if (
 			[
-				'cordelia',
-				'ophelia',
-				'bianca',
-				'cressida',
-				'desdemona',
-				'juliet',
-				'portia',
-				'rosalind',
-				'cupid',
-				'belinda',
-				'perdita',
-				'puck',
-				'mab'
+				'_cordelia',
+				'_ophelia',
+				'_bianca',
+				'_cressida',
+				'_desdemona',
+				'_juliet',
+				'_portia',
+				'_rosalind',
+				'_cupid',
+				'_belinda',
+				'_perdita',
+				'_puck',
+				'_mab'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Inner';
 			item.moonGroupColor = '#ff4c98';
 		}
 
-		if (['ariel', 'miranda', 'umbriel', 'titania', 'oberon'].indexOf(item.id) !== -1) {
+		if (['_ariel', '_miranda', '_umbriel', '_titania', '_oberon'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Major';
 			item.moonGroupColor = '#ff8b7b';
 		}
 
 		if (
 			[
-				'francisco',
-				'caliban',
-				'stephano',
-				'trinculo',
-				'sycorax',
-				'margaret',
-				'prospero',
-				'setebos',
-				'ferdinand'
+				'_francisco',
+				'_caliban',
+				'_stephano',
+				'_trinculo',
+				'_sycorax',
+				'_margaret',
+				'_prospero',
+				'_setebos',
+				'_ferdinand'
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Irregular';
-			item.direction = item.id === 'margaret' ? 'Prograde' : 'Retrograde';
+			item.direction = item.id === '_margaret' ? 'Prograde' : 'Retrograde';
 			item.moonGroupColor = '#308446';
 		}
 
 		// Neptune moon groups...
-		if (['naiad', 'thalassa', 'despina', 'galatea', 'larissa', 'hippocamp', 'proteus'].indexOf(item.id) !== -1) {
+		if (['_naiad', '_thalassa', '_despina', '_galatea', '_larissa', '_hippocamp', '_proteus'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Regular';
 			item.moonGroupColor = '#dc9d00';
 		}
-		if (['triton', 'nereid', 'halimede', 'sao', 'laomedeia', 'psamathe', 'neso'].indexOf(item.id) !== -1) {
+		if (['_triton', '_nereid', '_halimede', '_sao', '_laomedeia', '_psamathe', '_neso'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Irregular';
 			item.moonGroupColor = '#7fb5b5';
 		}
-		if (['triton', 'halimede', 'psamathe', 'neso'].indexOf(item.id) !== -1) item.direction = 'Retrograde';
-		if (['nereid', 'sao', 'laomedeia'].indexOf(item.id) !== -1) item.direction = 'Prograde';
+		if (['_triton', '_halimede', '_psamathe', '_neso'].indexOf(item.id) !== -1) item.direction = 'Retrograde';
+		if (['_nereid', '_sao', 'laomedeia'].indexOf(item.id) !== -1) item.direction = 'Prograde';
 
-		if (['charon', 'nix', 'hydra', 'kerberos', 'styx'].indexOf(item.id) !== -1) {
+		if (['_charon', '_nix', '_hydra', '_kerberos', '_styx'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
 			item.moonGroupColor = '#ff8333';
 		}
@@ -432,9 +432,7 @@ const setOrbitCalculations = (item) => {
 };
 
 const setWikipediaKeys = (item) => {
-	item.wikipediaKey = wikipediaKeys.find(
-		(w) => w.name.toLowerCase() === item.name.toLowerCase().replace('(', '').replace(')', '') || w.id === item.id
-	).wikipediaKey;
+	item.wikipediaKey = wikipediaKeys.find((w) => w.id === item.id).wikipediaKey;
 };
 
 export {

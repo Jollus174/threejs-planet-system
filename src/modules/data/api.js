@@ -68,9 +68,9 @@ const sortData = (data) => {
 			settings.planetColours[item.id] || settings.planetColours[item.bodyType] || settings.planetColours.default;
 
 		// setting the 'entity types' here rather than further down and redoing the loop
-		const key = '_' + convertToCamelCase(item.bodyType);
-		orrery.bodies.types[key] = orrery.bodies.types[key] || [];
-		orrery.bodies.types[key].push(item);
+		const typeKey = '_' + convertToCamelCase(item.bodyType);
+		orrery.bodies.types[typeKey] = orrery.bodies.types[typeKey] || [];
+		orrery.bodies.types[typeKey].push(item);
 
 		generalUpdates(item, englishifiedData);
 		addToMoonGroup(item);

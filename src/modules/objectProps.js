@@ -162,8 +162,7 @@ class OrbitLine {
 class Entity {
 	constructor(data) {
 		this.data = data;
-		// this.labelLink = document.createElement('a');
-		this.labelLink = document.createElement('span');
+		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group({ name: `${this.data.id} group label` });
 		this.meshGroup = new THREE.Group({ name: `${this.data.id} mesh group` });
 		this.fadingIn = false;
@@ -201,7 +200,7 @@ class Entity {
 			.join(' ')
 			.trim();
 
-		// this.labelLink.href = `/#/${this.data.id}`;
+		this.labelLink.href = `/#/${this.data.id}`;
 		this.labelLink.className = `label behind-label ${entityTypeClasses}`;
 		this.labelLink.dataset.selector = 'label';
 		this.labelLink.style.color = this.data.labelColour;

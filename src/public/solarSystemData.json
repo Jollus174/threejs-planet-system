@@ -7023,7 +7023,7 @@
 		{
 			"id": "hiiaka",
 			"name": "Hi'iaka",
-			"englishName": "Hiʻiaka",
+			"englishName": "Hi'iaka",
 			"isPlanet": false,
 			"moons": null,
 			"semimajorAxis": 49880,
@@ -7604,7 +7604,7 @@
 			"mainAnomaly": 0.0,
 			"argPeriapsis": 0.0,
 			"longAscNode": 0.0,
-			"bodyType": "Asteroid",
+			"bodyType": "Dwarf Planet",
 			"rel": "https://api.le-systeme-solaire.net/rest/bodies/quaoar"
 		},
 		{

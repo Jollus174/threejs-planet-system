@@ -484,19 +484,21 @@
 										v-model="tabGroup"
 										@change="switchDetailTabs"
 									/>
-									<label class="btn" for="tab-system"
-										><span><img src="/img/icon-orbit.svg" width="18" /></span>System</label
-									>
-									<input
-										type="radio"
-										class="btn-check"
-										name="tab-group"
-										id="tab-stats"
-										value="tab-stats"
-										autocomplete="off"
-										v-model="tabGroup"
-										@change="switchDetailTabs"
-									/>
+									<template v-show="moonGroups && moonGroups.length">
+										<label class="btn" for="tab-system"
+											><span><img src="/img/icon-orbit.svg" width="18" /></span>System</label
+										>
+										<input
+											type="radio"
+											class="btn-check"
+											name="tab-group"
+											id="tab-stats"
+											value="tab-stats"
+											autocomplete="off"
+											v-model="tabGroup"
+											@change="switchDetailTabs"
+										/>
+									</template>
 									<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
 									<input
 										type="radio"

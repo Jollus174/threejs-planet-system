@@ -2,7 +2,7 @@
 const subInvalidCharacters = (str) => {
 	// for parsing the API data
 	// add additional substitutions to this as needed
-	return str.replaceAll('é', 'e');
+	return str.replaceAll('é', 'e').replaceAll('ʻ', "'").replaceAll('Š', 'S');
 };
 
 const convertToKebabCase = (str) => {
@@ -20,11 +20,23 @@ const convertToCamelCase = (str) => {
 };
 
 const convertToId = (str) => {
+	// prepending each item with an underscore
+	// special care to make sure first letter of first word with letters is always lowercased
+	let idStr = subInvalidCharacters(str).toLowerCase().replace("'", '').replace(/\W/g, ' ');
+	let nonNumericCharacterParsed = false;
+	idStr = idStr
+		.split(' ')
+		.map((item) => {
+			if (!isNaN(item)) return item;
+			if (nonNumericCharacterParsed) return item.charAt(0).toUpperCase() + item.slice(1);
+			nonNumericCharacterParsed = true;
+			// return numbers AND the first word as are (since it's already lowercased)
+			return item;
+		})
+		.join('');
 	// convertToCamelCase, but also removes any numbers at the start, numbers at start make for invalid object keys
 	// removing the first numbers from a string and escaping with a letter-character
-	const idStr = convertToCamelCase(str).replace(/^([0-9]+)/, '');
-	// ALWAYS lowercasing the first letter
-	return `${idStr.charAt(0).toLowerCase()}${idStr.slice(1)}`;
+	return '_' + idStr;
 };
 
 const randomString = (length) => {

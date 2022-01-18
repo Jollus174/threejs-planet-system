@@ -190,7 +190,7 @@ fetch('./solarSystemData.json')
 		// --------------------
 
 		orrery.classes._sun = new Sun(orrery.bodies._sun);
-		orrery.classes._all.sun = orrery.classes._sun;
+		orrery.classes._all._sun = orrery.classes._sun;
 
 		const generateMoonClasses = (parentClass) => {
 			if (parentClass.data.moons && parentClass.data.moons.length) {
@@ -241,9 +241,7 @@ fetch('./solarSystemData.json')
 				zoomedClassData: null,
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
-				modelMoonGroupSelection: {}, // for keeping track of which moon group is filtered per system
-				modelMoonSelection: {}, // for keeping track of which moon in each moon group has been selected
-				tabGroup: 'tab-system'
+				tabGroup: 'tab-desc'
 			},
 			computed: {
 				nameApoapsis() {
@@ -485,6 +483,7 @@ fetch('./solarSystemData.json')
 						if (content.extract) {
 							formattedContent = content.extract;
 							formattedContent = formattedContent.replace('<span></span>', '');
+							formattedContent = formattedContent.replace('<p><br>', '<p>'); // Halimede article
 							// removing everything in parentheses since it's usually junk
 							formattedContent = formattedContent.replace(/ *\([^)]*\) */g, ' ');
 							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',').replace(',,', ',');
