@@ -442,7 +442,7 @@ fetch('./solarSystemData.json')
 					const queryParams = [
 						['format', 'json'],
 						['action', 'query'],
-						['prop', 'extracts|pageimages'],
+						['prop', 'extracts'],
 						['exintro', '1'],
 						// ['explaintext', '1'], // we want the HTML, so just text content. Saves needing to do extra formatting.
 						['redirects', '1'],
@@ -478,25 +478,30 @@ fetch('./solarSystemData.json')
 						}
 
 						const content = Object.values(result.query.pages)[0];
-						let formattedContent,
-							image = null;
+						let formattedContent;
 						if (content.extract) {
 							formattedContent = content.extract;
 							formattedContent = formattedContent.replace('<span></span>', '');
 							formattedContent = formattedContent.replace('<p><br>', '<p>'); // Halimede article
-							// removing everything in parentheses since it's usually junk
-							formattedContent = formattedContent.replace(/ *\([^)]*\) */g, ' ');
-							formattedContent = formattedContent.replace(' ()', '').replace(' ,', ',').replace(',,', ',');
-						}
+							// removing everything returned in parentheses since it's usually junk
+							// these sometimes come up ( ( nested ) ) too, so am removing them via loop
 
-						if (content.thumbnail) {
-							image = content.thumbnail;
-							image.alt = content.pageimage;
+							let oldFormattedContent;
+							do {
+								oldFormattedContent = formattedContent;
+								formattedContent = formattedContent.replace(/\([^\)\(]*\)/, '');
+							} while (oldFormattedContent !== formattedContent);
+
+							formattedContent = formattedContent
+								.replaceAll(' ()', '')
+								.replaceAll(' ,', ',')
+								.replaceAll(',,', ',')
+								.replaceAll(' ;', ';')
+								.replaceAll('—', ' - ');
 						}
 
 						desc.title = content.title;
 						desc.content = formattedContent;
-						desc.image = content.image;
 					});
 				},
 
