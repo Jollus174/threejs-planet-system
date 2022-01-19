@@ -593,9 +593,37 @@ fetch('./solarSystemData.json')
 					this.$refs.lightbox.showImage(i);
 				},
 
+				isScrolledInView(el, container) {
+					const cTop = container.scrollTop;
+					const cBottom = cTop + container.clientHeight;
+
+					// NOTE: elTop.offsetTop is relative to the nearest <tbody>!
+					const elTop =
+						el.offsetTop +
+						el.closest('[data-selector="tbody-wrapper"]').offsetTop +
+						el.closest('[data-selector="table-wrapper"]').offsetTop;
+					const eBottom = elTop + el.clientHeight;
+
+					// Check if in view
+					return elTop >= cTop && eBottom <= cBottom;
+				},
+
 				switchDetailTabs() {
 					if (this.tabGroup === 'tab-desc') {
 						if (!this.clickedClassData.description.content) this.getWikipediaData();
+					}
+
+					if (this.tabGroup === 'tab-system') {
+						if (!this.moonGroups || !this.moonGroups.length) this.tabGroup = 'tab-desc';
+						this.$nextTick(() => {
+							const elContentSystem = document.querySelector('#content-system .content-wrapper');
+							const activeTableRow = elContentSystem.querySelector('tr.active-entity');
+							if (this.isScrolledInView(activeTableRow, elContentSystem)) return;
+
+							activeTableRow.scrollIntoView({
+								block: 'nearest'
+							});
+						});
 					}
 
 					if (this.tabGroup === 'tab-media') {

@@ -139,7 +139,7 @@
 			width: 100%;
 
 			@include media-breakpoint-up(lg) {
-				margin-bottom: 1.5rem;
+				margin-bottom: 2px;
 			}
 
 			.btn {
@@ -195,7 +195,7 @@
 	.content-container {
 		position: relative;
 		flex-grow: 1;
-		overflow-y: auto;
+		height: 0; // let flex decide the height
 	}
 
 	.content {
@@ -217,9 +217,34 @@
 
 	.content-wrapper {
 		position: relative;
-		padding-top: 0.5rem;
-		padding-bottom: 1.5rem;
 		min-height: 100%;
+		height: 100%;
+		overflow: auto;
+
+		--scrollbar-track: #1c1c1c;
+		--scrollbar-thumb: #6a6767;
+		--scrollbar-width: 10px;
+
+		scrollbar-color: --scrollbar-thumb --scrollbar-track;
+		scrollbar-width: thin;
+
+		@include media-breakpoint-up(lg) {
+			padding-top: 1.5rem;
+			padding-bottom: 1rem;
+		}
+
+		&::-webkit-scrollbar {
+			width: var(--scrollbar-width);
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: var(--scrollbar-track);
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--scrollbar-thumb);
+			border-radius: 0;
+		}
 	}
 
 	.content-desc {
@@ -233,6 +258,26 @@
 				overflow: auto;
 			}
 		}
+	}
+
+	.scroll-shadows {
+		--bgRGB: 10, 10, 10;
+		--bg: rgb(var(--bgRGB));
+		--bgTrans: rgba(var(--bgRGB), 0);
+
+		--shadow: rgba(0, 0, 0, 1);
+
+		// overflow: auto;
+
+		background:
+			/* Shadow Cover TOP */ linear-gradient(var(--bg) 30%, var(--bgTrans)) center top,
+			/* Shadow Cover BOTTOM */ linear-gradient(var(--bgTrans), var(--bg) 70%) center bottom,
+			/* Shadow TOP */ radial-gradient(farthest-side at 50% 0, var(--shadow), rgba(0, 0, 0, 0)) center top,
+			/* Shadow BOTTOM */ radial-gradient(farthest-side at 50% 100%, var(--shadow), rgba(0, 0, 0, 0)) center bottom;
+
+		background-repeat: no-repeat;
+		background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+		background-attachment: local, local, scroll, scroll;
 	}
 
 	.content-system {
@@ -311,7 +356,7 @@
 					transition: opacity 0.2s ease;
 
 					@include media-breakpoint-up(md) {
-						left: -27px;
+						left: -23px;
 					}
 				}
 
@@ -410,6 +455,7 @@
 	.content-stats {
 		table {
 			width: 100%;
+			margin-bottom: 0.5rem;
 		}
 
 		tr {
@@ -481,6 +527,10 @@
 				object-fit: cover;
 				transition: scale 0.2s ease;
 			}
+		}
+
+		.btn-loadmore {
+			margin-bottom: 0.5rem;
 		}
 	}
 }

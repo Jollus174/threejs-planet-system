@@ -135,12 +135,12 @@
 											</div>
 										</div>
 
-										<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
+										<!-- <div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
 											<div class="key-data">
 												<span class="heading">Moons</span>
 												<span class="label-color">{{ clickedClassData.moons.length }}</span>
 											</div>
-										</div>
+										</div> -->
 										<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
 											<div class="key-data">
 												<span class="heading">Moon Group</span>
@@ -205,15 +205,16 @@
 									</div>
 								</section>
 
-								<section class="content content-system" v-show="tabGroup === 'tab-system'">
-									<div class="content-wrapper container-fluid">
-										<table>
+								<section id="content-system" class="content content-system" v-show="tabGroup === 'tab-system'">
+									<div class="content-wrapper container-fluid scroll-shadows" data-selector="content-wrapper">
+										<table data-selector="table-wrapper">
 											<tbody>
 												<tr>
 													<td class="td-wrapper">
 														<table>
 															<tbody
 																class="planet-group"
+																data-selector="tbody-wrapper"
 																:class="{'active-entity-group': clickedClassData.id === systemClassData.id}"
 															>
 																<tr
@@ -229,7 +230,7 @@
 												</tr>
 											</tbody>
 										</table>
-										<table v-if="moonGroups">
+										<table v-if="moonGroups" data-selector="table-wrapper">
 											<tr>
 												<td class="td-wrapper">
 													<table>
@@ -243,6 +244,7 @@
 														</thead>
 														<tbody
 															class="moon-group"
+															data-selector="tbody-wrapper"
 															v-if="moonGroups.length"
 															v-for="(moonGroup, i) in moonGroups"
 															:class="['moon-group-' + i, {'active-entity-group': moonGroup.name === clickedClassData.moonGroup}]"
@@ -430,7 +432,7 @@
 
 												<button
 													type="button"
-													class="btn btn-primary"
+													class="btn btn-primary btn-loadmore"
 													@click="getNASAMediaData(true)"
 													v-if="clickedClassData.media.more && !clickedClassData.media.loadingMore"
 												>
@@ -474,31 +476,31 @@
 										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-desc"><span class="fab fa-wikipedia-w"></span>Desc</label>
-									<input
-										type="radio"
-										class="btn-check"
-										name="tab-group"
-										id="tab-system"
-										value="tab-system"
-										autocomplete="off"
-										v-model="tabGroup"
-										@change="switchDetailTabs"
-									/>
-									<template v-show="moonGroups && moonGroups.length">
-										<label class="btn" for="tab-system"
-											><span><img src="/img/icon-orbit.svg" width="18" /></span>System</label
-										>
+									<template v-if="moonGroups && moonGroups.length">
 										<input
 											type="radio"
 											class="btn-check"
 											name="tab-group"
-											id="tab-stats"
-											value="tab-stats"
+											id="tab-system"
+											value="tab-system"
 											autocomplete="off"
 											v-model="tabGroup"
 											@change="switchDetailTabs"
 										/>
+										<label class="btn" for="tab-system">
+											<span><img src="/img/icon-orbit.svg" width="18" /></span>System
+										</label>
 									</template>
+									<input
+										type="radio"
+										class="btn-check"
+										name="tab-group"
+										id="tab-stats"
+										value="tab-stats"
+										autocomplete="off"
+										v-model="tabGroup"
+										@change="switchDetailTabs"
+									/>
 									<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
 									<input
 										type="radio"
