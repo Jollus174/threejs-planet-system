@@ -1,3 +1,5 @@
+import { hsl } from './utilities/strings';
+
 const settings = {
 	camera: {
 		_fov: 50,
@@ -27,23 +29,29 @@ const settings = {
 	domTarget: document.querySelector('#bg'),
 	// shoutouts to F-Zero GX
 	planetColours: {
-		default: '#e4e4e4',
-		dwarfPlanet: '#c8c8c8',
-		_sun: '#ffb01f',
-		_mercury: '#b78668',
-		_venus: '#ff7d00',
-		_earth: '#6dcbe7',
-		_mars: '#fc6f43',
-		_jupiter: '#e0ab79',
-		_saturn: '#ffe577',
-		_uranus: '#c8ecef',
-		_neptune: '#94c0ff',
-		_io: '#cab852',
-		_europa: '#f2e3ce',
-		_ganymede: '#c4c3be',
-		_callisto: '#806f79',
-		_titan: '#fbd74d',
-		_triton: '#cec3c7'
+		default: hsl(0, 0, 89.4),
+		dwarfPlanet: hsl(0, 0, 78.4),
+		_sun: hsl(38.8, 95, 62.5),
+		_mercury: hsl(22.8, 95, 62.5),
+		_venus: hsl(29.4, 95, 62.5),
+		_earth: hsl(193.8, 95, 62.5),
+		_mars: hsl(14.3, 95, 62.5),
+		_jupiter: hsl(29.1, 95, 62.5),
+		_saturn: hsl(48.5, 95, 62.5),
+		_uranus: hsl(184.6, 95, 62.5),
+		_neptune: hsl(215.3, 95, 62.5),
+
+		_io: hsl(51, 53.1, 55.7),
+		_europa: hsl(35, 58.1, 87.8),
+		_ganymede: hsl(50, 4.8, 75.7),
+		_callisto: hsl(324.7, 7.1, 46.9),
+		_titan: hsl(47.6, 95.6, 64.3),
+		_triton: hsl(338.2, 10.1, 78.6),
+
+		_136199eris: hsl(16, null, 70),
+		_136472makemake: hsl(28, 32, 70),
+		_136108haumea: hsl(357, 55, 74),
+		_90482orcus: hsl(0, 0, 66)
 	},
 	systemZoomDistanceThresholds: [1800000000, 5000000000],
 	navigationSystems: [
@@ -63,9 +71,9 @@ const settings = {
 		'_136199eris',
 		'_136472makemake',
 		'_136108haumea',
-		'_90482orcus',
+		'_90482orcus'
 		// '_gonggong',
-		'_50000quaoar'
+		// '_50000quaoar'
 	],
 	navigationEntities: [] // hydrated by API
 };

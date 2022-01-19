@@ -49,4 +49,6 @@ const randomString = (length) => {
 	return result;
 };
 
-export { subInvalidCharacters, convertToKebabCase, convertToCamelCase, convertToId, randomString };
+const hsl = (h, s, l) => `hsl(${h ?? 20}, ${s ?? 80}%, ${l ?? 70}%)`;
+
+export { subInvalidCharacters, convertToKebabCase, convertToCamelCase, convertToId, randomString, hsl };
