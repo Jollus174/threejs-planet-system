@@ -1271,7 +1271,7 @@ const wikipediaKeys = [
 	},
 	{
 		name: 'S/2015 (136472) 1',
-		id: '_mk2',
+		id: '_s20151364721',
 		wikipediaKey: 'S/2015_(136472)_1'
 	},
 	{
