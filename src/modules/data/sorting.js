@@ -8,11 +8,7 @@ import { wikipediaKeys } from './wikipediaKeys';
 const generalUpdates = (item, items) => {
 	// misc item replacements + updates
 
-	// if (item.id === 's20151364721') {
-	// 	item.id = 'mk2';
-	// 	item.displayName = 'MK2';
-	// }
-	item.discoveredBy = item.discoveredBy.replace('S&eacute;bastien', 'Sebastien');
+	if (item.id === '_s20151364721') item.displayName = 'MK2';
 	if (item.name === 'S/2017 J 9') item.semimajorAxis = 21487000;
 
 	if (item.aroundPlanet) {

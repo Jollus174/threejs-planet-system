@@ -9739,7 +9739,7 @@
 			"isPlanet": false,
 			"moons": [
 				{
-					"moon": "MK2",
+					"moon": "S/2015 (136472) 1",
 					"rel": "https://api.le-systeme-solaire.net/rest/bodies/mk2"
 				}
 			],
@@ -10967,9 +10967,9 @@
 			"rel": "https://api.le-systeme-solaire.net/rest/bodies/hippocampe"
 		},
 		{
-			"id": "MK2",
-			"name": "MK2",
-			"englishName": "MK2",
+			"id": "mk2",
+			"name": "S/2015 (136472) 1",
+			"englishName": "S/2015 (136472) 1",
 			"isPlanet": false,
 			"moons": null,
 			"semimajorAxis": 21000,
@@ -10995,7 +10995,7 @@
 			},
 			"discoveredBy": "Alex H. Parker, Marc W. Buie, M. Grundy, Keith S. Noll",
 			"discoveryDate": "26/04/2016",
-			"alternativeName": "MK2",
+			"alternativeName": "S/2015 (136472) 1",
 			"axialTilt": 0,
 			"avgTemp": 0,
 			"mainAnomaly": 0.0,
@@ -12293,7 +12293,7 @@
 		{
 			"id": "c2020f3-neowise",
 			"name": "C/2020 F3 (NEOWISE)",
-			"englishName": "C/2020 F3 NEOWISE",
+			"englishName": "C/2020 F3 (NEOWISE)",
 			"isPlanet": false,
 			"moons": null,
 			"semimajorAxis": 40690620830,
