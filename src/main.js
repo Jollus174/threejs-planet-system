@@ -245,11 +245,13 @@ fetch('./solarSystemData.json')
 			},
 			computed: {
 				nameApoapsis() {
+					if (!this.clickedClassData) return '';
 					if (this.clickedClassData.aroundPlanet && this.clickedClassData.aroundPlanet.planet === 'earth')
 						return 'Apogee';
 					return this.clickedClassData.aroundPlanet ? 'Apoapsis' : 'Aphelion';
 				},
 				namePeriapsis() {
+					if (!this.clickedClassData) return '';
 					if (this.clickedClassData.aroundPlanet && this.clickedClassData.aroundPlanet.planet === 'earth')
 						return 'Perigee';
 					return this.clickedClassData.aroundPlanet ? 'Periapsis' : 'Perihelion';
@@ -268,6 +270,7 @@ fetch('./solarSystemData.json')
 				},
 
 				distanceFromParentEntity() {
+					if (!this.clickedClassData) return null;
 					// to be in km or AU depending on amount
 					const parentEntity = this.clickedClassData.aroundPlanet
 						? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
@@ -284,7 +287,7 @@ fetch('./solarSystemData.json')
 				},
 
 				moonGroups() {
-					if (!this.systemClassData.moons) return null;
+					if (!this.systemClassData || !this.systemClassData.moons) return null;
 					// using Set to remove duplicates
 					const moonGroupNames = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroup))];
 					return moonGroupNames.map((moonGroupName) => {

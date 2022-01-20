@@ -325,15 +325,21 @@
 			tbody {
 				position: relative;
 
-				&.active-entity-group {
-					&::before {
-						opacity: 1;
-					}
+				&::after {
+					content: "";
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 4px;
+					height: 100%;
+					opacity: 0;
+					transition: opacity 0.2s ease;
+				}
 
-					tr {
-						&::after {
-							opacity: 0.15;
-						}
+				&.active-planet-group,
+				&.active-moon-group {
+					&::after {
+						opacity: 0.35;
 					}
 				}
 
@@ -353,7 +359,6 @@
 					text-transform: uppercase;
 					white-space: nowrap;
 					text-overflow: ellipsis;
-					transition: opacity 0.2s ease;
 
 					@include media-breakpoint-up(md) {
 						left: -23px;
@@ -361,20 +366,8 @@
 				}
 
 				th {
-					position: relative;
 					font-size: 17px;
 					font-weight: 400;
-
-					&::before {
-						content: "";
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 4px;
-						height: 100%;
-						opacity: 0;
-						transition: opacity 0.2s ease;
-					}
 				}
 
 				tr {
@@ -407,18 +400,33 @@
 					&.active-entity {
 						cursor: default;
 
-						th::before {
-							opacity: 0.25;
+						> *:last-child {
+							&::after {
+								content: "Selected";
+								position: absolute;
+								top: 0;
+								right: 0;
+								padding: 0 2px;
+								background-color: rgba($white, 0.1);
+								color: $white;
+								font-size: 10px;
+								font-weight: 600;
+								letter-spacing: 1.2px;
+								text-transform: uppercase;
+
+								@include media-breakpoint-between(0, sm) {
+									content: "\f05b";
+									font-family: "Font Awesome 5 Free";
+								}
+							}
 						}
 					}
 				}
 
 				&.planet-group {
-					tr {
-						&::after,
-						th::before {
-							background-color: var(--system-color);
-						}
+					&::after,
+					tr::after {
+						background-color: var(--system-color);
 					}
 				}
 
@@ -434,11 +442,9 @@
 							color: var(--moon-group-color-#{$i});
 						}
 
-						tr {
-							&::after,
-							th::before {
-								background-color: var(--moon-group-color-#{$i});
-							}
+						&::after,
+						tr::after {
+							background-color: var(--moon-group-color-#{$i});
 						}
 					}
 				}

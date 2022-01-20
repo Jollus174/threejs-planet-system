@@ -85,26 +85,26 @@ const addToMoonGroup = (item) => {
 	if (item.bodyType === 'Moon') {
 		if (['_moon'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
-			item.moonGroupColor = hsl(207.7, 5.5, 53.5);
+			item.moonGroupColor = hsl(208, 6, 54);
 		}
 
 		if (['_phobos', '_deimos'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
-			item.moonGroupColor = hsl(1.3, 96.9, 50);
+			item.moonGroupColor = hsl(1, 97, 50);
 		}
 
 		if (['_metis', '_adrastea', '_amalthea', '_thebe'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Inner';
-			item.moonGroupColor = hsl(31.7);
+			item.moonGroupColor = hsl(32);
 		}
 
 		if (['_io', '_europa', '_ganymede', '_callisto'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Galilean';
-			item.moonGroupColor = hsl(111.2);
+			item.moonGroupColor = hsl(111);
 		}
 		if (['_leda', '_ersa', '_pandia', '_himalia', '_lysithea', '_elara', '_dia'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Himalia';
-			item.moonGroupColor = hsl(43.9);
+			item.moonGroupColor = hsl(255);
 		}
 
 		if (
@@ -165,7 +165,7 @@ const addToMoonGroup = (item) => {
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Carme';
-			item.moonGroupColor = hsl(349.5);
+			item.moonGroupColor = hsl(350);
 		}
 
 		if (
@@ -191,12 +191,12 @@ const addToMoonGroup = (item) => {
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Pasiphae';
-			item.moonGroupColor = hsl(192.1);
+			item.moonGroupColor = hsl(192);
 		}
 
 		if (['_themisto', '_carpo', '_valetudo'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Misc';
-			item.moonGroupColor = hsl(207.7);
+			item.moonGroupColor = hsl(208);
 		}
 
 		// Saturn moon groups...
@@ -218,13 +218,13 @@ const addToMoonGroup = (item) => {
 		) {
 			item.moonGroup = 'Skathi';
 			item.direction = 'retrograde';
-			item.moonGroupColor = hsl(43.1);
+			item.moonGroupColor = hsl(43);
 		}
 
 		if (['_narvi', '_bestla', '_s2004S36'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Narvi';
 			item.direction = 'retrograde';
-			item.moonGroupColor = hsl(24.8);
+			item.moonGroupColor = hsl(25);
 		}
 
 		if (
@@ -270,32 +270,32 @@ const addToMoonGroup = (item) => {
 		if (['_albiorix', '_bebhionn', '_erriapus', '_tarvos'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Gallic';
 			item.direction = 'prograde';
-			item.moonGroupColor = hsl(43.1);
+			item.moonGroupColor = hsl(43);
 		}
 
 		if (['_prometheus', '_daphnis', '_pan', '_janus', '_epimetheus', '_atlas', '_pandora'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Shepherd Moons';
-			item.moonGroupColor = hsl(352.1);
+			item.moonGroupColor = hsl(352);
 		}
 		if (['_tethys', '_telesto', '_calypso'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Tethys';
-			item.moonGroupColor = hsl(85.9);
+			item.moonGroupColor = hsl(86);
 		}
 		if (['_dione', '_helene', '_polydeuces'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Dione';
-			item.moonGroupColor = hsl(189.8);
+			item.moonGroupColor = hsl(190);
 		}
 		if (['_methone', '_anthe', '_pallene'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Alkyonides';
-			item.moonGroupColor = hsl(220.9);
+			item.moonGroupColor = hsl(221);
 		}
 		if (['_ijiraq', '_kiviuq', '_paaliaq', '_siarnaq', '_tarqeq'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Inuit';
-			item.moonGroupColor = hsl(23.6);
+			item.moonGroupColor = hsl(24);
 		}
 		if (['_hyperion', '_rhea', '_titan', '_iapetus'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Outer Large';
-			item.moonGroupColor = hsl(264.8);
+			item.moonGroupColor = hsl(265);
 		}
 		if (
 			['_mimas', '_enceladus', '_aegaeon', '_s2009S1', '_s2004S24', '_s2004S29', '_s2004S31'].indexOf(item.id) !== -1
@@ -322,12 +322,12 @@ const addToMoonGroup = (item) => {
 			].indexOf(item.id) !== -1
 		) {
 			item.moonGroup = 'Inner';
-			item.moonGroupColor = hsl(334.5);
+			item.moonGroupColor = hsl(334);
 		}
 
 		if (['_ariel', '_miranda', '_umbriel', '_titania', '_oberon'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Major';
-			item.moonGroupColor = hsl(7.3);
+			item.moonGroupColor = hsl(7);
 		}
 
 		if (
@@ -345,13 +345,13 @@ const addToMoonGroup = (item) => {
 		) {
 			item.moonGroup = 'Irregular';
 			item.direction = item.id === '_margaret' ? 'Prograde' : 'Retrograde';
-			item.moonGroupColor = hsl(135.7);
+			item.moonGroupColor = hsl(136);
 		}
 
 		// Neptune moon groups...
 		if (['_naiad', '_thalassa', '_despina', '_galatea', '_larissa', '_hippocamp', '_proteus'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Regular';
-			item.moonGroupColor = hsl(42.8);
+			item.moonGroupColor = hsl(43);
 		}
 		if (['_triton', '_nereid', '_halimede', '_sao', '_laomedeia', '_psamathe', '_neso'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Irregular';
@@ -362,7 +362,7 @@ const addToMoonGroup = (item) => {
 
 		if (['_charon', '_nix', '_hydra', '_kerberos', '_styx'].indexOf(item.id) !== -1) {
 			item.moonGroup = '';
-			item.moonGroupColor = hsl(23.5);
+			item.moonGroupColor = hsl(24);
 		}
 
 		if (['_dysnomia'].indexOf(item.id) !== -1) {
@@ -371,7 +371,7 @@ const addToMoonGroup = (item) => {
 		}
 
 		if (!item.moonGroupColor) {
-			item.moonGroupColor = hsl(207.7, 5.5, 53.5);
+			item.moonGroupColor = hsl(208, 6, 54);
 		}
 
 		item.moonGroupId = item.moonGroup ? item.moonGroup.toLowerCase() : '';

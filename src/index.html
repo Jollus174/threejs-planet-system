@@ -212,11 +212,7 @@
 												<tr>
 													<td class="td-wrapper">
 														<table>
-															<tbody
-																class="planet-group"
-																data-selector="tbody-wrapper"
-																:class="{'active-entity-group': clickedClassData.id === systemClassData.id}"
-															>
+															<tbody class="planet-group active-planet-group" data-selector="tbody-wrapper">
 																<tr
 																	tabindex="0"
 																	:class="{'active-entity': clickedClassData.id === systemClassData.id}"
@@ -239,7 +235,6 @@
 																<th class="item-key">Moons</th>
 																<th class="item-key">Distance</th>
 																<th class="item-key">Radius</th>
-																<th class="item-key d-none d-md-table-cell">Mass</th>
 															</tr>
 														</thead>
 														<tbody
@@ -247,7 +242,7 @@
 															data-selector="tbody-wrapper"
 															v-if="moonGroups.length"
 															v-for="(moonGroup, i) in moonGroups"
-															:class="['moon-group-' + i, {'active-entity-group': moonGroup.name === clickedClassData.moonGroup}]"
+															:class="['moon-group-' + i, {'active-moon-group': moonGroup.name === clickedClassData.moonGroup}]"
 															:data-moongroup-name="moonGroup.name"
 														>
 															<tr
@@ -264,14 +259,6 @@
 																<td>
 																	{{ distanceConverter(moon.meanRadius).value }}
 																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
-																</td>
-																<td class="d-none d-md-table-cell">
-																	<template v-if="moon.mass && moon.mass.massValue && moon.mass.massExponent">
-																		{{ valueToFixedFloatingPoints(moon.mass.massValue) }} x 10<sup
-																			>{{ moon.mass.massExponent }}</sup
-																		>
-																		<sub>kg</sub>
-																	</template>
 																</td>
 															</tr>
 														</tbody>
