@@ -40,9 +40,6 @@ const orrery = {
 		_sun: null,
 		_starField: null,
 		_asteroidBelt: null,
-		_planetLabels: {},
-		_moonLabels: {},
-		_dwarfPlanetLabels: {},
 		_allPlanets: [],
 		_orbitLines: []
 	},

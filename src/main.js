@@ -166,10 +166,6 @@ const render = () => {
 	labelRenderer.render(scene, orrery.camera);
 };
 
-window.addEventListener('resize', () => {
-	updateProjectionViewSize(window.innerWidth, window.innerHeight);
-});
-
 // using window so RAF can be accessed through solution without importing
 // TODO: can probably be tidied up in future
 window.animate = () => {
@@ -239,6 +235,7 @@ fetch('./solarSystemData.json')
 				showSearchMobile: false,
 				bottomBar: {},
 				sidebarIsOpen: false,
+				sidebarWidthDesktop: 500,
 				clickedClassData: null,
 				zoomedClassData: null,
 				systemClassData: null,
@@ -615,7 +612,10 @@ fetch('./solarSystemData.json')
 
 				openSidebar() {
 					this.sidebarIsOpen = true; // show sidebar if it's the first time an entity has been clicked
-					if (checkIfDesktop()) updateProjectionViewSize(window.innerWidth - 600, window.innerHeight);
+					updateProjectionViewSize(
+						this.sidebarIsOpen && checkIfDesktop() ? window.innerWidth - this.sidebarWidthDesktop : window.innerWidth,
+						window.innerHeight
+					);
 				},
 				closeSidebar() {
 					this.sidebarIsOpen = false;
@@ -828,6 +828,13 @@ fetch('./solarSystemData.json')
 					// TODO: set this to work in dev-only
 					if (e.key === 'p') document.dispatchEvent(evRenderPause);
 					if (e.key === 'o') document.dispatchEvent(evRenderStart);
+				});
+
+				window.addEventListener('resize', () => {
+					updateProjectionViewSize(
+						this.sidebarIsOpen && checkIfDesktop() ? window.innerWidth - this.sidebarWidthDesktop : window.innerWidth,
+						window.innerHeight
+					);
 				});
 
 				orrery.vueTarget.addEventListener(customEventNames.updateClickTargetVue, () => {

@@ -186,9 +186,7 @@ class Entity {
 		// ---
 	}
 
-	build() {
-		this.setListeners();
-
+	createLabel() {
 		const entityTypeClasses = [
 			this.data.id === 'sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
@@ -219,8 +217,6 @@ class Entity {
 		this.labelGroup.name = `${this.data.id} group label`;
 		this.labelGroup.data = this.data;
 
-		orrery.bodies._planetLabels[this.data.id] = this.labelGroup;
-
 		if (this.data.startingPosition) {
 			this.labelGroup.position.copy(this.data.startingPosition);
 		} else {
@@ -229,6 +225,11 @@ class Entity {
 
 		this.labelGroup.add(this.CSSObj);
 		scene.add(this.labelGroup);
+	}
+
+	build() {
+		this.setListeners();
+		this.createLabel();
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
@@ -445,7 +446,7 @@ class Planet extends Entity {
 
 		if (cameraZoomedToPlanet) {
 			orrery.cameraState._currentPlanetInRange = this.data.id;
-			// this.labelLink.classList.add('faded');
+			this.labelLink.classList.add('faded');
 
 			// staggering the building of moon classes to help with performance
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -461,7 +462,7 @@ class Planet extends Entity {
 			// TODO: Need a fix for if a second planet immediately replaces the previous one
 			if (orrery.cameraState._currentPlanetInRange === this.data.id) {
 				orrery.cameraState._currentPlanetInRange = '';
-				// this.labelLink.classList.remove('faded');
+				this.labelLink.classList.remove('faded');
 			}
 
 			if (this.moonClasses && Object.values(this.moonClasses).length) {
@@ -590,10 +591,10 @@ class Moon extends Entity {
 		if (this.isAdded) return;
 		this.isAdded = true;
 
-		this.labelGroup.add(this.CSSObj);
-		this.planetGroup.add(this.labelGroup);
-
 		this.setListeners();
+		this.createLabel();
+
+		this.planetGroup.add(this.labelGroup);
 
 		this.OrbitLine.build();
 		this.createEntityMesh();
@@ -611,39 +612,42 @@ class Moon extends Entity {
 		});
 	}
 
-	/* 	intervalCheck() {
-		if (this.raycasterEnabled) {
-			this.updateRaycaster();
-			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+	intervalCheck() {
+		// Only fires if parent planet is in range
+		if (orrery.cameraState._currentPlanetInRange === this.planetClass.data.id) {
+			if (this.raycasterEnabled) {
+				this.updateRaycaster();
+				if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+			}
+
+			const v3 = new THREE.Vector3();
+			const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
+			this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
+			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+
+			if (cameraZoomedToMoon) {
+				this.labelLink.classList.add('faded');
+			} else {
+				this.labelLink.classList.remove('faded');
+			}
+
+			// if (this.OrbitLine) {
+			// 	if (cameraZoomedToMoon) {
+			// 		this.OrbitLine.fadeOut();
+			// 	} else {
+			// 		if (
+			// 			(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
+			// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
+			// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
+			// 		) {
+			// 			this.OrbitLine.fadeIn();
+			// 		} else {
+			// 			this.OrbitLine.fadeOut();
+			// 		}
+			// 	}
+			// }
 		}
-
-		const v3 = new THREE.Vector3();
-		const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
-		this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
-		const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
-
-		if (cameraZoomedToMoon) {
-			this.labelLink.classList.add('faded');
-		} else {
-			this.labelLink.classList.remove('faded');
-		}
-
-		// if (this.OrbitLine) {
-		// 	if (cameraZoomedToMoon) {
-		// 		this.OrbitLine.fadeOut();
-		// 	} else {
-		// 		if (
-		// 			(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
-		// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
-		// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
-		// 		) {
-		// 			this.OrbitLine.fadeIn();
-		// 		} else {
-		// 			this.OrbitLine.fadeOut();
-		// 		}
-		// 	}
-		// }
-	} */
+	}
 }
 
 export { setOrbitVisibility, OrbitLine, Planet, DwarfPlanet, Asteroid, Sun, Moon };
