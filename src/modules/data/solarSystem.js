@@ -44,7 +44,7 @@ const sunData = {
 };
 
 const materialData = {
-	sun: {
+	_sun: {
 		segments: 128,
 		map: textureSun,
 		normalMap: null,
@@ -54,7 +54,7 @@ const materialData = {
 		side: FrontSide
 	},
 
-	mercury: {
+	_mercury: {
 		map: textureMercury,
 		normalMap: null,
 		// emissive: '#FFF',
@@ -62,27 +62,27 @@ const materialData = {
 		// emissiveIntensity: 0.8,
 		side: FrontSide
 	},
-	venus: {
+	_venus: {
 		map: textureVenus,
 		normalMap: null,
 		side: FrontSide
 	},
-	earth: {
+	_earth: {
 		map: textureEarth,
 		normalMap: null,
 		side: FrontSide
 	},
-	mars: {
+	_mars: {
 		map: textureMars,
 		normalMap: null,
 		side: FrontSide
 	},
-	jupiter: {
+	_jupiter: {
 		map: textureJupiter,
 		normalMap: null,
 		side: FrontSide
 	},
-	saturn: {
+	_saturn: {
 		map: textureSaturn,
 		normalMap: null,
 		side: FrontSide,
@@ -97,22 +97,22 @@ const materialData = {
 			}
 		]
 	},
-	uranus: {
+	_uranus: {
 		map: textureUranus,
 		normalMap: null,
 		side: FrontSide
 	},
-	neptune: {
+	_neptune: {
 		map: textureNeptune,
 		normalMap: null,
 		side: FrontSide
 	},
-	pluto: {
+	_pluto: {
 		map: texturePluto,
 		normalMap: null,
 		side: FrontSide
 	},
-	moon: {
+	_moon: {
 		map: textureMoon,
 		normalMap: null,
 		side: FrontSide

@@ -93,7 +93,7 @@
 						</div>
 					</div>
 
-					<aside id="sidebar-ui-details" class="sidebar-ui-details" v-if="sidebarOpen">
+					<aside id="sidebar-ui-details" class="sidebar-ui-details" v-if="sidebarIsOpen">
 						<div class="ui-details-container">
 							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
 							<div class="title-container">
@@ -504,16 +504,11 @@
 							</div>
 						</div>
 					</aside>
-					<button class="btn btn-close-sidebar" v-if="sidebarOpen" @click="sidebarOpen = false">
+					<button class="btn btn-close-sidebar" v-if="sidebarIsOpen" @click="closeSidebar">
 						<img src="/img/icon-close.svg" />
 					</button>
 
-					<button
-						class="btn btn-show-details"
-						v-if="clickedClassData"
-						v-show="!sidebarOpen"
-						@click="sidebarOpen = true"
-					>
+					<button class="btn btn-show-details" v-if="clickedClassData" v-show="!sidebarIsOpen" @click="openSidebar">
 						Info
 					</button>
 				</div>

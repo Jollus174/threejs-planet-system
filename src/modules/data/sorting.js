@@ -385,7 +385,7 @@ const isInnerPlanet = (item) => {
 const setRings = (item) => {
 	// manually adding own ring data, API does not have this
 	const ringData = {
-		saturn: [
+		_saturn: [
 			{
 				inner: 66900,
 				outer: 140220,

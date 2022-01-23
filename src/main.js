@@ -18,6 +18,7 @@ import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps'
 import { sortData, APIRequest } from './modules/data/api';
 import { scene } from './modules/scene';
 import { customEventNames } from './modules/events/customEvents';
+import { evRenderPause, evRenderStart } from './modules/events/events';
 
 import Vue from 'vue/dist/vue.js';
 import LightBox from 'vue-it-bigger';
@@ -32,6 +33,25 @@ window.renderer = renderer;
 const clock = new THREE.Clock();
 const vectorPosition = new THREE.Vector3();
 
+const updateProjectionViewSize = (width, height) => {
+	renderer.setSize(width, height);
+	labelRenderer.setSize(width, height);
+	orrery.camera.aspect = width / height;
+	orrery.camera.updateProjectionMatrix();
+	orrery.isDesktop = checkIfDesktop();
+};
+
+window.pauseRender = () => document.dispatchEvent(evRenderPause);
+window.startRender = () => document.dispatchEvent(evRenderStart);
+
+document.addEventListener('renderPause', () => {
+	window.cancelAnimationFrame(window.renderLoop);
+});
+
+document.addEventListener('renderStart', () => {
+	window.animate();
+});
+
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const clickedClass = e.detail;
 	const newClickedClassSameAsOld = orrery.mouseState._clickedClass
@@ -43,20 +63,6 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	if (labelSelected) labelSelected.classList.remove('label-selected');
 
 	clickedClass.labelLink.classList.add('label-selected');
-
-	// updating modal with Wikipedia data
-	/* if (!clickedClass.data.content) {
-		const wikiKey = clickedClass.data.wikipediaKey || clickedClass.data.displayName;
-		getWikipediaData(wikiKey)
-			.then((response) => {
-				clickedClass.data.title = response.title;
-				clickedClass.data.content = response.content;
-				clickedClass.data.image = response.image;
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	} */
 
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateClickTargetVue));
 
@@ -161,11 +167,7 @@ const render = () => {
 };
 
 window.addEventListener('resize', () => {
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	labelRenderer.setSize(window.innerWidth, window.innerHeight);
-	orrery.camera.aspect = window.innerWidth / window.innerHeight;
-	orrery.camera.updateProjectionMatrix();
-	orrery.isDesktop = checkIfDesktop();
+	updateProjectionViewSize(window.innerWidth, window.innerHeight);
 });
 
 // using window so RAF can be accessed through solution without importing
@@ -214,11 +216,11 @@ fetch('./solarSystemData.json')
 			generateMoonClasses(orrery.classes._dwarfPlanets[dPlanet.id]);
 		}
 
-		for (const asteroid of orrery.bodies.types._asteroid) {
-			orrery.classes._asteroids[asteroid.id] = new Asteroid(asteroid);
-			orrery.classes._all[asteroid.id] = orrery.classes._asteroids[asteroid.id];
-			generateMoonClasses(orrery.classes._asteroids[asteroid.id]);
-		}
+		// for (const asteroid of orrery.bodies.types._asteroid) {
+		// 	orrery.classes._asteroids[asteroid.id] = new Asteroid(asteroid);
+		// 	orrery.classes._all[asteroid.id] = orrery.classes._asteroids[asteroid.id];
+		// 	generateMoonClasses(orrery.classes._asteroids[asteroid.id]);
+		// }
 
 		scene.add(skybox(skyboxTexturePaths));
 
@@ -236,7 +238,7 @@ fetch('./solarSystemData.json')
 				navigationEntities: settings.navigationEntities,
 				showSearchMobile: false,
 				bottomBar: {},
-				sidebarOpen: false,
+				sidebarIsOpen: false,
 				clickedClassData: null,
 				zoomedClassData: null,
 				systemClassData: null,
@@ -611,6 +613,15 @@ fetch('./solarSystemData.json')
 					return elTop >= cTop && eBottom <= cBottom;
 				},
 
+				openSidebar() {
+					this.sidebarIsOpen = true; // show sidebar if it's the first time an entity has been clicked
+					if (checkIfDesktop()) updateProjectionViewSize(window.innerWidth - 600, window.innerHeight);
+				},
+				closeSidebar() {
+					this.sidebarIsOpen = false;
+					if (checkIfDesktop()) updateProjectionViewSize(window.innerWidth, window.innerHeight);
+				},
+
 				switchDetailTabs() {
 					if (this.tabGroup === 'tab-desc') {
 						if (!this.clickedClassData.description.content) this.getWikipediaData();
@@ -658,11 +669,11 @@ fetch('./solarSystemData.json')
 							else if (a.type === 'Dwarf Planet' || b.type === 'Dwarf Planet')
 								return a.type === 'Dwarf Planet' ? -1 : 1;
 							else if (a.type === 'Comet' || b.type === 'Comet') return a.type === 'Comet' ? -1 : 1;
-							else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
 							else if (a.type === 'Moon' || b.type === 'Moon') {
 								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
 								return a.type === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
-							} else return -1;
+							} else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
+							else return -1;
 						})
 						.map((result) => {
 							return {
@@ -692,6 +703,7 @@ fetch('./solarSystemData.json')
 					// checking to see if entity in prev system was already previously selected
 					prevSystemKey = this.modelSystemSelection[prevSystemKey] || prevSystemKey;
 					this.updateEntity(orrery.classes._all[prevSystemKey].data);
+					this.updateZoomTarget(prevIndex);
 				},
 
 				goToNextSystem() {
@@ -705,12 +717,15 @@ fetch('./solarSystemData.json')
 					// checking to see if entity in next system was already previously selected
 					nextSystemKey = this.modelSystemSelection[nextSystemKey] || nextSystemKey;
 					this.updateEntity(orrery.classes._all[nextSystemKey].data);
+					this.updateZoomTarget(nextIndex);
 				},
 
 				updateEntity(data) {
 					const newClickedClassData = data;
 
-					if (!this.sidebarOpen && !this.clickedClassData) this.sidebarOpen = true; // show sidebar if it's the first time an entity has been clicked
+					if (!this.sidebarIsOpen && !this.clickedClassData) {
+						this.openSidebar();
+					}
 
 					this.clickedClassData = newClickedClassData;
 					this.systemClassData = this.clickedClassData.aroundPlanet
@@ -774,6 +789,14 @@ fetch('./solarSystemData.json')
 				}
 			},
 			mounted() {
+				this.$refs.lightbox.$on('onOpened', () => {
+					window.pauseRender();
+				});
+
+				this.$refs.lightbox.$on('onClosed', () => {
+					window.startRender();
+				});
+
 				document.querySelector('main').prepend(labelRenderer.domElement);
 
 				// TODO: These should be moved to a JS file that sets generic listeners
@@ -790,8 +813,8 @@ fetch('./solarSystemData.json')
 
 					// if (!e.target.closest('#sidebar-ui-details')) {
 					// 	setTimeout(() => {
-					// 		if (this.sidebarOpen) {
-					// 			this.sidebarOpen = false;
+					// 		if (this.sidebarIsOpen) {
+					// 			this.sidebarIsOpen = false;
 					// 		}
 					// 	}, 1000);
 					// }
@@ -799,8 +822,12 @@ fetch('./solarSystemData.json')
 
 				document.addEventListener('keydown', (e) => {
 					if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
-						this.sidebarOpen = false;
+						this.closeSidebar();
 					}
+
+					// TODO: set this to work in dev-only
+					if (e.key === 'p') document.dispatchEvent(evRenderPause);
+					if (e.key === 'o') document.dispatchEvent(evRenderStart);
 				});
 
 				orrery.vueTarget.addEventListener(customEventNames.updateClickTargetVue, () => {
@@ -836,7 +863,7 @@ fetch('./solarSystemData.json')
 					});
 				});
 
-				window.animate();
+				document.dispatchEvent(evRenderStart);
 
 				// scene.add(orrery.bodies._starField);
 				// scene.add(orrery.bodies._asteroidBelt);

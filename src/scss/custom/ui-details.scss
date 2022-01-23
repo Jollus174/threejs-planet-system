@@ -9,10 +9,12 @@
 	}
 
 	.sidebar-ui-details {
+		width: 100%;
+
 		@include media-breakpoint-up(lg) {
 			position: absolute;
+			max-width: 600px;
 			height: 100%;
-			min-width: 600px;
 		}
 	}
 

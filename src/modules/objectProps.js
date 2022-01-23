@@ -114,7 +114,7 @@ class OrbitLine {
 	}
 
 	orbitLineFadeOut() {
-		if (!this.fadingOut && this.orbitLine.material.opacity !== 0) {
+		if (!this.fadingOut && this.orbitLine && this.orbitLine.material.opacity !== 0) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
 				opacity: 0,
@@ -129,7 +129,7 @@ class OrbitLine {
 	}
 
 	orbitLineFadeIn() {
-		if (!this.fadingIn && this.orbitLine.material.opacity !== this.opacityDefault) {
+		if (!this.fadingIn && this.orbitLine && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
 			gsap.to(this.orbitLine.material, {
@@ -150,7 +150,7 @@ class OrbitLine {
 				duration: 0.25,
 				onComplete: () => {
 					this.fadingOut = false;
-					orrery.classes[this.parentPlanetType][this.parentPlanetId].labelGroup.children
+					orrery.classes._all[this.parentPlanetId].labelGroup.children
 						.find((o) => o.name === this.orbitLineName)
 						.removeFromParent();
 				}
@@ -163,8 +163,8 @@ class Entity {
 	constructor(data) {
 		this.data = data;
 		this.labelLink = document.createElement('a');
-		this.labelGroup = new THREE.Group({ name: `${this.data.id} group label` });
-		this.meshGroup = new THREE.Group({ name: `${this.data.id} mesh group` });
+		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
+		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
 		this.fadingIn = false;
 		this.fadingOut = false;
 		this.isVisible = false;
@@ -179,7 +179,7 @@ class Entity {
 		this.orbitLineVisibleAtBuild = true;
 		this.OrbitLine = new OrbitLine(data, this);
 
-		this.raycasterEnabled = true;
+		this.raycasterEnabled = false; // can cause some pretty laggy performance issues
 
 		// for debugging
 		this.raycasterArrowEnabled = false;
@@ -434,7 +434,7 @@ class Planet extends Entity {
 		this.moonClasses = {};
 	}
 
-	/* intervalCheck() {
+	intervalCheck() {
 		if (this.raycasterEnabled) {
 			this.updateRaycaster();
 			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
@@ -488,7 +488,7 @@ class Planet extends Entity {
 			// this.OrbitLine.fadeOut();
 			// }
 		}
-	} */
+	}
 }
 
 class DwarfPlanet extends Planet {
@@ -579,7 +579,7 @@ class Moon extends Entity {
 		this.isAdded = false;
 		this.planetClass = planetClass;
 		this.planetGroup = this.planetClass.labelGroup;
-		this.materialData = this.data.materialData || rawMaterialData.moon;
+		this.materialData = this.data.materialData || rawMaterialData._moon;
 		this.orbitLineVisibleAtBuild = this.planetClass.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
 
 		// All entities by default have an interval check. Want this cleared for moons since they start hidden
