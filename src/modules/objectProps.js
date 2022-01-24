@@ -10,12 +10,6 @@ import { textureLoader } from './loadManager'; // still not 100% sure if this cr
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
-import fragmentShader from './shaders/glow/fragmentShader.glsl';
-import vertexShader from './shaders/glow/vertexShader.glsl';
-import sunFragmentShader from './shaders/sun/fragmentShader.glsl';
-import sunVertexShader from './shaders/sun/vertexShader.glsl';
-import simpleFragmentShader from './shaders/debug/simpleFragmentShader.glsl';
-import simpleVertexShader from './shaders/debug/simpleVertexShader.glsl';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
@@ -105,7 +99,7 @@ class OrbitLine {
 			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
 		}
 
-		this.classRef.labelGroup.parent.add(this.orbitLine);
+		this.classRef.planetClass.labelGroup.add(this.orbitLine);
 
 		// initial page load
 		if (this.orbitLine.material.opacity === 0 && this.classRef.orbitLineVisibleAtBuild) {
@@ -114,6 +108,7 @@ class OrbitLine {
 	}
 
 	orbitLineFadeOut() {
+		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingOut && this.orbitLine && this.orbitLine.material.opacity !== 0) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
@@ -129,6 +124,7 @@ class OrbitLine {
 	}
 
 	orbitLineFadeIn() {
+		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingIn && this.orbitLine && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
@@ -143,6 +139,7 @@ class OrbitLine {
 	}
 
 	remove() {
+		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingOut) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
@@ -186,7 +183,7 @@ class Entity {
 		// ---
 	}
 
-	createLabel() {
+	createCSSLabel() {
 		const entityTypeClasses = [
 			this.data.id === 'sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
@@ -215,21 +212,23 @@ class Entity {
 		this.CSSObj.position.set(0, 0, 0);
 
 		this.labelGroup.name = `${this.data.id} group label`;
-		this.labelGroup.data = this.data;
+		this.labelGroup.add(this.CSSObj);
+	}
 
+	setLabelGroupPosition() {
 		if (this.data.startingPosition) {
 			this.labelGroup.position.copy(this.data.startingPosition);
 		} else {
 			this.labelGroup.position.set(0, 0, 0);
 		}
-
-		this.labelGroup.add(this.CSSObj);
-		scene.add(this.labelGroup);
 	}
 
 	build() {
+		scene.add(this.labelGroup);
+		this.setLabelGroupPosition();
+
 		this.setListeners();
-		this.createLabel();
+		this.createCSSLabel();
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
@@ -445,15 +444,21 @@ class Planet extends Entity {
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + 50000000;
 
 		if (cameraZoomedToPlanet) {
+			// TODO: investigate this 'cameraZoomedToPlanet' var
 			orrery.cameraState._currentPlanetInRange = this.data.id;
 			this.labelLink.classList.add('faded');
 
 			// staggering the building of moon classes to help with performance
-			if (this.moonClasses && Object.values(this.moonClasses).length) {
+			if (
+				// orrery.mouseState._zoomedClass &&
+				// orrery.mouseState._zoomedClass.data.id === this.data.id &&
+				this.moonClasses &&
+				Object.values(this.moonClasses).length
+			) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
 					if (!moonClass.isAdded) {
 						setTimeout(() => {
-							moonClass.build();
+							moonClass.createElements();
 						}, i * 20);
 					}
 				});
@@ -588,15 +593,19 @@ class Moon extends Entity {
 	}
 
 	build() {
-		if (this.isAdded) return;
-		this.isAdded = true;
-
-		this.setListeners();
-		this.createLabel();
+		// this.setListeners(); // listeners to only set if in range
+		// this.createCSSLabel(); // this should only build if planet is in range
 
 		this.planetGroup.add(this.labelGroup);
+		this.setLabelGroupPosition();
+	}
 
+	createElements() {
+		if (this.isAdded) return;
+		this.isAdded = true;
 		this.OrbitLine.build();
+		this.setListeners(); // listeners to only set if in range
+		this.createCSSLabel(); // this should only build if planet is in range
 		this.createEntityMesh();
 
 		gsap.to(this.labelLink, {

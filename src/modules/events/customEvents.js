@@ -1,6 +1,6 @@
 const customEventNames = {
 	updateClickTarget: 'updateEntityClickTarget',
-	updateClickTargetVue: 'updateEntityClickTargetVue',
+	updateEntityVue: 'updateEntityVue',
 	updateZoomTarget: 'updateEntityZoomTarget',
 	updateZoomTargetVue: 'updateEntityZoomTargetVue'
 };

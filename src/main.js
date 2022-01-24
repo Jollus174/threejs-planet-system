@@ -46,10 +46,12 @@ window.startRender = () => document.dispatchEvent(evRenderStart);
 
 document.addEventListener('renderPause', () => {
 	window.cancelAnimationFrame(window.renderLoop);
+	console.log('render paused');
 });
 
 document.addEventListener('renderStart', () => {
 	window.animate();
+	console.log('render started');
 });
 
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
@@ -64,7 +66,7 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 
 	clickedClass.labelLink.classList.add('label-selected');
 
-	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateClickTargetVue));
+	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
 
 	// checking to see if the item has already been clicked
 	// if it has, then zoom to it
@@ -84,7 +86,7 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 	orrery.cameraState._zoomToTarget = true; // to get the camera moving
 	controls.minDistance = zoomedClass.data.meanRadius * 8;
 
-	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateZoomTargetVue));
+	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
 });
 
 const render = () => {
@@ -196,6 +198,8 @@ fetch('./solarSystemData.json')
 					parentClass.moonClasses[moon.id] = new Moon(moon, parentClass);
 					orrery.classes._moons[moon.id] = parentClass.moonClasses[moon.id];
 					orrery.classes._all[moon.id] = parentClass.moonClasses[moon.id];
+
+					parentClass.moonClasses[moon.id].build();
 				}
 			}
 		};
@@ -309,6 +313,7 @@ fetch('./solarSystemData.json')
 
 					// splitting the results by bodyType, then recombining into the final Search Results
 					const sortedResults = filteredResults
+						.filter((item) => item.bodyType !== 'Asteroid')
 						.sort((a, b) => {
 							if (a.bodyType === 'Star' || b.bodyType === 'Star') return a.bodyType === 'Star' ? -1 : 1;
 							else if (a.bodyType === 'Planet' || b.bodyType === 'Planet') return a.bodyType === 'Planet' ? -1 : 1;
@@ -699,11 +704,11 @@ fetch('./solarSystemData.json')
 							? systemKeys.indexOf(this.clickedClassData.systemId)
 							: 0;
 					const prevIndex = this.clickedClassData && currentIndex !== 0 ? currentIndex - 1 : systemKeys.length - 1;
-					let prevSystemKey = systemKeys[prevIndex].toLowerCase();
 					// checking to see if entity in prev system was already previously selected
-					prevSystemKey = this.modelSystemSelection[prevSystemKey] || prevSystemKey;
-					this.updateEntity(orrery.classes._all[prevSystemKey].data);
-					this.updateZoomTarget(prevIndex);
+					const prevSystemKey = systemKeys[prevIndex];
+					const prevSystem = orrery.classes._all[prevSystemKey];
+					this.updateEntity(prevSystem.data);
+					this.updateZoomTarget(prevSystem.data);
 				},
 
 				goToNextSystem() {
@@ -713,11 +718,29 @@ fetch('./solarSystemData.json')
 							? systemKeys.indexOf(this.clickedClassData.systemId)
 							: 0;
 					const nextIndex = this.clickedClassData && currentIndex + 1 < systemKeys.length ? currentIndex + 1 : 0;
-					let nextSystemKey = systemKeys[nextIndex].toLowerCase();
 					// checking to see if entity in next system was already previously selected
-					nextSystemKey = this.modelSystemSelection[nextSystemKey] || nextSystemKey;
-					this.updateEntity(orrery.classes._all[nextSystemKey].data);
-					this.updateZoomTarget(nextIndex);
+					const nextSystemKey = systemKeys[nextIndex];
+					const nextSystem = orrery.classes._all[nextSystemKey];
+					this.updateEntity(nextSystem.data);
+					this.updateZoomTarget(nextSystem.data);
+				},
+
+				goToPreviousEntity() {
+					const keys = this.navigationEntities;
+					const currentIndex = keys.indexOf(this.clickedClassData.id);
+					const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
+					const prevEntity = orrery.classes._all[keys[prevIndex]];
+					this.updateEntity(prevEntity.data);
+					this.updateZoomTarget(prevEntity.data);
+				},
+
+				goToNextEntity() {
+					const keys = this.navigationEntities;
+					const currentIndex = keys.indexOf(this.clickedClassData.id);
+					const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
+					const nextEntity = orrery.classes._all[keys[nextIndex]];
+					this.updateEntity(nextEntity.data);
+					this.updateZoomTarget(nextEntity.data);
 				},
 
 				updateEntity(data) {
@@ -746,20 +769,6 @@ fetch('./solarSystemData.json')
 					this.switchDetailTabs(); // to trigger the API loader for content (if it's needed)
 				},
 
-				goToPreviousEntity() {
-					const keys = this.navigationEntities;
-					const currentIndex = keys.indexOf(this.clickedClassData.id);
-					const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
-					this.updateEntity(orrery.classes._all[keys[prevIndex]].data);
-				},
-
-				goToNextEntity() {
-					const keys = this.navigationEntities;
-					const currentIndex = keys.indexOf(this.clickedClassData.id);
-					const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
-					this.updateEntity(orrery.classes._all[keys[nextIndex]].data);
-				},
-
 				resetSearch() {
 					this.searchQuery = '';
 				},
@@ -775,13 +784,9 @@ fetch('./solarSystemData.json')
 					}
 				},
 
-				updateClickTarget(i) {
-					const clickedClass = orrery.classes._all[this.navigationEntities[i]];
-					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
-				},
-
-				updateZoomTarget(i) {
-					const clickedClass = orrery.classes._all[this.navigationEntities[i]];
+				updateZoomTarget(data) {
+					const clickedClass = orrery.classes._all[data.id];
+					this.updateEntity(data);
 					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();
@@ -837,7 +842,7 @@ fetch('./solarSystemData.json')
 					);
 				});
 
-				orrery.vueTarget.addEventListener(customEventNames.updateClickTargetVue, () => {
+				orrery.vueTarget.addEventListener(customEventNames.updateEntityVue, () => {
 					this.updateEntity(orrery.mouseState._clickedClass.data);
 				});
 

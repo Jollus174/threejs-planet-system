@@ -66,9 +66,7 @@ const idReplacements = (itemList) => {
 		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
 		if (item.name === 'Moon') item.displayName = 'The Moon';
 		if (item.id === 'dactyl') item.displayName = 'Dactyl';
-		if (
-			['eris', 'ceres', 'makemake', 'haumea', 'orcus', 'quaoar'].some((i) => item.displayName.toLowerCase().includes(i))
-		) {
+		if (['eris', 'ceres', 'makemake', 'haumea', 'orcus'].some((i) => item.displayName.toLowerCase().includes(i))) {
 			item.displayName = item.displayName.split(' ')[1];
 			item.bodyType = 'Dwarf Planet';
 		}
