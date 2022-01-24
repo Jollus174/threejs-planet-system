@@ -59,7 +59,7 @@
 											type="seach"
 											placeholder="Search"
 											v-model="searchQuery"
-											@keyup.enter="updateZoomTarget(searchResults[0].index)"
+											@keyup.enter="updateZoomTarget(searchResults[0].data)"
 										/>
 									</div>
 								</div>
@@ -76,14 +76,15 @@
 							placeholder="Search"
 							v-model="searchQuery"
 							:class="{'active': showSearchMobile}"
-							@keyup.enter="updateZoomTarget(searchResults[0].index)"
+							@keyup.enter="updateZoomTarget(searchResults[0].data)"
 						/>
 						<!-- TODO: Get links working and remove the '.prevent' -->
 						<div class="search-dropdown" :class="{'active': searchResults}">
 							<ul>
 								<li v-for="(result, i) in searchResults">
-									<a :href="'/#/' + result.id" @click.prevent="updateZoomTarget(result.index)">
-										<span v-html="result.displayName"></span> <sub class="text-type">{{ result.bodyType }}</sub>
+									<a :href="'/#/' + result.data.id" @click.prevent="updateZoomTarget(result.data)">
+										<span v-html="result.data.displayName"></span>
+										<sub class="text-type">{{ result.data.bodyType }}</sub>
 									</a>
 								</li>
 								<li v-if="searchResults && !searchResults.length">

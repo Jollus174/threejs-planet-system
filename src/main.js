@@ -329,12 +329,8 @@ fetch('./solarSystemData.json')
 						})
 						.map((result) => {
 							return {
-								id: result.id,
-								index: this.navigationEntities.indexOf(result.id),
 								displayName: this.highlightMatchSubstring(result.displayName),
-								bodyType: result.bodyType,
-								systemName: result.systemName,
-								systemId: result.systemId
+								data: { ...result }
 							};
 						})
 						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
@@ -831,8 +827,8 @@ fetch('./solarSystemData.json')
 					}
 
 					// TODO: set this to work in dev-only
-					if (e.key === 'p') document.dispatchEvent(evRenderPause);
-					if (e.key === 'o') document.dispatchEvent(evRenderStart);
+					// if (e.key === 'p') document.dispatchEvent(evRenderPause);
+					// if (e.key === 'o') document.dispatchEvent(evRenderStart);
 				});
 
 				window.addEventListener('resize', () => {

@@ -190,7 +190,7 @@ const addToMoonGroup = (item) => {
 
 		if (['_themisto', '_carpo', '_valetudo'].indexOf(item.id) !== -1) {
 			item.moonGroup = 'Misc';
-			item.moonGroupColor = hsl(208);
+			item.moonGroupColor = hsl(208, 0, 80);
 		}
 
 		// Saturn moon groups...

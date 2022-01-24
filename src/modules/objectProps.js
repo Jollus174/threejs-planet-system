@@ -59,8 +59,8 @@ class OrbitLine {
 		// create geometry using all points on the circle
 		const geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
 
-		const startColor = new THREE.Color(this.data.labelColour);
-		const endColor = new THREE.Color('black');
+		const startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
+		const endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
 
 		const vertCnt = geometryLine.getAttribute('position').count;
 		const lerpAcc = 1; // how much fade we want, closer to 0 means fades earlier
