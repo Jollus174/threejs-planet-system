@@ -96,7 +96,7 @@ const sortData = (data) => {
 		if (entity.moons && entity.moons.length) {
 			const eMoons = entity.moons
 				.map((eMoon) => moons.find((m) => m.id === eMoon.moon))
-				.sort((a, b) => (a.moonGroup > b.moonGroup ? 1 : b.moonGroup > a.moonGroup ? -1 : 0));
+				.sort((a, b) => (a.moonGroupIndex > b.moonGroupIndex ? 1 : -1));
 			entity.moons = eMoons;
 		}
 	};

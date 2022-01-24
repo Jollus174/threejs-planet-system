@@ -298,6 +298,8 @@ fetch('./solarSystemData.json')
 						return {
 							name: moonGroupName,
 							color: moons[0].moonGroupColor,
+							showName: moons[0].moonGroupShowName,
+							moonGroupIndex: moons[0].moonGroupIndex,
 							moons
 						};
 					});

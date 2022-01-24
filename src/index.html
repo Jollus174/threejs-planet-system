@@ -217,7 +217,7 @@
 																<tr
 																	tabindex="0"
 																	:class="{'active-entity': clickedClassData.id === systemClassData.id}"
-																	@click="updateEntity(systemClassData)"
+																	@click="updateZoomTarget(systemClassData)"
 																>
 																	<th scope="row"><span>{{ systemClassData.displayName }}</span></th>
 																</tr>
@@ -243,14 +243,14 @@
 															data-selector="tbody-wrapper"
 															v-if="moonGroups.length"
 															v-for="(moonGroup, i) in moonGroups"
-															:class="['moon-group-' + i, {'active-moon-group': moonGroup.name === clickedClassData.moonGroup}]"
+															:class="['moon-group-' + i, {'active-moon-group': moonGroup.name === clickedClassData.moonGroup, 'show-moon-group-name': moonGroup.showName}]"
 															:data-moongroup-name="moonGroup.name"
 														>
 															<tr
 																tabindex="0"
 																v-for="(moon, j) in moonGroup.moons"
 																:class="{'active-entity': clickedClassData.id === moon.id}"
-																@click="updateEntity(moon)"
+																@click="updateZoomTarget(moon)"
 															>
 																<th scope="row"><span>{{ moon.displayName }}</span></th>
 																<td>

@@ -432,7 +432,7 @@
 					}
 				}
 
-				&.moon-group {
+				&.moon-group.show-moon-group-name {
 					&::before {
 						content: attr(data-moongroup-name);
 					}
