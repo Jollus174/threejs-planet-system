@@ -227,7 +227,7 @@
 												</tr>
 											</tbody>
 										</table>
-										<table v-if="moonGroups" data-selector="table-wrapper">
+										<table v-if="modelMoonGroups[clickedClassData.systemId]" data-selector="table-wrapper">
 											<tr>
 												<td class="td-wrapper">
 													<table>
@@ -241,9 +241,9 @@
 														<tbody
 															class="moon-group"
 															data-selector="tbody-wrapper"
-															v-if="moonGroups.length"
-															v-for="(moonGroup, i) in moonGroups"
-															:class="['moon-group-' + i, {'active-moon-group': moonGroup.name === clickedClassData.moonGroup, 'show-moon-group-name': moonGroup.showName}]"
+															v-if="modelMoonGroups[clickedClassData.systemId].length"
+															v-for="(moonGroup, i) in modelMoonGroups[clickedClassData.systemId]"
+															:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isSelected, 'show-moon-group-name': moonGroup.showName}]"
 															:data-moongroup-name="moonGroup.name"
 														>
 															<tr
@@ -464,7 +464,9 @@
 										@change="switchDetailTabs"
 									/>
 									<label class="btn" for="tab-desc"><span class="fab fa-wikipedia-w"></span>Desc</label>
-									<template v-if="moonGroups && moonGroups.length">
+									<template
+										v-if="modelMoonGroups[clickedClassData.systemId] && modelMoonGroups[clickedClassData.systemId].length"
+									>
 										<input
 											type="radio"
 											class="btn-check"

@@ -456,7 +456,7 @@ class Planet extends Entity {
 				Object.values(this.moonClasses).length
 			) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
-					if (!moonClass.isAdded) {
+					if (!moonClass.isAdded && moonClass.moonGroupShow) {
 						setTimeout(() => {
 							moonClass.createElements();
 						}, i * 20);
@@ -587,6 +587,7 @@ class Moon extends Entity {
 		this.planetGroup = this.planetClass.labelGroup;
 		this.materialData = this.data.materialData || rawMaterialData._moon;
 		this.orbitLineVisibleAtBuild = this.planetClass.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+		this.moonGroupShow = false; // updated by event emitted by Vue when a moon group updates
 
 		// All entities by default have an interval check. Want this cleared for moons since they start hidden
 		clearInterval(this.intervalCheckVar);

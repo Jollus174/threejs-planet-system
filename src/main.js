@@ -89,6 +89,14 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
 });
 
+document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
+	for (const moonGroup of e.detail) {
+		for (const moonId of moonGroup.moonIds) {
+			orrery.classes._all[moonId].moonGroupShow = moonGroup.isSelected;
+		}
+	}
+});
+
 const render = () => {
 	delta = 5 * clock.getDelta();
 	// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
@@ -244,6 +252,7 @@ fetch('./solarSystemData.json')
 				zoomedClassData: null,
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
+				modelMoonGroups: {},
 				tabGroup: 'tab-desc'
 			},
 			computed: {
@@ -289,22 +298,6 @@ fetch('./solarSystemData.json')
 					};
 				},
 
-				moonGroups() {
-					if (!this.systemClassData || !this.systemClassData.moons) return null;
-					// using Set to remove duplicates
-					const moonGroupNames = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroup))];
-					return moonGroupNames.map((moonGroupName) => {
-						const moons = this.systemClassData.moons.filter((m) => m.moonGroup === moonGroupName);
-						return {
-							name: moonGroupName,
-							color: moons[0].moonGroupColor,
-							showName: moons[0].moonGroupShowName,
-							moonGroupIndex: moons[0].moonGroupIndex,
-							moons
-						};
-					});
-				},
-
 				searchResults() {
 					if (!this.searchQuery) return null;
 
@@ -341,6 +334,47 @@ fetch('./solarSystemData.json')
 				}
 			},
 			methods: {
+				updateMoonGroups() {
+					if (!this.systemClassData || !this.systemClassData.moons) return;
+
+					if (!this.modelMoonGroups[this.clickedClassData.systemId]) {
+						// using Set to remove duplicates
+						const moonGroupNames = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroup))];
+						const mappedMoonGroups = moonGroupNames.map((moonGroupName, i) => {
+							const moons = this.systemClassData.moons.filter((m) => m.moonGroup === moonGroupName);
+							return {
+								name: moonGroupName,
+								id: moons[0].moonGroupId,
+								color: moons[0].moonGroupColor,
+								showName: moons[0].moonGroupShowName,
+								moonGroupIndex: moons[0].moonGroupIndex,
+								moons,
+								isSelected: i === 0,
+								systemId: moons[0].systemId
+							};
+						});
+
+						this.modelMoonGroups[this.clickedClassData.systemId] = mappedMoonGroups;
+					}
+
+					// if moon is selected, update its moonGroup to 'isSelected' so the UI + 3D can display it
+					if (this.clickedClassData.bodyType === 'Moon') {
+						this.modelMoonGroups[this.clickedClassData.systemId].find(
+							(moonGroup) => moonGroup.id === this.clickedClassData.moonGroupId
+						).isSelected = true;
+					}
+
+					const dataForClass = this.modelMoonGroups[this.clickedClassData.systemId].map((moonGroup) => {
+						return {
+							systemId: moonGroup.systemId,
+							moonGroupId: moonGroup.id,
+							isSelected: moonGroup.isSelected,
+							moonIds: moonGroup.moons.map((m) => m.id)
+						};
+					});
+					document.dispatchEvent(new CustomEvent(customEventNames.updateSystemMoonGroups, { detail: dataForClass }));
+				},
+
 				convertToAU(km) {
 					return kmToAU(km);
 				},
@@ -631,7 +665,7 @@ fetch('./solarSystemData.json')
 					}
 
 					if (this.tabGroup === 'tab-system') {
-						if (!this.moonGroups || !this.moonGroups.length) this.tabGroup = 'tab-desc';
+						if (!this.modelMoonGroups[this.clickedClassData.systemId]) this.tabGroup = 'tab-desc';
 						this.$nextTick(() => {
 							const elContentSystem = document.querySelector('#content-system .content-wrapper');
 							const activeTableRow = elContentSystem.querySelector('tr.active-entity');
@@ -667,15 +701,16 @@ fetch('./solarSystemData.json')
 					// splitting the results by Type, then recombining into the final Search Results
 					const sortedResults = filteredResults
 						.sort((a, b) => {
-							if (a.type === 'Star' || b.type === 'Star') return a.type === 'Star' ? -1 : 1;
-							else if (a.type === 'Planet' || b.type === 'Planet') return a.type === 'Planet' ? -1 : 1;
-							else if (a.type === 'Dwarf Planet' || b.type === 'Dwarf Planet')
-								return a.type === 'Dwarf Planet' ? -1 : 1;
-							else if (a.type === 'Comet' || b.type === 'Comet') return a.type === 'Comet' ? -1 : 1;
-							else if (a.type === 'Moon' || b.type === 'Moon') {
+							if (a.bodyType === 'Star' || b.bodyType === 'Star') return a.bodyType === 'Star' ? -1 : 1;
+							else if (a.bodyType === 'Planet' || b.bodyType === 'Planet') return a.bodyType === 'Planet' ? -1 : 1;
+							else if (a.bodyType === 'Dwarf Planet' || b.bodyType === 'Dwarf Planet')
+								return a.bodyType === 'Dwarf Planet' ? -1 : 1;
+							else if (a.bodyType === 'Comet' || b.bodyType === 'Comet') return a.bodyType === 'Comet' ? -1 : 1;
+							else if (a.bodyType === 'Moon' || b.bodyType === 'Moon') {
 								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
-								return a.type === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
-							} else if (a.type === 'Asteroid' || b.type === 'Asteroid') return a.type === 'Asteroid' ? -1 : 1;
+								return a.bodyType === 'Moon' && !a.displayName.includes('S/2') ? -1 : 1;
+							} else if (a.bodyType === 'Asteroid' || b.bodyType === 'Asteroid')
+								return a.bodyType === 'Asteroid' ? -1 : 1;
 							else return -1;
 						})
 						.map((result) => {
@@ -683,7 +718,7 @@ fetch('./solarSystemData.json')
 								id: result.id,
 								index: this.navigationEntities.indexOf(result.id),
 								displayName: this.highlightMatchSubstring(result.displayName),
-								type: result.type,
+								bodyType: result.bodyType,
 								system: result.system
 							};
 						})
@@ -742,22 +777,26 @@ fetch('./solarSystemData.json')
 				},
 
 				updateEntity(data) {
-					const newClickedClassData = data;
+					if (this.clickedClassData === data) return;
+					if (!this.sidebarIsOpen && !this.clickedClassData) this.openSidebar();
+					this.clickedClassData = data;
 
-					if (!this.sidebarIsOpen && !this.clickedClassData) {
-						this.openSidebar();
-					}
-
-					this.clickedClassData = newClickedClassData;
 					this.systemClassData = this.clickedClassData.aroundPlanet
 						? orrery.classes._all[this.clickedClassData.id].planetClass.data
 						: this.clickedClassData;
 					document.querySelector(':root').style.setProperty('--entity-color', this.clickedClassData.labelColour);
 					document.querySelector(':root').style.setProperty('--system-color', this.systemClassData.labelColour);
 
-					if (this.moonGroups) {
-						for (let i = 0; i < this.moonGroups.length; i++) {
-							document.querySelector(':root').style.setProperty(`--moon-group-color-${i}`, this.moonGroups[i].color);
+					this.updateMoonGroups();
+
+					if (this.modelMoonGroups[this.clickedClassData.systemId]) {
+						for (let i = 0; i < this.modelMoonGroups[this.clickedClassData.systemId].length; i++) {
+							document
+								.querySelector(':root')
+								.style.setProperty(
+									`--moon-group-color-${i}`,
+									this.modelMoonGroups[this.clickedClassData.systemId][i].color
+								);
 						}
 					}
 
