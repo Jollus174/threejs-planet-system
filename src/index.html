@@ -218,6 +218,8 @@
 																	tabindex="0"
 																	:class="{'active-entity': clickedClassData.id === systemClassData.id}"
 																	@click="updateZoomTarget(systemClassData)"
+																	@mouseover="entityHovered(systemClassData)"
+																	@mouseleave="entityUnhovered(systemClassData)"
 																>
 																	<th scope="row"><span>{{ systemClassData.displayName }}</span></th>
 																</tr>
@@ -251,6 +253,8 @@
 																v-for="(moon, j) in moonGroup.moons"
 																:class="{'active-entity': clickedClassData.id === moon.id}"
 																@click="updateZoomTarget(moon)"
+																@mouseover="entityHovered(moon)"
+																@mouseleave="entityUnhovered(moon)"
 															>
 																<th scope="row"><span>{{ moon.displayName }}</span></th>
 																<td>
@@ -281,6 +285,10 @@
 												<tr v-if="clickedClassData.discoveryDate">
 													<td>Discovery Date</td>
 													<td>{{ clickedClassData.discoveryDate }}</td>
+												</tr>
+												<tr v-if="clickedClassData.moons && clickedClassData.moons.length">
+													<td>Moons</td>
+													<td>{{ clickedClassData.moons.length }}</td>
 												</tr>
 												<tr v-if="clickedClassData.avgTemp">
 													<td>Surface Temp</td>

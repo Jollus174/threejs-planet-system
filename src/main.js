@@ -92,7 +92,9 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 	for (const moonGroup of e.detail) {
 		for (const moonId of moonGroup.moonIds) {
-			orrery.classes._all[moonId].moonGroupShow = moonGroup.isSelected;
+			const moon = orrery.classes._all[moonId];
+			moon.setEnabled(moonGroup.isEnabled);
+			moon.setSelected(moonGroup.isSelected);
 		}
 	}
 });
@@ -249,7 +251,6 @@ fetch('./solarSystemData.json')
 				sidebarIsOpen: false,
 				sidebarWidthDesktop: 500,
 				clickedClassData: null,
-				zoomedClassData: null,
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
@@ -339,17 +340,22 @@ fetch('./solarSystemData.json')
 
 					if (!this.modelMoonGroups[this.clickedClassData.systemId]) {
 						// using Set to remove duplicates
-						const moonGroupNames = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroup))];
-						const mappedMoonGroups = moonGroupNames.map((moonGroupName, i) => {
-							const moons = this.systemClassData.moons.filter((m) => m.moonGroup === moonGroupName);
+						const moonGroupIds = [...new Set(Object.values(this.systemClassData.moons).map((m) => m.moonGroupId))];
+						const mappedMoonGroups = moonGroupIds.map((moonGroupId, i) => {
+							const moons = this.systemClassData.moons.filter((m) => m.moonGroupId === moonGroupId);
 							return {
-								name: moonGroupName,
-								id: moons[0].moonGroupId,
+								id: moonGroupId,
+								name: moons[0].moonGroupName,
 								color: moons[0].moonGroupColor,
 								showName: moons[0].moonGroupShowName,
 								moonGroupIndex: moons[0].moonGroupIndex,
 								moons,
-								isSelected: i === 0,
+								// switch on the selected moon group if it's the first visit by default, or else just switch on first one
+								isEnabled:
+									this.clickedClassData.bodyType === 'Moon'
+										? moonGroupId === this.clickedClassData.moonGroupId
+										: i === 0,
+								isSelected: false,
 								systemId: moons[0].systemId
 							};
 						});
@@ -359,15 +365,18 @@ fetch('./solarSystemData.json')
 
 					// if moon is selected, update its moonGroup to 'isSelected' so the UI + 3D can display it
 					if (this.clickedClassData.bodyType === 'Moon') {
-						this.modelMoonGroups[this.clickedClassData.systemId].find(
+						const selectedMoonGroup = this.modelMoonGroups[this.clickedClassData.systemId].find(
 							(moonGroup) => moonGroup.id === this.clickedClassData.moonGroupId
-						).isSelected = true;
+						);
+						selectedMoonGroup.isEnabled = true;
+						selectedMoonGroup.isSelected = true;
 					}
 
 					const dataForClass = this.modelMoonGroups[this.clickedClassData.systemId].map((moonGroup) => {
 						return {
 							systemId: moonGroup.systemId,
 							moonGroupId: moonGroup.id,
+							isEnabled: moonGroup.isEnabled,
 							isSelected: moonGroup.isSelected,
 							moonIds: moonGroup.moons.map((m) => m.id)
 						};
@@ -643,8 +652,15 @@ fetch('./solarSystemData.json')
 						el.closest('[data-selector="table-wrapper"]').offsetTop;
 					const eBottom = elTop + el.clientHeight;
 
-					// Check if in view
+					// true if in view
 					return elTop >= cTop && eBottom <= cBottom;
+				},
+
+				entityHovered(data) {
+					orrery.classes._all[data.id].OrbitLine.eventHovered();
+				},
+				entityUnhovered(data) {
+					orrery.classes._all[data.id].OrbitLine.eventUnhovered();
 				},
 
 				openSidebar() {
@@ -883,9 +899,9 @@ fetch('./solarSystemData.json')
 					this.updateEntity(orrery.mouseState._clickedClass.data);
 				});
 
-				orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {
-					this.zoomedClassData = orrery.mouseState._zoomedClass.data;
-				});
+				// orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {
+				// 	this.zoomedClassData = orrery.mouseState._zoomedClass.data;
+				// });
 				// ---
 
 				labelRenderer.render(scene, orrery.camera);

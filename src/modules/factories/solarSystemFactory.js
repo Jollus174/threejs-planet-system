@@ -94,7 +94,7 @@ const starField = () => {
 		depthWrite: false
 	};
 
-	const randFloatSpread = (x) => THREE.MathUtils.randFloatSpread(x); // to keep JS Hint happy
+	const randFloatSpread = (x) => THREE.MathUtils.randFloatSpread(x);
 	for (let i = 0; i < positions.length; i += 3) {
 		const [x, y, z] = Array(3)
 			.fill()

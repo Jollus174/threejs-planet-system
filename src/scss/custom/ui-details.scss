@@ -376,7 +376,7 @@
 					position: relative;
 					cursor: pointer;
 					outline: 0;
-					border-bottom: 1px solid $black; // TODO: set to whatever BG colour is used for the side thingo
+					border-bottom: 1px solid $black;
 					transition: background-color 0.2s ease;
 
 					&:hover,
@@ -400,8 +400,6 @@
 					}
 
 					&.active-entity {
-						cursor: default;
-
 						> *:last-child {
 							&::after {
 								content: "Selected";
@@ -429,6 +427,10 @@
 					&::after,
 					tr::after {
 						background-color: var(--system-color);
+					}
+
+					tr {
+						border-bottom: 0;
 					}
 				}
 

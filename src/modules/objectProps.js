@@ -32,8 +32,6 @@ class OrbitLine {
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
-		this.orbitLineVisibleAtBuild = this.classRef.orbitLineVisibleAtBuild;
-		this.opacityDefault = this.data.isDwarfPlanet || this.data.isOuterMoon ? 0.2 : 1;
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
@@ -83,7 +81,7 @@ class OrbitLine {
 			new THREE.LineBasicMaterial({
 				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
-				opacity: 0,
+				opacity: this.classRef.orbitLineOpacityDefault,
 				visible: this.classRef.orbitLineVisibleAtBuild,
 				blending: THREE.AdditiveBlending,
 				vertexColors: true
@@ -99,16 +97,17 @@ class OrbitLine {
 			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
 		}
 
-		this.classRef.planetClass.labelGroup.add(this.orbitLine);
+		this.classRef.labelGroup.parent.add(this.orbitLine);
 
 		// initial page load
-		if (this.orbitLine.material.opacity === 0 && this.classRef.orbitLineVisibleAtBuild) {
-			this.orbitLineFadeIn();
-		}
+		// if (this.orbitLine.material.opacity === 0 && this.classRef.orbitLineVisibleAtBuild) {
+		// 	this.orbitLineFadeIn();
+		// }
 	}
 
+	// TODO: Probably remove these since they rely on a loop and will overwrite any other opacity updates
 	orbitLineFadeOut() {
-		if (!this.orbitLine || !this.orbitLine.material) return;
+		/* if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingOut && this.orbitLine && this.orbitLine.material.opacity !== 0) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
@@ -120,11 +119,11 @@ class OrbitLine {
 					this.orbitLine.material.visible = false;
 				}
 			});
-		}
+		} */
 	}
 
 	orbitLineFadeIn() {
-		if (!this.orbitLine || !this.orbitLine.material) return;
+		/* if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingIn && this.orbitLine && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
@@ -135,7 +134,24 @@ class OrbitLine {
 					this.fadingIn = false;
 				}
 			});
-		}
+		} */
+	}
+
+	eventHovered() {
+		orrery.mouseState._hoveredClass = this.classRef;
+		if (!this.orbitLine) return;
+		gsap.to(this.orbitLine.material, {
+			opacity: 1,
+			duration: 0.25
+		});
+	}
+	eventUnhovered() {
+		orrery.mouseState._hoveredClass = '';
+		if (!this.orbitLine) return;
+		gsap.to(this.orbitLine.material, {
+			opacity: this.classRef.orbitLineOpacityDefault,
+			duration: 0.25
+		});
 	}
 
 	remove() {
@@ -146,10 +162,10 @@ class OrbitLine {
 				opacity: 0,
 				duration: 0.25,
 				onComplete: () => {
-					this.fadingOut = false;
 					orrery.classes._all[this.parentPlanetId].labelGroup.children
 						.find((o) => o.name === this.orbitLineName)
 						.removeFromParent();
+					this.fadingOut = false;
 				}
 			});
 		}
@@ -170,10 +186,14 @@ class Entity {
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
 
+		this.isEnabled = true;
+		this.isSelected = true;
+
 		this.intervalCheckTime = 300;
 		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
 
 		this.orbitLineVisibleAtBuild = true;
+		this.orbitLineOpacityDefault = 0.5;
 		this.OrbitLine = new OrbitLine(data, this);
 
 		this.raycasterEnabled = false; // can cause some pretty laggy performance issues
@@ -252,6 +272,30 @@ class Entity {
 		}
 	}
 
+	setEnabled(shouldEnable) {
+		if (shouldEnable === true) {
+			this.isEnabled = true;
+			this.orbitLineOpacityDefault = 0.5;
+			if (this.OrbitLine.orbitLine && this.OrbitLine.orbitLine.material && this.OrbitLine.orbitLine.material.opacity) {
+				this.OrbitLine.orbitLine.material.opacity = 0.5;
+			}
+		} else {
+			this.isEnabled = false;
+		}
+	}
+
+	setSelected(shouldSelect) {
+		if (shouldSelect === true) {
+			this.isSelected = true;
+			this.orbitLineOpacityDefault = 0.7;
+			if (this.OrbitLine.orbitLine && this.OrbitLine.orbitLine.material && this.OrbitLine.orbitLine.material.opacity) {
+				this.OrbitLine.orbitLine.material.opacity = 0.7;
+			}
+		} else {
+			this.isSelected = false;
+		}
+	}
+
 	setListeners() {
 		this.labelLink.addEventListener('pointerdown', () => {
 			// TODO: turning this off for now since it breaks on deployed build
@@ -260,11 +304,11 @@ class Entity {
 		});
 
 		this.labelLink.addEventListener('mouseover', () => {
-			orrery.mouseState._hoveredClass = this;
+			this.OrbitLine.eventHovered();
 		});
 
 		this.labelLink.addEventListener('mouseleave', () => {
-			orrery.mouseState._hoveredClass = '';
+			this.OrbitLine.eventUnhovered();
 		});
 	}
 
@@ -415,7 +459,6 @@ class Entity {
 							orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 						}
 						this.labelGroup.children.forEach((child) => child.removeFromParent());
-						this.labelGroup.removeFromParent();
 						this.isAdded = false;
 						this.fadingOut = false;
 						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
@@ -456,7 +499,7 @@ class Planet extends Entity {
 				Object.values(this.moonClasses).length
 			) {
 				Object.values(this.moonClasses).forEach((moonClass, i) => {
-					if (!moonClass.isAdded && moonClass.moonGroupShow) {
+					if (!moonClass.isAdded && moonClass.isEnabled) {
 						setTimeout(() => {
 							moonClass.createElements();
 						}, i * 20);
@@ -587,7 +630,10 @@ class Moon extends Entity {
 		this.planetGroup = this.planetClass.labelGroup;
 		this.materialData = this.data.materialData || rawMaterialData._moon;
 		this.orbitLineVisibleAtBuild = this.planetClass.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
-		this.moonGroupShow = false; // updated by event emitted by Vue when a moon group updates
+		// updated by event emitted by Vue when a moon group updates
+		this.isEnabled = false;
+		this.isSelected = false;
+		// ---
 
 		// All entities by default have an interval check. Want this cleared for moons since they start hidden
 		clearInterval(this.intervalCheckVar);
