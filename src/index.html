@@ -221,7 +221,7 @@
 													class="badge"
 													v-show="moonGroup.isEnabled"
 													:style="{'background-color': moonGroup.color}"
-													@click="deselectMoonGroup(moonGroup.moonGroupIndex)"
+													@click="disableMoonGroup(moonGroup.moonGroupIndex)"
 												>
 													{{ moonGroup.name }}
 													<i class="fas fa-times"></i>
@@ -238,12 +238,22 @@
 															<tbody class="planet-group active-planet-group" data-selector="tbody-wrapper">
 																<tr
 																	tabindex="0"
-																	:class="{'active-entity': clickedClassData.id === systemClassData.id}"
-																	@click="updateZoomTarget(systemClassData)"
+																	:class="{'entity-targeted': clickedClassData.id === systemClassData.id, 'entity-selected': zoomedClassData && zoomedClassData.id === systemClassData.id}"
+																	@click="updateClickTarget(systemClassData)"
 																	@mouseover="entityHovered(systemClassData)"
 																	@mouseleave="entityUnhovered(systemClassData)"
 																>
-																	<th scope="row"><span>{{ systemClassData.displayName }}</span></th>
+																	<th scope="row">
+																		<span>{{ systemClassData.displayName }}</span>
+																		<div class="status-wrapper">
+																			<label data-selector="targeted">
+																				<img src="/img/icon-crosshair.svg" preload />
+																			</label>
+																			<label data-selector="selected">
+																				<img src="/img/icon-camera.svg" preload />
+																			</label>
+																		</div>
+																	</th>
 																</tr>
 															</tbody>
 														</table>
@@ -265,7 +275,6 @@
 														<tbody
 															class="moon-group"
 															data-selector="tbody-wrapper"
-															v-if="modelMoonGroups[clickedClassData.systemId].length"
 															v-for="(moonGroup, i) in modelMoonGroups[clickedClassData.systemId]"
 															:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isEnabled, 'show-moon-group-name': moonGroup.showName}]"
 															:data-moongroup-name="moonGroup.name"
@@ -273,8 +282,8 @@
 															<tr
 																tabindex="0"
 																v-for="(moon, j) in moonGroup.moons"
-																:class="{'active-entity': clickedClassData.id === moon.id}"
-																@click="updateZoomTarget(moon)"
+																:class="{'entity-targeted': clickedClassData.id === moon.id, 'entity-selected': zoomedClassData && zoomedClassData.id === moon.id}"
+																@click="updateClickTarget(moon)"
 																@mouseover="entityHovered(moon)"
 																@mouseleave="entityUnhovered(moon)"
 															>
@@ -286,6 +295,14 @@
 																<td>
 																	{{ distanceConverter(moon.meanRadius).value }}
 																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
+																	<div class="status-wrapper">
+																		<label data-selector="targeted">
+																			<img src="/img/icon-crosshair.svg" preload />
+																		</label>
+																		<label data-selector="selected">
+																			<img src="/img/icon-camera.svg" preload />
+																		</label>
+																	</div>
 																</td>
 															</tr>
 														</tbody>

@@ -74,8 +74,8 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	if (newClickedClassSameAsOld) {
 		document.dispatchEvent(new CustomEvent(customEventNames.updateZoomTarget, { detail: clickedClass }));
 	} else {
-		orrery.cameraState._zoomToTarget = false;
 		orrery.mouseState._zoomedClass = null;
+		orrery.cameraState._zoomToTarget = false;
 		// orrery.mouseState._clickedClass = null; // TODO: this should be 'focused class'!
 	}
 });
@@ -87,7 +87,7 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 	orrery.cameraState._zoomToTarget = true; // to get the camera moving
 	controls.minDistance = zoomedClass.data.meanRadius * 8;
 
-	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
+	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateZoomEntityVue));
 });
 
 document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
@@ -252,6 +252,7 @@ fetch('./solarSystemData.json')
 				sidebarIsOpen: false,
 				sidebarWidthDesktop: 500,
 				clickedClassData: null,
+				zoomedClassData: null,
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
@@ -402,7 +403,7 @@ fetch('./solarSystemData.json')
 					this.updateClassMoonData();
 				},
 
-				deselectMoonGroup(moonGroupIndex) {
+				disableMoonGroup(moonGroupIndex) {
 					const moonGroup = this.modelMoonGroups[this.clickedClassData.systemId][moonGroupIndex];
 					moonGroup.isEnabled = false;
 					moonGroup.isSelected = false;
@@ -410,9 +411,12 @@ fetch('./solarSystemData.json')
 					// to force a re-render of the moon tags + selected groups
 					this.regenerateRandomString();
 
-					// resets back to system planet if the selected entity is a moon and the moon group gets set to disabled
-					if (this.clickedClassData.moonGroupId && this.clickedClassData.moonGroupId === moonGroup.id) {
-						this.updateZoomTarget(orrery.classes._all[this.clickedClassData.systemId].data);
+					// resets clicked target back to system planet if the selected entity is a moon and the moon group gets set to disabled
+					if (
+						(this.clickedClassData.moonGroupId && this.clickedClassData.moonGroupId === moonGroup.id) ||
+						(this.zoomedClassData.moonGroupId && this.zoomedClassData.moonGroupId === moonGroup.id)
+					) {
+						this.updateClickTarget(orrery.classes._all[this.clickedClassData.systemId].data);
 					}
 
 					this.setMoonGroups();
@@ -718,7 +722,7 @@ fetch('./solarSystemData.json')
 						if (!this.modelMoonGroups[this.clickedClassData.systemId]) this.tabGroup = 'tab-desc';
 						this.$nextTick(() => {
 							const elContentSystem = document.querySelector('#content-system .content-wrapper');
-							const activeTableRow = elContentSystem.querySelector('tr.active-entity');
+							const activeTableRow = elContentSystem.querySelector('tr.entity-targeted');
 							if (this.isScrolledInView(activeTableRow, elContentSystem)) return;
 
 							activeTableRow.scrollIntoView({
@@ -871,9 +875,13 @@ fetch('./solarSystemData.json')
 					}
 				},
 
+				updateClickTarget(data) {
+					const clickedClass = orrery.classes._all[data.id];
+					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
+				},
+
 				updateZoomTarget(data) {
 					const clickedClass = orrery.classes._all[data.id];
-					this.updateEntity(data);
 					orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();
@@ -931,6 +939,10 @@ fetch('./solarSystemData.json')
 
 				orrery.vueTarget.addEventListener(customEventNames.updateEntityVue, () => {
 					this.updateEntity(orrery.mouseState._clickedClass.data);
+				});
+
+				orrery.vueTarget.addEventListener(customEventNames.updateZoomEntityVue, () => {
+					this.zoomedClassData = orrery.mouseState._zoomedClass.data;
 				});
 
 				// orrery.vueTarget.addEventListener(customEventNames.updateZoomTargetVue, () => {

@@ -13,7 +13,8 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
-const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
+// const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
+const planetRangeThreshold = 100000000;
 // TODO: set it at this range only for the planet/moon that's targeted
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
 const innerMoonRangeThreshold = 1700000;
@@ -445,12 +446,12 @@ class Entity {
 		if (!this.fadingOut && this.isAdded) {
 			// fading out OrbitLine BEFORE entity (once the entity is gone, so is the line)
 			this.fadingOut = true;
+			if (this.OrbitLine) this.OrbitLine.remove();
 
 			gsap.to(this.labelLink, {
 				opacity: 0,
 				duration: 1,
 				onComplete: () => {
-					if (this.OrbitLine) this.OrbitLine.remove();
 					// setTimeout seems to allow smoother fading? Weird...
 					setTimeout(() => {
 						clearInterval(this.intervalCheckVar);
@@ -486,7 +487,7 @@ class Planet extends Entity {
 		}
 
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
-		const cameraZoomedToPlanet = distance < this.data.zoomTo + 50000000;
+		const cameraZoomedToPlanet = distance < this.data.zoomTo + planetRangeThreshold;
 
 		if (cameraZoomedToPlanet) {
 			// TODO: investigate this 'cameraZoomedToPlanet' var
