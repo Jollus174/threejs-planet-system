@@ -206,7 +206,29 @@
 									</div>
 								</section>
 
-								<section id="content-system" class="content content-system" v-show="tabGroup === 'tab-system'">
+								<section
+									id="content-system"
+									class="content content-system"
+									v-show="tabGroup === 'tab-system'"
+									:class="{'has-topbar': showSystemTopBar}"
+									:key="vueRandomString"
+								>
+									<div class="topbar-system" v-if="showSystemTopBar">
+										<div class="topbar-system-label">Enabled Moon Groups:</div>
+										<div class="topbar-system-contents">
+											<template v-for="moonGroup in modelMoonGroups[clickedClassData.systemId]">
+												<button
+													class="badge"
+													v-show="moonGroup.isEnabled"
+													:style="{'background-color': moonGroup.color}"
+													@click="deselectMoonGroup(moonGroup.moonGroupIndex)"
+												>
+													{{ moonGroup.name }}
+													<i class="fas fa-times"></i>
+												</button>
+											</template>
+										</div>
+									</div>
 									<div class="content-wrapper container-fluid scroll-shadows" data-selector="content-wrapper">
 										<table data-selector="table-wrapper">
 											<tbody>
@@ -245,7 +267,7 @@
 															data-selector="tbody-wrapper"
 															v-if="modelMoonGroups[clickedClassData.systemId].length"
 															v-for="(moonGroup, i) in modelMoonGroups[clickedClassData.systemId]"
-															:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isSelected, 'show-moon-group-name': moonGroup.showName}]"
+															:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isEnabled, 'show-moon-group-name': moonGroup.showName}]"
 															:data-moongroup-name="moonGroup.name"
 														>
 															<tr

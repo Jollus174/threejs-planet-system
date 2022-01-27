@@ -281,6 +281,7 @@ class Entity {
 			}
 		} else {
 			this.isEnabled = false;
+			this.remove();
 		}
 	}
 
@@ -461,6 +462,7 @@ class Entity {
 						this.labelGroup.children.forEach((child) => child.removeFromParent());
 						this.isAdded = false;
 						this.fadingOut = false;
+						this.meshGroup.visible = false;
 						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
 					}, 100);
 				}
@@ -653,7 +655,11 @@ class Moon extends Entity {
 		this.OrbitLine.build();
 		this.setListeners(); // listeners to only set if in range
 		this.createCSSLabel(); // this should only build if planet is in range
-		this.createEntityMesh();
+		if (!this.meshGroup.children.length) {
+			this.createEntityMesh();
+		} else {
+			this.meshGroup.visible = true;
+		}
 
 		gsap.to(this.labelLink, {
 			opacity: 1,

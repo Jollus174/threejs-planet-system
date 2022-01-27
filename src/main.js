@@ -9,6 +9,7 @@ import { renderer } from './modules/renderers/renderer';
 import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo } from './modules/utilities/animation';
 import { checkIfDesktop } from './modules/utilities/dom';
+import { randomString } from './modules/utilities/strings';
 import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
 import { skyboxTexturePaths } from './modules/data/solarSystem';
@@ -254,7 +255,8 @@ fetch('./solarSystemData.json')
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
-				tabGroup: 'tab-desc'
+				tabGroup: 'tab-desc',
+				vueRandomString: randomString(8)
 			},
 			computed: {
 				nameApoapsis() {
@@ -332,10 +334,35 @@ fetch('./solarSystemData.json')
 						.slice(0, 12); // cap the results (TODO: might change this later and implement max-height)
 
 					return sortedResults;
+				},
+
+				showSystemTopBar() {
+					return (
+						this.modelMoonGroups[this.clickedClassData.systemId] &&
+						this.modelMoonGroups[this.clickedClassData.systemId].length > 1
+					);
 				}
 			},
 			methods: {
-				updateMoonGroups() {
+				regenerateRandomString() {
+					this.vueRandomString = randomString(8);
+				},
+				updateClassMoonData() {
+					const moonDataForClass = this.modelMoonGroups[this.clickedClassData.systemId].map((moonGroup) => {
+						return {
+							systemId: moonGroup.systemId,
+							moonGroupId: moonGroup.id,
+							isEnabled: moonGroup.isEnabled,
+							isSelected: moonGroup.isSelected,
+							moonIds: moonGroup.moons.map((m) => m.id)
+						};
+					});
+
+					document.dispatchEvent(
+						new CustomEvent(customEventNames.updateSystemMoonGroups, { detail: moonDataForClass })
+					);
+				},
+				setMoonGroups() {
 					if (!this.systemClassData || !this.systemClassData.moons) return;
 
 					if (!this.modelMoonGroups[this.clickedClassData.systemId]) {
@@ -372,16 +399,23 @@ fetch('./solarSystemData.json')
 						selectedMoonGroup.isSelected = true;
 					}
 
-					const dataForClass = this.modelMoonGroups[this.clickedClassData.systemId].map((moonGroup) => {
-						return {
-							systemId: moonGroup.systemId,
-							moonGroupId: moonGroup.id,
-							isEnabled: moonGroup.isEnabled,
-							isSelected: moonGroup.isSelected,
-							moonIds: moonGroup.moons.map((m) => m.id)
-						};
-					});
-					document.dispatchEvent(new CustomEvent(customEventNames.updateSystemMoonGroups, { detail: dataForClass }));
+					this.updateClassMoonData();
+				},
+
+				deselectMoonGroup(moonGroupIndex) {
+					const moonGroup = this.modelMoonGroups[this.clickedClassData.systemId][moonGroupIndex];
+					moonGroup.isEnabled = false;
+					moonGroup.isSelected = false;
+
+					// to force a re-render of the moon tags + selected groups
+					this.regenerateRandomString();
+
+					// resets back to system planet if the selected entity is a moon and the moon group gets set to disabled
+					if (this.clickedClassData.moonGroupId && this.clickedClassData.moonGroupId === moonGroup.id) {
+						this.updateZoomTarget(orrery.classes._all[this.clickedClassData.systemId].data);
+					}
+
+					this.setMoonGroups();
 				},
 
 				convertToAU(km) {
@@ -803,7 +837,7 @@ fetch('./solarSystemData.json')
 					document.querySelector(':root').style.setProperty('--entity-color', this.clickedClassData.labelColour);
 					document.querySelector(':root').style.setProperty('--system-color', this.systemClassData.labelColour);
 
-					this.updateMoonGroups();
+					this.setMoonGroups();
 
 					if (this.modelMoonGroups[this.clickedClassData.systemId]) {
 						for (let i = 0; i < this.modelMoonGroups[this.clickedClassData.systemId].length; i++) {
