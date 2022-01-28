@@ -40,7 +40,7 @@
 		}
 
 		&.is-major-moon .label-text {
-			color: #fff;
+			color: $white;
 		}
 	}
 
@@ -57,7 +57,7 @@
 		pointer-events: none;
 
 		.label-text {
-			opacity: 0 !important;
+			opacity: 0;
 		}
 	}
 
@@ -73,19 +73,19 @@
 	&:not(.behind-label):not(.faded):hover {
 		.label-circle {
 			background-color: currentColor;
-			border-color: #fff;
+			border-color: $white;
 			box-shadow: 0 0 5px currentColor;
 		}
 
 		.label-text {
 			opacity: 1;
-			color: #fff;
+			color: $white;
 		}
 	}
 
 	&.label-selected {
 		.label-circle {
-			border-color: #fff !important;
+			border-color: $white !important;
 
 			&::after {
 				opacity: 1;

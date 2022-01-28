@@ -363,7 +363,7 @@
 			[data-selector="targeted"] {
 				display: none;
 				margin-left: 2px;
-				padding: 0 2px;
+				padding: 2px;
 				background-color: rgba($white, 0.1);
 
 				img {
@@ -450,13 +450,13 @@
 
 					&.entity-targeted {
 						[data-selector="targeted"] {
-							display: inline-block;
+							display: inline-flex;
 						}
 					}
 
 					&.entity-selected {
 						[data-selector="selected"] {
-							display: inline-block;
+							display: inline-flex;
 						}
 					}
 				}

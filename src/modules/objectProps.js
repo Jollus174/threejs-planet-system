@@ -155,7 +155,7 @@ class OrbitLine {
 		});
 	}
 
-	remove() {
+	destroy() {
 		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingOut) {
 			this.fadingOut = true;
@@ -163,9 +163,7 @@ class OrbitLine {
 				opacity: 0,
 				duration: 0.25,
 				onComplete: () => {
-					orrery.classes._all[this.parentPlanetId].labelGroup.children
-						.find((o) => o.name === this.orbitLineName)
-						.removeFromParent();
+					this.orbitLine.removeFromParent();
 					this.fadingOut = false;
 				}
 			});
@@ -181,6 +179,7 @@ class Entity {
 		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
 		this.fadingIn = false;
 		this.fadingOut = false;
+		this.isBuilt = false;
 		this.isVisible = false;
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.raycaster = new THREE.Raycaster();
@@ -268,6 +267,7 @@ class Entity {
 					this.fadingIn = false;
 					this.isVisible = true;
 					this.labelLink.style.pointerEvents = '';
+					this.isBuilt = true;
 				}
 			});
 		}
@@ -282,7 +282,7 @@ class Entity {
 			}
 		} else {
 			this.isEnabled = false;
-			this.remove();
+			// this.destroy();
 		}
 	}
 
@@ -441,12 +441,12 @@ class Entity {
 	// 	if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 	// }, 500);
 
-	remove() {
-		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isAdded) {
-		if (!this.fadingOut && this.isAdded) {
+	destroy() {
+		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
+		if (!this.fadingOut && this.isBuilt) {
 			// fading out OrbitLine BEFORE entity (once the entity is gone, so is the line)
 			this.fadingOut = true;
-			if (this.OrbitLine) this.OrbitLine.remove();
+			if (this.OrbitLine) this.OrbitLine.destroy();
 
 			gsap.to(this.labelLink, {
 				opacity: 0,
@@ -460,11 +460,15 @@ class Entity {
 						if (orrery.mouseState._clickedGroup && orrery.mouseState._clickedGroup.data.aroundPlanet) {
 							orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 						}
-						this.labelGroup.children.forEach((child) => child.removeFromParent());
-						this.isAdded = false;
+						// when it comes down to it, do we really want to do this?
+						// all we really want is to clear the label
+						// this.labelGroup.clear();
+						// this.labelGroup.removeFromParent();
+						this.CSSObj.removeFromParent();
 						this.fadingOut = false;
 						this.meshGroup.visible = false;
 						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
+						this.isBuilt = false;
 					}, 100);
 				}
 			});
@@ -478,6 +482,7 @@ class Planet extends Entity {
 	constructor(data) {
 		super(data);
 		this.moonClasses = {};
+		this.isZoomedToPlanet = true;
 	}
 
 	intervalCheck() {
@@ -490,44 +495,27 @@ class Planet extends Entity {
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + planetRangeThreshold;
 
 		if (cameraZoomedToPlanet) {
-			// TODO: investigate this 'cameraZoomedToPlanet' var
-			orrery.cameraState._currentPlanetInRange = this.data.id;
-			this.labelLink.classList.add('faded');
-
-			// staggering the building of moon classes to help with performance
-			if (
-				// orrery.mouseState._zoomedClass &&
-				// orrery.mouseState._zoomedClass.data.id === this.data.id &&
-				this.moonClasses &&
-				Object.values(this.moonClasses).length
-			) {
-				Object.values(this.moonClasses).forEach((moonClass, i) => {
-					if (!moonClass.isAdded && moonClass.isEnabled) {
-						setTimeout(() => {
-							moonClass.createElements();
-						}, i * 20);
-					}
-				});
+			if (!this.isZoomedToPlanet) {
+				this.isZoomedToPlanet = true; // to prevent multiple executions
+				// destroying previous set of moons first
+				// this.destroyMoons(Object.values(this.moonClasses));
+				orrery.cameraState._currentPlanetInRange = this.data.id;
+				const moonsToBuild = Object.values(this.moonClasses).filter((m) => m.isEnabled && !m.isBuilt);
+				this.buildMoons(moonsToBuild);
 			}
 		} else {
-			// TODO: Need a fix for if a second planet immediately replaces the previous one
-			if (orrery.cameraState._currentPlanetInRange === this.data.id) {
-				orrery.cameraState._currentPlanetInRange = '';
-				this.labelLink.classList.remove('faded');
-			}
-
-			if (this.moonClasses && Object.values(this.moonClasses).length) {
-				Object.values(this.moonClasses).forEach((moonClass, i) => {
-					if (moonClass.isAdded) {
-						setTimeout(() => {
-							moonClass.remove();
-						}, i * 20);
-					}
-				});
+			if (this.isZoomedToPlanet) {
+				this.isZoomedToPlanet = false;
+				if (orrery.cameraState._currentPlanetInRange === this.data.id) {
+					this.destroyMoons(Object.values(this.moonClasses));
+					orrery.cameraState._currentPlanetInRange = '';
+				}
+				// const moonsToDestroy = Object.values(this.moonClasses).filter((m) => !m.isEnabled && m.isBuilt);
+				// this.destroyMoons(moonsToDestroy);
 			}
 		}
 
-		if (this.OrbitLine) {
+		/* if (this.OrbitLine) {
 			// if (
 			// !orrery.cameraState._currentPlanetInRange ||
 			// (orrery.cameraState._currentPlanetInRange && orrery.cameraState._currentPlanetInRange === this.data.id) ||
@@ -539,7 +527,24 @@ class Planet extends Entity {
 			// } else {
 			// this.OrbitLine.fadeOut();
 			// }
-		}
+		} */
+	}
+
+	buildMoons(moonsToBuild) {
+		// staggering the building of moon classes to help with performance
+		moonsToBuild.forEach((moonClass, i) => {
+			setTimeout(() => {
+				moonClass.createElements();
+			}, i * 20);
+		});
+	}
+
+	destroyMoons(moonsToDestroy) {
+		moonsToDestroy.forEach((moonClass, i) => {
+			setTimeout(() => {
+				moonClass.destroy();
+			}, i * 20);
+		});
 	}
 }
 
@@ -628,7 +633,6 @@ class Sun extends Entity {
 class Moon extends Entity {
 	constructor(data, planetClass) {
 		super(data);
-		this.isAdded = false;
 		this.planetClass = planetClass;
 		this.planetGroup = this.planetClass.labelGroup;
 		this.materialData = this.data.materialData || rawMaterialData._moon;
@@ -650,12 +654,24 @@ class Moon extends Entity {
 		this.setLabelGroupPosition();
 	}
 
+	// createLabel() {
+	// 	this.createCSSLabel();
+
+	// 	gsap.to(this.labelLink, {
+	// 		opacity: 1,
+	// 		duration: 1,
+	// 		onComplete: () => {
+	// 			this.labelLink.style.pointerEvents = '';
+	// 		}
+	// 	});
+	// }
+
 	createElements() {
-		if (this.isAdded) return;
-		this.isAdded = true;
-		this.OrbitLine.build();
+		if (this.isBuilt) return;
+		// if (!this.CSSObj) this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
+		this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
 		this.setListeners(); // listeners to only set if in range
-		this.createCSSLabel(); // this should only build if planet is in range
+		this.OrbitLine.build();
 		if (!this.meshGroup.children.length) {
 			this.createEntityMesh();
 		} else {
@@ -671,6 +687,8 @@ class Moon extends Entity {
 				this.intervalCheckVar = setInterval(() => {
 					this.intervalCheck();
 				}, this.intervalCheckTime);
+
+				this.isBuilt = true;
 			}
 		});
 	}

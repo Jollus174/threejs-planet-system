@@ -60,12 +60,8 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const newClickedClassSameAsOld = orrery.mouseState._clickedClass
 		? clickedClass.data.id === orrery.mouseState._clickedClass.data.id
 		: false;
+
 	orrery.mouseState._clickedClass = clickedClass;
-
-	const labelSelected = document.querySelector('.label.label-selected');
-	if (labelSelected) labelSelected.classList.remove('label-selected');
-
-	clickedClass.labelLink.classList.add('label-selected');
 
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
 
@@ -78,6 +74,11 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 		orrery.cameraState._zoomToTarget = false;
 		// orrery.mouseState._clickedClass = null; // TODO: this should be 'focused class'!
 	}
+
+	const labelSelected = document.querySelector('.label.label-selected');
+	if (labelSelected) labelSelected.classList.remove('label-selected');
+
+	clickedClass.labelLink.classList.add('label-selected');
 });
 
 document.addEventListener(customEventNames.updateZoomTarget, (e) => {
@@ -91,6 +92,7 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 });
 
 document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
+	const systemId = e.detail[0].systemId;
 	for (const moonGroup of e.detail) {
 		for (const moonId of moonGroup.moonIds) {
 			const moon = orrery.classes._all[moonId];
@@ -98,6 +100,23 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 			moon.setSelected(moonGroup.isSelected);
 		}
 	}
+
+	const systemClass = orrery.classes._all[systemId];
+	const systemMoonClasses = Object.values(orrery.classes._all[systemId].moonClasses);
+	const toBuild = systemMoonClasses.filter((m) => m.isEnabled);
+
+	// only do if in range!
+	const cameraIsInSystem = orrery.mouseState._clickedClass
+		? orrery.cameraState._currentPlanetInRange === orrery.mouseState._clickedClass.data.systemId
+		: false;
+
+	// only build fresh moon groups if in the system's range!
+	if (cameraIsInSystem) {
+		systemClass.buildMoons(toBuild);
+	}
+	// systemClass.destroyMoons(toDestroy); // reset moons before zooming to them?
+
+	// if is in same system
 });
 
 const render = () => {
@@ -413,13 +432,15 @@ fetch('./solarSystemData.json')
 
 					// resets clicked target back to system planet if the selected entity is a moon and the moon group gets set to disabled
 					if (
-						(this.clickedClassData.moonGroupId && this.clickedClassData.moonGroupId === moonGroup.id) ||
-						(this.zoomedClassData.moonGroupId && this.zoomedClassData.moonGroupId === moonGroup.id)
+						(this.clickedClassData &&
+							this.clickedClassData.moonGroupId &&
+							this.clickedClassData.moonGroupId === moonGroup.id) ||
+						(this.zoomedClassData &&
+							this.zoomedClassData.moonGroupId &&
+							this.zoomedClassData.moonGroupId === moonGroup.id)
 					) {
 						this.updateClickTarget(orrery.classes._all[this.clickedClassData.systemId].data);
 					}
-
-					this.setMoonGroups();
 				},
 
 				convertToAU(km) {
