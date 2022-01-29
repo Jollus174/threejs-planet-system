@@ -429,9 +429,8 @@
 					transition: background-color 0.2s ease;
 
 					&:hover,
-					&:focus,
-					&:active,
-					&.entity-selected {
+					&.entity-selected,
+					&.entity-targeted {
 						&::after {
 							opacity: 0.25;
 						}

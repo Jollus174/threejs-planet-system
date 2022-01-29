@@ -13,8 +13,8 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
-// const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
-const planetRangeThreshold = 100000000;
+const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
+// const planetRangeThreshold = 100000000;
 // TODO: set it at this range only for the planet/moon that's targeted
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
 const innerMoonRangeThreshold = 1700000;
@@ -177,8 +177,6 @@ class Entity {
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
 		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
-		this.fadingIn = false;
-		this.fadingOut = false;
 		this.isBuilt = false;
 		this.isVisible = false;
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
@@ -201,9 +199,22 @@ class Entity {
 		// for debugging
 		this.raycasterArrowEnabled = false;
 		// ---
+
+		this.eventPointerDown = () => {
+			document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: this }));
+		};
+		this.eventMouseOver = () => {
+			this.OrbitLine.eventHovered();
+		};
+		this.eventMouseLeave = () => {
+			this.OrbitLine.eventUnhovered();
+		};
 	}
 
 	createCSSLabel() {
+		// checking to see if a label has already been built to avoid duplicate builds + listeners
+		if (this.labelGroup.children.some((i) => i.isCSS2DObject)) return;
+
 		const entityTypeClasses = [
 			this.data.id === 'sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
@@ -233,6 +244,24 @@ class Entity {
 
 		this.labelGroup.name = `${this.data.id} group label`;
 		this.labelGroup.add(this.CSSObj);
+
+		gsap.to(this.labelLink, {
+			opacity: 1,
+			duration: 1,
+			onComplete: () => {}
+		});
+
+		this.labelLink.addEventListener('pointerdown', this.eventPointerDown);
+		this.labelLink.addEventListener('mouseover', this.eventMouseOver);
+		this.labelLink.addEventListener('mouseleave', this.eventMouseLeave);
+	}
+
+	removeCSSLabel() {
+		if (!this.labelGroup.children.some((i) => i.isCSS2DObject)) return;
+		this.labelLink.removeEventListener('pointerDown', this.eventPointerDown);
+		this.labelLink.removeEventListener('mouseover', this.eventMouseOver);
+		this.labelLink.removeEventListener('mouseleave', this.eventMouseLeave);
+		this.CSSObj.removeFromParent();
 	}
 
 	setLabelGroupPosition() {
@@ -246,8 +275,6 @@ class Entity {
 	build() {
 		scene.add(this.labelGroup);
 		this.setLabelGroupPosition();
-
-		this.setListeners();
 		this.createCSSLabel();
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
@@ -257,19 +284,10 @@ class Entity {
 			this.createEntityMesh();
 		}
 
-		if (!this.fadingIn && !this.isVisible) {
-			this.fadingIn = true;
-			this.visible = true;
-			gsap.to(this.labelLink, {
-				opacity: 1,
-				duration: 1,
-				onComplete: () => {
-					this.fadingIn = false;
-					this.isVisible = true;
-					this.labelLink.style.pointerEvents = '';
-					this.isBuilt = true;
-				}
-			});
+		if (!this.isVisible) {
+			this.isVisible = true;
+			this.labelLink.style.pointerEvents = '';
+			this.isBuilt = true;
 		}
 	}
 
@@ -296,22 +314,6 @@ class Entity {
 		} else {
 			this.isSelected = false;
 		}
-	}
-
-	setListeners() {
-		this.labelLink.addEventListener('pointerdown', () => {
-			// TODO: turning this off for now since it breaks on deployed build
-			// window.location = this.labelLink.href; // OrbitControls eats the native click events :(
-			document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: this }));
-		});
-
-		this.labelLink.addEventListener('mouseover', () => {
-			this.OrbitLine.eventHovered();
-		});
-
-		this.labelLink.addEventListener('mouseleave', () => {
-			this.OrbitLine.eventUnhovered();
-		});
 	}
 
 	async constructEntityMesh() {
@@ -443,35 +445,23 @@ class Entity {
 
 	destroy() {
 		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
-		if (!this.fadingOut && this.isBuilt) {
-			// fading out OrbitLine BEFORE entity (once the entity is gone, so is the line)
-			this.fadingOut = true;
+		if (this.isBuilt) {
 			if (this.OrbitLine) this.OrbitLine.destroy();
+			setTimeout(() => {
+				clearInterval(this.intervalCheckVar);
 
-			gsap.to(this.labelLink, {
-				opacity: 0,
-				duration: 1,
-				onComplete: () => {
-					// setTimeout seems to allow smoother fading? Weird...
-					setTimeout(() => {
-						clearInterval(this.intervalCheckVar);
-
-						// snap the camera back to the planet if the clicked group moon is deloaded
-						if (orrery.mouseState._clickedGroup && orrery.mouseState._clickedGroup.data.aroundPlanet) {
-							orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
-						}
-						// when it comes down to it, do we really want to do this?
-						// all we really want is to clear the label
-						// this.labelGroup.clear();
-						// this.labelGroup.removeFromParent();
-						this.CSSObj.removeFromParent();
-						this.fadingOut = false;
-						this.meshGroup.visible = false;
-						if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
-						this.isBuilt = false;
-					}, 100);
+				// snap the camera back to the planet if the clicked group moon is deloaded
+				if (orrery.mouseState._clickedGroup && orrery.mouseState._clickedGroup.data.aroundPlanet) {
+					orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 				}
-			});
+				// all we really want is to clear the label
+				// the mesh can remain, but it should be hidden (this may change in future)
+				this.CSSObj.removeFromParent();
+				this.fadingOut = false;
+				this.meshGroup.visible = false;
+				if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
+			}, 100);
+			this.isBuilt = false;
 		}
 	}
 }
@@ -496,6 +486,7 @@ class Planet extends Entity {
 
 		if (cameraZoomedToPlanet) {
 			if (!this.isZoomedToPlanet) {
+				this.createCSSLabel(); // in case it was removed via a moon selection
 				this.isZoomedToPlanet = true; // to prevent multiple executions
 				// destroying previous set of moons first
 				// this.destroyMoons(Object.values(this.moonClasses));
@@ -542,6 +533,10 @@ class Planet extends Entity {
 	destroyMoons(moonsToDestroy) {
 		moonsToDestroy.forEach((moonClass, i) => {
 			setTimeout(() => {
+				// switch target to the base system entity if the moon currently targeted is destroyed
+				if (orrery.mouseState._clickedClass.data.id === moonClass.data.id) {
+					orrery.mouseState._clickedClass = moonClass.planetClass;
+				}
 				moonClass.destroy();
 			}, i * 20);
 		});
@@ -647,30 +642,14 @@ class Moon extends Entity {
 	}
 
 	build() {
-		// this.setListeners(); // listeners to only set if in range
-		// this.createCSSLabel(); // this should only build if planet is in range
-
 		this.planetGroup.add(this.labelGroup);
 		this.setLabelGroupPosition();
 	}
-
-	// createLabel() {
-	// 	this.createCSSLabel();
-
-	// 	gsap.to(this.labelLink, {
-	// 		opacity: 1,
-	// 		duration: 1,
-	// 		onComplete: () => {
-	// 			this.labelLink.style.pointerEvents = '';
-	// 		}
-	// 	});
-	// }
 
 	createElements() {
 		if (this.isBuilt) return;
 		// if (!this.CSSObj) this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
 		this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
-		this.setListeners(); // listeners to only set if in range
 		this.OrbitLine.build();
 		if (!this.meshGroup.children.length) {
 			this.createEntityMesh();
@@ -680,17 +659,14 @@ class Moon extends Entity {
 
 		gsap.to(this.labelLink, {
 			opacity: 1,
-			duration: 1,
-			onComplete: () => {
-				// Moon meshes build when camera is in planet orbit, and are destroyed when camera leaves orbit
-				// Need to check to see if mesh already built
-				this.intervalCheckVar = setInterval(() => {
-					this.intervalCheck();
-				}, this.intervalCheckTime);
-
-				this.isBuilt = true;
-			}
+			duration: 1
 		});
+		// Moon meshes build when camera is in planet orbit, and are destroyed when camera leaves orbit
+		// Need to check to see if mesh already built
+		this.intervalCheckVar = setInterval(() => {
+			this.intervalCheck();
+		}, this.intervalCheckTime);
+		this.isBuilt = true;
 	}
 
 	intervalCheck() {

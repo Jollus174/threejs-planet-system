@@ -61,6 +61,30 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 		? clickedClass.data.id === orrery.mouseState._clickedClass.data.id
 		: false;
 
+	const cameraIsOutsideSystem = orrery.mouseState._clickedClass
+		? orrery.cameraState._currentPlanetInRange !== orrery.mouseState._clickedClass.data.systemId
+		: false;
+
+	const previousSelectionWasSameSystem = orrery.mouseState._clickedClass
+		? clickedClass.data.systemId === orrery.mouseState._clickedClass.data.systemId
+		: false;
+
+	// remove a temp-rendered moon item from across in another system
+	if (cameraIsOutsideSystem && !newClickedClassSameAsOld) {
+		if (previousSelectionWasSameSystem) {
+			orrery.mouseState._clickedClass.removeCSSLabel();
+			clickedClass.createCSSLabel();
+		} else {
+			// Different system selected!
+			// If whatever was previously selected in the previous system was a moon, delete it
+			// then restore the base entity label for that system
+			if (orrery.mouseState._clickedClass.data.bodyType === 'Moon') {
+				orrery.mouseState._clickedClass.removeCSSLabel(); // only do this if whatever was selected wasn't a moon...
+				orrery.classes._all[orrery.mouseState._clickedClass.data.systemId].createCSSLabel();
+			}
+		}
+	}
+
 	orrery.mouseState._clickedClass = clickedClass;
 
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateEntityVue));
@@ -101,9 +125,11 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 		}
 	}
 
+	// build / destroy moons depending on which groups are enabled / disabled
 	const systemClass = orrery.classes._all[systemId];
 	const systemMoonClasses = Object.values(orrery.classes._all[systemId].moonClasses);
 	const toBuild = systemMoonClasses.filter((m) => m.isEnabled);
+	const toDestroy = systemMoonClasses.filter((m) => !m.isEnabled && m.isBuilt);
 
 	// only do if in range!
 	const cameraIsInSystem = orrery.mouseState._clickedClass
@@ -113,10 +139,8 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 	// only build fresh moon groups if in the system's range!
 	if (cameraIsInSystem) {
 		systemClass.buildMoons(toBuild);
+		systemClass.destroyMoons(toDestroy);
 	}
-	// systemClass.destroyMoons(toDestroy); // reset moons before zooming to them?
-
-	// if is in same system
 });
 
 const render = () => {
@@ -357,6 +381,7 @@ fetch('./solarSystemData.json')
 				},
 
 				showSystemTopBar() {
+					if (!this.clickedClassData) return;
 					return (
 						this.modelMoonGroups[this.clickedClassData.systemId] &&
 						this.modelMoonGroups[this.clickedClassData.systemId].length > 1
@@ -441,6 +466,8 @@ fetch('./solarSystemData.json')
 					) {
 						this.updateClickTarget(orrery.classes._all[this.clickedClassData.systemId].data);
 					}
+
+					this.updateClassMoonData();
 				},
 
 				convertToAU(km) {
@@ -816,7 +843,7 @@ fetch('./solarSystemData.json')
 					const prevSystemKey = systemKeys[prevIndex];
 					const prevSystem = orrery.classes._all[prevSystemKey];
 					this.updateEntity(prevSystem.data);
-					this.updateZoomTarget(prevSystem.data);
+					this.updateClickTarget(prevSystem.data);
 				},
 
 				goToNextSystem() {
@@ -830,7 +857,7 @@ fetch('./solarSystemData.json')
 					const nextSystemKey = systemKeys[nextIndex];
 					const nextSystem = orrery.classes._all[nextSystemKey];
 					this.updateEntity(nextSystem.data);
-					this.updateZoomTarget(nextSystem.data);
+					this.updateClickTarget(nextSystem.data);
 				},
 
 				goToPreviousEntity() {
