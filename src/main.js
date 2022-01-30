@@ -143,6 +143,10 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 	}
 });
 
+document.addEventListener(customEventNames.updateTimeShiftAmount, (e) => {
+	orrery.timeShiftAmount = e.detail; // render loop will read from this
+});
+
 const render = () => {
 	delta = 5 * clock.getDelta();
 	// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
@@ -214,6 +218,14 @@ const render = () => {
 	// 	orrery.bodies.meshes._planets[0].glow.material.uniforms.viewVector.value = viewVector;
 	// }
 
+	if (orrery.timeShiftAmount !== 0) {
+		for (const entity of orrery.classes._allIterable) {
+			entity.iteratePosition(
+				orrery.timeShiftAmount * (entity.data.sideralOrbit ? 360 / entity.data.sideralOrbit : 1) * 0.5
+			);
+		}
+	}
+
 	orrery.controls.update();
 
 	orrery.classes._sun.draw(delta); // TODO: Should be separate
@@ -283,6 +295,8 @@ fetch('./solarSystemData.json')
 		Object.values(orrery.classes._planets).forEach((item) => item.build());
 		Object.values(orrery.classes._dwarfPlanets).forEach((item) => item.build());
 
+		orrery.classes._allIterable = Object.values(orrery.classes._all);
+
 		Vue.component('lightbox', LightBox);
 		new Vue({
 			el: orrery.vueTarget,
@@ -299,8 +313,8 @@ fetch('./solarSystemData.json')
 				systemClassData: null,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
-				tabGroup: 'tab-desc',
-				vueRandomString: randomString(8)
+				vueRandomString: randomString(8),
+				timeShiftAmount: 0
 			},
 			computed: {
 				nameApoapsis() {
@@ -389,6 +403,29 @@ fetch('./solarSystemData.json')
 				}
 			},
 			methods: {
+				updateTimeShiftAmount() {
+					document.dispatchEvent(
+						new CustomEvent(customEventNames.updateTimeShiftAmount, { detail: this.timeShiftAmount })
+					);
+				},
+				timeShiftForwards() {
+					if (this.timeShiftAmount < 3) {
+						this.timeShiftAmount++;
+						this.vueRandomString = randomString(8);
+						this.updateTimeShiftAmount();
+					}
+				},
+				timeShiftBackwards() {
+					if (-3 < this.timeShiftAmount) {
+						this.timeShiftAmount--;
+						this.vueRandomString = randomString(8);
+						this.updateTimeShiftAmount();
+					}
+				},
+				timeShiftStop() {
+					this.timeShiftAmount = 0;
+					this.updateTimeShiftAmount();
+				},
 				regenerateRandomString() {
 					this.vueRandomString = randomString(8);
 				},

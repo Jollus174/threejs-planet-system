@@ -23,6 +23,7 @@ const orrery = {
 	skybox: null,
 	classes: {
 		_all: {},
+		_allIterable: [],
 		_planets: {},
 		_dwarfPlanets: {},
 		_asteroids: {},
@@ -52,7 +53,8 @@ const orrery = {
 		_ambientLights: []
 	},
 	isDesktop: false,
-	vueTarget: document.querySelector('#app-orrery')
+	vueTarget: document.querySelector('#app-orrery'),
+	timeShiftAmount: 0
 };
 
 window.orrery = orrery;

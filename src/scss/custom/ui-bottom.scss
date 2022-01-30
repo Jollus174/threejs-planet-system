@@ -1,0 +1,33 @@
+.ui-bottom {
+	pointer-events: all;
+	background-color: #111;
+
+	button {
+		position: relative;
+
+		&:disabled {
+			opacity: 1;
+
+			.fas {
+				opacity: 0.65;
+			}
+		}
+
+		.fas {
+			position: relative;
+		}
+
+		.fa-backward {
+			left: -1px;
+		}
+
+		.fa-forward {
+			left: 2px;
+		}
+
+		.badge {
+			position: absolute;
+			right: -8px;
+		}
+	}
+}

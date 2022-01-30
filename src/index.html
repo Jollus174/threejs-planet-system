@@ -59,7 +59,7 @@
 											type="seach"
 											placeholder="Search"
 											v-model="searchQuery"
-											@keyup.enter="updateZoomTarget(searchResults[0].data)"
+											@keyup.enter="updateClickTarget(searchResults[0].data)"
 										/>
 									</div>
 								</div>
@@ -67,7 +67,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="ui-details">
+				<div class="ui-details" :key="vueRandomString">
 					<div id="search-results-mobile" class="search-results">
 						<input
 							id="input-search-mobile"
@@ -76,13 +76,13 @@
 							placeholder="Search"
 							v-model="searchQuery"
 							:class="{'active': showSearchMobile}"
-							@keyup.enter="updateZoomTarget(searchResults[0].data)"
+							@keyup.enter="updateClickTarget(searchResults[0].data)"
 						/>
 						<!-- TODO: Get links working and remove the '.prevent' -->
 						<div class="search-dropdown" :class="{'active': searchResults}">
 							<ul>
 								<li v-for="(result, i) in searchResults">
-									<a :href="'/#/' + result.data.id" @click.prevent="updateZoomTarget(result.data)">
+									<a :href="'/#/' + result.data.id" @click.prevent="updateClickTarget(result.data)">
 										<span v-html="result.data.displayName"></span>
 										<sub class="text-type">{{ result.data.bodyType }}</sub>
 									</a>
@@ -211,7 +211,6 @@
 									class="content content-system"
 									v-show="tabGroup === 'tab-system'"
 									:class="{'has-topbar': showSystemTopBar}"
-									:key="vueRandomString"
 								>
 									<div class="topbar-system" v-if="showSystemTopBar">
 										<div class="topbar-system-label">Enabled Moon Groups:</div>
@@ -562,7 +561,7 @@
 						Info
 					</button>
 				</div>
-				<div class="ui-bottom-bar">
+				<div class="ui-bottom">
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col-2 col-lg-3">
@@ -570,14 +569,31 @@
 									<button type="button" class="btn btn-rounded">
 										<i class="fas fa-clock"></i>
 									</button>
-									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
+									<button
+										type="button"
+										class="btn btn-rounded d-none d-lg-inline-block"
+										:disabled="timeShiftAmount === -3"
+										@click="timeShiftBackwards()"
+									>
 										<i class="fas fa-backward"></i>
+										<span class="badge" v-if="timeShiftAmount < 0">{{ Math.abs(timeShiftAmount) }}</span>
 									</button>
-									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
-										<i class="fas fa-pause"></i>
+									<button
+										type="button"
+										class="btn btn-rounded d-none d-lg-inline-block"
+										:disabled="timeShiftAmount === 0"
+										@click="timeShiftStop()"
+									>
+										<i class="fas fa-stop"></i>
 									</button>
-									<button type="button" class="btn btn-rounded d-none d-lg-inline-block">
+									<button
+										type="button"
+										class="btn btn-rounded d-none d-lg-inline-block"
+										:disabled="timeShiftAmount === 3"
+										@click="timeShiftForwards()"
+									>
 										<i class="fas fa-forward"></i>
+										<span class="badge" v-if="timeShiftAmount > 0">{{ timeShiftAmount }}</span>
 									</button>
 								</div>
 							</div>

@@ -453,6 +453,7 @@ const setOrbitCalculations = (item) => {
 	item.argPeriapsis = item.argPeriapsis || getRandomArbitrary(0, 360);
 	item.meanAnomaly = item.meanAnomaly || getRandomArbitrary(0, 360);
 	// no negative rotations, thanks
+	// TODO: we will need these, actually
 	item.sideralRotation = !!item.sideralRotation ? Math.abs(parseFloat(item.sideralRotation)) : item.sideralRotationl;
 	//
 

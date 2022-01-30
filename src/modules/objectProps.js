@@ -33,6 +33,8 @@ class OrbitLine {
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
+		this.geometryLine = null;
+		this.vertexCount = null;
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
@@ -44,43 +46,43 @@ class OrbitLine {
 			: null;
 	}
 
-	build() {
-		const isMoon = this.data.aroundPlanet;
-		const points = [];
-
-		for (let i = this.data.meanAnomaly; i <= this.data.meanAnomaly + 360; i += 1) {
+	drawLine(iterator) {
+		const orbitPoints = [];
+		const i = iterator || 0;
+		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + 360 - i; p += 1) {
 			const v = new THREE.Vector3();
-			points.push(v.copy(calculateOrbit(i, this.data, this.parentPlanetData)));
+			orbitPoints.push(v.copy(calculateOrbit(p, this.data, this.parentPlanetData)));
 		}
 
-		const orbitPoints = points;
-
 		// create geometry using all points on the circle
-		const geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+		const geoLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+		this.vertexCount = this.vertexCount || geoLine.getAttribute('position').count;
 
 		const startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
 		const endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
 
-		const vertCnt = geometryLine.getAttribute('position').count;
-		const lerpAcc = 1; // how much fade we want, closer to 0 means fades earlier
+		const lerpAcc = 0.5; // how much fade we want, closer to 0 means fades earlier
 		const lerpIncrementer = 1 / 360 / lerpAcc;
 
-		const colors = new Float32Array(vertCnt * 3);
-		for (let i = 0; i <= 360; i += 1) {
+		const colors = new Float32Array(this.vertexCount * 3);
+		for (let c = 0; c <= 360; c += 1) {
 			const lerpColor = new THREE.Color(startColor);
-			lerpColor.lerpColors(startColor, endColor, i * lerpIncrementer);
+			lerpColor.lerpColors(startColor, endColor, c * lerpIncrementer);
 
-			colors[i * 3 + 0] = lerpColor.r;
-			colors[i * 3 + 1] = lerpColor.g;
-			colors[i * 3 + 2] = lerpColor.b;
+			colors[c * 3 + 0] = lerpColor.r;
+			colors[c * 3 + 1] = lerpColor.g;
+			colors[c * 3 + 2] = lerpColor.b;
 		}
 
-		geometryLine.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+		geoLine.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
+		return geoLine;
+	}
+
+	build() {
 		this.orbitLine = new THREE.Line(
-			geometryLine,
+			this.drawLine(),
 			new THREE.LineBasicMaterial({
-				color: isMoon ? settings.planetColours.default : '#FFF',
 				transparent: true,
 				opacity: this.classRef.orbitLineOpacityDefault,
 				visible: this.classRef.orbitLineVisibleAtBuild,
@@ -107,8 +109,8 @@ class OrbitLine {
 	}
 
 	// TODO: Probably remove these since they rely on a loop and will overwrite any other opacity updates
-	orbitLineFadeOut() {
-		/* if (!this.orbitLine || !this.orbitLine.material) return;
+	/* orbitLineFadeOut() {
+		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingOut && this.orbitLine && this.orbitLine.material.opacity !== 0) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
@@ -120,11 +122,11 @@ class OrbitLine {
 					this.orbitLine.material.visible = false;
 				}
 			});
-		} */
-	}
+		}
+	} */
 
-	orbitLineFadeIn() {
-		/* if (!this.orbitLine || !this.orbitLine.material) return;
+	/* orbitLineFadeIn() {
+		if (!this.orbitLine || !this.orbitLine.material) return;
 		if (!this.fadingIn && this.orbitLine && this.orbitLine.material.opacity !== this.opacityDefault) {
 			this.fadingIn = true;
 			this.orbitLine.material.visible = true;
@@ -135,8 +137,8 @@ class OrbitLine {
 					this.fadingIn = false;
 				}
 			});
-		} */
-	}
+		}
+	} */
 
 	eventHovered() {
 		orrery.mouseState._hoveredClass = this.classRef;
@@ -183,6 +185,9 @@ class Entity {
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
+
+		// this will be determined by the entity's current epoch, and should be something between 0 - 360
+		this.orbitIndex = 0;
 
 		this.isEnabled = true;
 		this.isSelected = true;
@@ -270,6 +275,21 @@ class Entity {
 		} else {
 			this.labelGroup.position.set(0, 0, 0);
 		}
+	}
+
+	iteratePosition(i) {
+		this.orbitIndex += i;
+
+		this.labelGroup.position.copy(
+			calculateOrbit(
+				this.data.meanAnomaly - this.orbitIndex,
+				this.data,
+				this.planetClass ? this.planetClass.data : null
+			)
+		);
+
+		if (this.OrbitLine && this.OrbitLine.orbitLine)
+			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(this.orbitIndex);
 	}
 
 	build() {

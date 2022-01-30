@@ -21,31 +21,6 @@ const createCircleTexture = (color, size) => {
 	return texture;
 };
 
-const createCircleFromPoints = (radius) => {
-	const points = [];
-
-	for (let i = 0; i <= 360; i++) {
-		points.push(new Vector3(Math.sin(i * (Math.PI / 180)) * radius, Math.cos(i * (Math.PI / 180)) * radius, 0));
-	}
-
-	const geometry = new BufferGeometry().setFromPoints(points);
-
-	const lineProps = {
-		geometry,
-		material: new PointsMaterial({
-			color: 0xffffff,
-			transparent: true,
-			opacity: 0.05,
-			size: radius * 0.01,
-			depthTest: false,
-			depthWrite: false
-		})
-	};
-	lineProps.renderOrder = 997;
-
-	return lineProps;
-};
-
 // custom UV map so textures can curve correctly (looking at you, rings of Saturn)
 const ringUVMapGeometry = (from, to) => {
 	const geometry = new RingBufferGeometry(from, to, 90);
@@ -69,4 +44,4 @@ const fadeTargetLineOpacity = (group, targetLine) => {
 	// }
 };
 
-export { createCircleTexture, createCircleFromPoints, ringUVMapGeometry, fadeTargetLineOpacity };
+export { createCircleTexture, ringUVMapGeometry, fadeTargetLineOpacity };

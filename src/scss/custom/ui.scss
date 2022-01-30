@@ -8,11 +8,6 @@
 	pointer-events: none;
 	z-index: $z-ui;
 
-	.ui-bottom-bar {
-		pointer-events: all;
-		background-color: #111;
-	}
-
 	sub {
 		text-transform: uppercase;
 	}
