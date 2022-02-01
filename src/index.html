@@ -16,7 +16,6 @@
 		<noscript>
 			Sorry, but <em>The Orrery</em> will not work without JavaScript enabled. Please enable it to continue.
 		</noscript>
-		<canvas id="bg"></canvas>
 		<main id="app-orrery">
 			<div class="loading-spinner-container">
 				<div class="loading-spinner">
@@ -66,8 +65,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="ui-details" :key="vueRandomString">
+
 					<div id="search-results-mobile" class="search-results">
 						<input
 							id="input-search-mobile"
@@ -93,157 +91,216 @@
 							</ul>
 						</div>
 					</div>
-
-					<aside id="sidebar-ui-details" class="sidebar-ui-details" v-if="sidebarIsOpen">
-						<div class="ui-details-container">
-							<img class="img-details" src="/img/details-jupiter.jpg" alt="Jupiter" />
-							<div class="title-container">
-								<button type="button" class="btn" @click="goToPreviousEntity()">
-									<i class="fas fa-angle-left"></i>
-								</button>
-								<div class="title-wrapper">
-									<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
-									<span class="text-type">{{ clickedClassData.bodyType }}</span>
+				</div>
+				<div class="ui-centre">
+					<div class="ui-centre-container">
+						<div id="renderers-container" class="renderers-container"></div>
+						<aside id="sidebar-ui-details" class="sidebar-ui-details" :key="vueRandomString">
+							<button id="btn-mobile-drag-bar" class="btn btn-mobile-drag-bar d-lg-none">
+								<i class="fas fa-grip-lines"></i>
+							</button>
+							<button id="btn-desktop-drag-bar" class="btn btn-desktop-drag-bar d-none d-lg-flex">
+								<i class="fas fa-grip-lines-vertical"></i>
+							</button>
+							<div class="ui-details">
+								<img class="img-details d-none d-lg-block" src="/img/details-jupiter.jpg" alt="Jupiter" />
+								<div class="title-container">
+									<button type="button" class="btn" @click="goToPreviousEntity()">
+										<i class="fas fa-angle-left"></i>
+									</button>
+									<div class="title-wrapper">
+										<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
+										<span class="text-type">{{ clickedClassData.bodyType }}</span>
+									</div>
+									<button type="button" class="btn" @click="goToNextEntity()">
+										<i class="fas fa-angle-right"></i>
+									</button>
 								</div>
-								<button type="button" class="btn" @click="goToNextEntity()">
-									<i class="fas fa-angle-right"></i>
-								</button>
-							</div>
-							<div class="key-data-container">
-								<div class="container-fluid">
-									<div class="row">
-										<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
-											<div class="key-data">
-												<span class="heading">Distance</span>
-												<span class="label-color">{{ distanceFromParentEntity.value }}</span>
-												<sub>{{ distanceFromParentEntity.unit }}</sub>
+								<div class="key-data-container">
+									<div class="container-fluid">
+										<div class="row">
+											<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
+												<div class="key-data">
+													<span class="heading">Distance</span>
+													<span class="label-color">{{ distanceFromParentEntity.value }}</span>
+													<sub>{{ distanceFromParentEntity.unit }}</sub>
+												</div>
 											</div>
-										</div>
-										<div class="col-4">
-											<div class="key-data">
-												<span class="heading">Mean Radius</span>
-												<span class="label-color">{{ distanceConverter(clickedClassData.meanRadius).value }}</span>
-												<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+											<div class="col-4">
+												<div class="key-data">
+													<span class="heading">Mean Radius</span>
+													<span class="label-color">{{ distanceConverter(clickedClassData.meanRadius).value }}</span>
+													<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+												</div>
 											</div>
-										</div>
-										<div class="col-4" v-if="clickedClassData.sideralOrbit">
-											<div class="key-data">
-												<span class="heading">Orbit Time</span>
-												<span class="label-color"
-													>{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}</span
-												>
-												<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+											<div class="col-4" v-if="clickedClassData.sideralOrbit">
+												<div class="key-data">
+													<span class="heading">Orbit Time</span>
+													<span class="label-color"
+														>{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}</span
+													>
+													<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+												</div>
 											</div>
-										</div>
 
-										<!-- <div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
-											<div class="key-data">
-												<span class="heading">Moons</span>
-												<span class="label-color">{{ clickedClassData.moons.length }}</span>
+											<!-- <div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
+												<div class="key-data">
+													<span class="heading">Moons</span>
+													<span class="label-color">{{ clickedClassData.moons.length }}</span>
+												</div>
+											</div> -->
+											<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
+												<div class="key-data">
+													<span class="heading">Moon Group</span>
+													<span class="label-color">{{ clickedClassData.moonGroup }}</span>
+												</div>
 											</div>
-										</div> -->
-										<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
-											<div class="key-data">
-												<span class="heading">Moon Group</span>
-												<span class="label-color">{{ clickedClassData.moonGroup }}</span>
-											</div>
-										</div>
 
-										<div class="col-4" v-if="clickedClassData.avgTemp">
-											<div class="key-data">
-												<span class="heading">Surface Temp</span>
-												<span class="label-color">{{ clickedClassData.avgTemp }}</span> <sub>°C</sub>
-											</div>
+											<!--<div class="col-4" v-if="clickedClassData.avgTemp">
+												<div class="key-data">
+													<span class="heading">Surface Temp</span>
+													<span class="label-color">{{ clickedClassData.avgTemp }}</span> <sub>°C</sub>
+												</div>
+											</div>-->
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="content-container order-lg-4">
-								<section class="content content-desc" v-show="tabGroup === 'tab-desc'">
-									<div
-										class="content-wrapper container-fluid container-extra-gutter"
-										:class="{ 'loaded': clickedClassData.description.hasLoaded }"
-									>
-										<template v-if="clickedClassData.description.hasLoaded">
-											<div
-												v-html="clickedClassData.description.content"
-												v-if="!clickedClassData.description.noResults && !clickedClassData.description.hasError"
-											></div>
-											<div v-else-if="clickedClassData.description.hasError">
-												<div class="alert alert-warning" role="alert">
-													<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
-														{{ error }}
-													</p>
-													<button type="button" class="btn btn-primary" @click="getWikipediaData">Try again</button>
+								<div class="content-container order-lg-4">
+									<section class="content content-desc" v-show="tabGroup === 'tab-desc'">
+										<div
+											class="content-wrapper container-fluid container-extra-gutter"
+											:class="{ 'loaded': clickedClassData.description.hasLoaded }"
+										>
+											<template v-if="clickedClassData.description.hasLoaded">
+												<div
+													v-html="clickedClassData.description.content"
+													v-if="!clickedClassData.description.noResults && !clickedClassData.description.hasError"
+												></div>
+												<div v-else-if="clickedClassData.description.hasError">
+													<div class="alert alert-warning" role="alert">
+														<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
+															{{ error }}
+														</p>
+														<button type="button" class="btn btn-primary" @click="getWikipediaData">Try again</button>
+													</div>
 												</div>
-											</div>
-											<div v-else>
-												<div class="alert alert-warning" role="alert">No results found.</div>
-											</div>
-										</template>
-										<div class="ssc" v-else>
-											<div class="flex align-start">
-												<div class="w-100">
-													<div class="ssc-line mts mb w-90"></div>
-													<div class="ssc-line mb w-80"></div>
-													<div class="ssc-line mb w-90"></div>
-													<div class="ssc-line mb w-60"></div>
-													<div class="ssc-line mb wp-80"></div>
-													<br />
-													<div class="ssc-line mb w-70"></div>
-													<div class="ssc-line mb w-80"></div>
-													<div class="ssc-line mb w-90"></div>
-													<div class="ssc-line mb w-60"></div>
-													<br />
-													<div class="ssc-line mb w-90"></div>
-													<div class="ssc-line mb w-80"></div>
-													<div class="ssc-line mb w-90"></div>
-													<div class="ssc-line mb w-60"></div>
-													<div class="ssc-line mb wp-80"></div>
+												<div v-else>
+													<div class="alert alert-warning" role="alert">No results found.</div>
 												</div>
-											</div>
-										</div>
-									</div>
-								</section>
-
-								<section
-									id="content-system"
-									class="content content-system"
-									v-show="tabGroup === 'tab-system'"
-									:class="{'has-topbar': showSystemTopBar}"
-								>
-									<div class="topbar-system" v-if="showSystemTopBar">
-										<div class="topbar-system-label">Enabled Moon Groups:</div>
-										<div class="topbar-system-contents">
-											<template v-for="moonGroup in modelMoonGroups[clickedClassData.systemId]">
-												<button
-													class="badge"
-													v-show="moonGroup.isEnabled"
-													:style="{'background-color': moonGroup.color}"
-													@click="disableMoonGroup(moonGroup.moonGroupIndex)"
-												>
-													{{ moonGroup.name }}
-													<i class="fas fa-times"></i>
-												</button>
 											</template>
+											<div class="ssc" v-else>
+												<div class="flex align-start">
+													<div class="w-100">
+														<div class="ssc-line mts mb w-90"></div>
+														<div class="ssc-line mb w-80"></div>
+														<div class="ssc-line mb w-90"></div>
+														<div class="ssc-line mb w-60"></div>
+														<div class="ssc-line mb wp-80"></div>
+														<br />
+														<div class="ssc-line mb w-70"></div>
+														<div class="ssc-line mb w-80"></div>
+														<div class="ssc-line mb w-90"></div>
+														<div class="ssc-line mb w-60"></div>
+														<br />
+														<div class="ssc-line mb w-90"></div>
+														<div class="ssc-line mb w-80"></div>
+														<div class="ssc-line mb w-90"></div>
+														<div class="ssc-line mb w-60"></div>
+														<div class="ssc-line mb wp-80"></div>
+													</div>
+												</div>
+											</div>
 										</div>
-									</div>
-									<div class="content-wrapper container-fluid scroll-shadows" data-selector="content-wrapper">
-										<table data-selector="table-wrapper">
-											<tbody>
+									</section>
+
+									<section
+										id="content-system"
+										class="content content-system"
+										v-show="tabGroup === 'tab-system'"
+										:class="{'has-topbar': showSystemTopBar}"
+									>
+										<div class="topbar-system" v-if="showSystemTopBar">
+											<div class="topbar-system-label">Enabled Moon Groups:</div>
+											<div class="topbar-system-contents">
+												<template v-for="moonGroup in modelMoonGroups[clickedClassData.systemId]">
+													<button
+														class="badge"
+														v-show="moonGroup.isEnabled"
+														:style="{'background-color': moonGroup.color}"
+														@click="disableMoonGroup(moonGroup.moonGroupIndex)"
+													>
+														{{ moonGroup.name }}
+														<i class="fas fa-times"></i>
+													</button>
+												</template>
+											</div>
+										</div>
+										<div class="content-wrapper container-fluid scroll-shadows" data-selector="content-wrapper">
+											<table data-selector="table-wrapper">
+												<tbody>
+													<tr>
+														<td class="td-wrapper">
+															<table>
+																<tbody class="planet-group active-planet-group" data-selector="tbody-wrapper">
+																	<tr
+																		tabindex="0"
+																		:class="{'entity-targeted': clickedClassData.id === systemClassData.id, 'entity-selected': zoomedClassData && zoomedClassData.id === systemClassData.id}"
+																		@click="updateClickTarget(systemClassData)"
+																		@mouseover="entityHovered(systemClassData)"
+																		@mouseleave="entityUnhovered(systemClassData)"
+																	>
+																		<th scope="row">
+																			<span>{{ systemClassData.displayName }}</span>
+																			<div class="status-wrapper">
+																				<label data-selector="targeted">
+																					<img src="/img/icon-crosshair.svg" preload />
+																				</label>
+																				<label data-selector="selected">
+																					<img src="/img/icon-camera.svg" preload />
+																				</label>
+																			</div>
+																		</th>
+																	</tr>
+																</tbody>
+															</table>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+											<table v-if="modelMoonGroups[clickedClassData.systemId]" data-selector="table-wrapper">
 												<tr>
 													<td class="td-wrapper">
 														<table>
-															<tbody class="planet-group active-planet-group" data-selector="tbody-wrapper">
+															<thead>
+																<tr>
+																	<th class="item-key">Moons</th>
+																	<th class="item-key">Distance</th>
+																	<th class="item-key">Radius</th>
+																</tr>
+															</thead>
+															<tbody
+																class="moon-group"
+																data-selector="tbody-wrapper"
+																v-for="(moonGroup, i) in modelMoonGroups[clickedClassData.systemId]"
+																:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isEnabled, 'show-moon-group-name': moonGroup.showName}]"
+																:data-moongroup-name="moonGroup.name"
+															>
 																<tr
 																	tabindex="0"
-																	:class="{'entity-targeted': clickedClassData.id === systemClassData.id, 'entity-selected': zoomedClassData && zoomedClassData.id === systemClassData.id}"
-																	@click="updateClickTarget(systemClassData)"
-																	@mouseover="entityHovered(systemClassData)"
-																	@mouseleave="entityUnhovered(systemClassData)"
+																	v-for="(moon, j) in moonGroup.moons"
+																	:class="{'entity-targeted': clickedClassData.id === moon.id, 'entity-selected': zoomedClassData && zoomedClassData.id === moon.id}"
+																	@click="updateClickTarget(moon)"
+																	@mouseover="entityHovered(moon)"
+																	@mouseleave="entityUnhovered(moon)"
 																>
-																	<th scope="row">
-																		<span>{{ systemClassData.displayName }}</span>
+																	<th scope="row"><span>{{ moon.displayName }}</span></th>
+																	<td>
+																		{{ distanceConverter(moon.semimajorAxis).value }}
+																		<sub>{{ distanceConverter(moon.semimajorAxis).unit }}</sub>
+																	</td>
+																	<td>
+																		{{ distanceConverter(moon.meanRadius).value }}
+																		<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
 																		<div class="status-wrapper">
 																			<label data-selector="targeted">
 																				<img src="/img/icon-crosshair.svg" preload />
@@ -252,326 +309,285 @@
 																				<img src="/img/icon-camera.svg" preload />
 																			</label>
 																		</div>
-																	</th>
+																	</td>
 																</tr>
 															</tbody>
 														</table>
 													</td>
 												</tr>
-											</tbody>
-										</table>
-										<table v-if="modelMoonGroups[clickedClassData.systemId]" data-selector="table-wrapper">
-											<tr>
-												<td class="td-wrapper">
-													<table>
-														<thead>
-															<tr>
-																<th class="item-key">Moons</th>
-																<th class="item-key">Distance</th>
-																<th class="item-key">Radius</th>
-															</tr>
-														</thead>
-														<tbody
-															class="moon-group"
-															data-selector="tbody-wrapper"
-															v-for="(moonGroup, i) in modelMoonGroups[clickedClassData.systemId]"
-															:class="['moon-group-' + i, {'active-moon-group': modelMoonGroups[clickedClassData.systemId][i].isEnabled, 'show-moon-group-name': moonGroup.showName}]"
-															:data-moongroup-name="moonGroup.name"
-														>
-															<tr
-																tabindex="0"
-																v-for="(moon, j) in moonGroup.moons"
-																:class="{'entity-targeted': clickedClassData.id === moon.id, 'entity-selected': zoomedClassData && zoomedClassData.id === moon.id}"
-																@click="updateClickTarget(moon)"
-																@mouseover="entityHovered(moon)"
-																@mouseleave="entityUnhovered(moon)"
-															>
-																<th scope="row"><span>{{ moon.displayName }}</span></th>
-																<td>
-																	{{ distanceConverter(moon.semimajorAxis).value }}
-																	<sub>{{ distanceConverter(moon.semimajorAxis).unit }}</sub>
-																</td>
-																<td>
-																	{{ distanceConverter(moon.meanRadius).value }}
-																	<sub>{{ distanceConverter(moon.meanRadius).unit }}</sub>
-																	<div class="status-wrapper">
-																		<label data-selector="targeted">
-																			<img src="/img/icon-crosshair.svg" preload />
-																		</label>
-																		<label data-selector="selected">
-																			<img src="/img/icon-camera.svg" preload />
-																		</label>
-																	</div>
-																</td>
-															</tr>
-														</tbody>
-													</table>
-												</td>
-											</tr>
-										</table>
-									</div>
-								</section>
+											</table>
+										</div>
+									</section>
 
-								<section class="content content-stats" v-show="tabGroup === 'tab-stats'">
-									<div class="content-wrapper container-fluid container-extra-gutter">
-										<table>
-											<tbody>
-												<tr v-if="clickedClassData.discoveredBy">
-													<td>Discovered By</td>
-													<td>{{ clickedClassData.discoveredBy }}</td>
-												</tr>
-												<tr v-if="clickedClassData.discoveryDate">
-													<td>Discovery Date</td>
-													<td>{{ clickedClassData.discoveryDate }}</td>
-												</tr>
-												<tr v-if="clickedClassData.moons && clickedClassData.moons.length">
-													<td>Moons</td>
-													<td>{{ clickedClassData.moons.length }}</td>
-												</tr>
-												<tr v-if="clickedClassData.avgTemp">
-													<td>Surface Temp</td>
-													<td class="text-nowrap">{{ clickedClassData.avgTemp }} °C</td>
-												</tr>
-												<tr
-													v-if="clickedClassData.mass && clickedClassData.mass.massValue && clickedClassData.mass.massExponent"
-												>
-													<td>Mass</td>
-													<td class="text-nowrap">
-														{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
-															>{{ clickedClassData.mass.massExponent }}</sup
-														>
-														<sub>kg</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.semimajorAxis">
-													<td>Semi-Major Axis</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.semimajorAxis).value }}
-														<sub>{{ distanceConverter(clickedClassData.semimajorAxis).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.perihelion">
-													<td>{{ namePeriapsis }}</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.perihelion).value }}
-														<sub>{{ distanceConverter(clickedClassData.perihelion).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.aphelion">
-													<td>{{ nameApoapsis }}</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.aphelion).value }}
-														<sub>{{ distanceConverter(clickedClassData.aphelion).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.eccentricity">
-													<td>Eccentricity</td>
-													<td class="text-nowrap">{{ clickedClassData.eccentricity }}</td>
-												</tr>
-												<tr v-if="clickedClassData.inclination">
-													<td>Inclination</td>
-													<td class="text-nowrap">{{ clickedClassData.inclination }} °</td>
-												</tr>
-												<tr v-if="clickedClassData.diameter">
-													<td>Mean Diameter</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.diameter).value }}
-														<sub>{{ distanceConverter(clickedClassData.diameter).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.meanRadius">
-													<td>Mean Radius</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.meanRadius).value }}
-														<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.equaRadius">
-													<td>Equatorial Radius</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.equaRadius).value }}
-														<sub>{{ distanceConverter(clickedClassData.equaRadius).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.polarRadius">
-													<td>Polar Radius</td>
-													<td class="text-nowrap">
-														{{ distanceConverter(clickedClassData.polarRadius).value }}
-														<sub>{{ distanceConverter(clickedClassData.polarRadius).unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.axialTilt">
-													<td>Axial Tilt</td>
-													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.axialTilt) }} °</td>
-												</tr>
-												<tr v-if="clickedClassData.sideralOrbit">
-													<td>Sideral Orbit</td>
-													<td class="text-nowrap">
-														{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}
-														<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
-													</td>
-												</tr>
-												<tr v-if="clickedClassData.sideralRotation">
-													<td>Sideral Rotation</td>
-													<td class="text-nowrap">
-														{{ timeConversion(clickedClassData.sideralRotation, 'hours').value }}
-														<sub>{{ timeConversion(clickedClassData.sideralRotation, 'hours').unit }}</sub>
-													</td>
-												</tr>
-
-												<tr v-if="clickedClassData.meanAnomaly">
-													<td>Mean Anomaly</td>
-													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.meanAnomaly) }} °</td>
-												</tr>
-												<tr v-if="clickedClassData.argPeriapsis">
-													<td>Argument of {{namePeriapsis}}</td>
-													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.argPeriapsis) }} °</td>
-												</tr>
-												<tr v-if="clickedClassData.longAscNode">
-													<td>Longitude of Ascending Node</td>
-													<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °</td>
-												</tr>
-												<tr v-if="clickedClassData.longOfPeriapsis">
-													<td>Longitude of {{namePeriapsis}}</td>
-													<td class="text-nowrap">
-														{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</section>
-
-								<section class="content content-media" v-show="tabGroup === 'tab-media'">
-									<div
-										class="content-wrapper container-fluid container-extra-gutter text-center"
-										:class="{ 'loaded': clickedClassData.media.hasLoaded }"
-									>
-										<template v-if="clickedClassData.media.hasLoaded">
-											<div v-if="!clickedClassData.media.noResults && !clickedClassData.media.hasError">
-												<div class="row">
-													<div
-														class="col-media col-6 col-md-4"
-														v-for="(item, i) in clickedClassData.media.items"
-														:key="i"
+									<section class="content content-stats" v-show="tabGroup === 'tab-stats'">
+										<div class="content-wrapper container-fluid container-extra-gutter">
+											<table>
+												<tbody>
+													<tr v-if="clickedClassData.discoveredBy">
+														<td>Discovered By</td>
+														<td>{{ clickedClassData.discoveredBy }}</td>
+													</tr>
+													<tr v-if="clickedClassData.discoveryDate">
+														<td>Discovery Date</td>
+														<td>{{ clickedClassData.discoveryDate }}</td>
+													</tr>
+													<tr v-if="clickedClassData.moons && clickedClassData.moons.length">
+														<td>Moons</td>
+														<td>{{ clickedClassData.moons.length }}</td>
+													</tr>
+													<tr v-if="clickedClassData.avgTemp">
+														<td>Surface Temp</td>
+														<td class="text-nowrap">{{ clickedClassData.avgTemp }} °C</td>
+													</tr>
+													<tr
+														v-if="clickedClassData.mass && clickedClassData.mass.massValue && clickedClassData.mass.massExponent"
 													>
-														<figure>
-															<a class="media" href="#" @click="openGallery(i)">
-																<img :src="item.list_image_src" width="100%" :alt="item.alt_text" />
-																<div class="overlay" v-html="item.title"></div>
-															</a>
-														</figure>
+														<td>Mass</td>
+														<td class="text-nowrap">
+															{{ valueToFixedFloatingPoints(clickedClassData.mass.massValue) }} x 10<sup
+																>{{ clickedClassData.mass.massExponent }}</sup
+															>
+															<sub>kg</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.semimajorAxis">
+														<td>Semi-Major Axis</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.semimajorAxis).value }}
+															<sub>{{ distanceConverter(clickedClassData.semimajorAxis).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.perihelion">
+														<td>{{ namePeriapsis }}</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.perihelion).value }}
+															<sub>{{ distanceConverter(clickedClassData.perihelion).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.aphelion">
+														<td>{{ nameApoapsis }}</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.aphelion).value }}
+															<sub>{{ distanceConverter(clickedClassData.aphelion).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.eccentricity">
+														<td>Eccentricity</td>
+														<td class="text-nowrap">{{ clickedClassData.eccentricity }}</td>
+													</tr>
+													<tr v-if="clickedClassData.inclination">
+														<td>Inclination</td>
+														<td class="text-nowrap">{{ clickedClassData.inclination }} °</td>
+													</tr>
+													<tr v-if="clickedClassData.diameter">
+														<td>Mean Diameter</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.diameter).value }}
+															<sub>{{ distanceConverter(clickedClassData.diameter).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.meanRadius">
+														<td>Mean Radius</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.meanRadius).value }}
+															<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.equaRadius">
+														<td>Equatorial Radius</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.equaRadius).value }}
+															<sub>{{ distanceConverter(clickedClassData.equaRadius).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.polarRadius">
+														<td>Polar Radius</td>
+														<td class="text-nowrap">
+															{{ distanceConverter(clickedClassData.polarRadius).value }}
+															<sub>{{ distanceConverter(clickedClassData.polarRadius).unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.axialTilt">
+														<td>Axial Tilt</td>
+														<td class="text-nowrap">{{ valueToFixedFloatingPoints(clickedClassData.axialTilt) }} °</td>
+													</tr>
+													<tr v-if="clickedClassData.sideralOrbit">
+														<td>Sideral Orbit</td>
+														<td class="text-nowrap">
+															{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}
+															<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.sideralRotation">
+														<td>Sideral Rotation</td>
+														<td class="text-nowrap">
+															{{ timeConversion(clickedClassData.sideralRotation, 'hours').value }}
+															<sub>{{ timeConversion(clickedClassData.sideralRotation, 'hours').unit }}</sub>
+														</td>
+													</tr>
+
+													<tr v-if="clickedClassData.meanAnomaly">
+														<td>Mean Anomaly</td>
+														<td class="text-nowrap">
+															{{ valueToFixedFloatingPoints(clickedClassData.meanAnomaly) }} °
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.argPeriapsis">
+														<td>Argument of {{namePeriapsis}}</td>
+														<td class="text-nowrap">
+															{{ valueToFixedFloatingPoints(clickedClassData.argPeriapsis) }} °
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.longAscNode">
+														<td>Longitude of Ascending Node</td>
+														<td class="text-nowrap">
+															{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °
+														</td>
+													</tr>
+													<tr v-if="clickedClassData.longOfPeriapsis">
+														<td>Longitude of {{namePeriapsis}}</td>
+														<td class="text-nowrap">
+															{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</section>
+
+									<section class="content content-media" v-show="tabGroup === 'tab-media'">
+										<div
+											class="content-wrapper container-fluid container-extra-gutter text-center"
+											:class="{ 'loaded': clickedClassData.media.hasLoaded }"
+										>
+											<template v-if="clickedClassData.media.hasLoaded">
+												<div v-if="!clickedClassData.media.noResults && !clickedClassData.media.hasError">
+													<div class="row">
+														<div
+															class="col-media col-6"
+															:class="{'col-md-4': sidebarDesktopWidth < 960, 'col-md-3': 960 <= sidebarDesktopWidth && sidebarDesktopWidth < 1280, 'col-md-2': 1280 <= sidebarDesktopWidth }"
+															v-for="(item, i) in clickedClassData.media.items"
+															:key="i"
+														>
+															<figure>
+																<a class="media" href="#" @click="openGallery(i)">
+																	<img :src="item.list_image_src" width="100%" :alt="item.alt_text" />
+																	<div class="overlay" v-html="item.title"></div>
+																</a>
+															</figure>
+														</div>
+													</div>
+
+													<button
+														type="button"
+														class="btn btn-primary btn-loadmore"
+														@click="getNASAMediaData(true)"
+														v-if="clickedClassData.media.more && !clickedClassData.media.loadingMore"
+													>
+														Load More
+													</button>
+													<div class="spinner-border" role="status" v-if="clickedClassData.media.loadingMore">
+														<span class="sr-only">Loading...</span>
 													</div>
 												</div>
-
-												<button
-													type="button"
-													class="btn btn-primary btn-loadmore"
-													@click="getNASAMediaData(true)"
-													v-if="clickedClassData.media.more && !clickedClassData.media.loadingMore"
-												>
-													Load More
-												</button>
-												<div class="spinner-border" role="status" v-if="clickedClassData.media.loadingMore">
-													<span class="sr-only">Loading...</span>
+												<div v-else-if="clickedClassData.media.hasError">
+													<div class="alert alert-warning" role="alert">
+														<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
+														<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
+													</div>
 												</div>
-											</div>
-											<div v-else-if="clickedClassData.media.hasError">
-												<div class="alert alert-warning" role="alert">
-													<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
-													<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
+												<div v-else>
+													<div class="alert alert-warning" role="alert">No results found.</div>
 												</div>
-											</div>
-											<div v-else>
-												<div class="alert alert-warning" role="alert">No results found.</div>
-											</div>
-										</template>
-										<div class="ssc" v-if="!clickedClassData.media.hasLoaded && !clickedClassData.media.loadingMore">
-											<div class="row">
-												<div class="col-media col-6 col-md-4" v-for="i in 12">
-													<div class="ssc-square w-100"></div>
+											</template>
+											<div class="ssc" v-if="!clickedClassData.media.hasLoaded && !clickedClassData.media.loadingMore">
+												<div class="row">
+													<div class="col-media col-6 col-md-4" v-for="i in 12">
+														<div class="ssc-square w-100"></div>
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								</section>
-							</div>
+									</section>
+								</div>
 
-							<div class="btn-group-wrapper tabs-details order-lg-3">
-								<nav class="btn-group" role="group">
-									<input
-										type="radio"
-										class="btn-check"
-										name="tab-group"
-										id="tab-desc"
-										value="tab-desc"
-										autocomplete="off"
-										v-model="tabGroup"
-										@change="switchDetailTabs"
-									/>
-									<label class="btn" for="tab-desc"><span class="fab fa-wikipedia-w"></span>Desc</label>
-									<template
-										v-if="modelMoonGroups[clickedClassData.systemId] && modelMoonGroups[clickedClassData.systemId].length"
-									>
-										<input
-											type="radio"
-											class="btn-check"
-											name="tab-group"
-											id="tab-system"
-											value="tab-system"
-											autocomplete="off"
-											v-model="tabGroup"
-											@change="switchDetailTabs"
-										/>
-										<label class="btn" for="tab-system">
-											<span><img src="/img/icon-orbit.svg" width="18" preload /></span>System
-										</label>
-									</template>
-									<input
-										type="radio"
-										class="btn-check"
-										name="tab-group"
-										id="tab-stats"
-										value="tab-stats"
-										autocomplete="off"
-										v-model="tabGroup"
-										@change="switchDetailTabs"
-									/>
-									<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
-									<input
-										type="radio"
-										class="btn-check"
-										name="tab-group"
-										id="tab-media"
-										value="tab-media"
-										autocomplete="off"
-										v-model="tabGroup"
-										@change="switchDetailTabs"
-									/>
-									<label class="btn" for="tab-media"><span class="fas fa-images"></span>Media</label>
-								</nav>
+								<div class="btn-group-wrapper tabs-details order-lg-3">
+									<nav class="btn-group" role="group">
+										<div class="input-group">
+											<input
+												type="radio"
+												class="btn-check"
+												name="tab-group"
+												id="tab-desc"
+												value="tab-desc"
+												autocomplete="off"
+												v-model="tabGroup"
+												@change="switchDetailTabs"
+											/>
+											<label class="btn" for="tab-desc"><span class="fab fa-wikipedia-w"></span>Desc</label>
+										</div>
+										<template
+											v-if="modelMoonGroups[clickedClassData.systemId] && modelMoonGroups[clickedClassData.systemId].length"
+										>
+											<div class="input-group">
+												<input
+													type="radio"
+													class="btn-check"
+													name="tab-group"
+													id="tab-system"
+													value="tab-system"
+													autocomplete="off"
+													v-model="tabGroup"
+													@change="switchDetailTabs"
+												/>
+												<label class="btn" for="tab-system">
+													<span><img src="/img/icon-orbit.svg" width="18" preload /></span>System
+												</label>
+											</div>
+										</template>
+										<div class="input-group">
+											<input
+												type="radio"
+												class="btn-check"
+												name="tab-group"
+												id="tab-stats"
+												value="tab-stats"
+												autocomplete="off"
+												v-model="tabGroup"
+												@change="switchDetailTabs"
+											/>
+											<label class="btn" for="tab-stats"><span class="fas fa-table"></span>Stats</label>
+										</div>
+										<div class="input-group">
+											<input
+												type="radio"
+												class="btn-check"
+												name="tab-group"
+												id="tab-media"
+												value="tab-media"
+												autocomplete="off"
+												v-model="tabGroup"
+												@change="switchDetailTabs"
+											/>
+											<label class="btn" for="tab-media"><span class="fas fa-images"></span>Media</label>
+										</div>
+									</nav>
+								</div>
 							</div>
-						</div>
-					</aside>
-					<button class="btn btn-close-sidebar" v-if="sidebarIsOpen" @click="closeSidebar">
-						<img src="/img/icon-close.svg" />
-					</button>
-
-					<button class="btn btn-show-details" v-if="clickedClassData" v-show="!sidebarIsOpen" @click="openSidebar">
-						Info
-					</button>
+						</aside>
+					</div>
 				</div>
 				<div class="ui-bottom">
 					<div class="container-fluid">
 						<div class="row">
-							<div class="col-2 col-lg-3">
+							<div class="col-12">
 								<div class="time-container">
 									<button type="button" class="btn btn-rounded">
 										<i class="fas fa-clock"></i>
 									</button>
 									<button
 										type="button"
-										class="btn btn-rounded d-none d-lg-inline-block"
+										class="btn btn-rounded"
 										:disabled="timeShiftAmount === -3"
 										@click="timeShiftBackwards()"
 									>
@@ -580,7 +596,7 @@
 									</button>
 									<button
 										type="button"
-										class="btn btn-rounded d-none d-lg-inline-block"
+										class="btn btn-rounded"
 										:disabled="timeShiftAmount === 0"
 										@click="timeShiftStop()"
 									>
@@ -588,7 +604,7 @@
 									</button>
 									<button
 										type="button"
-										class="btn btn-rounded d-none d-lg-inline-block"
+										class="btn btn-rounded"
 										:disabled="timeShiftAmount === 3"
 										@click="timeShiftForwards()"
 									>
@@ -637,17 +653,6 @@
 				</div>
 			</div>
 		</main>
-
-		<script
-			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-			integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-			integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
-			crossorigin="anonymous"
-		></script>
 		<script type="module" src="./main.js"></script>
 	</body>
 </html>

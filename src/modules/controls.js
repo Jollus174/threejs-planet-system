@@ -22,6 +22,6 @@ controls.keys = {
 	IN: 'KeyF',
 	OUT: 'KeyV'
 };
-controls.listenToKeyEvents(document.querySelector('#bg'));
+// controls.listenToKeyEvents(document.querySelector('#bg'));
 
 export { controls };

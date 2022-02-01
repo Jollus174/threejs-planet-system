@@ -288,8 +288,6 @@ fetch('./solarSystemData.json')
 		// 	generateMoonClasses(orrery.classes._asteroids[asteroid.id]);
 		// }
 
-		scene.add(skybox(skyboxTexturePaths));
-
 		// MESH BUILDING
 		orrery.classes._sun.build();
 		Object.values(orrery.classes._planets).forEach((item) => item.build());
@@ -306,11 +304,11 @@ fetch('./solarSystemData.json')
 				navigationEntities: settings.navigationEntities,
 				showSearchMobile: false,
 				bottomBar: {},
-				sidebarIsOpen: false,
-				sidebarWidthDesktop: 500,
-				clickedClassData: null,
+				clickedClassData: orrery.classes._all._sun.data,
 				zoomedClassData: null,
-				systemClassData: null,
+				sidebarMobileHeight: 400,
+				sidebarDesktopWidth: 600,
+				systemClassData: orrery.classes._all._sun.data,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
 				vueRandomString: randomString(8),
@@ -379,7 +377,7 @@ fetch('./solarSystemData.json')
 							else if (a.bodyType === 'Asteroid' || b.bodyType === 'Asteroid')
 								return a.bodyType === 'Asteroid' ? -1 : 1;
 							else if (a.bodyType === 'Moon' || b.bodyType === 'Moon') {
-								// further split out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever', they're less important)
+								// further splitting out 'named moons' vs 'unnamed moons' (ones with 'S/2013-whatever' are less important)
 								return a.bodyType === 'Moon' && !a.name.includes('S/2') ? -1 : 1;
 							} else return -1;
 						})
@@ -786,18 +784,6 @@ fetch('./solarSystemData.json')
 					orrery.classes._all[data.id].OrbitLine.eventUnhovered();
 				},
 
-				openSidebar() {
-					this.sidebarIsOpen = true; // show sidebar if it's the first time an entity has been clicked
-					updateProjectionViewSize(
-						this.sidebarIsOpen && checkIfDesktop() ? window.innerWidth - this.sidebarWidthDesktop : window.innerWidth,
-						window.innerHeight
-					);
-				},
-				closeSidebar() {
-					this.sidebarIsOpen = false;
-					if (checkIfDesktop()) updateProjectionViewSize(window.innerWidth, window.innerHeight);
-				},
-
 				switchDetailTabs() {
 					if (this.tabGroup === 'tab-desc') {
 						if (!this.clickedClassData.description.content) this.getWikipediaData();
@@ -917,7 +903,6 @@ fetch('./solarSystemData.json')
 
 				updateEntity(data) {
 					if (this.clickedClassData === data) return;
-					if (!this.sidebarIsOpen && !this.clickedClassData) this.openSidebar();
 					this.clickedClassData = data;
 
 					this.systemClassData = this.clickedClassData.aroundPlanet
@@ -982,7 +967,13 @@ fetch('./solarSystemData.json')
 					window.startRender();
 				});
 
-				document.querySelector('main').prepend(labelRenderer.domElement);
+				// adding renderers
+				const orreryRendererEl = renderer.domElement;
+				orreryRendererEl.id = 'bg';
+				document.querySelector('#renderers-container').append(orreryRendererEl);
+				const labelRendererEl = labelRenderer.domElement;
+				labelRendererEl.id = labelRenderer.domElement.id = 'label-renderer';
+				document.querySelector('#renderers-container').append(labelRenderer.domElement);
 
 				// TODO: These should be moved to a JS file that sets generic listeners
 				document.addEventListener('click', (e) => {
@@ -1005,21 +996,15 @@ fetch('./solarSystemData.json')
 					// }
 				});
 
-				document.addEventListener('keydown', (e) => {
-					if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
-						this.closeSidebar();
-					}
-
-					// TODO: set this to work in dev-only
-					// if (e.key === 'p') document.dispatchEvent(evRenderPause);
-					// if (e.key === 'o') document.dispatchEvent(evRenderStart);
-				});
+				// document.addEventListener('keydown', (e) => {
+				// 	if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
+				// 		this.closeSidebar();
+				// 	}
+				// });
 
 				window.addEventListener('resize', () => {
-					updateProjectionViewSize(
-						this.sidebarIsOpen && checkIfDesktop() ? window.innerWidth - this.sidebarWidthDesktop : window.innerWidth,
-						window.innerHeight
-					);
+					const { width, height } = orreryRendererEl.getBoundingClientRect();
+					updateProjectionViewSize(width, height);
 				});
 
 				orrery.vueTarget.addEventListener(customEventNames.updateEntityVue, () => {
@@ -1034,8 +1019,6 @@ fetch('./solarSystemData.json')
 				// 	this.zoomedClassData = orrery.mouseState._zoomedClass.data;
 				// });
 				// ---
-
-				labelRenderer.render(scene, orrery.camera);
 
 				// --------------------
 				// Setting Events
@@ -1059,7 +1042,62 @@ fetch('./solarSystemData.json')
 					});
 				});
 
+				scene.add(skybox(skyboxTexturePaths));
+
+				// targeting Sun by default
+				new CustomEvent(customEventNames.updateClickTarget, { detail: orrery.classes._all._sun });
+				controls.listenToKeyEvents(orreryRendererEl);
 				document.dispatchEvent(evRenderStart);
+
+				const desktopDragBar = document.querySelector('#btn-desktop-drag-bar');
+				const mobileDragBar = document.querySelector('#btn-mobile-drag-bar');
+
+				const resizeSidebarMobile = (e) => {
+					const diffBottom = window.innerHeight - e.y;
+					document.querySelector(':root').style.setProperty('--sidebar-height-mobile', `${diffBottom - 18 * 2}px`);
+
+					const { width, height } = orreryRendererEl.getBoundingClientRect();
+					this.sidebarMobileHeight = height;
+					updateProjectionViewSize(width, height);
+				};
+
+				const resizeSidebarDesktop = (e) => {
+					const diffRight = window.innerWidth - e.x;
+					document.querySelector(':root').style.setProperty('--sidebar-width-desktop', `${diffRight}px`);
+
+					const { width, height } = orreryRendererEl.getBoundingClientRect();
+					this.sidebarDesktopWidth = diffRight;
+					updateProjectionViewSize(width, height);
+				};
+
+				document.querySelector(':root').style.setProperty('--sidebar-height-mobile', `${this.sidebarMobileHeight}px`);
+				document.querySelector(':root').style.setProperty('--sidebar-width-desktop', `${this.sidebarDesktopWidth}px`);
+				if (checkIfDesktop()) {
+					updateProjectionViewSize(
+						window.innerWidth - this.sidebarDesktopWidth,
+						orreryRendererEl.getBoundingClientRect().height
+					);
+				} else {
+					updateProjectionViewSize(
+						orreryRendererEl.getBoundingClientRect().width,
+						// TODO: am unsure why this magic number needs to exist
+						window.innerHeight - this.sidebarMobileHeight - 88
+						// window.innerHeight - this.sidebarMobileHeight
+					);
+				}
+
+				mobileDragBar.addEventListener('pointerdown', () => {
+					document.addEventListener('pointermove', resizeSidebarMobile, false);
+				});
+
+				desktopDragBar.addEventListener('pointerdown', () => {
+					document.addEventListener('pointermove', resizeSidebarDesktop, false);
+				});
+
+				document.addEventListener('pointerup', () => {
+					document.removeEventListener('pointermove', resizeSidebarMobile, false);
+					document.removeEventListener('pointermove', resizeSidebarDesktop, false);
+				});
 
 				// scene.add(orrery.bodies._starField);
 				// scene.add(orrery.bodies._asteroidBelt);

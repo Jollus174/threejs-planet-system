@@ -49,6 +49,7 @@
 @import "custom/controls";
 @import "custom/alert";
 @import "custom/scroll-shadows";
+@import "custom/scrollbars";
 
 :root {
 	--progress-amount: 0%;
@@ -70,9 +71,6 @@ main {
 }
 
 canvas[id="bg"] {
-	position: fixed;
-	top: 0;
-	left: 0;
 	visibility: visible;
 }
 

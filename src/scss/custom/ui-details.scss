@@ -1,80 +1,157 @@
-.ui-details {
+.ui-centre {
 	position: relative;
 	flex-grow: 1;
-	overflow-y: hidden;
+	overflow: hidden;
 
-	@include media-breakpoint-up(lg) {
-		display: flex;
-		justify-content: flex-end;
-	}
+	.btn-mobile-drag-bar,
+	.btn-desktop-drag-bar {
+		background-color: #2a2a2a;
+		border-radius: 0;
+		transition: background-color 0.2s ease;
+		box-shadow: none !important;
+		z-index: #{$z-ui + 5};
+		touch-action: none;
 
-	.sidebar-ui-details {
-		width: 100%;
+		&:hover {
+			background-color: #383838;
+		}
 
-		@include media-breakpoint-up(lg) {
-			position: absolute;
-			max-width: 600px;
-			height: 100%;
+		i {
+			opacity: 0.4;
 		}
 	}
 
-	.btn-close-sidebar {
-		opacity: 0.9;
+	.btn-mobile-drag-bar {
+		padding-top: 0;
+		padding-bottom: 0;
+		box-shadow: 0 2px 2px rgba($black, 0.5);
+		line-height: 0;
+		cursor: row-resize;
+	}
+
+	.btn-desktop-drag-bar {
 		position: absolute;
 		top: 0;
-		right: 0;
-		display: flex;
+		left: 0;
 		align-items: center;
-		justify-content: center;
-		pointer-events: all;
-		background-color: rgba($black, 0.75);
-		padding: 6px;
-		width: 32px;
-		height: 32px;
-		border-radius: 0;
-		transition: opacity 0.2s ease;
-
-		&:hover,
-		&:focus {
-			opacity: 1;
-		}
-
-		img {
-			width: 100%;
-		}
-	}
-
-	.btn-show-details {
-		opacity: 0.75;
-		position: absolute;
-		bottom: 30px;
-		left: 50%;
-		transform: translateX(-50%);
-		color: var(--entity-color);
-		pointer-events: all;
-		padding: 3px 10px;
-		border-color: currentColor;
-		font-weight: 600;
-		text-transform: uppercase;
-		border-radius: 0;
-		transition: opacity 0.2s ease;
-
-		&:hover,
-		&:focus,
-		&:active {
-			opacity: 1;
-		}
-	}
-
-	.ui-details-container {
-		position: absolute;
-		width: 100%;
 		height: 100%;
+		padding-left: 0;
+		padding-right: 0;
+		cursor: col-resize;
+		transition: padding 0.2s ease, transform 0.2s ease;
+
+		&:hover {
+			padding-left: 1px;
+			padding-right: 1px;
+			transform: translateX(-1px);
+		}
+
+		i {
+			font-size: 10px;
+		}
+	}
+
+	.ui-centre-container {
+		position: absolute;
 		display: flex;
 		flex-flow: column nowrap;
+		width: 100%;
+		height: 100%;
+
+		@include media-breakpoint-up(lg) {
+			flex-direction: row;
+		}
+	}
+
+	.renderers-container {
+		position: relative;
+		flex-grow: 1;
+
+		@include media-breakpoint-between(0, lg) {
+			// !important to override the JS that's set
+			width: 100% !important;
+			height: 0 !important;
+		}
+
+		@include media-breakpoint-up(lg) {
+			width: 0 !important;
+			height: 100% !important;
+		}
+	}
+
+	#bg,
+	#label-renderer {
+		position: absolute;
+		width: 100% !important;
+		height: 100% !important;
+	}
+}
+
+:root {
+	--sidebar-height-mobile: 50%;
+	--sidebar-width-desktop: 600px;
+}
+
+.sidebar-ui-details {
+	position: relative;
+	z-index: $z-ui;
+	display: flex;
+	flex-flow: column nowrap;
+	width: 100%;
+	height: 100%;
+	min-height: 177px;
+	background-color: #060606;
+
+	@include media-breakpoint-between(0, lg) {
+		height: 100%;
+		max-height: var(--sidebar-height-mobile);
+	}
+
+	@include media-breakpoint-up(lg) {
+		flex-direction: row;
+		min-width: 400px;
+		max-width: var(--sidebar-width-desktop);
+	}
+}
+
+.btn-close-sidebar {
+	opacity: 0.9;
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba($black, 0.75);
+	padding: 6px;
+	width: 32px;
+	height: 32px;
+	border-radius: 0;
+	transition: opacity 0.2s ease;
+
+	&:hover,
+	&:focus {
+		opacity: 1;
+	}
+
+	img {
+		width: 100%;
+	}
+}
+
+.ui-details {
+	display: flex;
+	flex-flow: column nowrap;
+	flex-grow: 1;
+	height: 100%;
+
+	.ui-details-container {
+		display: flex;
+		flex-flow: column nowrap;
+		width: 100%;
+		height: 100%;
 		background: #0a0a0a;
 		overflow: hidden;
-		pointer-events: all;
 	}
 
 	.title-container {
@@ -84,10 +161,10 @@
 		text-transform: uppercase;
 		margin-top: 8px;
 
-		// .title-wrapper {
-		// 	display: flex;
-		// 	align-items: flex-end;
-		// }
+		@include media-breakpoint-up(lg) {
+			// TODO: weird magic number
+			margin-left: 6px;
+		}
 
 		.h3 {
 			margin: 0;
@@ -108,6 +185,11 @@
 		color: $white;
 		margin-top: 10px;
 		margin-bottom: 10px;
+
+		@include media-breakpoint-up(lg) {
+			// TODO: weird magic number
+			margin-left: 6px;
+		}
 
 		.key-data {
 			border-left: solid 2px var(--entity-color);
@@ -132,31 +214,52 @@
 	}
 
 	.tabs-details {
+		user-select: none;
+
+		@include media-breakpoint-up(lg) {
+			margin-left: 6px;
+		}
+
 		.fa-wikipedia-w {
 			position: relative;
 			top: 1px;
 		}
 
 		.btn-group {
+			display: flex;
+			flex-flow: row nowrap;
 			width: 100%;
 
 			@include media-breakpoint-up(lg) {
 				margin-bottom: 2px;
 			}
 
+			&:first-child {
+				.btn {
+					border-left-color: $black;
+				}
+			}
+
+			&:not(:last-child) {
+				.btn {
+					border-right: 1px solid #2e2e2e;
+				}
+			}
+
+			.input-group {
+				flex-grow: 1;
+			}
+
 			.btn {
+				width: 100%;
 				padding-top: 10px;
 				padding-bottom: 12px;
 				background-color: #1e1e1e;
 				border: 1px solid rgba($white, 0.1);
-				border-top-color: transparent;
+				border-top-color: rgba(#060606, 0.5);
 				border-radius: 0;
 				box-shadow: none;
 				transition-property: color, background-color, border, box-shadow;
-
-				&:not(:last-child) {
-					border-right: 1px solid #2e2e2e;
-				}
 
 				&:hover,
 				&:focus,
@@ -192,6 +295,7 @@
 		height: 130px;
 		object-fit: cover;
 		object-position: center;
+		user-select: none;
 	}
 
 	.content-container {
@@ -218,34 +322,15 @@
 	}
 
 	.content-wrapper {
+		@extend %scrollbar-grey;
 		position: relative;
 		min-height: 100%;
 		height: 100%;
 		overflow: auto;
 
-		--scrollbar-track: #1c1c1c;
-		--scrollbar-thumb: #6a6767;
-		--scrollbar-width: 10px;
-
-		scrollbar-color: --scrollbar-thumb --scrollbar-track;
-		scrollbar-width: thin;
-
 		@include media-breakpoint-up(lg) {
 			padding-top: 1.5rem;
 			padding-bottom: 1rem;
-		}
-
-		&::-webkit-scrollbar {
-			width: var(--scrollbar-width);
-		}
-
-		&::-webkit-scrollbar-track {
-			background-color: var(--scrollbar-track);
-		}
-
-		&::-webkit-scrollbar-thumb {
-			background-color: var(--scrollbar-thumb);
-			border-radius: 0;
 		}
 	}
 
@@ -532,7 +617,12 @@
 		}
 
 		figure {
+			margin-top: 5px;
 			margin-bottom: 25px;
+
+			@include media-breakpoint-up(lg) {
+				margin-top: 0;
+			}
 		}
 
 		.media {

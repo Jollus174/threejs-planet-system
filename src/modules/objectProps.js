@@ -13,7 +13,8 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
-const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
+// const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
+const planetRangeThreshold = 80000000;
 // const planetRangeThreshold = 100000000;
 // TODO: set it at this range only for the planet/moon that's targeted
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
@@ -231,7 +232,8 @@ class Entity {
 			.join(' ')
 			.trim();
 
-		this.labelLink.href = `/#/${this.data.id}`;
+		// TODO: turn this back on when links are performing correctly
+		// this.labelLink.href = `/#/${this.data.id}`;
 		this.labelLink.className = `label behind-label ${entityTypeClasses}`;
 		this.labelLink.dataset.selector = 'label';
 		this.labelLink.style.color = this.data.labelColour;
@@ -293,6 +295,7 @@ class Entity {
 	}
 
 	build() {
+		this.labelGroup.visible = false; // updated when camera is close
 		scene.add(this.labelGroup);
 		this.setLabelGroupPosition();
 		this.createCSSLabel();
@@ -508,6 +511,7 @@ class Planet extends Entity {
 			if (!this.isZoomedToPlanet) {
 				this.createCSSLabel(); // in case it was removed via a moon selection
 				this.isZoomedToPlanet = true; // to prevent multiple executions
+				this.labelGroup.visible = true;
 				// destroying previous set of moons first
 				// this.destroyMoons(Object.values(this.moonClasses));
 				orrery.cameraState._currentPlanetInRange = this.data.id;
@@ -517,6 +521,7 @@ class Planet extends Entity {
 		} else {
 			if (this.isZoomedToPlanet) {
 				this.isZoomedToPlanet = false;
+				this.labelGroup.visible = false;
 				if (orrery.cameraState._currentPlanetInRange === this.data.id) {
 					this.destroyMoons(Object.values(this.moonClasses));
 					orrery.cameraState._currentPlanetInRange = '';
