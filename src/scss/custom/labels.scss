@@ -137,6 +137,7 @@
 		color: rgb(162, 162, 162);
 		white-space: nowrap;
 		text-shadow: 1px 1px 0 black, -1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, 0 0 3px black;
+		user-select: none;
 		transition: border-width 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 	}
 }

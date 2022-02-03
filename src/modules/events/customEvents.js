@@ -3,8 +3,7 @@ const customEventNames = {
 	updateEntityVue: 'updateEntityVue',
 	updateZoomTarget: 'updateEntityZoomTarget',
 	updateZoomTargetVue: 'updateEntityZoomTargetVue',
-	updateSystemMoonGroups: 'updateSystemMoonGroups',
-	updateTimeShiftAmount: 'updateTimeShiftAmount'
+	updateSystemMoonGroups: 'updateSystemMoonGroups'
 };
 
 export { customEventNames };

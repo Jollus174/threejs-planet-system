@@ -23,6 +23,7 @@ import { evRenderPause, evRenderStart } from './modules/events/events';
 
 import Vue from 'vue/dist/vue.js';
 import LightBox from 'vue-it-bigger';
+import { format, add, differenceInHours } from 'date-fns';
 
 window.settings = settings;
 window.renderLoop = '';
@@ -41,19 +42,6 @@ const updateProjectionViewSize = (width, height) => {
 	orrery.camera.updateProjectionMatrix();
 	orrery.isDesktop = checkIfDesktop();
 };
-
-window.pauseRender = () => document.dispatchEvent(evRenderPause);
-window.startRender = () => document.dispatchEvent(evRenderStart);
-
-document.addEventListener('renderPause', () => {
-	window.cancelAnimationFrame(window.renderLoop);
-	console.log('render paused');
-});
-
-document.addEventListener('renderStart', () => {
-	window.animate();
-	console.log('render started');
-});
 
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const clickedClass = e.detail;
@@ -143,104 +131,6 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 	}
 });
 
-document.addEventListener(customEventNames.updateTimeShiftAmount, (e) => {
-	orrery.timeShiftAmount = e.detail; // render loop will read from this
-});
-
-const render = () => {
-	delta = 5 * clock.getDelta();
-	// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
-
-	// determining if mouse was held
-	// if (orrery.mouseState._mouseClicked) {
-	// 	orrery.mouseState._mouseClickTimeout -= 60;
-	// 	if (orrery.mouseState._mouseClickTimeout <= 0) orrery.mouseState._mouseHeld = true;
-	// } else {
-	// 	orrery.mouseState._mouseClickTimeout = settings.mouse._mouseClickTimeoutDefault;
-	// 	orrery.mouseState._mouseHeld = false;
-	// }
-
-	// if (orrery.mouseState._mouseHoverTarget !== null) {
-	// 	if (orrery.isDesktop) settings.domTarget.classList.add('object-hovered');
-
-	// 	orrery.mouseState._mouseHoverTarget.mouseHoverTimeout = settings.mouse._mouseHoverTimeoutDefault;
-	// 	// checking to see if hoveredGroups already contains target
-	// 	if (!orrery.mouseState._hoveredGroups.some((group) => group.name === orrery.mouseState._mouseHoverTarget.name)) {
-	// 		orrery.mouseState._hoveredGroups.push(orrery.mouseState._mouseHoverTarget);
-	// 	}
-	// } else {
-	// 	if (orrery.isDesktop) settings.domTarget.classList.remove('object-hovered');
-	// }
-	orrery.cameraState._isInPlaneOfReference =
-		orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;
-
-	if (orrery.mouseState._clickedClass) {
-		const clickedGroup = orrery.mouseState._clickedClass.labelGroup;
-		clickedGroup.getWorldPosition(vectorPosition);
-	}
-
-	if (orrery.mouseState._zoomedClass && orrery.cameraState._zoomToTarget) {
-		orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
-		orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
-		orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
-		const zoomTo = orrery.mouseState._zoomedClass.data.zoomTo;
-		const distanceToTarget = orrery.controls.getDistance();
-
-		if (distanceToTarget > zoomTo) {
-			const amountComplete = zoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
-			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
-			orrery.cameraState._dollySpeed = Math.min(
-				settings.controls._dollySpeedMax + amountToIncrease,
-				settings.controls._dollySpeedMin
-			);
-			orrery.controls.dollyIn(orrery.cameraState._dollySpeed);
-		} else if (distanceToTarget + 0.1 < zoomTo) {
-			const amountComplete = distanceToTarget / zoomTo; // decimal percent completion of camera dolly based on the zoomTo of targetObj
-			const amountToIncrease = (settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
-			orrery.cameraState._dollySpeed = Math.min(
-				settings.controls._dollySpeedMax + amountToIncrease,
-				settings.controls._dollySpeedMin
-			);
-			orrery.controls.dollyOut(orrery.cameraState._dollySpeed);
-		}
-	}
-
-	// if (orrery.bodies.meshes._sun.glow) {
-	// 	const viewVector = new THREE.Vector3().subVectors(camera.position, orrery.bodies.meshes._sun.parent.position);
-	// 	orrery.bodies.meshes._sun.glow.material.uniforms.viewVector.value = viewVector;
-	// }
-
-	// if (orrery.bodies.meshes._planets.length && orrery.bodies.meshes._planets[0].glow) {
-	// 	const viewVector = new THREE.Vector3().subVectors(
-	// 		camera.position,
-	// 		orrery.bodies.meshes._planets[0].parent.position
-	// 	);
-	// 	orrery.bodies.meshes._planets[0].glow.material.uniforms.viewVector.value = viewVector;
-	// }
-
-	if (orrery.timeShiftAmount !== 0) {
-		for (const entity of orrery.classes._allIterable) {
-			entity.iteratePosition(
-				orrery.timeShiftAmount * (entity.data.sideralOrbit ? 360 / entity.data.sideralOrbit : 1) * 0.5
-			);
-		}
-	}
-
-	orrery.controls.update();
-
-	orrery.classes._sun.draw(delta); // TODO: Should be separate
-
-	renderer.render(scene, orrery.camera);
-	labelRenderer.render(scene, orrery.camera);
-};
-
-// using window so RAF can be accessed through solution without importing
-// TODO: can probably be tidied up in future
-window.animate = () => {
-	render();
-	window.renderLoop = requestAnimationFrame(window.animate);
-};
-
 fetch('./solarSystemData.json')
 	.then((response) => {
 		if (!response.ok) throw new Error('Error retrieving Solar System data');
@@ -312,7 +202,11 @@ fetch('./solarSystemData.json')
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
 				vueRandomString: randomString(8),
-				timeShiftAmount: 0
+				timeShiftTypes: { minutes: 0, hours: 0, days: 0, months: 0 },
+				timeShiftTypeCurrentIndex: 0,
+				dateTimeCurrent: new Date(),
+				orreryRendererEl: renderer.domElement,
+				labelRendererEl: labelRenderer.domElement
 			},
 			computed: {
 				nameApoapsis() {
@@ -398,32 +292,57 @@ fetch('./solarSystemData.json')
 						this.modelMoonGroups[this.clickedClassData.systemId] &&
 						this.modelMoonGroups[this.clickedClassData.systemId].length > 1
 					);
+				},
+
+				currentTimeShiftType() {
+					const i = Math.abs(this.timeShiftTypeCurrentIndex);
+					if (i === 1) return 'minutes';
+					else if (i === 2) return 'hours';
+					else if (i === 3) return 'days';
+					else if (i === 4) return 'months';
+					else return '';
+				},
+
+				dateTimeShifted() {
+					return add(new Date(), { ...this.timeShiftTypes });
+				},
+
+				dateTimeDifference() {
+					// this creates 'i', the iteration value
+					// am using Earth as the base for orbit timings
+					return differenceInHours(this.dateTimeShifted, new Date()) / 24;
+				},
+
+				dateTimeText() {
+					const time = format(this.dateTimeShifted, `HH:mm:ss`);
+					const days = format(this.dateTimeShifted, 'dd');
+					const months = format(this.dateTimeShifted, 'MMM');
+					const years = format(this.dateTimeShifted, 'yyyy');
+
+					return `<time class="time">${time}</time> / <time class="days">${days}</time> / <time class="months">${months}</time> / <time class="years">${years}</time>`;
 				}
 			},
 			methods: {
-				updateTimeShiftAmount() {
-					document.dispatchEvent(
-						new CustomEvent(customEventNames.updateTimeShiftAmount, { detail: this.timeShiftAmount })
-					);
-				},
 				timeShiftForwards() {
-					if (this.timeShiftAmount < 3) {
-						this.timeShiftAmount++;
-						this.vueRandomString = randomString(8);
-						this.updateTimeShiftAmount();
+					if (this.timeShiftTypeCurrentIndex < 4) {
+						this.timeShiftTypeCurrentIndex++;
 					}
 				},
 				timeShiftBackwards() {
-					if (-3 < this.timeShiftAmount) {
-						this.timeShiftAmount--;
-						this.vueRandomString = randomString(8);
-						this.updateTimeShiftAmount();
+					if (-4 < this.timeShiftTypeCurrentIndex) {
+						this.timeShiftTypeCurrentIndex--;
+					}
+				},
+				timeShiftReset() {
+					Object.keys(this.timeShiftTypes).forEach((timeShiftType) => (this.timeShiftTypes[timeShiftType] = 0));
+					for (const entity of orrery.classes._allIterable) {
+						entity.resetLabelGroupPosition();
 					}
 				},
 				timeShiftStop() {
-					this.timeShiftAmount = 0;
-					this.updateTimeShiftAmount();
+					this.timeShiftTypeCurrentIndex = 0;
 				},
+
 				regenerateRandomString() {
 					this.vueRandomString = randomString(8);
 				},
@@ -664,6 +583,7 @@ fetch('./solarSystemData.json')
 							formattedContent = formattedContent
 								.replaceAll(' ()', '')
 								.replaceAll(' ,', ',')
+								.replaceAll(' .', '.')
 								.replaceAll(',,', ',')
 								.replaceAll(' ;', ';')
 								.replaceAll('—', ' - ');
@@ -902,7 +822,6 @@ fetch('./solarSystemData.json')
 				},
 
 				updateEntity(data) {
-					if (this.clickedClassData === data) return;
 					this.clickedClassData = data;
 
 					this.systemClassData = this.clickedClassData.aroundPlanet
@@ -956,6 +875,32 @@ fetch('./solarSystemData.json')
 					document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					this.resetSearch();
 					this.showSearchMobile = false;
+				},
+
+				resizeSidebarMobile(e) {
+					const diffBottom = window.innerHeight - e.y;
+					document.querySelector(':root').style.setProperty('--sidebar-height-mobile', `${diffBottom - 18 * 2}px`);
+
+					const { width, height } = this.orreryRendererEl.getBoundingClientRect();
+					this.sidebarMobileHeight = height;
+					updateProjectionViewSize(width, height);
+				},
+
+				resizeSidebarDesktop(e) {
+					const diffRight = window.innerWidth - e.x;
+					document.querySelector(':root').style.setProperty('--sidebar-width-desktop', `${diffRight}px`);
+
+					const { width, height } = this.orreryRendererEl.getBoundingClientRect();
+					this.sidebarDesktopWidth = diffRight;
+					updateProjectionViewSize(width, height);
+				},
+
+				evResizeSidebarMobile() {
+					document.addEventListener('pointermove', this.resizeSidebarMobile, false);
+				},
+
+				evResizeSidebarDesktop() {
+					document.addEventListener('pointermove', this.resizeSidebarDesktop, false);
 				}
 			},
 			mounted() {
@@ -968,12 +913,10 @@ fetch('./solarSystemData.json')
 				});
 
 				// adding renderers
-				const orreryRendererEl = renderer.domElement;
-				orreryRendererEl.id = 'bg';
-				document.querySelector('#renderers-container').append(orreryRendererEl);
-				const labelRendererEl = labelRenderer.domElement;
-				labelRendererEl.id = labelRenderer.domElement.id = 'label-renderer';
-				document.querySelector('#renderers-container').append(labelRenderer.domElement);
+				this.orreryRendererEl.id = 'bg';
+				document.querySelector('#renderers-container').append(this.orreryRendererEl);
+				this.labelRendererEl.id = 'label-renderer';
+				document.querySelector('#renderers-container').append(this.labelRendererEl);
 
 				// TODO: These should be moved to a JS file that sets generic listeners
 				document.addEventListener('click', (e) => {
@@ -1003,7 +946,7 @@ fetch('./solarSystemData.json')
 				// });
 
 				window.addEventListener('resize', () => {
-					const { width, height } = orreryRendererEl.getBoundingClientRect();
+					const { width, height } = this.orreryRendererEl.getBoundingClientRect();
 					updateProjectionViewSize(width, height);
 				});
 
@@ -1045,59 +988,25 @@ fetch('./solarSystemData.json')
 				scene.add(skybox(skyboxTexturePaths));
 
 				// targeting Sun by default
-				new CustomEvent(customEventNames.updateClickTarget, { detail: orrery.classes._all._sun });
-				controls.listenToKeyEvents(orreryRendererEl);
-				document.dispatchEvent(evRenderStart);
-
-				const desktopDragBar = document.querySelector('#btn-desktop-drag-bar');
-				const mobileDragBar = document.querySelector('#btn-mobile-drag-bar');
-
-				const resizeSidebarMobile = (e) => {
-					const diffBottom = window.innerHeight - e.y;
-					document.querySelector(':root').style.setProperty('--sidebar-height-mobile', `${diffBottom - 18 * 2}px`);
-
-					const { width, height } = orreryRendererEl.getBoundingClientRect();
-					this.sidebarMobileHeight = height;
-					updateProjectionViewSize(width, height);
-				};
-
-				const resizeSidebarDesktop = (e) => {
-					const diffRight = window.innerWidth - e.x;
-					document.querySelector(':root').style.setProperty('--sidebar-width-desktop', `${diffRight}px`);
-
-					const { width, height } = orreryRendererEl.getBoundingClientRect();
-					this.sidebarDesktopWidth = diffRight;
-					updateProjectionViewSize(width, height);
-				};
+				document.dispatchEvent(
+					new CustomEvent(customEventNames.updateClickTarget, { detail: orrery.classes._all._sun })
+				);
 
 				document.querySelector(':root').style.setProperty('--sidebar-height-mobile', `${this.sidebarMobileHeight}px`);
 				document.querySelector(':root').style.setProperty('--sidebar-width-desktop', `${this.sidebarDesktopWidth}px`);
+
 				if (checkIfDesktop()) {
 					updateProjectionViewSize(
 						window.innerWidth - this.sidebarDesktopWidth,
-						orreryRendererEl.getBoundingClientRect().height
+						this.orreryRendererEl.getBoundingClientRect().height
 					);
 				} else {
 					updateProjectionViewSize(
-						orreryRendererEl.getBoundingClientRect().width,
+						this.orreryRendererEl.getBoundingClientRect().width,
 						// TODO: am unsure why this magic number needs to exist
 						window.innerHeight - this.sidebarMobileHeight - 88
-						// window.innerHeight - this.sidebarMobileHeight
 					);
 				}
-
-				mobileDragBar.addEventListener('pointerdown', () => {
-					document.addEventListener('pointermove', resizeSidebarMobile, false);
-				});
-
-				desktopDragBar.addEventListener('pointerdown', () => {
-					document.addEventListener('pointermove', resizeSidebarDesktop, false);
-				});
-
-				document.addEventListener('pointerup', () => {
-					document.removeEventListener('pointermove', resizeSidebarMobile, false);
-					document.removeEventListener('pointermove', resizeSidebarDesktop, false);
-				});
 
 				// scene.add(orrery.bodies._starField);
 				// scene.add(orrery.bodies._asteroidBelt);
@@ -1109,6 +1018,98 @@ fetch('./solarSystemData.json')
 				setInterval(() => {
 					labelRenderer.zOrder(scene);
 				}, 200);
+
+				const render = () => {
+					delta = 5 * clock.getDelta();
+					// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
+
+					orrery.cameraState._isInPlaneOfReference =
+						orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;
+
+					if (orrery.mouseState._clickedClass) {
+						const clickedGroup = orrery.mouseState._clickedClass.labelGroup;
+						clickedGroup.getWorldPosition(vectorPosition);
+					}
+
+					// if (orrery.mouseState._zoomedClass && orrery.cameraState._zoomToTarget) {
+					if (orrery.mouseState._zoomedClass) {
+						orrery.controls.target.x += easeTo({ from: orrery.controls.target.x, to: vectorPosition.x });
+						orrery.controls.target.y += easeTo({ from: orrery.controls.target.y, to: vectorPosition.y });
+						orrery.controls.target.z += easeTo({ from: orrery.controls.target.z, to: vectorPosition.z });
+						const zoomTo = orrery.mouseState._zoomedClass.data.zoomTo;
+						const distanceToTarget = orrery.controls.getDistance();
+
+						if (orrery.cameraState._zoomToTarget) {
+							if (distanceToTarget > zoomTo) {
+								const amountComplete = zoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+								const amountToIncrease =
+									(settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
+								orrery.cameraState._dollySpeed = Math.min(
+									settings.controls._dollySpeedMax + amountToIncrease,
+									settings.controls._dollySpeedMin
+								);
+								orrery.controls.dollyIn(orrery.cameraState._dollySpeed);
+							} else if (distanceToTarget + 0.1 < zoomTo) {
+								const amountComplete = distanceToTarget / zoomTo; // decimal percent completion of camera dolly based on the zoomTo of targetObj
+								const amountToIncrease =
+									(settings.controls._dollySpeedMin - settings.controls._dollySpeedMax) * amountComplete;
+								orrery.cameraState._dollySpeed = Math.min(
+									settings.controls._dollySpeedMax + amountToIncrease,
+									settings.controls._dollySpeedMin
+								);
+								orrery.controls.dollyOut(orrery.cameraState._dollySpeed);
+							}
+						}
+					}
+
+					if (this.timeShiftTypeCurrentIndex !== 0) {
+						// making sure to account for -ve numbers, so can reverse orbits based on time if needed
+						this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
+						// should be taking 'i' then dividing it depending on the entity
+
+						// TODO: this sucks, I should be calling some kind of 'draw()' function
+						// iterating this in a RAF will consume huge amounts of memory
+						for (const entity of orrery.classes._allIterable) {
+							const sideralOrbit = entity.data.sideralOrbit ? 360 / entity.data.sideralOrbit : 1;
+							entity.iteratePosition(this.dateTimeDifference * sideralOrbit);
+						}
+					}
+
+					orrery.controls.update();
+
+					orrery.classes._sun.draw(delta); // TODO: Should be separate
+
+					renderer.render(scene, orrery.camera);
+					labelRenderer.render(scene, orrery.camera);
+				};
+
+				window.pauseRender = () => document.dispatchEvent(evRenderPause);
+				window.startRender = () => document.dispatchEvent(evRenderStart);
+
+				document.addEventListener('renderPause', () => {
+					window.cancelAnimationFrame(window.renderLoop);
+					console.log('render paused');
+				});
+
+				document.addEventListener('renderStart', () => {
+					window.animate();
+					console.log('render started');
+				});
+
+				// using window so RAF can be accessed through solution without importing
+				// TODO: can probably be tidied up in future
+				window.animate = () => {
+					render();
+					window.renderLoop = requestAnimationFrame(window.animate);
+				};
+
+				controls.listenToKeyEvents(this.orreryRendererEl);
+				document.dispatchEvent(evRenderStart);
+
+				document.addEventListener('pointerup', () => {
+					document.removeEventListener('pointermove', this.resizeSidebarMobile, false);
+					document.removeEventListener('pointermove', this.resizeSidebarDesktop, false);
+				});
 			}
 		});
 	});

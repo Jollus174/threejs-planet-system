@@ -192,20 +192,22 @@
 		}
 
 		.key-data {
-			border-left: solid 2px var(--entity-color);
-			margin-bottom: 5px;
-			padding-left: 10px;
+			margin-bottom: 4px;
 			line-height: 1.1;
-			text-transform: uppercase;
 
-			@include media-breakpoint-up(md) {
+			@include media-breakpoint-up(lg) {
 				margin-bottom: 10px;
 			}
 		}
 
 		.heading {
 			display: block;
+			margin-bottom: 4px;
+			padding-bottom: 4px;
+			border-bottom: 1px solid #1f1f1f;
 			color: #9f9f9f;
+			font-size: 14px;
+			letter-spacing: 1px;
 		}
 
 		.label-color {
@@ -306,7 +308,6 @@
 
 	.content {
 		height: 100%;
-		font-size: 18px;
 	}
 
 	.spinner-border-container {
@@ -337,6 +338,10 @@
 	.content-desc {
 		line-height: 1.7;
 
+		@include media-breakpoint-up(lg) {
+			font-size: 18px;
+		}
+
 		.content-wrapper {
 			overflow: hidden;
 			max-height: 100%;
@@ -354,7 +359,12 @@
 			width: 100%;
 			font-size: 13px;
 			background-color: #121212;
-			padding: 10px 25px;
+			padding: 10px 20px;
+
+			@include media-breakpoint-up(lg) {
+				padding-left: 25px;
+				padding-right: 25px;
+			}
 
 			.topbar-system-label {
 				margin-right: 10px;
@@ -369,6 +379,7 @@
 				color: $black;
 				border: 2px solid transparent;
 				margin: 3px 6px 3px 0;
+				padding: 0.125em 0.25em;
 				font-size: 0.7rem;
 				line-height: normal;
 				outline: 0;
@@ -432,7 +443,7 @@
 			padding-left: 9px;
 			padding-right: 0;
 
-			@include media-breakpoint-up(md) {
+			@include media-breakpoint-up(lg) {
 				padding-left: 15px;
 			}
 		}
@@ -496,8 +507,8 @@
 					white-space: nowrap;
 					text-overflow: ellipsis;
 
-					@include media-breakpoint-up(md) {
-						left: -23px;
+					@include media-breakpoint-up(lg) {
+						left: -20px;
 					}
 				}
 
@@ -596,7 +607,11 @@
 			}
 
 			td {
-				padding: 0.375rem 0.75rem;
+				padding: 0.1875rem 0.375rem;
+
+				@include media-breakpoint-up(lg) {
+					padding: 0.375rem 0.75rem;
+				}
 			}
 		}
 	}

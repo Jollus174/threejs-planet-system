@@ -1,19 +1,14 @@
-- Planet meshes + moons should appear when zoomed into planet
-- Create UX for navigation?
-
 - Allow orbits that tilt on the y-axis
 - Load in and cache more high-res textures as they're needed, unload when not
 - Fancy light for sun
 - Fix up planet textures, so are still pinched at top/bottom (like Mercury)
 - Include grid helper?
+- During time shift, show perturbation of Mercury along its eccentric orbit
 
 - Uranus orbits to be top to bottom!
 
-- Rework the API data and fill in missing gaps, find/create some sort of scraper
-
 For UX/UI:
 - Include 'X Planet' system when arriving at planet
-- For Jupiter / Saturn / Uranus / Neptune with a lot of moons, have toggle switcher o---o---o for inner/outer/minor moons
 - Include list of available moons to switch to via swiper at bottom (hopefully isn't laggy)
 
 - Include time slider

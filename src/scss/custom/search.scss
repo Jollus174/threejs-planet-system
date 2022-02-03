@@ -17,16 +17,14 @@
 
 .search-dropdown {
 	display: none;
+	width: 100%;
 	overflow: hidden;
 	background-color: $black;
 	border: 1px $input-border solid;
 	color: $grey-medium;
+	z-index: $z-search;
 
 	@include media-breakpoint-up(lg) {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 100%;
 		max-width: 260px;
 	}
 
@@ -85,8 +83,6 @@
 	}
 
 	.fa-search {
-		color: $white;
-
 		@include media-breakpoint-up(lg) {
 			position: absolute;
 			left: 15px;
@@ -101,12 +97,16 @@
 	}
 }
 
-.search-results {
+.search-results-container {
 	position: absolute;
 	top: 0;
 	width: 100%;
 	z-index: $z-search;
-	pointer-events: all;
+
+	@include media-breakpoint-up(lg) {
+		display: flex;
+		justify-content: flex-end;
+	}
 
 	.input-search-mobile {
 		display: none;

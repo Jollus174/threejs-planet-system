@@ -7,7 +7,8 @@ const renderer = new WebGLRenderer({
 	// powerPreference: 'low-power',
 	antialias: true,
 	// TODO: This messes up the sun shader, and will need to be accounted for
-	logarithmicDepthBuffer: checkIfDesktop()
+	// logarithmicDepthBuffer: checkIfDesktop()
+	logarithmicDepthBuffer: true
 });
 
 // renderer.shadowMap.enabled = true;

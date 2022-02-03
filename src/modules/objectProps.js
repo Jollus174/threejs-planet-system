@@ -187,13 +187,10 @@ class Entity {
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
 
-		// this will be determined by the entity's current epoch, and should be something between 0 - 360
-		this.orbitIndex = 0;
-
 		this.isEnabled = true;
 		this.isSelected = true;
 
-		this.intervalCheckTime = 300;
+		this.intervalCheckTime = 1000;
 		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
 
 		this.orbitLineVisibleAtBuild = true;
@@ -271,7 +268,7 @@ class Entity {
 		this.CSSObj.removeFromParent();
 	}
 
-	setLabelGroupPosition() {
+	setLabelGroupDefaultPosition() {
 		if (this.data.startingPosition) {
 			this.labelGroup.position.copy(this.data.startingPosition);
 		} else {
@@ -279,25 +276,24 @@ class Entity {
 		}
 	}
 
-	iteratePosition(i) {
-		this.orbitIndex += i;
+	resetLabelGroupPosition() {
+		this.setLabelGroupDefaultPosition();
+		if (this.OrbitLine && this.OrbitLine.orbitLine) this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(0);
+	}
 
+	// TODO: am unsure if should be using 'copy' on all of these...
+	iteratePosition(i) {
 		this.labelGroup.position.copy(
-			calculateOrbit(
-				this.data.meanAnomaly - this.orbitIndex,
-				this.data,
-				this.planetClass ? this.planetClass.data : null
-			)
+			calculateOrbit(this.data.meanAnomaly - i, this.data, this.planetClass ? this.planetClass.data : null)
 		);
 
-		if (this.OrbitLine && this.OrbitLine.orbitLine)
-			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(this.orbitIndex);
+		if (this.OrbitLine && this.OrbitLine.orbitLine) this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
 	}
 
 	build() {
 		this.labelGroup.visible = false; // updated when camera is close
 		scene.add(this.labelGroup);
-		this.setLabelGroupPosition();
+		this.setLabelGroupDefaultPosition();
 		this.createCSSLabel();
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
@@ -668,7 +664,7 @@ class Moon extends Entity {
 
 	build() {
 		this.planetGroup.add(this.labelGroup);
-		this.setLabelGroupPosition();
+		this.setLabelGroupDefaultPosition();
 	}
 
 	createElements() {

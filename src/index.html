@@ -48,7 +48,12 @@
 
 							<div class="col-search col-1 col-md-3 d-md-flex">
 								<div class="search-desktop" :class="{'active': searchResults}">
-									<button type="button" class="btn btn-rounded d-lg-none" @click="showOrHideMobileSearch">
+									<button
+										type="button"
+										class="btn btn-rounded d-lg-none"
+										:class="{'active': showSearchMobile}"
+										@click="showOrHideMobileSearch"
+									>
 										<i class="fas fa-search"></i>
 									</button>
 									<div id="search" class="search d-none d-lg-block">
@@ -65,17 +70,20 @@
 							</div>
 						</div>
 					</div>
-
-					<div id="search-results-mobile" class="search-results">
-						<input
-							id="input-search-mobile"
-							class="d-lg-none form-control input-search-mobile"
-							type="seach"
-							placeholder="Search"
-							v-model="searchQuery"
-							:class="{'active': showSearchMobile}"
-							@keyup.enter="updateClickTarget(searchResults[0].data)"
-						/>
+				</div>
+				<div class="ui-centre">
+					<div class="search-results-container">
+						<div id="search-results-mobile" class="search-results">
+							<input
+								id="input-search-mobile"
+								class="d-lg-none form-control input-search-mobile"
+								type="seach"
+								placeholder="Search"
+								v-model="searchQuery"
+								:class="{'active': showSearchMobile}"
+								@keyup.enter="updateClickTarget(searchResults[0].data)"
+							/>
+						</div>
 						<!-- TODO: Get links working and remove the '.prevent' -->
 						<div class="search-dropdown" :class="{'active': searchResults}">
 							<ul>
@@ -91,15 +99,21 @@
 							</ul>
 						</div>
 					</div>
-				</div>
-				<div class="ui-centre">
 					<div class="ui-centre-container">
 						<div id="renderers-container" class="renderers-container"></div>
 						<aside id="sidebar-ui-details" class="sidebar-ui-details" :key="vueRandomString">
-							<button id="btn-mobile-drag-bar" class="btn btn-mobile-drag-bar d-lg-none">
+							<button
+								id="btn-mobile-drag-bar"
+								class="btn btn-mobile-drag-bar d-lg-none"
+								@pointerDown="evResizeSidebarMobile"
+							>
 								<i class="fas fa-grip-lines"></i>
 							</button>
-							<button id="btn-desktop-drag-bar" class="btn btn-desktop-drag-bar d-none d-lg-flex">
+							<button
+								id="btn-desktop-drag-bar"
+								class="btn btn-desktop-drag-bar d-none d-lg-flex"
+								@pointerDown="evResizeSidebarDesktop"
+							>
 								<i class="fas fa-grip-lines-vertical"></i>
 							</button>
 							<div class="ui-details">
@@ -142,26 +156,12 @@
 													<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
 												</div>
 											</div>
-
-											<!-- <div class="col-4 d-none d-lg-block" v-if="clickedClassData.moons">
-												<div class="key-data">
-													<span class="heading">Moons</span>
-													<span class="label-color">{{ clickedClassData.moons.length }}</span>
-												</div>
-											</div> -->
 											<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
 												<div class="key-data">
 													<span class="heading">Moon Group</span>
 													<span class="label-color">{{ clickedClassData.moonGroup }}</span>
 												</div>
 											</div>
-
-											<!--<div class="col-4" v-if="clickedClassData.avgTemp">
-												<div class="key-data">
-													<span class="heading">Surface Temp</span>
-													<span class="label-color">{{ clickedClassData.avgTemp }}</span> <sub>°C</sub>
-												</div>
-											</div>-->
 										</div>
 									</div>
 								</div>
@@ -582,22 +582,21 @@
 						<div class="row">
 							<div class="col-12">
 								<div class="time-container">
-									<button type="button" class="btn btn-rounded">
-										<i class="fas fa-clock"></i>
-									</button>
 									<button
 										type="button"
 										class="btn btn-rounded"
-										:disabled="timeShiftAmount === -3"
+										:disabled="timeShiftTypeCurrentIndex === -4"
 										@click="timeShiftBackwards()"
 									>
 										<i class="fas fa-backward"></i>
-										<span class="badge" v-if="timeShiftAmount < 0">{{ Math.abs(timeShiftAmount) }}</span>
+										<span class="badge" v-if="timeShiftTypeCurrentIndex < 0"
+											>{{ Math.abs(timeShiftTypeCurrentIndex) }}</span
+										>
 									</button>
 									<button
 										type="button"
 										class="btn btn-rounded"
-										:disabled="timeShiftAmount === 0"
+										:disabled="timeShiftTypeCurrentIndex === 0"
 										@click="timeShiftStop()"
 									>
 										<i class="fas fa-stop"></i>
@@ -605,12 +604,16 @@
 									<button
 										type="button"
 										class="btn btn-rounded"
-										:disabled="timeShiftAmount === 3"
+										:disabled="timeShiftTypeCurrentIndex === 4"
 										@click="timeShiftForwards()"
 									>
 										<i class="fas fa-forward"></i>
-										<span class="badge" v-if="timeShiftAmount > 0">{{ timeShiftAmount }}</span>
+										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0">{{ timeShiftTypeCurrentIndex }}</span>
 									</button>
+									<button type="button" class="btn btn-rounded" @click="timeShiftReset()">
+										<i class="fas fa-redo-alt"></i>
+									</button>
+									<span class="date-time" v-html="dateTimeText"></span>
 								</div>
 							</div>
 

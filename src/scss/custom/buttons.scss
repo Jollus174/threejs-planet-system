@@ -33,6 +33,11 @@ button {
 		border-radius: 2px;
 		background-color: #191919;
 	}
+
+	&.active {
+		background-color: $white;
+		color: $black;
+	}
 }
 
 .btn-check:active + .btn-outline-primary,
@@ -42,8 +47,10 @@ button {
 }
 
 .btn-rounded {
-	width: 40px;
-	height: 40px;
+	width: 32px;
+	height: 32px;
+	margin: 0.25em 0.125em;
+	padding: 0;
 	border-radius: 50%;
 }
 

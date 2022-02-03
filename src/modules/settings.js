@@ -26,7 +26,6 @@ const settings = {
 	orbitLines: {
 		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
 	},
-	domTarget: document.querySelector('#bg'),
 	// shoutouts to F-Zero GX
 	planetColours: {
 		default: hsl(0, 0, 89),

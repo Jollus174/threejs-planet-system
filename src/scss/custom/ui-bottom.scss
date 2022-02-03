@@ -1,8 +1,18 @@
 .ui-bottom {
+	display: flex;
+	align-items: center;
 	background-color: #111;
+
+	.time-container {
+		display: flex;
+		align-items: center;
+		padding-top: 3px;
+		padding-bottom: 3px;
+	}
 
 	button {
 		position: relative;
+		user-select: none;
 
 		&:disabled {
 			opacity: 1;
@@ -20,13 +30,33 @@
 			left: -1px;
 		}
 
-		.fa-forward {
-			left: 2px;
-		}
-
 		.badge {
 			position: absolute;
 			right: -8px;
+			border: 1px solid rgba(#111, 0.25);
+			padding: 1px 4px;
+		}
+	}
+
+	.date-time {
+		display: inline-block;
+		margin-left: 5px;
+		color: #494949;
+
+		time {
+			display: inline-block;
+			margin: 0 5px;
+			border-radius: 3px;
+			text-align: center;
+			color: $white;
+
+			&.days {
+				width: 18px;
+			}
+
+			&.months {
+				width: 28px;
+			}
 		}
 	}
 }

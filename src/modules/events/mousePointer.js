@@ -21,10 +21,6 @@ const mouse = new Vector2();
 // 	returnHoveredGroup().name === orrery.mouseState._clickedGroup.name;
 
 const initMousePointerEvents = () => {
-	window.addEventListener('wheel', () => {
-		orrery.cameraState._zoomToTarget = false;
-	});
-
 	// document.querySelector('#btn-back').addEventListener('click', () => {
 	// 	orrery.cameraState._zoomToTarget = false;
 	// 	document.querySelector('#btn-modal-info').disabled = true;

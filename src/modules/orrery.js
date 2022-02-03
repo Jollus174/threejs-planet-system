@@ -53,8 +53,7 @@ const orrery = {
 		_ambientLights: []
 	},
 	isDesktop: false,
-	vueTarget: document.querySelector('#app-orrery'),
-	timeShiftAmount: 0
+	vueTarget: document.querySelector('#app-orrery')
 };
 
 window.orrery = orrery;
