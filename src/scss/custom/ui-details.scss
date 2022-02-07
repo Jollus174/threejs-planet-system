@@ -159,11 +159,18 @@
 		align-items: center;
 		justify-content: space-between;
 		text-transform: uppercase;
-		margin-top: 8px;
+		margin-top: 4px;
+		margin-bottom: 4px;
+
+		@include media-breakpoint-between(0, md) {
+			user-select: none;
+		}
 
 		@include media-breakpoint-up(lg) {
 			// TODO: weird magic number
 			margin-left: 6px;
+			margin-top: 8px;
+			margin-bottom: 0;
 		}
 
 		.h3 {

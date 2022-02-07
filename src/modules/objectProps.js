@@ -39,12 +39,6 @@ class OrbitLine {
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
-		this.parentPlanetId = this.parentPlanetData ? this.parentPlanetData.id : null;
-		this.parentPlanetType = this.parentPlanetData
-			? this.parentPlanetData.isDwarfPlanet
-				? '_dwarfPlanets'
-				: '_planets'
-			: null;
 	}
 
 	drawLine(iterator) {
@@ -62,7 +56,8 @@ class OrbitLine {
 		const startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
 		const endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
 
-		const lerpAcc = 0.5; // how much fade we want, closer to 0 means fades earlier
+		// how much fade we want, closer to 0 means fades earlier
+		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
 		const lerpIncrementer = 1 / 360 / lerpAcc;
 
 		const colors = new Float32Array(this.vertexCount * 3);

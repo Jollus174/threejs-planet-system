@@ -42,6 +42,12 @@
 		display: inline-block;
 		margin-left: 5px;
 		color: #494949;
+		flex-grow: 1;
+		text-align: right;
+
+		@include media-breakpoint-up(lg) {
+			text-align: left;
+		}
 
 		time {
 			display: inline-block;

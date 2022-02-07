@@ -63,7 +63,7 @@
 											type="seach"
 											placeholder="Search"
 											v-model="searchQuery"
-											@keyup.enter="updateClickTarget(searchResults[0].data)"
+											@keyup.enter="updateZoomTarget(searchResults[0].data)"
 										/>
 									</div>
 								</div>
@@ -81,14 +81,14 @@
 								placeholder="Search"
 								v-model="searchQuery"
 								:class="{'active': showSearchMobile}"
-								@keyup.enter="updateClickTarget(searchResults[0].data)"
+								@keyup.enter="updateZoomTarget(searchResults[0].data)"
 							/>
 						</div>
 						<!-- TODO: Get links working and remove the '.prevent' -->
 						<div class="search-dropdown" :class="{'active': searchResults}">
 							<ul>
 								<li v-for="(result, i) in searchResults">
-									<a :href="'/#/' + result.data.id" @click.prevent="updateClickTarget(result.data)">
+									<a :href="'/#/' + result.data.id" @click.prevent="updateZoomTarget(result.data)">
 										<span v-html="result.data.displayName"></span>
 										<sub class="text-type">{{ result.data.bodyType }}</sub>
 									</a>
@@ -130,7 +130,7 @@
 										<i class="fas fa-angle-right"></i>
 									</button>
 								</div>
-								<div class="key-data-container">
+								<div class="key-data-container d-none d-lg-block">
 									<div class="container-fluid">
 										<div class="row">
 											<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
@@ -465,7 +465,7 @@
 													<div class="row">
 														<div
 															class="col-media col-6"
-															:class="{'col-md-4': sidebarDesktopWidth < 960, 'col-md-3': 960 <= sidebarDesktopWidth && sidebarDesktopWidth < 1280, 'col-md-2': 1280 <= sidebarDesktopWidth }"
+															:class="{'col-sm-4': sidebarDesktopWidth < 960, 'col-sm-3': 960 <= sidebarDesktopWidth && sidebarDesktopWidth < 1280, 'col-sm-2': 1280 <= sidebarDesktopWidth }"
 															v-for="(item, i) in clickedClassData.media.items"
 															:key="i"
 														>
@@ -502,7 +502,7 @@
 											</template>
 											<div class="ssc" v-if="!clickedClassData.media.hasLoaded && !clickedClassData.media.loadingMore">
 												<div class="row">
-													<div class="col-media col-6 col-md-4" v-for="i in 12">
+													<div class="col-media col-6 col-sm-4" v-for="i in 12">
 														<div class="ssc-square w-100"></div>
 													</div>
 												</div>

@@ -786,7 +786,7 @@ fetch('./solarSystemData.json')
 					const prevSystemKey = systemKeys[prevIndex];
 					const prevSystem = orrery.classes._all[prevSystemKey];
 					this.updateEntity(prevSystem.data);
-					this.updateClickTarget(prevSystem.data);
+					this.updateZoomTarget(prevSystem.data);
 				},
 
 				goToNextSystem() {
@@ -800,7 +800,7 @@ fetch('./solarSystemData.json')
 					const nextSystemKey = systemKeys[nextIndex];
 					const nextSystem = orrery.classes._all[nextSystemKey];
 					this.updateEntity(nextSystem.data);
-					this.updateClickTarget(nextSystem.data);
+					this.updateZoomTarget(nextSystem.data);
 				},
 
 				goToPreviousEntity() {
