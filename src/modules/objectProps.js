@@ -36,6 +36,9 @@ class OrbitLine {
 		this.fadingOut = false;
 		this.geometryLine = null;
 		this.vertexCount = null;
+		this.colors = [];
+		this.startColor = null;
+		this.endColor = null;
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
@@ -50,29 +53,29 @@ class OrbitLine {
 		}
 
 		// create geometry using all points on the circle
-		const geoLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
-		this.vertexCount = this.vertexCount || geoLine.getAttribute('position').count;
+		this.geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+		this.vertexCount = this.vertexCount || this.geometryLine.getAttribute('position').count;
 
-		const startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
-		const endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
+		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
+		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
 
 		// how much fade we want, closer to 0 means fades earlier
 		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
 		const lerpIncrementer = 1 / 360 / lerpAcc;
 
-		const colors = new Float32Array(this.vertexCount * 3);
+		this.colors = new Float32Array(this.vertexCount * 3);
 		for (let c = 0; c <= 360; c += 1) {
-			const lerpColor = new THREE.Color(startColor);
-			lerpColor.lerpColors(startColor, endColor, c * lerpIncrementer);
+			const lerpColor = new THREE.Color(this.startColor);
+			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
 
-			colors[c * 3 + 0] = lerpColor.r;
-			colors[c * 3 + 1] = lerpColor.g;
-			colors[c * 3 + 2] = lerpColor.b;
+			this.colors[c * 3 + 0] = lerpColor.r;
+			this.colors[c * 3 + 1] = lerpColor.g;
+			this.colors[c * 3 + 2] = lerpColor.b;
 		}
 
-		geoLine.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
 
-		return geoLine;
+		return this.geometryLine;
 	}
 
 	build() {
@@ -277,7 +280,9 @@ class Entity {
 	}
 
 	// TODO: am unsure if should be using 'copy' on all of these...
-	iteratePosition(i) {
+	iteratePosition() {
+		if (!this.isVisible) return;
+		const i = (orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
 		this.labelGroup.position.copy(
 			calculateOrbit(this.data.meanAnomaly - i, this.data, this.planetClass ? this.planetClass.data : null)
 		);
@@ -475,6 +480,7 @@ class Entity {
 				this.meshGroup.visible = false;
 				if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
 			}, 100);
+			this.isVisible = false;
 			this.isBuilt = false;
 		}
 	}
@@ -665,6 +671,7 @@ class Moon extends Entity {
 	createElements() {
 		if (this.isBuilt) return;
 		// if (!this.CSSObj) this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
+		this.isVisible = true;
 		this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
 		this.OrbitLine.build();
 		if (!this.meshGroup.children.length) {
@@ -672,6 +679,9 @@ class Moon extends Entity {
 		} else {
 			this.meshGroup.visible = true;
 		}
+
+		// to make sure labels + orbits are in correct position if have been iterating over time
+		this.iteratePosition();
 
 		gsap.to(this.labelLink, {
 			opacity: 1,

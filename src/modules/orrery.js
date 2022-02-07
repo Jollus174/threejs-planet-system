@@ -24,6 +24,7 @@ const orrery = {
 	classes: {
 		_all: {},
 		_allIterable: [],
+		_allIterableLength: null,
 		_planets: {},
 		_dwarfPlanets: {},
 		_asteroids: {},
@@ -53,7 +54,8 @@ const orrery = {
 		_ambientLights: []
 	},
 	isDesktop: false,
-	vueTarget: document.querySelector('#app-orrery')
+	vueTarget: document.querySelector('#app-orrery'),
+	dateTimeDifference: 0
 };
 
 window.orrery = orrery;

@@ -184,6 +184,7 @@ fetch('./solarSystemData.json')
 		Object.values(orrery.classes._dwarfPlanets).forEach((item) => item.build());
 
 		orrery.classes._allIterable = Object.values(orrery.classes._all);
+		orrery.classes._allIterableLength = orrery.classes._allIterable.length;
 
 		Vue.component('lightbox', LightBox);
 		new Vue({
@@ -1062,23 +1063,17 @@ fetch('./solarSystemData.json')
 						}
 					}
 
-					if (this.timeShiftTypeCurrentIndex !== 0) {
-						// making sure to account for -ve numbers, so can reverse orbits based on time if needed
-						this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
-						// should be taking 'i' then dividing it depending on the entity
+					orrery.dateTimeDifference = this.dateTimeDifference;
+					// making sure to account for -ve numbers, so can reverse orbits based on time if needed
+					this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
 
-						// TODO: this sucks, I should be calling some kind of 'draw()' function
-						// iterating this in a RAF will consume huge amounts of memory
-						for (const entity of orrery.classes._allIterable) {
-							const sideralOrbit = entity.data.sideralOrbit ? 360 / entity.data.sideralOrbit : 1;
-							entity.iteratePosition(this.dateTimeDifference * sideralOrbit);
-						}
+					for (let i = 0; i < orrery.classes._allIterableLength; i++) {
+						orrery.classes._allIterable[i].iteratePosition();
 					}
-
-					orrery.controls.update();
 
 					orrery.classes._sun.draw(delta); // TODO: Should be separate
 
+					orrery.controls.update();
 					renderer.render(scene, orrery.camera);
 					labelRenderer.render(scene, orrery.camera);
 				};
