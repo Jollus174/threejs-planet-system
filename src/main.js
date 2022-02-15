@@ -202,9 +202,11 @@ fetch('./solarSystemData.json')
 				systemClassData: orrery.classes._all._sun.data,
 				modelSystemSelection: {}, // for keeping track of what's selected between systems
 				modelMoonGroups: {},
+				tabGroup: 'tab-stats', // TODO: set this to Wikipedia by default
 				vueRandomString: randomString(8),
 				timeShiftTypes: { minutes: 0, hours: 0, days: 0, months: 0 },
 				timeShiftTypeCurrentIndex: 0,
+				timeShifterInteractedWith: false,
 				dateTimeCurrent: new Date(),
 				orreryRendererEl: renderer.domElement,
 				labelRendererEl: labelRenderer.domElement
@@ -711,7 +713,8 @@ fetch('./solarSystemData.json')
 					}
 
 					if (this.tabGroup === 'tab-system') {
-						if (!this.modelMoonGroups[this.clickedClassData.systemId]) this.tabGroup = 'tab-desc';
+						// TODO: set this to Wikipedia by default
+						if (!this.modelMoonGroups[this.clickedClassData.systemId]) this.tabGroup = 'tab-stats';
 						this.$nextTick(() => {
 							const elContentSystem = document.querySelector('#content-system .content-wrapper');
 							const activeTableRow = elContentSystem.querySelector('tr.entity-targeted');
