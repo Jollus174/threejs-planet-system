@@ -48,7 +48,7 @@ const materialData = {
 		segments: 128,
 		map: textureSun,
 		normalMap: null,
-		emissive: '#FFF',
+		emissive: '#ffe484',
 		emissiveMap: textureSun,
 		emissiveIntensity: 1,
 		side: FrontSide

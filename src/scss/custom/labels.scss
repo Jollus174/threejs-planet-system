@@ -16,9 +16,11 @@
 		display: block;
 	}
 
-	// &.is-sun {
-	// 	display: none !important;
-	// }
+	&.is-sun {
+		.label-circle {
+			opacity: 0 !important;
+		}
+	}
 
 	&.is-moon {
 		.label-circle {

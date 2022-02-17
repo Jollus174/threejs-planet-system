@@ -16,6 +16,8 @@ https://www.desmos.com/calculator/zc5zdjqzln - Rotating ellipse around foci
 https://www.youtube.com/watch?v=5l2tR2smeHY - Jupiter moon orbits example
 https://whillyard.com/science-pages/our-solar-system/himalia-group.html - Jupiter Moon Group names
 http://www.stjarnhimlen.se/comp/ppcomp.html#4
+https://ssd.jpl.nasa.gov/planets/approx_pos.html - Orbit equations
+https://github.com/mgvez/jsorrery
 
 https://whillyard.com/science-pages/our-solar-system/solar-system-model.html - Universe scale facts
 

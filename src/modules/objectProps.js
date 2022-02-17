@@ -1,5 +1,6 @@
 'use strict';
 import * as THREE from 'three';
+import { GodRaysEffect } from 'postprocessing';
 import { gsap } from 'gsap';
 import { orrery } from './orrery';
 import { scene } from './scene';
@@ -177,9 +178,10 @@ class Entity {
 		this.data = data;
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
+		this.labelGroup.visible = false;
 		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
 		this.isBuilt = false;
-		this.isVisible = false;
+		this.isVisible = false; // TODO: Do we really need this? Should just check the 'visible' property
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
@@ -212,12 +214,32 @@ class Entity {
 		};
 	}
 
+	async build() {
+		this.labelGroup.visible = false; // updated when camera is close
+		scene.add(this.labelGroup);
+		this.setLabelGroupDefaultPosition();
+		this.createCSSLabel();
+
+		// building orbitLine after the group is added to the scene, so the group has a parent
+		this.OrbitLine.build();
+
+		if (!this.isVisible) {
+			this.isVisible = true;
+			this.labelLink.style.pointerEvents = '';
+			this.isBuilt = true;
+		}
+
+		await this.createEntityMesh().then(() => {
+			return this;
+		});
+	}
+
 	createCSSLabel() {
 		// checking to see if a label has already been built to avoid duplicate builds + listeners
 		if (this.labelGroup.children.some((i) => i.isCSS2DObject)) return;
 
 		const entityTypeClasses = [
-			this.data.id === 'sun' ? 'is-sun' : '',
+			this.data.id === '_sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
 			this.data.isPlanet ? 'is-planet' : '',
 			this.data.isDwarfPlanet ? 'is-dwarf-planet' : '',
@@ -287,26 +309,10 @@ class Entity {
 			calculateOrbit(this.data.meanAnomaly - i, this.data, this.planetClass ? this.planetClass.data : null)
 		);
 
-		if (this.OrbitLine && this.OrbitLine.orbitLine) this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
-	}
-
-	build() {
-		this.labelGroup.visible = false; // updated when camera is close
-		scene.add(this.labelGroup);
-		this.setLabelGroupDefaultPosition();
-		this.createCSSLabel();
-
-		// building orbitLine after the group is added to the scene, so the group has a parent
-		this.OrbitLine.build();
-
-		if (this.materialData) {
-			this.createEntityMesh();
-		}
-
-		if (!this.isVisible) {
-			this.isVisible = true;
-			this.labelLink.style.pointerEvents = '';
-			this.isBuilt = true;
+		// careful, this causes the memory to massively leak!
+		if (this.OrbitLine && this.OrbitLine.orbitLine) {
+			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
+			// this.OrbitLine.colorLine(i);
 		}
 	}
 
@@ -336,7 +342,6 @@ class Entity {
 	}
 
 	async constructEntityMesh() {
-		// TODO: Am unsure about this
 		if (this.meshGroup && this.meshGroup.children.length) return;
 
 		const segments = this.materialData.segments || 32;
@@ -349,16 +354,13 @@ class Entity {
 			emissiveIntensity: this.materialData.emissiveIntensity || null
 		};
 
-		this.meshGroup.class = this;
-
 		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
 		const material = new THREE.MeshStandardMaterial(materialProps);
 
 		const entityMesh = new THREE.Mesh(geometry, material);
 		entityMesh.name = this.data.id;
-		entityMesh.class = this;
 		entityMesh.castShadow = true;
-		entityMesh.receiveShadow = false;
+		entityMesh.receiveShadow = true;
 
 		return entityMesh;
 	}
@@ -372,13 +374,14 @@ class Entity {
 			emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
 			emissive: ring.emissive || null,
 			emissiveIntensity: ring.emissiveIntensity || null,
-			side: THREE.DoubleSide,
-			blending: THREE.CustomBlending
+			side: THREE.DoubleSide
+			// blending: THREE.CustomBlending
+			// blending: THREE.AdditiveBlending
 		};
 
-		ringMaterial.blendEquation = THREE.MaxEquation;
-		ringMaterial.blendSrc = THREE.OneFactor;
-		ringMaterial.blendDst = THREE.DstAlphaFactor;
+		// ringMaterial.blendEquation = THREE.MaxEquation;
+		// ringMaterial.blendSrc = THREE.OneFactor;
+		// ringMaterial.blendDst = THREE.DstAlphaFactor;
 
 		const ringMesh = new THREE.Mesh(
 			ringUVMapGeometry(
@@ -396,8 +399,9 @@ class Entity {
 
 	// TODO: set distance checker to fade label when zoomed in
 
-	createEntityMesh() {
-		this.constructEntityMesh().then((mesh) => {
+	async createEntityMesh() {
+		if (!this.materialData) return this;
+		const mesh = await this.constructEntityMesh();
 			this.meshGroup.add(mesh);
 			this.labelGroup.add(this.meshGroup);
 
@@ -406,7 +410,7 @@ class Entity {
 					return this.constructRingMeshes(ring, i);
 				});
 
-				Promise.all(ringMeshPromises).then((ringMeshes) => {
+			await Promise.all(ringMeshPromises).then((ringMeshes) => {
 					ringMeshes.forEach((ringMesh) => {
 						// TODO: this will need to be adjusted later
 						ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
@@ -414,7 +418,6 @@ class Entity {
 					});
 				});
 			}
-		});
 	}
 
 	// for updates that need to happen in the main render loop
@@ -582,15 +585,9 @@ class Asteroid extends Planet {
 class Sun extends Entity {
 	constructor(data) {
 		super(data);
-		this.uniforms = {
-			aspectRatio: { type: 'f', value: window.innerWidth / window.innerHeight },
-			sunPos: { type: 'v3', value: new THREE.Vector3() },
-			sunScreenPos: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
-			sunSize: { type: 'f', value: 0.1 },
-			randAngle: { type: 'f', value: 0.1 },
-			camAngle: { type: 'f', value: 0.26 }
-		};
 		// this.raycasterEnabled = false;
+
+		this.godRaysEffect = null;
 	}
 
 	// intervalCheck() {
@@ -600,51 +597,77 @@ class Sun extends Entity {
 	// 	}
 	// }
 
-	// async constructEntityMesh() {
-	// 	if (this.meshGroup) return this.meshGroup;
+	async constructEntityMesh() {
+		if (this.meshGroup && this.meshGroup.children.length) return;
 
-	// 	const meshGroup = new THREE.Group();
-	// 	meshGroup.class = this;
-	// 	meshGroup.name = this.data.id;
+		const meshGroup = new THREE.Group();
+		meshGroup.name = this.data.id;
 
-	// 	// const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-	// 	const largestOrbit = Math.max(...orrery.bodies._all.map((o) => o.aphelion));
-	// 	const geometry = new THREE.PlaneBufferGeometry(largestOrbit, largestOrbit, 10);
-	// 	const material = new THREE.ShaderMaterial({
-	// 		uniforms: this.uniforms,
-	// 		vertexShader: sunVertexShader,
-	// 		fragmentShader: sunFragmentShader,
-	// 		transparent: true
-	// 	});
+		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, 32, 32);
+		const material = new THREE.MeshStandardMaterial({
+			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
+			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
+			transparent: false,
+			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
+			emissive: this.materialData.emissive || null,
+			emissiveIntensity: this.materialData.emissiveIntensity || null
+		});
 
-	// 	meshGroup.renderOrder = 1;
-
-	// 	const entityMesh = new THREE.Mesh(geometry, material);
-	// 	entityMesh.name = this.data.id;
-	// 	entityMesh.class = this;
-	// 	entityMesh.castShadow = true;
-	// 	entityMesh.receiveShadow = false;
-
-	// 	meshGroup.add(entityMesh);
-
-	// 	return meshGroup;
-	// }
-
-	draw() {
-		// if (!this.meshGroup) return;
-		// const camToSun = orrery.camera.position.clone().sub(this.labelGroup.position);
-		// const groupPosition = new THREE.Vector3();
-		// this.labelGroup.getWorldPosition(groupPosition);
-		// // const sunScreenPos = this.labelGroup.position.project(orrery.camera);
-		// this.uniforms.sunPos.value.copy(camToSun.multiplyScalar(-1));
-		// const visibleW = Math.tan(THREE.MathUtils.degToRad(orrery.camera.fov) / 2) * camToSun.length() * 2;
-		// const sunScreenRatio = this.data.diameter / visibleW;
-		// this.uniforms.sunSize.value = sunScreenRatio;
-		// this.uniforms.randAngle.value = this.uniforms.randAngle.value + 0.001;
-		// this.uniforms.camAngle.value = camToSun.angleTo(new THREE.Vector3(1, 1, 0));
-		// this.uniforms.sunScreenPos.value = new THREE.Vector3(0, 0, 0);
-		// this.labelGroup.lookAt(orrery.camera.position);
+		const entityMesh = new THREE.Mesh(geometry, material);
+		entityMesh.name = this.data.id;
+		entityMesh.castShadow = true;
+		entityMesh.receiveShadow = false;
+		entityMesh.matrixAutoUpdate = false;
+		return entityMesh;
 	}
+
+	async createEntityMesh() {
+		this.labelGroup.visible = true;
+		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
+		const meshPromises = [this.constructEntityMesh(), this.constructEntityMesh()];
+		Promise.all(meshPromises).then((meshes) => {
+			this.meshGroup.add(meshes[0]);
+			this.labelGroup.add(this.meshGroup);
+
+			this.meshGroup.add(meshes[1]);
+			this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
+				// TODO: fix this!
+				width: 600,
+				height: 600,
+				//
+				blurriness: 1,
+				density: 0.96,
+				decay: 0.92,
+				weight: 0.3,
+				exposure: 0.54,
+				samples: 60,
+				clampMax: 1.0
+			});
+
+			return true;
+		});
+	}
+
+	intervalCheck() {
+		// Only fires if parent planet is in range
+		if (this.raycasterEnabled) {
+			this.updateRaycaster();
+			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+		}
+
+		this.distanceFromCamera = orrery.camera.position.distanceTo(this.labelGroup.position);
+		const cameraZoomed = this.distanceFromCamera < 75000000;
+
+		if (cameraZoomed) {
+			this.labelLink.classList.add('faded');
+		} else {
+			this.labelLink.classList.remove('faded');
+		}
+
+		// TODO: sun should glow all cool-like when zoomed out
+	}
+
+	draw() {}
 }
 
 class Moon extends Entity {
@@ -670,10 +693,15 @@ class Moon extends Entity {
 
 	createElements() {
 		if (this.isBuilt) return;
-		// if (!this.CSSObj) this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
-		this.isVisible = true;
+		this.labelGroup.visible = true;
 		this.createCSSLabel(); // this should only build if planet is in range (or doesn't already exist)
+		gsap.to(this.labelLink, {
+			opacity: 1,
+			duration: 1
+		});
+
 		this.OrbitLine.build();
+
 		if (!this.meshGroup.children.length) {
 			this.createEntityMesh();
 		} else {
@@ -683,10 +711,6 @@ class Moon extends Entity {
 		// to make sure labels + orbits are in correct position if have been iterating over time
 		this.iteratePosition();
 
-		gsap.to(this.labelLink, {
-			opacity: 1,
-			duration: 1
-		});
 		// Moon meshes build when camera is in planet orbit, and are destroyed when camera leaves orbit
 		// Need to check to see if mesh already built
 		this.intervalCheckVar = setInterval(() => {

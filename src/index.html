@@ -444,7 +444,7 @@
 															{{ valueToFixedFloatingPoints(clickedClassData.longAscNode) }} °
 														</td>
 													</tr>
-													<tr v-if="clickedClassData.longOfPeriapsis">
+													<tr v-if="clickedClassData.longOfPeriapsis && clickedClassData.longOfPeriapsis < 360">
 														<td>Longitude of {{namePeriapsis}}</td>
 														<td class="text-nowrap">
 															{{ valueToFixedFloatingPoints(clickedClassData.longOfPeriapsis) }} °
