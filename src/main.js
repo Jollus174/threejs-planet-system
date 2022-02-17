@@ -129,7 +129,6 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 
 const updateProjectionViewSize = (width, height) => {
 	renderer.setSize(width, height);
-	composer.setSize(width, height);
 
 	labelRenderer.setSize(width, height);
 	orrery.camera.aspect = width / height;

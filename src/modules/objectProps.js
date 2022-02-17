@@ -403,22 +403,22 @@ class Entity {
 	async createEntityMesh() {
 		if (!this.materialData) return this;
 		const mesh = await this.constructEntityMesh();
-			this.meshGroup.add(mesh);
-			this.labelGroup.add(this.meshGroup);
+		this.meshGroup.add(mesh);
+		this.labelGroup.add(this.meshGroup);
 
-			if (this.materialData.rings) {
-				const ringMeshPromises = this.materialData.rings.map((ring, i) => {
-					return this.constructRingMeshes(ring, i);
-				});
+		if (this.materialData.rings) {
+			const ringMeshPromises = this.materialData.rings.map((ring, i) => {
+				return this.constructRingMeshes(ring, i);
+			});
 
 			await Promise.all(ringMeshPromises).then((ringMeshes) => {
-					ringMeshes.forEach((ringMesh) => {
-						// TODO: this will need to be adjusted later
-						ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
-						this.meshGroup.add(ringMesh);
-					});
+				ringMeshes.forEach((ringMesh) => {
+					// TODO: this will need to be adjusted later
+					ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
+					this.meshGroup.add(ringMesh);
 				});
-			}
+			});
+		}
 	}
 
 	// for updates that need to happen in the main render loop
@@ -598,13 +598,14 @@ class Sun extends Entity {
 	// 	}
 	// }
 
-	async constructEntityMesh() {
+	async constructEntityMesh(isGodRays) {
 		if (this.meshGroup && this.meshGroup.children.length) return;
 
 		const meshGroup = new THREE.Group();
 		meshGroup.name = this.data.id;
 
-		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, 32, 32);
+		// smaller geometry behind godRays so orbit lines don't bleed from behind it
+		const geometry = new THREE.SphereBufferGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
 		const material = new THREE.MeshStandardMaterial({
 			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
 			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
@@ -624,19 +625,15 @@ class Sun extends Entity {
 
 	async createEntityMesh() {
 		this.labelGroup.visible = true;
-		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
-		const meshPromises = [this.constructEntityMesh(), this.constructEntityMesh()];
-		Promise.all(meshPromises).then((meshes) => {
-			this.meshGroup.add(meshes[0]);
-			this.labelGroup.add(this.meshGroup);
 
+		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
+		const meshPromises = [this.constructEntityMesh(), this.constructEntityMesh(true)];
+		await Promise.all(meshPromises).then((meshes) => {
+			this.labelGroup.add(this.meshGroup);
+			this.meshGroup.add(meshes[0]);
 			this.meshGroup.add(meshes[1]);
 			this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
-				// TODO: fix this!
-				width: 600,
-				height: 600,
-				//
-				blurriness: 1,
+				blurriness: 2,
 				density: 0.96,
 				decay: 0.92,
 				weight: 0.3,
@@ -644,8 +641,6 @@ class Sun extends Entity {
 				samples: 60,
 				clampMax: 1.0
 			});
-
-			return true;
 		});
 	}
 
