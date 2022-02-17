@@ -37,9 +37,9 @@ class OrbitLine {
 		this.fadingOut = false;
 		this.geometryLine = null;
 		this.vertexCount = null;
-		this.colors = [];
-		this.startColor = null;
-		this.endColor = null;
+		this.colors = null;
+		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
+		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....;
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
@@ -57,26 +57,27 @@ class OrbitLine {
 		this.geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
 		this.vertexCount = this.vertexCount || this.geometryLine.getAttribute('position').count;
 
-		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
-		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....
+		this.colors = this.colors || this.generateColors();
+		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+		return this.geometryLine;
+	}
 
+	generateColors() {
 		// how much fade we want, closer to 0 means fades earlier
 		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
 		const lerpIncrementer = 1 / 360 / lerpAcc;
 
-		this.colors = new Float32Array(this.vertexCount * 3);
+		const colors = new Float32Array(this.vertexCount * 3);
 		for (let c = 0; c <= 360; c += 1) {
 			const lerpColor = new THREE.Color(this.startColor);
 			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
 
-			this.colors[c * 3 + 0] = lerpColor.r;
-			this.colors[c * 3 + 1] = lerpColor.g;
-			this.colors[c * 3 + 2] = lerpColor.b;
+			colors[c * 3 + 0] = lerpColor.r;
+			colors[c * 3 + 1] = lerpColor.g;
+			colors[c * 3 + 2] = lerpColor.b;
 		}
 
-		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
-
-		return this.geometryLine;
+		return colors;
 	}
 
 	build() {
