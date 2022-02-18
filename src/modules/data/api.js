@@ -35,7 +35,6 @@ const sortData = (data) => {
 
 	for (const item of englishifiedData) {
 		item.media = {
-			apiRequester: null,
 			hasLoaded: false,
 			noResults: false,
 			hasError: false,
@@ -49,7 +48,6 @@ const sortData = (data) => {
 		};
 
 		item.description = {
-			apiRequester: null,
 			hasLoaded: false,
 			noResults: false,
 			hasError: false,

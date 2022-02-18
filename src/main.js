@@ -606,23 +606,15 @@ fetch('./solarSystemData.json')
 					},
 
 					generateNASAMediaUrl(key, pageNumber) {
-						// https://solarsystem.nasa.gov/api/v1/resources/?page=0&per_page=25&order=created_at+desc&search=&href_query_params=category%3Dplanets_jupiter&button_class=big_more_button&tags=jupiter&condition_1=1%3Ais_in_resource_list&category=51
-						// ?order=pub_date+desc&per_page=50&page=0&search=venus&condition_1=1%3Ais_in_resource_list&fs=&fc=51&ft=&dp=&category=51
-						const baseUrl = 'https://solarsystem.nasa.gov/api/v1/resources/';
+						// https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf
+						const baseUrl = 'https://images-api.nasa.gov';
 						const queryParams = [
-							['page', pageNumber || '0'],
-							['per_page', '18'],
-							['order', 'created_at+desc'],
-							['href_query_params', 'category%3Dplanets_jupiter'],
-							['search', key],
-							// ['tags', key],
-							['condition_1', '1%3Ais_in_resource_list'],
-							// for images
-							['category', '51'],
-							['fc', '51']
+							['keywords', key],
+							['page', pageNumber || '1'],
+							['media_type', 'image']
 						];
 
-						return `${baseUrl}?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
+						return `${baseUrl}/search?${queryParams.map((q) => [q[0], q[1]].join('=')).join('&')}`;
 					},
 
 					getNASAMediaData(isLoadingMore) {
@@ -631,11 +623,10 @@ fetch('./solarSystemData.json')
 
 						if (isLoadingMore) this.clickedClassData.media.loadingMore = true;
 						this.clickedClassData.media.errors.splice(0);
-						const pageRequestNumber = this.clickedClassData.media.items.length
-							? this.clickedClassData.media.items.length / this.clickedClassData.media.per_page
-							: 0;
 
-						const url = this.generateNASAMediaUrl(this.clickedClassData.name, pageRequestNumber);
+						const url = isLoadingMore
+							? this.clickedClassData.media.loadMoreLink
+							: this.generateNASAMediaUrl(this.clickedClassData.name);
 						const apiRequest = this.clickedClassData.media.apiRequester || new APIRequest();
 						apiRequest.GET(url).then((response) => {
 							const media = this.clickedClassData.media;
@@ -646,25 +637,29 @@ fetch('./solarSystemData.json')
 								return;
 							}
 
-							if (!response.result || !response.result.items || !response.result.items.length) {
+							if (
+								!response.result ||
+								!response.result.collection ||
+								!response.result.collection.items ||
+								!response.result.collection.items.length
+							) {
 								media.noResults = true;
 								return;
 							}
 
 							this.clickedClassData.media.loadingMore = false;
+							this.clickedClassData.media.loadMoreLink = response.result.collection.links
+								? response.result.collection.links.find((link) => link.rel === 'next').href
+								: '';
 
-							const { total, more, page, items, per_page } = response.result;
-							media.total = total;
-							media.more = more;
-							media.page = page;
-							media.per_page = per_page;
-							for (const item of items) {
-								item.list_image_src = `https://solarsystem.nasa.gov${item.list_image_src}`;
-								item.detail_image = `https://solarsystem.nasa.gov${item.detail_image}`;
-								item.link = `https://solarsystem.nasa.gov${item.link}`;
-								media.items.push(item);
+							for (const item of response.result.collection.items) {
+								const { title, description, photographer, nasa_id } = item.data[0]; // not sure why it's an array in the returned data
+								const thumb = item.links[0].href;
 
-								const formattedDetails = item.short_description
+								const mediaThumbnail = { title, thumb };
+								media.items.push(mediaThumbnail);
+
+								const formattedDetails = description
 									// splitting desc by paragraphs so can work with it
 									// removing paragraphs with links back to NASA's FAQs and such, looks weird
 									.replaceAll('\n', '')
@@ -674,18 +669,11 @@ fetch('./solarSystemData.json')
 									.join('</p>');
 								media.lightboxData.push({
 									type: 'image',
-									thumb: item.list_image_src,
-									src: item.detail_image,
-									caption: formattedDetails
+									thumb,
+									src: `https://images-assets.nasa.gov/image/${nasa_id}/${nasa_id}~orig.jpg`,
+									caption: formattedDetails || title
 								});
 							}
-
-							// short_description
-							// link
-							// title
-
-							// list_image_src
-							// detail_image
 						});
 					},
 
