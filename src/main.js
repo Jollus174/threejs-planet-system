@@ -128,7 +128,8 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 });
 
 const updateProjectionViewSize = (width, height) => {
-	renderer.setSize(width, height);
+	// renderer.setSize(width, height);
+	composer.setSize(width, height);
 
 	labelRenderer.setSize(width, height);
 	orrery.camera.aspect = width / height;
@@ -184,7 +185,8 @@ fetch('./solarSystemData.json')
 		// }
 
 		// MESH BUILDING
-		const buildPromises = [orrery.classes._sun.build()];
+		const buildPromises = [];
+		buildPromises.push(orrery.classes._sun.build());
 		Object.values(orrery.classes._planets).forEach((item) => buildPromises.push(item.build()));
 		Object.values(orrery.classes._dwarfPlanets).forEach((item) => buildPromises.push(item.build()));
 

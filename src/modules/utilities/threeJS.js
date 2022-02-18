@@ -1,5 +1,5 @@
 'use strict';
-import { Texture, BufferGeometry, RingBufferGeometry, Vector3, PointsMaterial } from 'three';
+import { Texture, RingBufferGeometry, Vector3 } from 'three';
 
 // draw a circle to a new canvas so we can render a circle texture (good for Points)
 const createCircleTexture = (color, size) => {

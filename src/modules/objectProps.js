@@ -53,6 +53,8 @@ class OrbitLine {
 			orbitPoints.push(v.copy(calculateOrbit(p, this.data, this.parentPlanetData)));
 		}
 
+		// deleting last geometry line if iterated upon, otherwise they'll start to chew up lots of memory
+		if (this.geometryLine) this.geometryLine.dispose();
 		// create geometry using all points on the circle
 		this.geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
 		this.vertexCount = this.vertexCount || this.geometryLine.getAttribute('position').count;
@@ -179,7 +181,6 @@ class Entity {
 		this.data = data;
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
-		this.labelGroup.visible = false;
 		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
 		this.isBuilt = false;
 		this.isVisible = false; // TODO: Do we really need this? Should just check the 'visible' property
@@ -216,7 +217,6 @@ class Entity {
 	}
 
 	async build() {
-		this.labelGroup.visible = false; // updated when camera is close
 		scene.add(this.labelGroup);
 		this.setLabelGroupDefaultPosition();
 		this.createCSSLabel();
@@ -552,7 +552,7 @@ class Planet extends Entity {
 		moonsToBuild.forEach((moonClass, i) => {
 			setTimeout(() => {
 				moonClass.createElements();
-			}, i * 20);
+			}, i * 100);
 		});
 	}
 
@@ -564,7 +564,7 @@ class Planet extends Entity {
 					orrery.mouseState._clickedClass = moonClass.planetClass;
 				}
 				moonClass.destroy();
-			}, i * 20);
+			}, i * 100);
 		});
 	}
 }
@@ -634,7 +634,7 @@ class Sun extends Entity {
 			this.meshGroup.add(meshes[1]);
 			this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
 				blurriness: 2,
-				density: 0.96,
+				density: 0.56,
 				decay: 0.92,
 				weight: 0.3,
 				exposure: 0.54,
