@@ -25,6 +25,7 @@ const orrery = {
 		_all: {},
 		_allIterable: [],
 		_allIterableLength: null,
+		_moonsIterable: [],
 		_planets: {},
 		_dwarfPlanets: {},
 		_asteroids: {},

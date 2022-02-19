@@ -14,14 +14,8 @@ import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
-// const planetRangeThreshold = 50000000; // Jupiter moons appear from Ceres at higher range...
-const planetRangeThreshold = 80000000;
-// const planetRangeThreshold = 100000000;
-// TODO: set it at this range only for the planet/moon that's targeted
+const planetRangeThreshold = 100000000;
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
-const innerMoonRangeThreshold = 1700000;
-const majorMoonRangeThreshold = 25000000;
-const planetOrbitLineRangeThreshold = 2000000;
 
 const setOrbitVisibility = () => {
 	return (orrery.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
@@ -43,12 +37,13 @@ class OrbitLine {
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
+		this.amountOfOrbitToDraw = 180; // 360 means full circle
 	}
 
 	drawLine(iterator) {
 		const orbitPoints = [];
 		const i = iterator || 0;
-		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + 360 - i; p += 1) {
+		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i; p += 1) {
 			const v = new THREE.Vector3();
 			orbitPoints.push(v.copy(calculateOrbit(p, this.data, this.parentPlanetData)));
 		}
@@ -67,10 +62,10 @@ class OrbitLine {
 	generateColors() {
 		// how much fade we want, closer to 0 means fades earlier
 		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
-		const lerpIncrementer = 1 / 360 / lerpAcc;
+		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
 
 		const colors = new Float32Array(this.vertexCount * 3);
-		for (let c = 0; c <= 360; c += 1) {
+		for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
 			const lerpColor = new THREE.Color(this.startColor);
 			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
 
@@ -224,11 +219,11 @@ class Entity {
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
 
-		if (!this.isVisible) {
+		// if (!this.isVisible) {
 			this.isVisible = true;
 			this.labelLink.style.pointerEvents = '';
 			this.isBuilt = true;
-		}
+		// }
 
 		await this.createEntityMesh().then(() => {
 			return this;
@@ -304,7 +299,7 @@ class Entity {
 
 	// TODO: am unsure if should be using 'copy' on all of these...
 	iteratePosition() {
-		if (!this.isVisible) return;
+		// if (!this.isVisible) return;
 		const i = (orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
 		this.labelGroup.position.copy(
 			calculateOrbit(this.data.meanAnomaly - i, this.data, this.planetClass ? this.planetClass.data : null)
@@ -506,13 +501,17 @@ class Planet extends Entity {
 		}
 
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
+		const planetIsTargeted =
+			orrery.mouseState._zoomedClass &&
+			(orrery.mouseState._zoomedClass.data.id === this.data.id ||
+				(this.planetClass && this.planetClass.data.id === this.data.id));
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + planetRangeThreshold;
 
 		if (cameraZoomedToPlanet) {
-			if (!this.isZoomedToPlanet) {
+			if (planetIsTargeted && !this.isZoomedToPlanet) {
 				this.createCSSLabel(); // in case it was removed via a moon selection
 				this.isZoomedToPlanet = true; // to prevent multiple executions
-				this.labelGroup.visible = true;
+				// this.labelGroup.visible = true;
 				// destroying previous set of moons first
 				// this.destroyMoons(Object.values(this.moonClasses));
 				orrery.cameraState._currentPlanetInRange = this.data.id;
@@ -520,9 +519,9 @@ class Planet extends Entity {
 				this.buildMoons(moonsToBuild);
 			}
 		} else {
-			if (this.isZoomedToPlanet) {
+			if (!planetIsTargeted && this.isZoomedToPlanet) {
 				this.isZoomedToPlanet = false;
-				this.labelGroup.visible = false;
+				// this.labelGroup.visible = false;
 				if (orrery.cameraState._currentPlanetInRange === this.data.id) {
 					this.destroyMoons(Object.values(this.moonClasses));
 					orrery.cameraState._currentPlanetInRange = '';
@@ -552,7 +551,7 @@ class Planet extends Entity {
 		moonsToBuild.forEach((moonClass, i) => {
 			setTimeout(() => {
 				moonClass.createElements();
-			}, i * 100);
+			}, i * 10);
 		});
 	}
 
@@ -564,7 +563,7 @@ class Planet extends Entity {
 					orrery.mouseState._clickedClass = moonClass.planetClass;
 				}
 				moonClass.destroy();
-			}, i * 100);
+			}, i * 10);
 		});
 	}
 }

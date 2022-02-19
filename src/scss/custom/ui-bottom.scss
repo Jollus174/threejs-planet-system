@@ -36,6 +36,11 @@
 			border: 1px solid rgba(#111, 0.25);
 			padding: 1px 4px;
 		}
+
+		&.active {
+			background-color: rgba($white, 0.15);
+			color: $white;
+		}
 	}
 
 	.date-time {

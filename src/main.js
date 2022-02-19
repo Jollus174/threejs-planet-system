@@ -19,7 +19,18 @@ import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps'
 import { sortData, APIRequest } from './modules/data/api';
 import { scene } from './modules/scene';
 
-import { RenderPass, EffectPass, SMAAEffect, SMAAPreset, EdgeDetectionMode, SMAAImageGenerator } from 'postprocessing';
+import {
+	RenderPass,
+	EffectPass,
+	SMAAEffect,
+	GodRaysEffect,
+	SMAAPreset,
+	EdgeDetectionMode,
+	SMAAImageGenerator,
+	SelectiveBloomEffect,
+	BlendFunction,
+	KernelSize
+} from 'postprocessing';
 
 import { customEventNames } from './modules/events/customEvents';
 import { evRenderPause, evRenderStart } from './modules/events/events';
@@ -78,7 +89,6 @@ document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	if (newClickedClassSameAsOld) {
 		document.dispatchEvent(new CustomEvent(customEventNames.updateZoomTarget, { detail: clickedClass }));
 	} else {
-		orrery.mouseState._zoomedClass = null;
 		orrery.cameraState._zoomToTarget = false;
 		// orrery.mouseState._clickedClass = null; // TODO: this should be 'focused class'!
 	}
@@ -193,6 +203,7 @@ fetch('./solarSystemData.json')
 		Promise.all(buildPromises).then(() => {
 			orrery.classes._allIterable = Object.values(orrery.classes._all);
 			orrery.classes._allIterableLength = orrery.classes._allIterable.length;
+			orrery.classes._moonsIterable = orrery.classes._allIterable.filter((c) => c.data.bodyType === 'Moon');
 
 			Vue.component('lightbox', LightBox);
 			new Vue({
@@ -215,6 +226,7 @@ fetch('./solarSystemData.json')
 					timeShiftTypes: { minutes: 0, hours: 0, days: 0, months: 0 },
 					timeShiftTypeCurrentIndex: 0,
 					dateTimeCurrent: new Date(),
+					timeShiftSystemOnly: false,
 					orreryRendererEl: renderer.domElement,
 					labelRendererEl: labelRenderer.domElement
 				},
@@ -245,16 +257,12 @@ fetch('./solarSystemData.json')
 					},
 
 					distanceFromParentEntity() {
-						if (!this.clickedClassData) return null;
+						if (!this.clickedClassData || !this.clickedClassData.semimajorAxis) return null;
 						// to be in km or AU depending on amount
 						const parentEntity = this.clickedClassData.aroundPlanet
 							? orrery.classes._all[this.clickedClassData.aroundPlanet.planet].data.displayName
 							: 'Sun';
 
-						if (!this.clickedClassData.semimajorAxis) {
-							console.warn('Semi-Major Axis required.');
-							return;
-						}
 						return {
 							value: this.distanceConverter(this.clickedClassData.semimajorAxis, true).value,
 							unit: `${this.distanceConverter(this.clickedClassData.semimajorAxis, true).unit} from ${parentEntity}`
@@ -306,10 +314,9 @@ fetch('./solarSystemData.json')
 
 					currentTimeShiftType() {
 						const i = Math.abs(this.timeShiftTypeCurrentIndex);
-						if (i === 1) return 'minutes';
-						else if (i === 2) return 'hours';
-						else if (i === 3) return 'days';
-						else if (i === 4) return 'months';
+						if (i === 1) return 'hours';
+						else if (i === 2) return 'days';
+						else if (i === 3) return 'months';
 						else return '';
 					},
 
@@ -334,12 +341,12 @@ fetch('./solarSystemData.json')
 				},
 				methods: {
 					timeShiftForwards() {
-						if (this.timeShiftTypeCurrentIndex < 4) {
+						if (this.timeShiftTypeCurrentIndex < 3) {
 							this.timeShiftTypeCurrentIndex++;
 						}
 					},
 					timeShiftBackwards() {
-						if (-4 < this.timeShiftTypeCurrentIndex) {
+						if (-3 < this.timeShiftTypeCurrentIndex) {
 							this.timeShiftTypeCurrentIndex--;
 						}
 					},
@@ -352,6 +359,9 @@ fetch('./solarSystemData.json')
 					},
 					timeShiftStop() {
 						this.timeShiftTypeCurrentIndex = 0;
+					},
+					toggleTimeShiftSystemOnly() {
+						this.timeShiftSystemOnly = !this.timeShiftSystemOnly;
 					},
 
 					regenerateRandomString() {
@@ -1022,22 +1032,67 @@ fetch('./solarSystemData.json')
 						labelRenderer.zOrder(scene);
 					}, 200);
 
+					const geometry = new THREE.SphereBufferGeometry(0.01, 32, 32);
+					const material = new THREE.MeshBasicMaterial({ color: /* 0xffe484 */ 'orange' });
+					const sphere = new THREE.Mesh(geometry, material);
+					scene.add(sphere);
+
+					// RENDER PASSES HERE
+					composer.addPass(new RenderPass(orrery.scene, orrery.camera));
+					composer.multisampling = 8;
+
+					const godRaysEffect = new GodRaysEffect(orrery.camera, sphere, {
+						blurriness: 2,
+						density: 0.86,
+						decay: 0.92,
+						weight: 0.3,
+						exposure: 0.54,
+						samples: 60,
+						clampMax: 1.0
+					});
+
 					// Will cause the Godrays to appear in front of planets...
 					const smaaGenerator = new SMAAImageGenerator();
 					smaaGenerator.generate().then((images) => {
 						// SMAAGenerator returns [searchImage, areaImage];
 						const smaaEffect = new SMAAEffect(images[0], images[1], SMAAPreset.MEDIUM, EdgeDetectionMode.COLOR);
-						const effects = [smaaEffect, orrery.classes._sun.godRaysEffect];
+						const selectiveBloomEffect = new SelectiveBloomEffect(orrery.scene, orrery.camera, {
+							kernelSize: KernelSize.SMALL,
+							blurScale: 0.15,
+							luminanceThreshold: 0,
+							luminanceSmoothing: 0.6,
+							// height: 480
+							// intensity: 2,
+							intensity: 5,
+							blendFunction: BlendFunction.ADD
+						});
+						window.selectiveBloomEffect = selectiveBloomEffect;
+
+						// const effects = [smaaEffect, orrery.classes._sun.godRaysEffect, selectiveBloomEffect];
+						const effects = [godRaysEffect, smaaEffect, orrery.classes._sun.godRaysEffect];
 						const effectPass = new EffectPass(orrery.camera, ...effects);
+						// effectPass.renderToScreen = true;
 						composer.addPass(effectPass);
 					});
 
-					// RENDER PASSES HERE
-					composer.addPass(new RenderPass(orrery.scene, orrery.camera));
-					composer.multisampling = 8;
+					// setTimeout(() => {
+					// 	const orbitLines = window.scene.children.filter((c) => c.name.includes('orbit line'));
+					// 	orbitLines.forEach((l) => window.selectiveBloomEffect.selection.add(l));
+					// 	// window.selectiveBloomEffect.update();
+					// 	console.log(window.selectiveBloomEffect.getSelection());
+					// 	// window.selectiveBloomEffect.setEnabled = true;
+					// 	console.log('lines added!');
+					// }, 2000);
+
 					// ---
 
+					const scaleVector = new THREE.Vector3();
+					let scaleFactor = 4;
+
 					const render = () => {
+						var scale = scaleVector.subVectors(sphere.position, orrery.camera.position).length() / scaleFactor;
+						sphere.scale.set(scale, scale, scale);
+
 						delta = 5 * clock.getDelta();
 						// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
 
@@ -1057,7 +1112,7 @@ fetch('./solarSystemData.json')
 							const zoomTo = orrery.mouseState._zoomedClass.data.zoomTo;
 							const distanceToTarget = orrery.controls.getDistance();
 
-							if (orrery.cameraState._zoomToTarget) {
+							if (orrery.cameraState._zoomToTarget && !orrery.camera.target) {
 								if (distanceToTarget > zoomTo) {
 									const amountComplete = zoomTo / distanceToTarget; // decimal percent completion of camera dolly based on the zoomTo of targetObj
 									const amountToIncrease =
@@ -1076,6 +1131,8 @@ fetch('./solarSystemData.json')
 										settings.controls._dollySpeedMin
 									);
 									orrery.controls.dollyOut(orrery.cameraState._dollySpeed);
+								} else {
+									orrery.controls.target = orrery.mouseState._zoomedClass.labelGroup.getWorldPosition(vectorPosition);
 								}
 							}
 						}
@@ -1084,10 +1141,16 @@ fetch('./solarSystemData.json')
 						// making sure to account for -ve numbers, so can reverse orbits based on time if needed
 						this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
 
-						// TODO: recheck this
+						// TODO: it should ease into different time shift types
 						if (this.timeShiftTypeCurrentIndex !== 0) {
-							for (let i = 0; i < orrery.classes._allIterableLength; i++) {
-								orrery.classes._allIterable[i].iteratePosition();
+							if (this.timeShiftSystemOnly) {
+								for (let i = 0; i < orrery.classes._moonsIterable.length; i++) {
+									orrery.classes._moonsIterable[i].iteratePosition();
+								}
+							} else {
+								for (let i = 0; i < orrery.classes._allIterableLength; i++) {
+									orrery.classes._allIterable[i].iteratePosition();
+								}
 							}
 						}
 
