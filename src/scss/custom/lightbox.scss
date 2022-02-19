@@ -1,10 +1,57 @@
 .vib-container {
+	display: flex;
+	flex-flow: column nowrap;
+
+	.vib-thumbnail-wrapper {
+		position: static;
+	}
+
+	.vib-content {
+		width: 100%;
+		flex-grow: 1;
+		display: flex;
+		align-items: center;
+	}
+
+	.spinner-border-container {
+		position: absolute;
+		opacity: 0.5;
+	}
+
 	.vib-image {
-		max-height: 80vh;
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 100%;
 		cursor: default;
+
+		.vib-copyright {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			padding: 5px 10px;
+			color: $white;
+			background-color: rgba($black, 0.75);
+		}
+
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+	}
+
+	.vib-arrow {
+		top: auto;
+		margin-top: 0;
 	}
 
 	.vib-footer {
+		position: static;
 		background-color: rgba($black, 0.8);
 
 		@include media-breakpoint-between(0, sm) {
@@ -28,5 +75,10 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 		}
+	}
+
+	.vib-close {
+		background-color: rgba($black, 0.75);
+		border-bottom-left-radius: 0;
 	}
 }

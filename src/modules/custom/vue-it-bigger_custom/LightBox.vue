@@ -305,40 +305,6 @@ export default {
 			@beforeLeave="disableImageTransition"
 		>
 			<div v-if="media && media.length > 0" v-show="lightBoxShown" ref="container" class="vib-container">
-				<div class="vib-content" @click.stop>
-					<transition mode="out-in" :name="imageTransitionName">
-						<img
-							v-if="currentMedia.type == undefined || currentMedia.type == 'image'"
-							:key="currentMedia.src"
-							:src="currentMedia.src"
-							:srcset="currentMedia.srcset || ''"
-							class="vib-image"
-							:alt="currentMedia.caption"
-						/>
-						<div v-else-if="media[select].type == 'youtube'" class="video-background">
-							<iframe
-								:src="'https://www.youtube.com/embed/' + media[select].id + '?showinfo=0'"
-								width="560"
-								height="315"
-								frameborder="0"
-								allowfullscreen
-							/>
-						</div>
-						<video
-							v-else-if="currentMedia.type == 'video'"
-							:key="currentMedia.sources[0].src"
-							ref="video"
-							controls
-							:width="currentMedia.width"
-							:height="currentMedia.height"
-							:autoplay="currentMedia.autoplay"
-						>
-							<source v-for="source in currentMedia.sources" :key="source.src" :src="source.src" :type="source.type" />
-						</video>
-					</transition>
-				</div>
-				<!-- .vib-content -->
-
 				<div
 					v-if="showThumbs"
 					class="vib-thumbnail-wrapper vib-hideable"
@@ -361,6 +327,23 @@ export default {
 					</div>
 				</div>
 				<!-- .vib-thumbnail-wrapper -->
+
+				<div class="spinner-border-container">
+					<div class="spinner-border"></div>
+				</div>
+
+				<div class="vib-content" @click.stop>
+					<transition mode="out-in" :name="imageTransitionName">
+						<div v-if="currentMedia.type == undefined || currentMedia.type == 'image'" class="vib-image">
+							<picture>
+								<!-- API doesn't always have 'small' images... -->
+								<!-- <source v-if="currentMedia.srcset" media="(min-width: 768px)" :srcset="currentMedia.srcset" /> -->
+								<img :key="currentMedia.src" :src="currentMedia.src" :alt="currentMedia.caption" />
+							</picture>
+							<div class="vib-copyright">{{ currentMedia.copyright }}</div>
+						</div>
+					</transition>
+				</div>
 
 				<div
 					class="vib-footer vib-hideable"

@@ -653,7 +653,7 @@ fetch('./solarSystemData.json')
 								: '';
 
 							for (const item of response.result.collection.items) {
-								const { title, description, photographer, nasa_id } = item.data[0]; // not sure why it's an array in the returned data
+								const { title, description, nasa_id, secondary_creator } = item.data[0]; // not sure why it's an array in the returned data
 								const thumb = item.links[0].href;
 
 								const mediaThumbnail = { title, thumb };
@@ -671,7 +671,8 @@ fetch('./solarSystemData.json')
 									type: 'image',
 									thumb,
 									src: `https://images-assets.nasa.gov/image/${nasa_id}/${nasa_id}~orig.jpg`,
-									caption: formattedDetails || title
+									caption: formattedDetails || title,
+									copyright: secondary_creator
 								});
 							}
 						});
