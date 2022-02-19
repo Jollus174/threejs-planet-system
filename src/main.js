@@ -921,7 +921,7 @@ fetch('./solarSystemData.json')
 
 					// TODO: These should be moved to a JS file that sets generic listeners
 					document.addEventListener('click', (e) => {
-						if (!e.target.closest('#search')) {
+						if (!e.target.closest('[data-selector="search"]')) {
 							this.resetSearch();
 						}
 
