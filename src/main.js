@@ -25,7 +25,7 @@ import { customEventNames } from './modules/events/customEvents';
 import { evRenderPause, evRenderStart } from './modules/events/events';
 
 import Vue from 'vue/dist/vue.js';
-import LightBox from 'vue-it-bigger';
+import LightBox from './modules/custom/vue-it-bigger_custom/LightBox.vue';
 import { format, add, differenceInHours } from 'date-fns';
 
 window.settings = settings;
