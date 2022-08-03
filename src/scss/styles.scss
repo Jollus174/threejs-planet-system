@@ -29,7 +29,6 @@
 @import "../node_modules/fontawesome-free/scss/brands";
 
 /*! purgecss start ignore */
-@import "../node_modules/vue-it-bigger/dist/vue-it-bigger.min.css";
 
 @import "custom/skeleton";
 @import "custom/lightbox";
@@ -60,6 +59,10 @@
 
 body {
 	background-color: #000;
+
+	@include media-breakpoint-down(lg) {
+		user-select: none;
+	}
 }
 
 main {
