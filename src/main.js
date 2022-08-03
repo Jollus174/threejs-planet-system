@@ -223,7 +223,7 @@ fetch('./solarSystemData.json')
 					modelMoonGroups: {},
 					tabGroup: 'tab-stats', // TODO: set this to Wikipedia by default
 					vueRandomString: randomString(8),
-					timeShiftTypes: { minutes: 0, hours: 0, days: 0, months: 0 },
+					timeShiftTypes: { hours: 0, days: 0, months: 0 },
 					timeShiftTypeCurrentIndex: 0,
 					dateTimeCurrent: new Date(),
 					timeShiftSystemOnly: false,
@@ -350,11 +350,9 @@ fetch('./solarSystemData.json')
 						}
 					},
 					timeShiftReset() {
-						Object.keys(this.timeShiftTypes).forEach((timeShiftType) => (this.timeShiftTypes[timeShiftType] = 0));
+						for (const timeShiftType of Object.keys(this.timeShiftTypes)) this.timeShiftTypes[timeShiftType] = 0;
 						// TODO: This should be an event that each one is listening for!
-						for (const entity of orrery.classes._allIterable) {
-							entity.resetLabelGroupPosition();
-						}
+						for (const entity of orrery.classes._allIterable) entity.resetLabelGroupPosition();
 					},
 					timeShiftStop() {
 						this.timeShiftTypeCurrentIndex = 0;
