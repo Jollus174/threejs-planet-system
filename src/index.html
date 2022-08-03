@@ -62,8 +62,7 @@
 											class="form-control input-search"
 											type="seach"
 											placeholder="Search"
-											v-model="searchQuery"
-											@keyup.enter="updateZoomTarget(searchResults[0].data)"
+											@keyup="(e) => updateSearchQuery(e)"
 										/>
 									</div>
 								</div>
@@ -79,9 +78,8 @@
 								class="d-lg-none form-control input-search-mobile"
 								type="seach"
 								placeholder="Search"
-								v-model="searchQuery"
 								:class="{'active': showSearchMobile}"
-								@keyup.enter="updateZoomTarget(searchResults[0].data)"
+								@keyup="(e) => updateSearchQuery(e)"
 							/>
 						</div>
 						<!-- TODO: Get links working and remove the '.prevent' -->
@@ -498,7 +496,10 @@
 												</div>
 												<div v-else-if="clickedClassData.media.hasError">
 													<div class="alert alert-warning" role="alert">
-														<p v-for="error in clickedClassData.media.errors.map(err => err.message)" v-text="error"></p>
+														<p
+															v-for="error in clickedClassData.media.errors.map(err => err.message)"
+															v-text="error"
+														></p>
 														<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
 													</div>
 												</div>

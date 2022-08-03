@@ -879,6 +879,17 @@ fetch('./solarSystemData.json')
 						document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: clickedClass }));
 					},
 
+					// using V-model is a no-go on Android due to compositions
+					// https://github.com/vuejs/vue/issues/9777
+					updateSearchQuery(e) {
+						if (e.key === 'Enter') {
+							this.updateZoomTarget(this.searchResults[0].data);
+							e.target.value = '';
+						} else {
+							this.searchQuery = e.target.value;
+						}
+					},
+
 					updateZoomTarget(data) {
 						const clickedClass = orrery.classes._all[data.id];
 						orrery.mouseState._clickedClass = clickedClass; // updating _clickedClass here to trigger the _zoomedClass change
