@@ -90,7 +90,7 @@
 								<li v-for="(result, i) in searchResults">
 									<a :href="'/#/' + result.data.id" @click.prevent="updateZoomTarget(result.data)">
 										<span v-html="result.data.displayName"></span>
-										<sub class="text-type">{{ result.data.bodyType }}</sub>
+										<sub class="text-type" v-text="result.data.bodyType"></sub>
 									</a>
 								</li>
 								<li v-if="searchResults && !searchResults.length">
@@ -123,8 +123,8 @@
 										<i class="fas fa-angle-left"></i>
 									</button>
 									<div class="title-wrapper">
-										<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
-										<span class="text-type">{{ clickedClassData.bodyType }}</span>
+										<h3 class="h3 text-entity-color" v-text="clickedClassData.displayName"></h3>
+										<span class="text-type" v-text="clickedClassData.bodyType"></span>
 									</div>
 									<button type="button" class="btn" @click="goToNextEntity()">
 										<i class="fas fa-angle-right"></i>
@@ -136,30 +136,34 @@
 											<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
 												<div class="key-data">
 													<span class="heading">Distance</span>
-													<span class="label-color">{{ distanceFromParentEntity.value }}</span>
-													<sub>{{ distanceFromParentEntity.unit }}</sub>
+													<span class="label-color" v-text="distanceFromParentEntity.value"></span>
+													<sub v-text="distanceFromParentEntity.unit"></sub>
 												</div>
 											</div>
 											<div class="col-4">
 												<div class="key-data">
 													<span class="heading">Mean Radius</span>
-													<span class="label-color">{{ distanceConverter(clickedClassData.meanRadius).value }}</span>
-													<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+													<span
+														class="label-color"
+														v-text="distanceConverter(clickedClassData.meanRadius).value"
+													></span>
+													<sub v-text="distanceConverter(clickedClassData.meanRadius).unit"></sub>
 												</div>
 											</div>
 											<div class="col-4" v-if="clickedClassData.sideralOrbit">
 												<div class="key-data">
 													<span class="heading">Orbit Time</span>
-													<span class="label-color"
-														>{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}</span
-													>
-													<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+													<span
+														class="label-color"
+														v-text="timeConversion(clickedClassData.sideralOrbit, 'days').value"
+													></span>
+													<sub v-text="timeConversion(clickedClassData.sideralOrbit, 'days').unit"></sub>
 												</div>
 											</div>
 											<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
 												<div class="key-data">
 													<span class="heading">Moon Group</span>
-													<span class="label-color">{{ clickedClassData.moonGroup }}</span>
+													<span class="label-color" v-text="clickedClassData.moonGroup"></span>
 												</div>
 											</div>
 										</div>
@@ -178,9 +182,10 @@
 												></div>
 												<div v-else-if="clickedClassData.description.hasError">
 													<div class="alert alert-warning" role="alert">
-														<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
-															{{ error }}
-														</p>
+														<p
+															v-for="error in clickedClassData.description.errors.map(err => err.message)"
+															v-text="error"
+														></p>
 														<button type="button" class="btn btn-primary" @click="getWikipediaData">Try again</button>
 													</div>
 												</div>
@@ -250,7 +255,7 @@
 																		@mouseleave="entityUnhovered(systemClassData)"
 																	>
 																		<th scope="row">
-																			<span>{{ systemClassData.displayName }}</span>
+																			<span v-text="systemClassData.displayName"></span>
 																			<div class="status-wrapper">
 																				<label data-selector="targeted">
 																					<img src="/img/icon-crosshair.svg" preload />
@@ -492,7 +497,7 @@
 												</div>
 												<div v-else-if="clickedClassData.media.hasError">
 													<div class="alert alert-warning" role="alert">
-														<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
+														<p v-for="error in clickedClassData.media.errors.map(err => err.message)" v-text="error"></p>
 														<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
 													</div>
 												</div>
@@ -589,9 +594,11 @@
 										@click="timeShiftBackwards()"
 									>
 										<i class="fas fa-backward"></i>
-										<span class="badge" v-if="timeShiftTypeCurrentIndex < 0"
-											>{{ Math.abs(timeShiftTypeCurrentIndex) }}</span
-										>
+										<span
+											class="badge"
+											v-if="timeShiftTypeCurrentIndex < 0"
+											v-text="Math.abs(timeShiftTypeCurrentIndex)"
+										></span>
 									</button>
 									<button
 										type="button"
@@ -608,7 +615,7 @@
 										@click="timeShiftForwards()"
 									>
 										<i class="fas fa-forward"></i>
-										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0">{{ timeShiftTypeCurrentIndex }}</span>
+										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0" v-text="timeShiftTypeCurrentIndex"></span>
 									</button>
 									<button type="button" class="btn btn-rounded" @click="timeShiftReset()">
 										<i class="fas fa-redo-alt"></i>
