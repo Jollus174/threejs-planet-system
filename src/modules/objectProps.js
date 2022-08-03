@@ -345,6 +345,7 @@ class Entity {
 			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
 			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
 			transparent: false,
+			side: this.materialData.side || THREE.FrontSide,
 			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
 			emissive: this.materialData.emissive || null,
 			emissiveIntensity: this.materialData.emissiveIntensity || null
@@ -366,7 +367,7 @@ class Entity {
 		const ringMaterial = {
 			map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
 			normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
-			transparent: false,
+			transparent: true,
 			emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
 			emissive: ring.emissive || null,
 			emissiveIntensity: ring.emissiveIntensity || null,
