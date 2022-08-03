@@ -432,7 +432,8 @@ const setRings = (item) => {
 		_saturn: [
 			{
 				inner: 66900,
-				outer: 140220,
+				// outer: 140220,
+				outer: 180220, // looks more rad
 				tilt: null
 			}
 		]

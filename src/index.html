@@ -476,7 +476,8 @@
 														>
 															<figure>
 																<a class="media" href="#" @click="openGallery(i)">
-																	<img :src="item.thumb" width="100%" :alt="item.title" />
+																	<!-- If NASA start including alt text for their images, then so will I -->
+																	<img :src="item.thumb" width="100%" alt="" />
 																	<div class="overlay" v-html="item.title"></div>
 																</a>
 															</figure>

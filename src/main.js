@@ -331,12 +331,11 @@ fetch('./solarSystemData.json')
 					},
 
 					dateTimeText() {
-						const time = format(this.dateTimeShifted, `HH:mm:ss`);
 						const days = format(this.dateTimeShifted, 'dd');
 						const months = format(this.dateTimeShifted, 'MMM');
 						const years = format(this.dateTimeShifted, 'yyyy');
 
-						return `<time class="time">${time}</time> / <time class="days">${days}</time> / <time class="months">${months}</time> / <time class="years">${years}</time>`;
+						return `<time class="days">${days}</time> / <time class="months">${months}</time> / <time class="years">${years}</time>`;
 					}
 				},
 				methods: {

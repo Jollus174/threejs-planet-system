@@ -37,7 +37,7 @@ class OrbitLine {
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
-		this.amountOfOrbitToDraw = 180; // 360 means full circle
+		this.amountOfOrbitToDraw = 270; // 360 means full circle
 	}
 
 	drawLine(iterator) {
@@ -220,9 +220,9 @@ class Entity {
 		this.OrbitLine.build();
 
 		// if (!this.isVisible) {
-			this.isVisible = true;
-			this.labelLink.style.pointerEvents = '';
-			this.isBuilt = true;
+		this.isVisible = true;
+		this.labelLink.style.pointerEvents = '';
+		this.isBuilt = true;
 		// }
 
 		await this.createEntityMesh().then(() => {
