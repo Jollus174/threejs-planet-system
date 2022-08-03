@@ -20,7 +20,7 @@ const calculateOrbit = (index, data, parentPlanetData) => {
 	const i = MathUtils.degToRad(data.inclination);
 
 	// iterating for accuracy
-	let E = M + e * Math.sin(M) * (1.0 + e * Math.cos(M));
+	let E = M + e * Math.sin(M) * (1 + e * Math.cos(M));
 	E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
 	E = E - (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
 

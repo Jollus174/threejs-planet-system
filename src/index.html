@@ -56,14 +56,13 @@
 									>
 										<i class="fas fa-search"></i>
 									</button>
-									<div id="search" class="search d-none d-lg-block">
+									<div data-selector="search" class="search d-none d-lg-block">
 										<i class="fas fa-search"></i>
 										<input
 											class="form-control input-search"
 											type="seach"
 											placeholder="Search"
-											v-model="searchQuery"
-											@keyup.enter="updateZoomTarget(searchResults[0].data)"
+											@keyup="(e) => updateSearchQuery(e)"
 										/>
 									</div>
 								</div>
@@ -73,15 +72,14 @@
 				</div>
 				<div class="ui-centre">
 					<div class="search-results-container">
-						<div id="search-results-mobile" class="search-results">
+						<div data-selector="search" class="search-results">
 							<input
 								id="input-search-mobile"
 								class="d-lg-none form-control input-search-mobile"
 								type="seach"
 								placeholder="Search"
-								v-model="searchQuery"
 								:class="{'active': showSearchMobile}"
-								@keyup.enter="updateZoomTarget(searchResults[0].data)"
+								@keyup="(e) => updateSearchQuery(e)"
 							/>
 						</div>
 						<!-- TODO: Get links working and remove the '.prevent' -->
@@ -90,7 +88,7 @@
 								<li v-for="(result, i) in searchResults">
 									<a :href="'/#/' + result.data.id" @click.prevent="updateZoomTarget(result.data)">
 										<span v-html="result.data.displayName"></span>
-										<sub class="text-type">{{ result.data.bodyType }}</sub>
+										<sub class="text-type" v-text="result.data.bodyType"></sub>
 									</a>
 								</li>
 								<li v-if="searchResults && !searchResults.length">
@@ -123,8 +121,8 @@
 										<i class="fas fa-angle-left"></i>
 									</button>
 									<div class="title-wrapper">
-										<h3 class="h3 text-entity-color">{{ clickedClassData.displayName }}</h3>
-										<span class="text-type">{{ clickedClassData.bodyType }}</span>
+										<h3 class="h3 text-entity-color" v-text="clickedClassData.displayName"></h3>
+										<span class="text-type" v-text="clickedClassData.bodyType"></span>
 									</div>
 									<button type="button" class="btn" @click="goToNextEntity()">
 										<i class="fas fa-angle-right"></i>
@@ -136,30 +134,34 @@
 											<div class="col-4" v-if="clickedClassData.bodyType !== 'Star'">
 												<div class="key-data">
 													<span class="heading">Distance</span>
-													<span class="label-color">{{ distanceFromParentEntity.value }}</span>
-													<sub>{{ distanceFromParentEntity.unit }}</sub>
+													<span class="label-color" v-text="distanceFromParentEntity.value"></span>
+													<sub v-text="distanceFromParentEntity.unit"></sub>
 												</div>
 											</div>
 											<div class="col-4">
 												<div class="key-data">
 													<span class="heading">Mean Radius</span>
-													<span class="label-color">{{ distanceConverter(clickedClassData.meanRadius).value }}</span>
-													<sub>{{ distanceConverter(clickedClassData.meanRadius).unit }}</sub>
+													<span
+														class="label-color"
+														v-text="distanceConverter(clickedClassData.meanRadius).value"
+													></span>
+													<sub v-text="distanceConverter(clickedClassData.meanRadius).unit"></sub>
 												</div>
 											</div>
 											<div class="col-4" v-if="clickedClassData.sideralOrbit">
 												<div class="key-data">
 													<span class="heading">Orbit Time</span>
-													<span class="label-color"
-														>{{ timeConversion(clickedClassData.sideralOrbit, 'days').value }}</span
-													>
-													<sub>{{ timeConversion(clickedClassData.sideralOrbit, 'days').unit }}</sub>
+													<span
+														class="label-color"
+														v-text="timeConversion(clickedClassData.sideralOrbit, 'days').value"
+													></span>
+													<sub v-text="timeConversion(clickedClassData.sideralOrbit, 'days').unit"></sub>
 												</div>
 											</div>
 											<div class="col-4 d-none d-lg-block" v-if="clickedClassData.moonGroup">
 												<div class="key-data">
 													<span class="heading">Moon Group</span>
-													<span class="label-color">{{ clickedClassData.moonGroup }}</span>
+													<span class="label-color" v-text="clickedClassData.moonGroup"></span>
 												</div>
 											</div>
 										</div>
@@ -178,9 +180,10 @@
 												></div>
 												<div v-else-if="clickedClassData.description.hasError">
 													<div class="alert alert-warning" role="alert">
-														<p v-for="error in clickedClassData.description.errors.map(err => err.message)">
-															{{ error }}
-														</p>
+														<p
+															v-for="error in clickedClassData.description.errors.map(err => err.message)"
+															v-text="error"
+														></p>
 														<button type="button" class="btn btn-primary" @click="getWikipediaData">Try again</button>
 													</div>
 												</div>
@@ -250,7 +253,7 @@
 																		@mouseleave="entityUnhovered(systemClassData)"
 																	>
 																		<th scope="row">
-																			<span>{{ systemClassData.displayName }}</span>
+																			<span v-text="systemClassData.displayName"></span>
 																			<div class="status-wrapper">
 																				<label data-selector="targeted">
 																					<img src="/img/icon-crosshair.svg" preload />
@@ -471,7 +474,8 @@
 														>
 															<figure>
 																<a class="media" href="#" @click="openGallery(i)">
-																	<img :src="item.thumb" width="100%" :alt="item.title" />
+																	<!-- If NASA start including alt text for their images, then so will I -->
+																	<img :src="item.thumb" width="100%" alt="" />
 																	<div class="overlay" v-html="item.title"></div>
 																</a>
 															</figure>
@@ -492,7 +496,10 @@
 												</div>
 												<div v-else-if="clickedClassData.media.hasError">
 													<div class="alert alert-warning" role="alert">
-														<p v-for="error in clickedClassData.media.errors.map(err => err.message)">{{ error }}</p>
+														<p
+															v-for="error in clickedClassData.media.errors.map(err => err.message)"
+															v-text="error"
+														></p>
 														<button type="button" class="btn btn-primary" @click="getNASAMediaData">Try again</button>
 													</div>
 												</div>
@@ -589,9 +596,11 @@
 										@click="timeShiftBackwards()"
 									>
 										<i class="fas fa-backward"></i>
-										<span class="badge" v-if="timeShiftTypeCurrentIndex < 0"
-											>{{ Math.abs(timeShiftTypeCurrentIndex) }}</span
-										>
+										<span
+											class="badge"
+											v-if="timeShiftTypeCurrentIndex < 0"
+											v-text="Math.abs(timeShiftTypeCurrentIndex)"
+										></span>
 									</button>
 									<button
 										type="button"
@@ -608,11 +617,29 @@
 										@click="timeShiftForwards()"
 									>
 										<i class="fas fa-forward"></i>
-										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0">{{ timeShiftTypeCurrentIndex }}</span>
+										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0" v-text="timeShiftTypeCurrentIndex"></span>
 									</button>
 									<button type="button" class="btn btn-rounded" @click="timeShiftReset()">
 										<i class="fas fa-redo-alt"></i>
 									</button>
+
+									<button
+										type="button"
+										class="btn btn-rounded"
+										:class="{'active': timeShiftSystemOnly}"
+										@click="toggleTimeShiftSystemOnly()"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width: 18px; margin-top: -4px">
+											<ellipse style="fill: none; stroke-width: 27px" cx="255.372" cy="253.904" rx="238.5" ry="238.5" />
+											<path
+												d="M 507.372 253.904 C 507.372 322.522 478.424 387.234 433.563 432.095 C 388.702 476.956 323.99 505.904 255.372 505.904 C 186.754 505.904 122.042 476.956 77.181 432.095 C 32.32 387.234 3.372 322.522 3.372 253.904 C 3.372 207.986 16.335 163.817 38.355 126.175 C 44.216 133.035 51.166 138.935 58.939 143.607 C 40.56 175.993 30.372 213.164 30.372 253.904 C 30.372 317.006 54.814 371.544 96.273 413.003 C 137.732 454.462 192.27 478.904 255.372 478.904 C 318.474 478.904 373.012 454.462 414.471 413.003 C 455.93 371.544 480.372 317.006 480.372 253.904 C 480.372 190.802 455.93 136.264 414.471 94.805 C 373.012 53.346 318.474 28.904 255.372 28.904 C 228.559 28.904 203.293 33.317 179.919 41.573 C 176.62 33.097 171.98 25.292 166.258 18.418 C 194.186 7.809 224.381 1.904 255.372 1.904 C 323.99 1.904 388.702 30.852 433.563 75.713 C 478.424 120.574 507.372 185.286 507.372 253.904 Z"
+												style="fill: currentColor"
+											/>
+											<ellipse style="fill: currentColor" cx="250.399" cy="250.133" rx="121.032" ry="121.032" />
+											<ellipse style="fill: currentColor" cx="101.226" cy="71.152" rx="52.814" ry="52.814" />
+										</svg>
+									</button>
+
 									<span class="date-time" v-html="dateTimeText"></span>
 								</div>
 							</div>

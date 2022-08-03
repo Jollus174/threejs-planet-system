@@ -5,7 +5,7 @@ import { EffectComposer } from 'postprocessing';
 const renderer = new WebGLRenderer({
 	// powerPreference: 'high-performance',
 	// powerPreference: 'low-power',
-	antialias: true,
+	// antialias: true,
 	logarithmicDepthBuffer: true
 });
 

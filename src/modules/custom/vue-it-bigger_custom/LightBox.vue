@@ -164,11 +164,6 @@ export default {
 		this.onToggleLightBox(this.lightBoxShown);
 
 		if (this.$refs.container) {
-			const hammer = new Hammer(this.$refs.container);
-
-			hammer.on('swiperight', this.previousImage);
-			hammer.on('swipeleft', this.nextImage);
-
 			this.$refs.container.addEventListener('mousedown', this.handleMouseActivity);
 			this.$refs.container.addEventListener('mousemove', this.handleMouseActivity);
 			this.$refs.container.addEventListener('touchmove', this.handleMouseActivity);
@@ -410,5 +405,3 @@ export default {
 		</transition>
 	</div>
 </template>
-
-<style src="./style.css"></style>
