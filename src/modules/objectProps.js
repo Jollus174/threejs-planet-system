@@ -502,14 +502,15 @@ class Planet extends Entity {
 		}
 
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
-		const planetIsTargeted =
-			orrery.mouseState._zoomedClass &&
-			(orrery.mouseState._zoomedClass.data.id === this.data.id ||
-				(this.planetClass && this.planetClass.data.id === this.data.id));
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + planetRangeThreshold;
+		const planetIsTargeted = orrery.mouseState._zoomedClass && orrery.mouseState._zoomedClass.data.id === this.data.id;
+		const planetMoonIsTargeted =
+			orrery.mouseState._zoomedClass &&
+			orrery.mouseState._zoomedClass.planetClass &&
+			orrery.mouseState._zoomedClass.planetClass.data.id === this.data.id;
 
 		if (cameraZoomedToPlanet) {
-			if (planetIsTargeted && !this.isZoomedToPlanet) {
+			if (!this.isZoomedToPlanet && (planetIsTargeted || planetMoonIsTargeted)) {
 				this.createCSSLabel(); // in case it was removed via a moon selection
 				this.isZoomedToPlanet = true; // to prevent multiple executions
 				// this.labelGroup.visible = true;
