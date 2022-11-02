@@ -770,7 +770,7 @@ fetch('./solarSystemData.json')
 								return {
 									id: result.id,
 									index: this.navigationEntities.indexOf(result.id),
-									displayName: this.highlightMatchSubstring(result.displayName),
+									displayName: result.displayName,
 									bodyType: result.bodyType,
 									system: result.system
 								};
