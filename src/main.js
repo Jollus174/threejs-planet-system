@@ -859,6 +859,8 @@ fetch('./solarSystemData.json')
 
 					resetSearch() {
 						this.searchQuery = '';
+						for (const searchInput of [...document.querySelectorAll('[data-selector="search"] input')])
+							searchInput.value = '';
 					},
 
 					showOrHideMobileSearch() {
