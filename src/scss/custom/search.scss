@@ -63,9 +63,12 @@
 			white-space: nowrap;
 			text-overflow: ellipsis;
 
+			&.text-name {
+				color: rgba($white, 0.8);
+			}
+
 			&.highlight {
 				color: $white;
-				text-shadow: 0 0 3px rgba($white, 0.5);
 			}
 		}
 	}

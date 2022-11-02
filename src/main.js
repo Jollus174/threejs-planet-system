@@ -770,7 +770,7 @@ fetch('./solarSystemData.json')
 								return {
 									id: result.id,
 									index: this.navigationEntities.indexOf(result.id),
-									displayName: this.highlightMatchSubstring(result.displayName),
+									displayName: result.displayName,
 									bodyType: result.bodyType,
 									system: result.system
 								};
@@ -859,6 +859,8 @@ fetch('./solarSystemData.json')
 
 					resetSearch() {
 						this.searchQuery = '';
+						for (const searchInput of [...document.querySelectorAll('[data-selector="search"] input')])
+							searchInput.value = '';
 					},
 
 					showOrHideMobileSearch() {
