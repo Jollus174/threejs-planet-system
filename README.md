@@ -1,4 +1,3 @@
-
 # The Orrery
 
 ![Orrery Screenshot](orrery-screenshot.jpg)
@@ -11,6 +10,7 @@ These are rendered to a `<canvas>` using ThreeJS. Some parsing is done to the da
 Vite is utilised for the front-end build process, and Vue2 is leveraged to render the UI elements.
 
 The Orrery currently lists **231 celestial entities** in the Solar System, including:
+
 - 1 Sun
 - 8 Planets
 - 216 Moons
@@ -19,6 +19,7 @@ The Orrery currently lists **231 celestial entities** in the Solar System, inclu
 Clicking on an entity will retrieve Wikipedia information via the [Wikipedia API](https://www.mediawiki.org/wiki/API:Main_page), and NASA information via the [NASA images API](https://images.nasa.gov/).
 
 ## Running the project
+
 ```bash
   git clone https://github.com/Jollus174/threejs-planet-system.git
 ```
@@ -38,7 +39,7 @@ Install dependencies
 Start the server
 
 ```bash
-  npm run start
+  npm run dev
 ```
 
 ## Building the project
