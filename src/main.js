@@ -793,7 +793,6 @@ fetch('./solarSystemData.json')
 						// checking to see if entity in prev system was already previously selected
 						const prevSystemKey = systemKeys[prevIndex];
 						const prevSystem = orrery.classes._all[prevSystemKey];
-						this.updateEntity(prevSystem.data);
 						this.updateZoomTarget(prevSystem.data);
 					},
 
@@ -807,7 +806,6 @@ fetch('./solarSystemData.json')
 						// checking to see if entity in next system was already previously selected
 						const nextSystemKey = systemKeys[nextIndex];
 						const nextSystem = orrery.classes._all[nextSystemKey];
-						this.updateEntity(nextSystem.data);
 						this.updateZoomTarget(nextSystem.data);
 					},
 
@@ -816,7 +814,6 @@ fetch('./solarSystemData.json')
 						const currentIndex = keys.indexOf(this.clickedClassData.id);
 						const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
 						const prevEntity = orrery.classes._all[keys[prevIndex]];
-						this.updateEntity(prevEntity.data);
 						this.updateZoomTarget(prevEntity.data);
 					},
 
@@ -825,7 +822,6 @@ fetch('./solarSystemData.json')
 						const currentIndex = keys.indexOf(this.clickedClassData.id);
 						const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
 						const nextEntity = orrery.classes._all[keys[nextIndex]];
-						this.updateEntity(nextEntity.data);
 						this.updateZoomTarget(nextEntity.data);
 					},
 
