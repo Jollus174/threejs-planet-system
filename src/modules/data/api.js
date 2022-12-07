@@ -96,7 +96,13 @@ const sortData = (data) => {
 		if (entity.moons && entity.moons.length) {
 			const eMoons = entity.moons
 				.map((eMoon) => moons.find((m) => m.id === eMoon.moon))
-				.sort((a, b) => (a.moonGroupIndex > b.moonGroupIndex ? 1 : -1));
+				// sorting by moonGroupIndex, then by distance from planet
+				.sort((a, b) => {
+					if (a.moonGroupIndex > b.moonGroupIndex) return 1;
+					if (a.moonGroupIndex < b.moonGroupIndex) return -1;
+					if (a.semimajorAxis > b.semimajorAxis) return 1;
+					if (a.semimajorAxis < b.semimajorAxis) return -1;
+				});
 			entity.moons = eMoons;
 		}
 	};
