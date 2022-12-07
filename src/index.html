@@ -618,6 +618,7 @@
 									<button
 										type="button"
 										class="btn btn-rounded"
+										title="Shift Time Backwards"
 										:disabled="timeShiftTypeCurrentIndex === -4"
 										@click="timeShiftBackwards()"
 									>
@@ -631,6 +632,7 @@
 									<button
 										type="button"
 										class="btn btn-rounded"
+										title="Stop Time"
 										:disabled="timeShiftTypeCurrentIndex === 0"
 										@click="timeShiftStop()"
 									>
@@ -639,19 +641,21 @@
 									<button
 										type="button"
 										class="btn btn-rounded"
+										title="Shift Time Forwards"
 										:disabled="timeShiftTypeCurrentIndex === 4"
 										@click="timeShiftForwards()"
 									>
 										<i class="fas fa-forward"></i>
 										<span class="badge" v-if="timeShiftTypeCurrentIndex > 0" v-text="timeShiftTypeCurrentIndex"></span>
 									</button>
-									<button type="button" class="btn btn-rounded" @click="timeShiftReset()">
+									<button type="button" class="btn btn-rounded" title="Reset Time" @click="timeShiftReset()">
 										<i class="fas fa-redo-alt"></i>
 									</button>
 
 									<button
 										type="button"
 										class="btn btn-rounded"
+										title="Lock Planets"
 										:class="{'active': timeShiftSystemOnly}"
 										@click="toggleTimeShiftSystemOnly()"
 									>
