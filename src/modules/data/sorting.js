@@ -1,7 +1,6 @@
 'use strict';
-import { convertToId } from '../utilities/strings';
+import { convertToId, convertToKebabCase, hsl } from '../utilities/strings';
 import { currentDateTime } from '../utilities/time';
-import { hsl } from '../utilities/strings';
 import { getRandomArbitrary } from '../utilities/numeric';
 import { wikipediaKeys } from './wikipediaKeys';
 
@@ -485,12 +484,17 @@ const setWikipediaKeys = (item) => {
 	item.wikipediaKey = wikipediaKeys.find((w) => w.id === item.id).wikipediaKey;
 };
 
+const setSidebarImage = (item) => {
+	item.sidebarImage = `/img/sidebar-images/${convertToKebabCase(item.id.replace('_', ''))}.jpg`;
+};
+
 export {
 	addToMoonGroup,
 	isInnerPlanet,
 	setRings,
 	setOrbitCalculations,
 	setWikipediaKeys,
+	setSidebarImage,
 	generalUpdates,
 	idReplacements
 };

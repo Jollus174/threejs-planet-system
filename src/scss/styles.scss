@@ -10,6 +10,7 @@
 @import "../node_modules/bootstrap/scss/root";
 @import "../node_modules/bootstrap/scss/reboot";
 @import "../node_modules/bootstrap/scss/grid";
+@import "../node_modules/bootstrap/scss/helpers/visually-hidden";
 @import "../node_modules/bootstrap/scss/utilities";
 @import "../node_modules/bootstrap/scss/containers";
 @import "../node_modules/bootstrap/scss/modal";
@@ -32,6 +33,8 @@
 
 @import "custom/skeleton";
 @import "custom/lightbox";
+
+@import "custom/utilities";
 
 @import "custom/breakpoints";
 @import "custom/z";

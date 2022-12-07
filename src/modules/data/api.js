@@ -13,6 +13,7 @@ import {
 	setOrbitCalculations,
 	setRings,
 	setWikipediaKeys,
+	setSidebarImage,
 	idReplacements
 } from './sorting';
 
@@ -76,6 +77,7 @@ const sortData = (data) => {
 		setRings(item);
 		setOrbitCalculations(item);
 		setWikipediaKeys(item);
+		setSidebarImage(item);
 	}
 
 	orrery.bodies._all = [...englishifiedData];

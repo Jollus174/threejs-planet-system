@@ -37,7 +37,7 @@ class OrbitLine {
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
-		this.amountOfOrbitToDraw = 270; // 360 means full circle
+		this.amountOfOrbitToDraw = this.data.bodyType === 'Moon' ? 180 : 330; // 360 means full circle
 	}
 
 	drawLine(iterator) {
@@ -223,9 +223,8 @@ class Entity {
 		this.isVisible = true;
 		this.labelLink.style.pointerEvents = '';
 		this.isBuilt = true;
-		// }
 
-		await this.createEntityMesh().then(() => {
+		await this.renderEntityMesh().then(() => {
 			return this;
 		});
 	}
@@ -396,7 +395,7 @@ class Entity {
 
 	// TODO: set distance checker to fade label when zoomed in
 
-	async createEntityMesh() {
+	async renderEntityMesh() {
 		if (!this.materialData) return this;
 		const mesh = await this.constructEntityMesh();
 		this.meshGroup.add(mesh);
@@ -624,7 +623,7 @@ class Sun extends Entity {
 		return entityMesh;
 	}
 
-	async createEntityMesh() {
+	async renderEntityMesh() {
 		this.labelGroup.visible = true;
 
 		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
@@ -700,7 +699,7 @@ class Moon extends Entity {
 		this.OrbitLine.build();
 
 		if (!this.meshGroup.children.length) {
-			this.createEntityMesh();
+			this.renderEntityMesh();
 		} else {
 			this.meshGroup.visible = true;
 		}

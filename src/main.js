@@ -213,13 +213,13 @@ fetch('./solarSystemData.json')
 					navigationSystems: settings.navigationSystems,
 					navigationEntities: settings.navigationEntities,
 					showSearchMobile: false,
-					bottomBar: {},
 					clickedClassData: orrery.classes._all._sun.data,
 					zoomedClassData: null,
 					sidebarMobileHeight: 400,
 					sidebarDesktopWidth: 600,
 					systemClassData: orrery.classes._all._sun.data,
 					modelSystemSelection: {}, // for keeping track of what's selected between systems
+					modelSidebarImages: {}, // for keeping track of which images have been loaded, so can apply a loading spinner if needed
 					modelMoonGroups: {},
 					tabGroup: 'tab-stats', // TODO: set this to Wikipedia by default
 					vueRandomString: randomString(8),
@@ -228,7 +228,14 @@ fetch('./solarSystemData.json')
 					dateTimeCurrent: new Date(),
 					timeShiftSystemOnly: false,
 					orreryRendererEl: renderer.domElement,
-					labelRendererEl: labelRenderer.domElement
+					labelRendererEl: labelRenderer.domElement,
+					sidebar: {
+						imageLoading: true,
+						imageError: true,
+						imagesQueue: [], // gross, but is here to allow loading spinners to only appear when needed
+						images: [],
+						loadingTimeout: null
+					}
 				},
 				computed: {
 					nameApoapsis() {
@@ -847,8 +854,28 @@ fetch('./solarSystemData.json')
 							}
 						}
 
+						// checking to see if image has been loaded previously so can apply a loading spinner
+						// also stopping redundant requests being made for images that were already loaded
+						if (this.modelSidebarImages[this.clickedClassData.id] === undefined) {
+							// making the loading spinner appear after 400ms so it doesn't appear instantly after every image switch
+							this.sidebar.loadingTimeout = setTimeout(() => {
+								this.sidebar.imageLoading = true;
+							}, 400);
+							this.sidebar.imagesQueue.push(this.clickedClassData.sidebarImage);
+						} else {
+							// image was already loaded previously, and is in the cache
+							if (this.modelSidebarImages[this.clickedClassData.id] === '') {
+								// this image load had failed
+								this.sidebar.imageError = true;
+							} else {
+								// this image load was successful
+								this.sidebar.images.push(this.clickedClassData.sidebarImage);
+								this.sidebar.imageError = false;
+							}
+						}
+
 						// keeping track of what's been selected between each system
-						this.modelSystemSelection[this.clickedClassData.systemId] = this.clickedClassData.id;
+						this.modelSystemSelection[this.clickedClassData.id] = this.clickedClassData.id;
 
 						this.switchDetailTabs(); // to trigger the API loader for content (if it's needed)
 					},
@@ -918,6 +945,26 @@ fetch('./solarSystemData.json')
 
 					evResizeSidebarDesktop() {
 						document.addEventListener('pointermove', this.resizeSidebarDesktop, false);
+					},
+
+					imageLoad() {
+						clearTimeout(this.sidebar.loadingTimeout);
+						this.sidebar.imageLoading = false;
+						this.sidebar.imageError = false;
+						this.sidebar.images.push(this.sidebar.imagesQueue[this.sidebar.imagesQueue.length - 1]);
+						const { id } = this.clickedClassData;
+						if (this.modelSidebarImages[id] === undefined) {
+							this.modelSidebarImages[id] = this.sidebar.imagesQueue[this.sidebar.imagesQueue.length - 1];
+						}
+					},
+					imageError() {
+						clearTimeout(this.sidebar.loadingTimeout);
+						const { id } = this.clickedClassData;
+						this.sidebar.imageLoading = false;
+						this.sidebar.imageError = true;
+						if (this.modelSidebarImages[id] === undefined) {
+							this.modelSidebarImages[id] = '';
+						}
 					}
 				},
 				mounted() {
@@ -940,27 +987,7 @@ fetch('./solarSystemData.json')
 						if (!e.target.closest('[data-selector="search"]')) {
 							this.resetSearch();
 						}
-
-						// if (this.showSearchMobile && !e.target.closest('#search-results-mobile')) {
-						// 	// this.showSearchMobile = false;
-						// 	console.log('close search mobile');
-						// 	console.log(e);
-						// }
-
-						// if (!e.target.closest('#sidebar-ui-details')) {
-						// 	setTimeout(() => {
-						// 		if (this.sidebarIsOpen) {
-						// 			this.sidebarIsOpen = false;
-						// 		}
-						// 	}, 1000);
-						// }
 					});
-
-					// document.addEventListener('keydown', (e) => {
-					// 	if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
-					// 		this.closeSidebar();
-					// 	}
-					// });
 
 					const handleResize = () => {
 						const { width, height } = this.orreryRendererEl.getBoundingClientRect();
@@ -1100,7 +1127,6 @@ fetch('./solarSystemData.json')
 						sphere.scale.set(scale, scale, scale);
 
 						delta = 5 * clock.getDelta();
-						// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
 
 						orrery.cameraState._isInPlaneOfReference =
 							orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;

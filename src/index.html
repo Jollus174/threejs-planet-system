@@ -115,7 +115,32 @@
 								<i class="fas fa-grip-lines-vertical"></i>
 							</button>
 							<div class="ui-details">
-								<img class="img-details d-none d-lg-block" src="/img/details-jupiter.jpg" alt="Jupiter" />
+								<figure class="d-none d-lg-block img-container">
+									<img
+										v-if="sidebar.imagesQueue.length"
+										:src="sidebar.imagesQueue[sidebar.imagesQueue.length - 1]"
+										@load="imageLoad"
+										@error="imageError"
+									/>
+									<transition-group
+										name="fade"
+										v-if="sidebar.images.length && sidebar.images[sidebar.images.length - 1]"
+									>
+										<img
+											class="img-details"
+											v-for="(sidebarImage, i) of sidebar.images"
+											:src="sidebarImage"
+											:key="sidebarImage + '-' + i"
+											v-if="sidebarImage === sidebar.images[sidebar.images.length - 1] && !sidebar.imageError"
+										/>
+									</transition-group>
+									<div class="img-unavailable" :class="{show: sidebar.imageError}">Image Unavailable</div>
+									<div class="img-loading" :class="{show: sidebar.imageLoading}">
+										<div class="spinner-border" role="status">
+											<span class="visually-hidden">Loading...</span>
+										</div>
+									</div>
+								</figure>
 								<div class="title-container">
 									<button type="button" class="btn" @click="goToPreviousEntity()">
 										<i class="fas fa-angle-left"></i>
