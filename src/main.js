@@ -42,12 +42,9 @@ import { format, add, differenceInHours } from 'date-fns';
 window.settings = settings;
 window.renderLoop = '';
 
-let delta;
-
 window.renderer = renderer;
 window.composer = composer;
 
-const clock = new THREE.Clock();
 const vectorPosition = new THREE.Vector3();
 
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
@@ -202,7 +199,6 @@ fetch('./solarSystemData.json')
 
 		Promise.all(buildPromises).then(() => {
 			orrery.classes._allIterable = Object.values(orrery.classes._all);
-			orrery.classes._allIterableLength = orrery.classes._allIterable.length;
 			orrery.classes._moonsIterable = orrery.classes._allIterable.filter((c) => c.data.bodyType === 'Moon');
 
 			Vue.component('lightbox', LightBox);
@@ -1126,8 +1122,6 @@ fetch('./solarSystemData.json')
 						var scale = scaleVector.subVectors(sphere.position, orrery.camera.position).length() / scaleFactor;
 						sphere.scale.set(scale, scale, scale);
 
-						delta = 5 * clock.getDelta();
-
 						orrery.cameraState._isInPlaneOfReference =
 							orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;
 
@@ -1173,15 +1167,14 @@ fetch('./solarSystemData.json')
 						// making sure to account for -ve numbers, so can reverse orbits based on time if needed
 						this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
 
-						// TODO: it should ease into different time shift types
 						if (this.timeShiftTypeCurrentIndex !== 0) {
 							if (this.timeShiftSystemOnly) {
-								for (let i = 0; i < orrery.classes._moonsIterable.length; i++) {
-									orrery.classes._moonsIterable[i].iteratePosition();
+								for (const moon of orrery.classes._moonsIterable) {
+									moon.iteratePosition();
 								}
 							} else {
-								for (let i = 0; i < orrery.classes._allIterableLength; i++) {
-									orrery.classes._allIterable[i].iteratePosition();
+								for (const entity of orrery.classes._allIterable) {
+									entity.iteratePosition();
 								}
 							}
 						}
@@ -1190,6 +1183,10 @@ fetch('./solarSystemData.json')
 
 						composer.render();
 						labelRenderer.render(scene, orrery.camera);
+
+						for (const entity of orrery.classes._allIterable) {
+							entity.draw();
+						}
 					};
 
 					window.pauseRender = () => document.dispatchEvent(evRenderPause);

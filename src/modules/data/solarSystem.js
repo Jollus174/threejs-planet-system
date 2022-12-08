@@ -1,7 +1,12 @@
 import { DoubleSide } from 'three';
 import textureSun from './../../img/textures/sun-min.jpg';
-import textureMercury from './../../img/textures/mercury.jpg';
-import textureVenus from './../../img/textures/venus.jpg';
+
+import textureMercury from './../../img/textures/mercury-2k.jpg';
+import bumpMercury from './../../img/textures/mercury-2k-bump.jpg';
+
+import textureVenus from './../../img/textures/venus-2k.jpg';
+import textureVenusAtmosphere from './../../img/textures/venus-2k-atmosphere.jpg';
+
 import textureEarth from './../../img/textures/earth.jpg';
 import textureMoon from './../../img/textures/moon.jpg';
 import textureMars from './../../img/textures/mars.jpg';
@@ -60,20 +65,27 @@ const materialData = {
 	},
 
 	_mercury: {
-		map: textureMercury
+		map: textureMercury,
+		bump: bumpMercury,
+		segments: 64
 	},
 	_venus: {
-		map: textureVenus
+		map: textureVenus,
+		clouds: textureVenusAtmosphere,
+		segments: 64
 	},
 	_earth: {
-		map: textureEarth
+		map: textureEarth,
+		segments: 64
 	},
 	_mars: {
-		map: textureMars
+		map: textureMars,
+		segments: 64
 	},
 
 	_jupiter: {
-		map: textureJupiter
+		map: textureJupiter,
+		segments: 64
 	},
 	_callisto: {
 		map: textureCallisto
@@ -91,6 +103,7 @@ const materialData = {
 	_saturn: {
 		map: textureSaturn,
 		normalMap: null,
+		segments: 64,
 		rings: [
 			{
 				map: textureSaturnRing,
@@ -103,10 +116,12 @@ const materialData = {
 		]
 	},
 	_uranus: {
-		map: textureUranus
+		map: textureUranus,
+		segments: 64
 	},
 	_neptune: {
-		map: textureNeptune
+		map: textureNeptune,
+		segments: 64
 	},
 
 	_1ceres: {

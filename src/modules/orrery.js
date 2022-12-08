@@ -1,6 +1,7 @@
 import { scene } from './scene';
 import { controls } from './controls';
 import { camera } from './camera';
+import { Clock } from 'three';
 
 const orrery = {
 	scene,
@@ -56,7 +57,8 @@ const orrery = {
 	},
 	isDesktop: false,
 	vueTarget: document.querySelector('#app-orrery'),
-	dateTimeDifference: 0
+	dateTimeDifference: 0,
+	time: new Clock()
 };
 
 window.orrery = orrery;

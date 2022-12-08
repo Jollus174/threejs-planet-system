@@ -177,14 +177,15 @@ class Entity {
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
 		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
+		this.surfaceMesh = null;
+		this.cloudMesh = null;
 		this.isBuilt = false;
-		this.isVisible = false; // TODO: Do we really need this? Should just check the 'visible' property
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
+		this.segments = this.data.materialData ? this.data.materialData.segments : 32;
 
-		this.isEnabled = true;
 		this.isSelected = true;
 
 		this.intervalCheckTime = 1000;
@@ -198,6 +199,8 @@ class Entity {
 
 		// for debugging
 		this.raycasterArrowEnabled = false;
+
+		this.time = orrery.time;
 		// ---
 
 		this.eventPointerDown = () => {
@@ -336,27 +339,62 @@ class Entity {
 		}
 	}
 
-	async constructEntityMesh() {
-		if (this.meshGroup && this.meshGroup.children.length) return;
+	async constructCloudMesh() {
+		if (!this.materialData || !this.materialData.clouds) return null;
+		const { clouds = null } = this.materialData;
 
-		const segments = this.materialData.segments || 32;
+		const cloudMaterialProps = {
+			map: clouds ? await textureLoader.loadAsync(clouds) : null,
+			transparent: true,
+			opacity: 0.9
+		};
+		cloudMaterialProps.map.minFilter = THREE.LinearFilter;
+
+		const cloudMesh = new THREE.Mesh(
+			new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
+			new THREE.MeshPhongMaterial(cloudMaterialProps)
+		);
+		return cloudMesh;
+	}
+
+	async constructEntityMesh() {
+		if (this.meshGroup && this.meshGroup.children.length) return null;
+
+		// setting default fallbacks
+		const {
+			map = null,
+			bumpMap = null,
+			specularMap = null,
+			// emissiveMap = null,
+			side = THREE.FrontSide
+			// emissive = null,
+			// emissiveIntensity = null,
+		} = this.materialData;
+
 		const materialProps = {
-			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
-			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
+			map: map ? await textureLoader.loadAsync(map) : null,
+			bumpMap: bumpMap ? await textureLoader.loadAsync(bumpMap) : null,
+			bumpScale: bumpMap ? 0.015 : null,
+			specularMap: specularMap ? await textureLoader.loadAsync(specularMap) : null,
+			// normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
 			transparent: false,
-			side: this.materialData.side || THREE.FrontSide,
-			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
-			emissive: this.materialData.emissive || null,
-			emissiveIntensity: this.materialData.emissiveIntensity || null
+			side
+			// emissiveMap: emissiveMap ? await textureLoader.loadAsync(emissiveMap) : null,
+			// emissive,
+			// emissiveIntensity
 		};
 
-		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-		const material = new THREE.MeshStandardMaterial(materialProps);
+		if (materialProps.specularMap) {
+			materialProps.specularMap.minFilter = THREE.LinearFilter;
+		}
+
+		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, this.segments, this.segments);
+		const material = new THREE.MeshPhongMaterial(materialProps);
 
 		const entityMesh = new THREE.Mesh(geometry, material);
 		entityMesh.name = this.data.id;
-		entityMesh.castShadow = true;
-		entityMesh.receiveShadow = true;
+		// entityMesh.castShadow = true;
+		// entityMesh.receiveShadow = true;
 
 		return entityMesh;
 	}
@@ -398,6 +436,8 @@ class Entity {
 	async renderEntityMesh() {
 		if (!this.materialData) return this;
 		const mesh = await this.constructEntityMesh();
+		this.mesh = mesh;
+
 		this.meshGroup.add(mesh);
 		this.labelGroup.add(this.meshGroup);
 
@@ -414,10 +454,21 @@ class Entity {
 				});
 			});
 		}
+
+		if (this.materialData.clouds) {
+			const cloudMesh = await this.constructCloudMesh();
+			this.cloudMesh = cloudMesh;
+			this.meshGroup.add(cloudMesh);
+		}
 	}
 
 	// for updates that need to happen in the main render loop
-	// draw() {};
+	draw() {
+		if (this.cloudMesh) {
+			this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * 0.03;
+			this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * 0.01;
+		}
+	}
 
 	// is overwritten by child classes
 	intervalCheck() {}
@@ -662,8 +713,6 @@ class Sun extends Entity {
 
 		// TODO: sun should glow all cool-like when zoomed out
 	}
-
-	draw() {}
 }
 
 class Moon extends Entity {
