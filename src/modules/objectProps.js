@@ -186,8 +186,6 @@ class Entity {
 		this.materialData = this.data.materialData;
 		this.segments = this.data.materialData ? this.data.materialData.segments : 32;
 
-		this.isSelected = true;
-
 		this.intervalCheckTime = 1000;
 		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
 
@@ -221,9 +219,6 @@ class Entity {
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
-
-		// if (!this.isVisible) {
-		this.isVisible = true;
 		this.labelLink.style.pointerEvents = '';
 		this.isBuilt = true;
 
@@ -301,6 +296,7 @@ class Entity {
 
 	// TODO: am unsure if should be using 'copy' on all of these...
 	iteratePosition() {
+		if (!this.meshGroup.visible) return;
 		// if (!this.isVisible) return;
 		const i = (orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
 		this.labelGroup.position.copy(
@@ -524,7 +520,6 @@ class Entity {
 				this.meshGroup.visible = false;
 				if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
 			}, 100);
-			this.isVisible = false;
 			this.isBuilt = false;
 		}
 	}
