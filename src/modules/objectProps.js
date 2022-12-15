@@ -344,6 +344,7 @@ class Entity {
 		const { clouds = null } = this.materialData;
 
 		const cloudMaterialProps = {
+			name: 'Clouds',
 			map: clouds ? await textureLoader.loadAsync(clouds) : null,
 			transparent: true,
 			opacity: 0.9
@@ -357,41 +358,39 @@ class Entity {
 		return cloudMesh;
 	}
 
-	async constructEntityMesh() {
-		if (this.meshGroup && this.meshGroup.children.length) return null;
-
+	async constructTextures() {
 		// setting default fallbacks
-		const {
-			map = null,
-			bumpMap = null,
-			specularMap = null,
-			// emissiveMap = null,
-			side = THREE.FrontSide
-			// emissive = null,
-			// emissiveIntensity = null,
-		} = this.materialData;
+		const { map = null, bumpMap = null, specularMap = null, side = THREE.FrontSide } = this.materialData;
 
 		const materialProps = {
+			name: `${this.data.name} material`,
+			color: new THREE.Color(0xffffff), // setting back to default colour, otherwise a tint will show
 			map: map ? await textureLoader.loadAsync(map) : null,
 			bumpMap: bumpMap ? await textureLoader.loadAsync(bumpMap) : null,
 			bumpScale: bumpMap ? 0.015 : null,
 			specularMap: specularMap ? await textureLoader.loadAsync(specularMap) : null,
-			// normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
 			transparent: false,
-			side
-			// emissiveMap: emissiveMap ? await textureLoader.loadAsync(emissiveMap) : null,
-			// emissive,
-			// emissiveIntensity
+			side,
+			wireframe: false
 		};
 
 		if (materialProps.specularMap) {
 			materialProps.specularMap.minFilter = THREE.LinearFilter;
 		}
 
-		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, this.segments, this.segments);
-		const material = new THREE.MeshPhongMaterial(materialProps);
+		return materialProps;
+	}
 
-		const entityMesh = new THREE.Mesh(geometry, material);
+	async constructEntityMesh() {
+		if (this.meshGroup && this.meshGroup.children.length) return null;
+
+		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, this.segments, this.segments);
+		const loaderMaterial = new THREE.MeshPhongMaterial({
+			color: new THREE.Color(this.data.labelColour),
+			wireframe: true
+		});
+
+		const entityMesh = new THREE.Mesh(geometry, loaderMaterial);
 		entityMesh.name = this.data.id;
 		// entityMesh.castShadow = true;
 		// entityMesh.receiveShadow = true;
@@ -453,12 +452,6 @@ class Entity {
 					this.meshGroup.add(ringMesh);
 				});
 			});
-		}
-
-		if (this.materialData.clouds) {
-			const cloudMesh = await this.constructCloudMesh();
-			this.cloudMesh = cloudMesh;
-			this.meshGroup.add(cloudMesh);
 		}
 	}
 
@@ -569,6 +562,24 @@ class Planet extends Entity {
 				orrery.cameraState._currentPlanetInRange = this.data.id;
 				const moonsToBuild = Object.values(this.moonClasses).filter((m) => m.isEnabled && !m.isBuilt);
 				this.buildMoons(moonsToBuild);
+
+				// if a material hasn't loaded, load it and put that in
+				if (!this.mesh.material.name) {
+					this.constructTextures().then((texture) => {
+						for (const textureProp of Object.entries(texture)) {
+							this.mesh.material[textureProp[0]] = textureProp[1];
+						}
+						this.mesh.material.needsUpdate = true;
+					});
+				}
+
+				// if we need clouds too, create a new mesh for them
+				if (this.materialData.clouds && !this.cloudMesh) {
+					this.constructCloudMesh().then((cloudMesh) => {
+						this.cloudMesh = cloudMesh;
+						this.meshGroup.add(this.cloudMesh);
+					});
+				}
 			}
 		} else {
 			if (!planetIsTargeted && this.isZoomedToPlanet) {

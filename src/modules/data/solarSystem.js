@@ -1,11 +1,6 @@
 import { DoubleSide } from 'three';
+
 import textureSun from './../../img/textures/sun-min.jpg';
-
-import textureMercury from './../../img/textures/mercury-2k.jpg';
-import bumpMercury from './../../img/textures/mercury-2k-bump.jpg';
-
-import textureVenus from './../../img/textures/venus-2k.jpg';
-import textureVenusAtmosphere from './../../img/textures/venus-2k-atmosphere.jpg';
 
 import textureEarth from './../../img/textures/earth.jpg';
 import textureMoon from './../../img/textures/moon.jpg';
@@ -65,13 +60,13 @@ const materialData = {
 	},
 
 	_mercury: {
-		map: textureMercury,
-		bump: bumpMercury,
+		map: './../../img/textures/mercury-2k.jpg',
+		bump: './../../img/textures/mercury-2k-bump.jpg',
 		segments: 64
 	},
 	_venus: {
-		map: textureVenus,
-		clouds: textureVenusAtmosphere,
+		map: './../../img/textures/venus-2k.jpg',
+		clouds: './../../img/textures/venus-2k-atmosphere.jpg',
 		segments: 64
 	},
 	_earth: {
