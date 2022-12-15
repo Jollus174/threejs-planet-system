@@ -2,10 +2,6 @@ import { DoubleSide } from 'three';
 
 import textureSun from './../../img/textures/sun-min.jpg';
 
-import textureEarth from './../../img/textures/earth.jpg';
-import textureMoon from './../../img/textures/moon.jpg';
-import textureMars from './../../img/textures/mars.jpg';
-
 import textureJupiter from './../../img/textures/jupiter.jpg';
 import textureCallisto from './../../img/textures/moon-callisto.jpg';
 import textureEuropa from './../../img/textures/moon-europa.jpg';
@@ -61,20 +57,28 @@ const materialData = {
 
 	_mercury: {
 		map: './../../img/textures/mercury-2k.jpg',
-		bump: './../../img/textures/mercury-2k-bump.jpg',
+		bumpMap: './../../img/textures/mercury-bump-2k.jpg',
 		segments: 64
 	},
 	_venus: {
 		map: './../../img/textures/venus-2k.jpg',
-		clouds: './../../img/textures/venus-2k-atmosphere.jpg',
+		clouds: './../../img/textures/venus-clouds-2k.jpg',
+		cloudsRotateX: 0.01,
+		cloudsRotateY: 0.03,
 		segments: 64
 	},
 	_earth: {
-		map: textureEarth,
+		map: './../../img/textures/earth-4k.jpg',
+		bumpMap: './../../img/textures/earth-bump-4k.jpg',
+		clouds: './../../img/textures/earth-clouds-4k.jpg',
+		cloudsAlpha: './../../img/textures/earth-clouds-alpha-4k.jpg',
+		cloudsRotateX: 0.005,
+		cloudsRotateY: 0.005,
 		segments: 64
 	},
 	_mars: {
-		map: textureMars,
+		map: './../../img/textures/mars-2k.jpg',
+		normalMap: './../../img/textures/mars-normal-2k.jpg',
 		segments: 64
 	},
 
@@ -139,7 +143,8 @@ const materialData = {
 	},
 
 	_moon: {
-		map: textureMoon
+		map: './../../img/textures/moon-2k.jpg',
+		bumpMap: './../../img/textures/moon-bump-2k.jpg'
 	}
 };
 

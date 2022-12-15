@@ -341,11 +341,12 @@ class Entity {
 
 	async constructCloudMesh() {
 		if (!this.materialData || !this.materialData.clouds) return null;
-		const { clouds = null } = this.materialData;
+		const { clouds = null, cloudsAlpha = null } = this.materialData;
 
 		const cloudMaterialProps = {
 			name: 'Clouds',
 			map: clouds ? await textureLoader.loadAsync(clouds) : null,
+			alphaMap: cloudsAlpha ? await textureLoader.loadAsync(cloudsAlpha) : null,
 			transparent: true,
 			opacity: 0.9
 		};
@@ -360,15 +361,15 @@ class Entity {
 
 	async constructTextures() {
 		// setting default fallbacks
-		const { map = null, bumpMap = null, specularMap = null, side = THREE.FrontSide } = this.materialData;
+		const { map = null, normalMap = null, bumpMap = null, side = THREE.FrontSide } = this.materialData;
 
 		const materialProps = {
 			name: `${this.data.name} material`,
 			color: new THREE.Color(0xffffff), // setting back to default colour, otherwise a tint will show
 			map: map ? await textureLoader.loadAsync(map) : null,
+			normalMap: normalMap ? await textureLoader.loadAsync(normalMap) : null,
 			bumpMap: bumpMap ? await textureLoader.loadAsync(bumpMap) : null,
 			bumpScale: bumpMap ? 0.015 : null,
-			specularMap: specularMap ? await textureLoader.loadAsync(specularMap) : null,
 			transparent: false,
 			side,
 			wireframe: false
@@ -457,9 +458,9 @@ class Entity {
 
 	// for updates that need to happen in the main render loop
 	draw() {
-		if (this.cloudMesh) {
-			this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * 0.03;
-			this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * 0.01;
+		if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
+			this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX;
+			this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY;
 		}
 	}
 
@@ -786,12 +787,25 @@ class Moon extends Entity {
 			const v3 = new THREE.Vector3();
 			const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
 			this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
-			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+			const cameraZoomedCloseToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 1000000;
 
-			if (cameraZoomedToMoon) {
+			if (cameraZoomedCloseToMoon) {
 				this.labelLink.classList.add('faded');
 			} else {
 				this.labelLink.classList.remove('faded');
+			}
+
+			if (cameraZoomedToMoon) {
+				// if a material hasn't loaded, load it and put that in
+				if (!this.mesh.material.name) {
+					this.constructTextures().then((texture) => {
+						for (const textureProp of Object.entries(texture)) {
+							this.mesh.material[textureProp[0]] = textureProp[1];
+						}
+						this.mesh.material.needsUpdate = true;
+					});
+				}
 			}
 
 			// if (this.OrbitLine) {
