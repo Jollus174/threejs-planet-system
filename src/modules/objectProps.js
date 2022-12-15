@@ -361,7 +361,6 @@ class Entity {
 
 		const materialProps = {
 			name: `${this.data.name} material`,
-			color: new THREE.Color(0xffffff), // setting back to default colour, otherwise a tint will show
 			map: map ? await textureLoader.loadAsync(map) : null,
 			normalMap: normalMap ? await textureLoader.loadAsync(normalMap) : null,
 			bumpMap: bumpMap ? await textureLoader.loadAsync(bumpMap) : null,
@@ -389,8 +388,6 @@ class Entity {
 
 		const entityMesh = new THREE.Mesh(geometry, loaderMaterial);
 		entityMesh.name = this.data.id;
-		// entityMesh.castShadow = true;
-		// entityMesh.receiveShadow = true;
 
 		return entityMesh;
 	}
@@ -405,13 +402,7 @@ class Entity {
 			emissive: ring.emissive || null,
 			emissiveIntensity: ring.emissiveIntensity || null,
 			side: THREE.DoubleSide
-			// blending: THREE.CustomBlending
-			// blending: THREE.AdditiveBlending
 		};
-
-		// ringMaterial.blendEquation = THREE.MaxEquation;
-		// ringMaterial.blendSrc = THREE.OneFactor;
-		// ringMaterial.blendDst = THREE.DstAlphaFactor;
 
 		const ringMesh = new THREE.Mesh(
 			ringUVMapGeometry(
@@ -569,7 +560,7 @@ class Planet extends Entity {
 					});
 				}
 
-				// if we need clouds too, create a new mesh for them
+				// if we need clouds, create a new mesh for them
 				if (this.materialData.clouds && !this.cloudMesh) {
 					this.constructCloudMesh().then((cloudMesh) => {
 						this.cloudMesh = cloudMesh;
