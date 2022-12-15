@@ -7,9 +7,8 @@ import { scene } from './scene';
 import { settings } from './settings';
 import { calculateOrbit } from './utilities/astronomy';
 import { ringUVMapGeometry } from './utilities/threeJS';
-import { textureLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
+import { textureLoader, imageBitmapLoader } from './loadManager';
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
-import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
@@ -335,46 +334,38 @@ class Entity {
 		}
 	}
 
-	async constructCloudMesh() {
-		if (!this.materialData || !this.materialData.clouds) return null;
-		const { clouds = null, cloudsAlpha = null } = this.materialData;
-
-		const cloudMaterialProps = {
-			name: 'Clouds',
-			map: clouds ? await textureLoader.loadAsync(clouds) : null,
-			alphaMap: cloudsAlpha ? await textureLoader.loadAsync(cloudsAlpha) : null,
-			transparent: true,
-			opacity: 0.9
-		};
-		cloudMaterialProps.map.minFilter = THREE.LinearFilter;
-
-		const cloudMesh = new THREE.Mesh(
-			new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
-			new THREE.MeshPhongMaterial(cloudMaterialProps)
-		);
-		return cloudMesh;
-	}
-
 	async constructTextures() {
 		// setting default fallbacks
 		const { map = null, normalMap = null, bumpMap = null, side = THREE.FrontSide } = this.materialData;
 
 		const materialProps = {
 			name: `${this.data.name} material`,
-			map: map ? await textureLoader.loadAsync(map) : null,
-			normalMap: normalMap ? await textureLoader.loadAsync(normalMap) : null,
-			bumpMap: bumpMap ? await textureLoader.loadAsync(bumpMap) : null,
+			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
+			normalMap: normalMap ? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t)) : null,
+			bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new THREE.CanvasTexture(t)) : null,
 			bumpScale: bumpMap ? 0.015 : null,
 			transparent: false,
 			side,
 			wireframe: false
 		};
 
-		if (materialProps.specularMap) {
-			materialProps.specularMap.minFilter = THREE.LinearFilter;
-		}
-
 		return materialProps;
+	}
+
+	async constructCloudTextures() {
+		if (!this.materialData || !this.materialData.clouds) return null;
+		const { clouds = null, cloudsAlpha = null } = this.materialData;
+
+		const cloudMaterialProps = {
+			name: `${this.data.name} clouds`,
+			map: clouds ? await imageBitmapLoader.loadAsync(clouds).then((t) => new THREE.CanvasTexture(t)) : null,
+			alphaMap: cloudsAlpha ? await imageBitmapLoader.loadAsync(cloudsAlpha).then((t) => new THREE.CanvasTexture(t)) : null,
+			transparent: true,
+			opacity: 0.9
+		};
+		cloudMaterialProps.map.minFilter = THREE.LinearFilter;
+
+		return cloudMaterialProps;
 	}
 
 	async constructEntityMesh() {
@@ -405,10 +396,7 @@ class Entity {
 		};
 
 		const ringMesh = new THREE.Mesh(
-			ringUVMapGeometry(
-				this.data.meanRadius + this.data.rings[i].inner,
-				this.data.meanRadius + this.data.rings[i].outer
-			),
+			ringUVMapGeometry(this.data.meanRadius + this.data.rings[i].inner, this.data.meanRadius + this.data.rings[i].outer),
 			new THREE.MeshStandardMaterial(ringMaterial)
 		);
 
@@ -418,7 +406,23 @@ class Entity {
 		return ringMesh;
 	}
 
-	// TODO: set distance checker to fade label when zoomed in
+	applyTextures() {
+		this.constructTextures().then((texture) => {
+			this.mesh.material.dispose(); // remove the pre-loader wireframe material
+			this.mesh.material = new THREE.MeshPhongMaterial({ ...texture });
+		});
+	}
+	applyClouds() {
+		this.constructCloudTextures().then((texture) => {
+			const cloudMesh = new THREE.Mesh(
+				new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
+				new THREE.MeshPhongMaterial({ ...texture })
+			);
+
+			this.cloudMesh = cloudMesh;
+			this.meshGroup.add(this.cloudMesh);
+		});
+	}
 
 	async renderEntityMesh() {
 		if (!this.materialData) return this;
@@ -552,20 +556,12 @@ class Planet extends Entity {
 
 				// if a material hasn't loaded, load it and put that in
 				if (!this.mesh.material.name) {
-					this.constructTextures().then((texture) => {
-						for (const textureProp of Object.entries(texture)) {
-							this.mesh.material[textureProp[0]] = textureProp[1];
-						}
-						this.mesh.material.needsUpdate = true;
-					});
+					this.applyTextures();
 				}
 
 				// if we need clouds, create a new mesh for them
 				if (this.materialData.clouds && !this.cloudMesh) {
-					this.constructCloudMesh().then((cloudMesh) => {
-						this.cloudMesh = cloudMesh;
-						this.meshGroup.add(this.cloudMesh);
-					});
+					this.applyClouds();
 				}
 			}
 		} else {
@@ -785,12 +781,7 @@ class Moon extends Entity {
 			if (cameraZoomedToMoon) {
 				// if a material hasn't loaded, load it and put that in
 				if (!this.mesh.material.name) {
-					this.constructTextures().then((texture) => {
-						for (const textureProp of Object.entries(texture)) {
-							this.mesh.material[textureProp[0]] = textureProp[1];
-						}
-						this.mesh.material.needsUpdate = true;
-					});
+					this.applyTextures();
 				}
 			}
 
