@@ -184,8 +184,8 @@ class EquatorLine {
 		for (let i = 0; i < 360; i++) {
 			const theta = this.data.diameter * 1.1;
 			const x = Math.sin(THREE.MathUtils.degToRad(i * -1)) * theta;
-			const y = Math.cos(THREE.MathUtils.degToRad(i)) * theta;
-			equatorPoints.push(new THREE.Vector3(x, y, 0));
+			const z = Math.cos(THREE.MathUtils.degToRad(i)) * theta;
+			equatorPoints.push(new THREE.Vector3(x, 0, z));
 		}
 		const geometryLine = new THREE.BufferGeometry().setFromPoints(equatorPoints);
 		const color = this.data.sideralRotation >= 0 ? new THREE.Color(0.933, 0.4, 0.4) : new THREE.Color(0.2, 0.8, 0.933);
@@ -194,13 +194,10 @@ class EquatorLine {
 			geometryLine,
 			new THREE.LineDashedMaterial({
 				color,
-				opacity: 0.2,
 				visible: this.classRef.orbitLineVisibleAtBuild,
-				blending: THREE.AdditiveBlending,
 				scale: 10 / this.data.diameter,
 				dashSize: 3,
-				gapSize: 1,
-				transparent: true
+				gapSize: 2
 			})
 		);
 		this.line.computeLineDistances();
@@ -517,15 +514,14 @@ class Entity {
 	// for updates that need to happen in the main render loop
 	draw() {
 		if (this.meshGroup.visible) {
-			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * ((this.data.sideralRotation / Math.pow(10, 4)) * -1);
-
+			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (1 / (this.data.sideralRotation * 10));
 			if (this.EquatorLine && this.EquatorLine.line) {
-				this.EquatorLine.line.rotation.z = orrery.time.getElapsedTime() * (this.data.sideralRotation / Math.pow(10, 3));
+				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (1 / this.data.sideralRotation);
 			}
 
 			if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
-				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * (this.materialData.cloudsRotateX * -1);
-				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * (this.materialData.cloudsRotateY * -1);
+				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX;
+				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY;
 			}
 		}
 	}
