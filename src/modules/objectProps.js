@@ -514,6 +514,7 @@ class Entity {
 	draw() {
 		if (this.meshGroup.visible) {
 			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (1 / (this.data.sideralRotation * 10));
+
 			if (this.EquatorLine && this.EquatorLine.line) {
 				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (1 / this.data.sideralRotation);
 			}
@@ -759,6 +760,8 @@ class Sun extends Entity {
 			});
 		});
 	}
+
+	draw() {}
 
 	intervalCheck() {
 		// Only fires if parent planet is in range
