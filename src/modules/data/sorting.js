@@ -4,24 +4,6 @@ import { currentDateTime } from '../utilities/time';
 import { getRandomArbitrary } from '../utilities/numeric';
 import { wikipediaKeys } from './wikipediaKeys';
 
-const generalUpdates = (item, items) => {
-	// misc item replacements + updates
-
-	if (item.id === '_s20151364721') item.displayName = 'MK2';
-	if (item.name === 'S/2017 J 9') item.semimajorAxis = 21487000;
-
-	if (item.aroundPlanet) {
-		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-		planet.systemId = planet.systemId || convertToId(planet.name); // be mindful that NAME is used here instead of DISPLAY NAME
-		planet.systemName = planet.displayName;
-		item.systemId = planet.systemId;
-		item.systemName = planet.systemName;
-	} else {
-		item.systemId = item.systemId || convertToId(item.name);
-		item.systemName = item.displayName;
-	}
-};
-
 const idReplacements = (itemList) => {
 	// needing to replace the French planet IDs for each moon with English ones, same for planets, etc
 	// getting rid 'englishName', it's going to just be the 'name'. All in English and no French references in the data
@@ -37,6 +19,11 @@ const idReplacements = (itemList) => {
 			const planet = items.find((i) => i.id === item.aroundPlanet.planet);
 			planet.englishId = planet.englishId || convertToId(planet.englishName);
 			item.aroundPlanet.planet = planet.englishId;
+
+			// TODO: remove moons around asteroids, no support for those yet
+			// if (planet.bodyType === 'Asteroid') {
+			// 	console.log(`the cursed asteroid satellite entity is ${item.name}`);
+			// }
 		}
 
 		if (item.moons && item.moons.length) {
@@ -64,7 +51,8 @@ const idReplacements = (itemList) => {
 
 		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
 		if (item.name === 'Moon') item.displayName = 'The Moon';
-		if (item.id === 'dactyl') item.displayName = 'Dactyl';
+		// if (item.id.toLowerCase().includes('dactyl')) item.displayName = 'Dactyl';
+
 		if (['eris', 'ceres', 'makemake', 'haumea', 'orcus'].some((i) => item.displayName.toLowerCase().includes(i))) {
 			item.displayName = item.displayName.split(' ')[1];
 			item.bodyType = 'Dwarf Planet';
@@ -72,6 +60,24 @@ const idReplacements = (itemList) => {
 	}
 
 	return items;
+};
+
+const generalUpdates = (item, items) => {
+	// misc item replacements + updates
+
+	if (item.id === '_s20151364721') item.displayName = 'MK2';
+	if (item.name === 'S/2017 J 9') item.semimajorAxis = 21487000;
+
+	if (item.aroundPlanet) {
+		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
+		planet.systemId = planet.systemId || convertToId(planet.name); // be mindful that NAME is used here instead of DISPLAY NAME
+		planet.systemName = planet.displayName;
+		item.systemId = planet.systemId;
+		item.systemName = planet.systemName;
+	} else {
+		item.systemId = item.systemId || convertToId(item.name);
+		item.systemName = item.displayName;
+	}
 };
 
 const addToMoonGroup = (item) => {
@@ -495,6 +501,6 @@ export {
 	setOrbitCalculations,
 	setWikipediaKeys,
 	setSidebarImage,
-	generalUpdates,
-	idReplacements
+	idReplacements,
+	generalUpdates
 };

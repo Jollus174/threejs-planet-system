@@ -82,7 +82,6 @@ const sortData = (data) => {
 	orrery.bodies._all = [...englishifiedData];
 	const sun = orrery.bodies.types._star[0];
 
-	// TODO: sort this out later, assign a 'moonGroup index' to keep track of order better
 	const moons = orrery.bodies.types._moon;
 	for (const moon of moons) {
 		moon.materialData = materialData[moon.id] || null;
@@ -114,15 +113,15 @@ const sortData = (data) => {
 		setMoonsToDataEntity(dwarfPlanet);
 	}
 
-	const asteroids = orrery.bodies.types._asteroid;
-	for (const asteroid of asteroids) {
-		asteroid.labelColour = settings.planetColours.default;
-		asteroid.bodyType = 'Asteroid';
-		asteroid.startingPosition = new Vector3();
-		asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
+	// const asteroids = orrery.bodies.types._asteroid;
+	// for (const asteroid of asteroids) {
+	// 	asteroid.labelColour = settings.planetColours.default;
+	// 	asteroid.bodyType = 'Asteroid';
+	// 	asteroid.startingPosition = new Vector3();
+	// 	asteroid.startingPosition.copy(startingOrbitPosition(asteroid));
 
-		setMoonsToDataEntity(asteroid);
-	}
+	// 	setMoonsToDataEntity(asteroid);
+	// }
 
 	const planets = orrery.bodies.types._planet;
 	for (const planet of planets) {
@@ -148,8 +147,8 @@ const sortData = (data) => {
 		sun,
 		moons,
 		dwarfPlanets,
-		planets,
-		asteroids
+		planets
+		// asteroids
 	};
 };
 
