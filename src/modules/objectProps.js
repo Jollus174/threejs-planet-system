@@ -63,7 +63,7 @@ class OrbitLine {
 		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
 
 		const colors = new Float32Array(this.vertexCount * 3);
-		for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
+		for (let c = this.amountOfOrbitToDraw; c >= 0; c -= 1) {
 			const lerpColor = new THREE.Color(this.startColor);
 			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
 
@@ -197,7 +197,6 @@ class EquatorLine {
 				opacity: 0.2,
 				visible: this.classRef.orbitLineVisibleAtBuild,
 				blending: THREE.AdditiveBlending,
-				// linewidth: 10, // doesn't seem to do anything, but looks to be used for WebGL
 				scale: 10 / this.data.diameter,
 				dashSize: 3,
 				gapSize: 1,
