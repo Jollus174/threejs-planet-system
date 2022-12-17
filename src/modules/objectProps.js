@@ -203,7 +203,6 @@ class EquatorLine {
 		this.line.computeLineDistances();
 
 		this.line.name = this.lineName;
-		this.line.rotation.x = THREE.MathUtils.degToRad(90);
 
 		this.classRef.labelGroup.add(this.line);
 	}
