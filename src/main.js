@@ -902,6 +902,7 @@ fetch('./solarSystemData.json')
 					// https://github.com/vuejs/vue/issues/9777
 					updateSearchQuery(e) {
 						if (e.key === 'Enter') {
+							if (!this.searchQuery) return;
 							this.updateZoomTarget(this.searchResults[0].data);
 							e.target.value = '';
 						} else {
