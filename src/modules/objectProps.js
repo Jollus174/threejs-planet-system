@@ -432,8 +432,9 @@ class Entity {
 
 		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, this.segments, this.segments);
 		const loaderMaterial = new THREE.MeshPhongMaterial({
-			color: new THREE.Color(this.data.labelColour),
-			wireframe: true
+			color: new THREE.Color(0x000000),
+			transparent: true,
+			opacity: 0.2
 		});
 
 		const entityMesh = new THREE.Mesh(geometry, loaderMaterial);
