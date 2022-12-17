@@ -336,7 +336,7 @@ class Entity {
 
 	async constructTextures() {
 		// setting default fallbacks
-		const { map = null, normalMap = null, bumpMap = null, side = THREE.FrontSide } = this.materialData;
+		const { map = null, normalMap = null, bumpMap = null, shininess = 30, side = THREE.FrontSide } = this.materialData;
 
 		const materialProps = {
 			name: `${this.data.name} material`,
@@ -344,8 +344,9 @@ class Entity {
 			normalMap: normalMap ? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t)) : null,
 			bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new THREE.CanvasTexture(t)) : null,
 			bumpScale: bumpMap ? 0.015 : null,
-			transparent: false,
+			shininess,
 			side,
+			transparent: false,
 			wireframe: false
 		};
 
