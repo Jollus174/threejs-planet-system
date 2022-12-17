@@ -43,8 +43,7 @@ class OrbitLine {
 		const orbitPoints = [];
 		const i = iterator || 0;
 		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i; p += 1) {
-			const v = new THREE.Vector3();
-			orbitPoints.push(v.copy(calculateOrbit(p, this.data, this.parentPlanetData)));
+			orbitPoints.push(calculateOrbit(p, this.data, this.parentPlanetData));
 		}
 
 		// deleting last geometry line if iterated upon, otherwise they'll start to chew up lots of memory
@@ -170,6 +169,65 @@ class OrbitLine {
 	}
 }
 
+class EquatorLine {
+	constructor(data, classRef) {
+		this.data = data;
+		this.classRef = classRef;
+		this.lineName = `${this.data.id} equator line`;
+		this.line = null;
+		this.fadingIn = false;
+		this.fadingOut = false;
+	}
+
+	build() {
+		const equatorPoints = [];
+		for (let i = 0; i < 360; i++) {
+			const theta = this.data.diameter * 1.1;
+			const x = Math.sin(THREE.MathUtils.degToRad(i * -1)) * theta;
+			const y = Math.cos(THREE.MathUtils.degToRad(i)) * theta;
+			equatorPoints.push(new THREE.Vector3(x, y, 0));
+		}
+		const geometryLine = new THREE.BufferGeometry().setFromPoints(equatorPoints);
+		const color = this.data.sideralRotation >= 0 ? new THREE.Color(0.933, 0.4, 0.4) : new THREE.Color(0.2, 0.8, 0.933);
+
+		this.line = new THREE.Line(
+			geometryLine,
+			new THREE.LineDashedMaterial({
+				color,
+				opacity: 0.2,
+				visible: this.classRef.orbitLineVisibleAtBuild,
+				blending: THREE.AdditiveBlending,
+				// linewidth: 10, // doesn't seem to do anything, but looks to be used for WebGL
+				scale: 10 / this.data.diameter,
+				dashSize: 3,
+				gapSize: 1,
+				transparent: true
+			})
+		);
+		this.line.computeLineDistances();
+
+		this.line.name = this.lineName;
+		this.line.rotation.x = THREE.MathUtils.degToRad(90);
+
+		this.classRef.labelGroup.add(this.line);
+	}
+
+	destroy() {
+		if (!this.equatorLine || !this.equatorLine.material) return;
+		if (!this.fadingOut) {
+			this.fadingOut = true;
+			gsap.to(this.equatorLine.material, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					this.equatorLine.removeFromParent();
+					this.fadingOut = false;
+				}
+			});
+		}
+	}
+}
+
 class Entity {
 	constructor(data) {
 		this.data = data;
@@ -191,6 +249,7 @@ class Entity {
 		this.orbitLineVisibleAtBuild = true;
 		this.orbitLineOpacityDefault = 0.5;
 		this.OrbitLine = new OrbitLine(data, this);
+		this.EquatorLine = new EquatorLine(data, this);
 
 		this.raycasterEnabled = false; // can cause some pretty laggy performance issues
 
@@ -218,6 +277,7 @@ class Entity {
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
+		this.EquatorLine.build();
 		this.labelLink.style.pointerEvents = '';
 		this.isBuilt = true;
 
@@ -414,19 +474,20 @@ class Entity {
 	}
 
 	applyTextures() {
-		this.constructTextures().then((texture) => {
+		this.constructTextures().then((textureObj) => {
 			this.mesh.material.dispose(); // remove the pre-loader wireframe material
-			this.mesh.material = new THREE.MeshPhongMaterial({ ...texture });
+			this.mesh.material = new THREE.MeshPhongMaterial(textureObj);
 		});
 	}
 	applyClouds() {
-		this.constructCloudTextures().then((texture) => {
+		this.constructCloudTextures().then((textureObj) => {
 			const cloudMesh = new THREE.Mesh(
 				new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
-				new THREE.MeshPhongMaterial({ ...texture })
+				new THREE.MeshPhongMaterial(textureObj)
 			);
 
 			this.cloudMesh = cloudMesh;
+			this.cloudMesh.name = `${this.data.id} clouds`;
 			this.meshGroup.add(this.cloudMesh);
 		});
 	}
@@ -436,11 +497,11 @@ class Entity {
 		const mesh = await this.constructEntityMesh();
 		this.mesh = mesh;
 
-		this.meshGroup.add(mesh);
-		this.labelGroup.add(this.meshGroup);
-
 		this.meshGroup.name = `${this.data.name} mesh group`;
-		this.meshGroup.rotation.z = THREE.MathUtils.degToRad(this.data.axialTilt);
+		this.meshGroup.add(mesh);
+
+		this.labelGroup.rotation.z = THREE.MathUtils.degToRad(this.data.axialTilt);
+		this.labelGroup.add(this.meshGroup);
 
 		if (this.materialData.rings) {
 			const ringMeshPromises = this.materialData.rings.map((ring, i) => this.constructRingMeshes(ring, i));
@@ -456,9 +517,17 @@ class Entity {
 
 	// for updates that need to happen in the main render loop
 	draw() {
-		if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
-			this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX;
-			this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY;
+		if (this.meshGroup.visible) {
+			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * ((this.data.sideralRotation / Math.pow(10, 4)) * -1);
+
+			if (this.EquatorLine && this.EquatorLine.line) {
+				this.EquatorLine.line.rotation.z = orrery.time.getElapsedTime() * (this.data.sideralRotation / Math.pow(10, 3));
+			}
+
+			if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
+				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * (this.materialData.cloudsRotateX * -1);
+				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * (this.materialData.cloudsRotateY * -1);
+			}
 		}
 	}
 
@@ -508,6 +577,7 @@ class Entity {
 		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
 		if (this.isBuilt) {
 			if (this.OrbitLine) this.OrbitLine.destroy();
+			if (this.EquatorLine) this.EquatorLine.destroy();
 			setTimeout(() => {
 				clearInterval(this.intervalCheckVar);
 
@@ -747,6 +817,7 @@ class Moon extends Entity {
 		});
 
 		this.OrbitLine.build();
+		this.EquatorLine.build();
 
 		if (!this.meshGroup.children.length) {
 			this.renderEntityMesh();
