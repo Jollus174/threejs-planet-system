@@ -194,8 +194,8 @@ fetch('./solarSystemData.json')
 		// MESH BUILDING
 		const buildPromises = [];
 		buildPromises.push(orrery.classes._sun.build());
-		Object.values(orrery.classes._planets).forEach((item) => buildPromises.push(item.build()));
-		Object.values(orrery.classes._dwarfPlanets).forEach((item) => buildPromises.push(item.build()));
+		for (const planet of Object.values(orrery.classes._planets)) buildPromises.push(planet.build());
+		for (const dwarfPlanet of Object.values(orrery.classes._dwarfPlanets)) buildPromises.push(dwarfPlanet.build());
 
 		Promise.all(buildPromises).then(() => {
 			orrery.classes._allIterable = Object.values(orrery.classes._all);

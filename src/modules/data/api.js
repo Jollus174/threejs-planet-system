@@ -63,7 +63,8 @@ const sortData = (data) => {
 		// Math.min to account for huge bodies like Sun
 		item.zoomTo = Math.min(item.meanRadius * 8, item.meanRadius + 7000000);
 
-		item.labelColour = settings.planetColours[item.id] || settings.planetColours[item.bodyType] || settings.planetColours.default;
+		item.labelColour =
+			settings.planetColours[item.id] || settings.planetColours[item.bodyType] || settings.planetColours.default;
 
 		// setting the 'entity types' here rather than further down and redoing the loop
 		const typeKey = '_' + convertToCamelCase(item.bodyType);
