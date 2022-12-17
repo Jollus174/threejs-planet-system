@@ -430,8 +430,8 @@ const setRings = (item) => {
 	const ringData = {
 		_saturn: [
 			{
+				// TODO: these numbers are likely inaccurate
 				inner: 66900,
-				// outer: 140220,
 				outer: 180220, // looks more rad
 				tilt: null
 			}

@@ -174,8 +174,8 @@ class Entity {
 	constructor(data) {
 		this.data = data;
 		this.labelLink = document.createElement('a');
-		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
-		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
+		this.labelGroup = new THREE.Group();
+		this.meshGroup = new THREE.Group();
 		this.surfaceMesh = null;
 		this.cloudMesh = null;
 		this.isBuilt = false;
@@ -318,7 +318,6 @@ class Entity {
 			}
 		} else {
 			this.isEnabled = false;
-			// this.destroy();
 		}
 	}
 
@@ -336,12 +335,14 @@ class Entity {
 
 	async constructTextures() {
 		// setting default fallbacks
-		const { map = null, normalMap = null, bumpMap = null, shininess = 30, side = THREE.FrontSide } = this.materialData;
+		const { map = null, normalMap = null, bumpMap = null, shininess = 20, side = THREE.FrontSide } = this.materialData;
 
 		const materialProps = {
 			name: `${this.data.name} material`,
 			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
-			normalMap: normalMap ? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t)) : null,
+			normalMap: normalMap
+				? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t))
+				: null,
 			bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new THREE.CanvasTexture(t)) : null,
 			bumpScale: bumpMap ? 0.015 : null,
 			shininess,
@@ -360,7 +361,9 @@ class Entity {
 		const cloudMaterialProps = {
 			name: `${this.data.name} clouds`,
 			map: clouds ? await imageBitmapLoader.loadAsync(clouds).then((t) => new THREE.CanvasTexture(t)) : null,
-			alphaMap: cloudsAlpha ? await imageBitmapLoader.loadAsync(cloudsAlpha).then((t) => new THREE.CanvasTexture(t)) : null,
+			alphaMap: cloudsAlpha
+				? await imageBitmapLoader.loadAsync(cloudsAlpha).then((t) => new THREE.CanvasTexture(t))
+				: null,
 			transparent: true,
 			opacity: 0.9
 		};
@@ -386,19 +389,22 @@ class Entity {
 
 	async constructRingMeshes(ring, i) {
 		if (!ring) return;
+		const { map = null, mapAlpha = null, opacity = 0.98, emissive = { r: 0, g: 0, b: 0 } } = ring;
 		const ringMaterial = {
-			map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
-			normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
+			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
+			alphaMap: mapAlpha ? await imageBitmapLoader.loadAsync(mapAlpha).then((t) => new THREE.CanvasTexture(t)) : null,
 			transparent: true,
-			emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
-			emissive: ring.emissive || null,
-			emissiveIntensity: ring.emissiveIntensity || null,
+			emissive: emissive.r || emissive.g || emissive.b ? new THREE.Color(emissive.r, emissive.g, emissive.b) : null,
+			opacity,
 			side: THREE.DoubleSide
 		};
 
 		const ringMesh = new THREE.Mesh(
-			ringUVMapGeometry(this.data.meanRadius + this.data.rings[i].inner, this.data.meanRadius + this.data.rings[i].outer),
-			new THREE.MeshStandardMaterial(ringMaterial)
+			ringUVMapGeometry(
+				this.data.meanRadius + this.data.rings[i].inner,
+				this.data.meanRadius + this.data.rings[i].outer
+			),
+			new THREE.MeshPhongMaterial(ringMaterial)
 		);
 
 		ringMesh.name = `${this.data.id} ring ${i}`;
@@ -433,17 +439,17 @@ class Entity {
 		this.meshGroup.add(mesh);
 		this.labelGroup.add(this.meshGroup);
 
+		this.meshGroup.name = `${this.data.name} mesh group`;
+		this.meshGroup.rotation.z = THREE.MathUtils.degToRad(this.data.axialTilt);
+
 		if (this.materialData.rings) {
-			const ringMeshPromises = this.materialData.rings.map((ring, i) => {
-				return this.constructRingMeshes(ring, i);
-			});
+			const ringMeshPromises = this.materialData.rings.map((ring, i) => this.constructRingMeshes(ring, i));
 
 			await Promise.all(ringMeshPromises).then((ringMeshes) => {
-				ringMeshes.forEach((ringMesh) => {
-					// TODO: this will need to be adjusted later
+				for (const ringMesh of ringMeshes) {
 					ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
 					this.meshGroup.add(ringMesh);
-				});
+				}
 			});
 		}
 	}

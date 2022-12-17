@@ -78,16 +78,13 @@ const materialData = {
 
 	_saturn: {
 		map: './../../img/textures/saturn-2k.jpg',
-		normalMap: null,
 		shininess: 10,
 		segments: 64,
 		rings: [
 			{
-				map: './../../img/textures/saturn-ring-alpha.png',
-				emissive: '#FFF',
-				emissiveMap: './../../img/textures/saturn-ring-alpha.png',
-				emissiveIntensity: 1,
-				normalMap: null,
+				map: './../../img/textures/saturn-rings-color.png',
+				mapAlpha: './../../img/textures/saturn-rings-alpha.png',
+				emissive: { r: 0.2, g: 0.2, b: 0.17 },
 				side: DoubleSide
 			}
 		]

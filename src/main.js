@@ -282,7 +282,7 @@ fetch('./solarSystemData.json')
 
 						// splitting the results by bodyType, then recombining into the final Search Results
 						const sortedResults = filteredResults
-							.filter((item) => item.bodyType !== 'Asteroid')
+							.filter((item) => item.bodyType !== 'Asteroid' && item.bodyType !== 'Comet')
 							.sort((a, b) => {
 								if (a.bodyType === 'Star' || b.bodyType === 'Star') return a.bodyType === 'Star' ? -1 : 1;
 								else if (a.bodyType === 'Planet' || b.bodyType === 'Planet') return a.bodyType === 'Planet' ? -1 : 1;
