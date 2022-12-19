@@ -397,11 +397,12 @@ fetch('./solarSystemData.json')
 									showName: moons[0].moonGroupShowName,
 									moonGroupIndex: moons[0].moonGroupIndex,
 									moons,
-									// switch on the selected moon group if it's the first visit by default, or else just switch on first one
+									// switch on the selected moon group if it's the first visit by default, or else just switch it on if it's set to be on during the data parsing at start
 									isEnabled:
 										this.clickedClassData.bodyType === 'Moon'
 											? moonGroupId === this.clickedClassData.moonGroupId
-											: i === 0,
+											: !moons[0].hasOwnProperty('moonGroupDefaultEnabled') ||
+											  moons[0].moonGroupDefaultEnabled === true,
 									isSelected: false,
 									systemId: moons[0].systemId
 								};
