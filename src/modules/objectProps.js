@@ -42,8 +42,12 @@ class OrbitLine {
 	drawLine(iterator) {
 		const orbitPoints = [];
 		const i = iterator || 0;
-		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i; p += 1) {
-			orbitPoints.push(calculateOrbit(p, this.data, this.parentPlanetData));
+		for (
+			let theta = this.data.meanAnomaly - i;
+			theta <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i;
+			theta += 1
+		) {
+			orbitPoints.push(calculateOrbit(theta, this.data, this.parentPlanetData));
 		}
 
 		// deleting last geometry line if iterated upon, otherwise they'll start to chew up lots of memory
@@ -192,10 +196,10 @@ class EquatorLine {
 
 	build() {
 		const equatorPoints = [];
-		for (let i = 0; i < 360; i++) {
-			const theta = this.data.diameter * 1.1;
-			const x = Math.sin(THREE.MathUtils.degToRad(i * -1)) * theta;
-			const z = Math.cos(THREE.MathUtils.degToRad(i)) * theta;
+		for (let theta = 0; theta < 360; theta++) {
+			const r = this.data.diameter * 1.1;
+			const x = Math.sin(THREE.MathUtils.degToRad(theta * -1)) * r;
+			const z = Math.cos(THREE.MathUtils.degToRad(theta)) * r;
 			equatorPoints.push(new THREE.Vector3(x, 0, z));
 		}
 		const geometryLine = new THREE.BufferGeometry().setFromPoints(equatorPoints);
