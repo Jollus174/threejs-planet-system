@@ -197,7 +197,9 @@ class EquatorLine {
 				visible: this.classRef.orbitLineVisibleAtBuild,
 				scale: 10 / this.data.diameter,
 				dashSize: 3,
-				gapSize: 2
+				gapSize: 2,
+				transparent: true,
+				opacity: 0.3
 			})
 		);
 		this.line.computeLineDistances();
@@ -216,6 +218,60 @@ class EquatorLine {
 				duration: 0.25,
 				onComplete: () => {
 					this.equatorLine.removeFromParent();
+					this.fadingOut = false;
+				}
+			});
+		}
+	}
+}
+
+class PolesLine {
+	constructor(data, classRef) {
+		this.data = data;
+		this.classRef = classRef;
+		this.lineName = `${this.data.id} poles line`;
+		this.line = null;
+		this.fadingIn = false;
+		this.fadingOut = false;
+	}
+
+	build() {
+		const polesPoints = [
+			new THREE.Vector3(0, this.data.diameter * 1.15, 0),
+			new THREE.Vector3(0, this.data.diameter * -1.15, 0)
+		];
+
+		const geometryLine = new THREE.BufferGeometry().setFromPoints(polesPoints);
+		const color = new THREE.Color(0xffffff);
+
+		this.line = new THREE.Line(
+			geometryLine,
+			new THREE.LineDashedMaterial({
+				color,
+				visible: this.classRef.orbitLineVisibleAtBuild,
+				scale: 60 / this.data.diameter,
+				dashSize: 1,
+				gapSize: 1,
+				transparent: true,
+				opacity: 0.3
+			})
+		);
+		this.line.computeLineDistances();
+
+		this.line.name = this.lineName;
+
+		this.classRef.labelGroup.add(this.line);
+	}
+
+	destroy() {
+		if (!this.polesLine || !this.polesLine.material) return;
+		if (!this.fadingOut) {
+			this.fadingOut = true;
+			gsap.to(this.polesLine.material, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					this.polesLine.removeFromParent();
 					this.fadingOut = false;
 				}
 			});
@@ -245,6 +301,7 @@ class Entity {
 		this.orbitLineOpacityDefault = 0.5;
 		this.OrbitLine = new OrbitLine(data, this);
 		this.EquatorLine = new EquatorLine(data, this);
+		this.PolesLine = new PolesLine(data, this);
 
 		this.raycasterEnabled = false; // can cause some pretty laggy performance issues
 
@@ -273,6 +330,7 @@ class Entity {
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
 		this.EquatorLine.build();
+		this.PolesLine.build();
 		this.labelLink.style.pointerEvents = '';
 		this.isBuilt = true;
 
@@ -574,6 +632,7 @@ class Entity {
 		if (this.isBuilt) {
 			if (this.OrbitLine) this.OrbitLine.destroy();
 			if (this.EquatorLine) this.EquatorLine.destroy();
+			if (this.PolesLine) this.PolesLine.destroy();
 			setTimeout(() => {
 				clearInterval(this.intervalCheckVar);
 
@@ -759,6 +818,8 @@ class Sun extends Entity {
 				samples: 60,
 				clampMax: 1.0
 			});
+			this.EquatorLine.line.visible = false;
+			this.PolesLine.line.visible = false;
 		});
 	}
 
@@ -816,6 +877,7 @@ class Moon extends Entity {
 
 		this.OrbitLine.build();
 		this.EquatorLine.build();
+		this.PolesLine.build();
 
 		if (!this.meshGroup.children.length) {
 			this.renderEntityMesh();
