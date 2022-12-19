@@ -572,15 +572,15 @@ class Entity {
 	// for updates that need to happen in the main render loop
 	draw() {
 		if (this.meshGroup.visible) {
-			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (1 / (this.data.sideralRotation * 10));
+			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (-1 / (this.data.sideralRotation * 10));
 
 			if (this.EquatorLine && this.EquatorLine.line) {
-				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (1 / this.data.sideralRotation);
+				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (-1 / 50);
 			}
 
 			if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
-				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX;
-				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY;
+				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX * -1;
+				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY * -1;
 			}
 		}
 	}
