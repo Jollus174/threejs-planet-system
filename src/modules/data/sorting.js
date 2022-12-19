@@ -81,6 +81,8 @@ const generalUpdates = (item, items) => {
 };
 
 const addToMoonGroup = (item) => {
+	item.sideralOrbitDirection = 'Prograde'; // prograde unless specified otherwise
+
 	if (item.bodyType === 'Moon') {
 		if (['_moon'].includes(item.id)) {
 			item.moonGroupName = 'Earth';
@@ -241,7 +243,7 @@ const addToMoonGroup = (item) => {
 			].includes(item.id)
 		) {
 			item.moonGroupName = 'Skathi';
-			item.direction = 'retrograde';
+			item.sideralOrbitDirection = 'Retrograde';
 			item.moonGroupColor = hsl(43);
 			item.moonGroupShowName = true;
 			item.moonGroupIndex = 1;
@@ -249,7 +251,7 @@ const addToMoonGroup = (item) => {
 		}
 		if (['_narvi', '_bestla', '_s2004S36'].includes(item.id)) {
 			item.moonGroupName = 'Narvi';
-			item.direction = 'retrograde';
+			item.sideralOrbitDirection = 'Retrograde';
 			item.moonGroupColor = hsl(25);
 			item.moonGroupShowName = true;
 			item.moonGroupIndex = 2;
@@ -291,7 +293,7 @@ const addToMoonGroup = (item) => {
 			].includes(item.id)
 		) {
 			item.moonGroupName = 'Norse';
-			item.direction = 'retrograde';
+			item.sideralOrbitDirection = 'Retrograde';
 			item.moonGroupColor = hsl(236);
 			item.moonGroupShowName = true;
 			item.moonGroupIndex = 3;
@@ -388,7 +390,7 @@ const addToMoonGroup = (item) => {
 			item.moonGroupName = 'Irregular';
 			item.moonGroupColor = hsl(136);
 			item.moonGroupShowName = true;
-			item.direction = item.id === '_margaret' ? 'Prograde' : 'Retrograde';
+			item.sideralOrbitDirection = item.id === '_margaret' ? 'Prograde' : 'Retrograde';
 			item.moonGroupIndex = 2;
 			item.moonGroupDefaultEnabled = false;
 		}
@@ -408,7 +410,7 @@ const addToMoonGroup = (item) => {
 			item.moonGroupDefaultEnabled = false;
 		}
 
-		if (['_triton', '_halimede', '_psamathe', '_neso'].includes(item.id)) item.direction = 'Retrograde';
+		if (['_triton', '_halimede', '_psamathe', '_neso'].includes(item.id)) item.sideralOrbitDirection = 'Retrograde';
 
 		if (['_charon', '_nix', '_hydra', '_kerberos', '_styx'].includes(item.id)) {
 			item.moonGroupName = 'Pluto';

@@ -63,6 +63,7 @@ class OrbitLine {
 		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
 
 		const colors = new Float32Array(this.vertexCount * 3);
+		if (this.data.sideralOrbitDirection === 'Prograde') {
 		for (let c = this.amountOfOrbitToDraw; c >= 0; c -= 1) {
 			const lerpColor = new THREE.Color(this.startColor);
 			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
@@ -70,6 +71,16 @@ class OrbitLine {
 			colors[c * 3 + 0] = lerpColor.r;
 			colors[c * 3 + 1] = lerpColor.g;
 			colors[c * 3 + 2] = lerpColor.b;
+		}
+		} else {
+			// all because some of the moons have to go all yeehaa and orbit in the other direction
+			for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
+				const lerpColor = new THREE.Color(this.startColor);
+				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
+				colors[c * 3 + 0] = lerpColor.r;
+				colors[c * 3 + 1] = lerpColor.g;
+				colors[c * 3 + 2] = lerpColor.b;
+			}
 		}
 
 		return colors;
