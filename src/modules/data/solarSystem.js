@@ -57,11 +57,18 @@ const materialData = {
 		segments: 64
 	},
 
-	// TODO: jupiter rings
 	_jupiter: {
 		map: './../../img/textures/jupiter-2k.jpg',
 		shininess: 10,
-		segments: 64
+		segments: 64,
+		rings: [
+			{
+				map: './../../img/textures/uranus-rings-color.png',
+				mapAlpha: './../../img/textures/uranus-rings-alpha.png',
+				opacity: 0.1,
+				side: DoubleSide
+			}
+		]
 	},
 	_callisto: {
 		map: './../../img/textures/moon-callisto-2k.jpg'
@@ -91,11 +98,27 @@ const materialData = {
 	},
 	_uranus: {
 		map: './../../img/textures/uranus-2k.jpg',
-		segments: 64
+		segments: 64,
+		rings: [
+			{
+				map: './../../img/textures/uranus-rings-color.png',
+				mapAlpha: './../../img/textures/uranus-rings-alpha.png',
+				opacity: 0.3,
+				side: DoubleSide
+			}
+		]
 	},
 	_neptune: {
 		map: './../../img/textures/neptune-2k.jpg',
-		segments: 64
+		segments: 64,
+		rings: [
+			{
+				map: './../../img/textures/neptune-rings-color.png',
+				mapAlpha: './../../img/textures/neptune-rings-alpha.png',
+				opacity: 0.3,
+				side: DoubleSide
+			}
+		]
 	},
 
 	_1ceres: {

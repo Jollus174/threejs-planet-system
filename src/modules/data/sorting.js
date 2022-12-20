@@ -444,23 +444,42 @@ const isInnerPlanet = (item) => {
 
 const setRings = (item) => {
 	// manually adding own ring data, API does not have this
-	const ringData = {
-		_saturn: [
+	if (item.id === '_jupiter') {
+		item.rings = [
+			{
+				inner: 86900,
+				outer: 228000
+			}
+		];
+	}
+
+	if (item.id === '_saturn') {
+		item.rings = [
 			{
 				// TODO: these numbers are likely inaccurate
-				inner: 66900,
-				outer: 180220, // looks more rad
-				tilt: null
+				inner: 86900,
+				// https://www.britannica.com/place/Saturn-planet/The-ring-system#:~:text=idealized%20case%20is-,2.44%20Saturn%20radii,-(147%2C000%20km%20%5B91%2C300
+				outer: 282000
 			}
-		]
-	};
+		];
+	}
 
-	// TODO: This will eventually be 'englishId' because of Monsiour French API Dev's data
-	if (ringData[item.id]) {
-		item.rings = [];
-		for (const ring of ringData[item.id]) {
-			item.rings.push(ring);
-		}
+	if (item.id === '_uranus') {
+		item.rings = [
+			{
+				inner: 48000,
+				outer: 62220
+			}
+		];
+	}
+
+	if (item.id === '_neptune') {
+		item.rings = [
+			{
+				inner: 48000,
+				outer: 62220
+			}
+		];
 	}
 };
 
