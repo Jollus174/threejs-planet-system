@@ -105,11 +105,12 @@ class OrbitLine {
 		this.orbitLine.name = this.orbitLineName;
 
 		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
-		if (this.parentPlanetData) {
-			this.orbitLine.renderOrder = 2;
-		} else {
-			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
-		}
+		// causes issues where rings will obscure orbit lines
+		// if (this.parentPlanetData) {
+		// 	this.orbitLine.renderOrder = 2;
+		// } else {
+		// 	this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
+		// }
 
 		this.classRef.labelGroup.parent.add(this.orbitLine);
 
