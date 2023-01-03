@@ -1,13 +1,13 @@
 import { DoubleSide } from 'three';
 
-import textureSun from './../../img/textures/sun-min.jpg';
+import textureSun from '/img/textures/sun-min.jpg';
 
-import spaceFt from './../../img/textures/space_ft.jpg';
-import spaceBk from './../../img/textures/space_bk.jpg';
-import spaceUp from './../../img/textures/space_up.jpg';
-import spaceDn from './../../img/textures/space_dn.jpg';
-import spaceRt from './../../img/textures/space_rt.jpg';
-import spaceLt from './../../img/textures/space_lt.jpg';
+import spaceFt from '/img/textures/space_ft.jpg';
+import spaceBk from '/img/textures/space_bk.jpg';
+import spaceUp from '/img/textures/space_up.jpg';
+import spaceDn from '/img/textures/space_dn.jpg';
+import spaceRt from '/img/textures/space_rt.jpg';
+import spaceLt from '/img/textures/space_lt.jpg';
 
 const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
 
@@ -25,96 +25,96 @@ const materialData = {
 	},
 
 	_mercury: {
-		map: './../../img/textures/mercury-2k.jpg',
-		bumpMap: './../../img/textures/mercury-bump-2k.jpg',
+		map: '/img/textures/mercury-2k.jpg',
+		bumpMap: '/img/textures/mercury-bump-2k.jpg',
 		segments: 64
 	},
 	_venus: {
-		map: './../../img/textures/venus-2k.jpg',
-		clouds: './../../img/textures/venus-clouds-2k.jpg',
+		map: '/img/textures/venus-2k.jpg',
+		clouds: '/img/textures/venus-clouds-2k.jpg',
 		cloudsRotateX: 0.01,
 		cloudsRotateY: 0.03,
 		segments: 64
 	},
 
 	_earth: {
-		map: './../../img/textures/earth-4k.jpg',
-		bumpMap: './../../img/textures/earth-bump-4k.jpg',
-		clouds: './../../img/textures/earth-clouds-4k.jpg',
-		cloudsAlpha: './../../img/textures/earth-clouds-alpha-4k.jpg',
+		map: '/img/textures/earth-4k.jpg',
+		bumpMap: '/img/textures/earth-bump-4k.jpg',
+		clouds: '/img/textures/earth-clouds-4k.jpg',
+		cloudsAlpha: '/img/textures/earth-clouds-alpha-4k.jpg',
 		cloudsRotateX: 0.005,
 		cloudsRotateY: 0.0,
 		segments: 64
 	},
 	_moon: {
-		map: './../../img/textures/moon-2k.jpg',
-		bumpMap: './../../img/textures/moon-bump-2k.jpg'
+		map: '/img/textures/moon-2k.jpg',
+		bumpMap: '/img/textures/moon-bump-2k.jpg'
 	},
 
 	_mars: {
-		map: './../../img/textures/mars-2k.jpg',
-		normalMap: './../../img/textures/mars-normal-2k.jpg',
+		map: '/img/textures/mars-2k.jpg',
+		normalMap: '/img/textures/mars-normal-2k.jpg',
 		segments: 64
 	},
 
 	_jupiter: {
-		map: './../../img/textures/jupiter-2k.jpg',
+		map: '/img/textures/jupiter-2k.jpg',
 		shininess: 10,
 		segments: 64,
 		rings: [
 			{
-				map: './../../img/textures/uranus-rings-color.png',
-				mapAlpha: './../../img/textures/uranus-rings-alpha.png',
+				map: '/img/textures/uranus-rings-color.png',
+				mapAlpha: '/img/textures/uranus-rings-alpha.png',
 				opacity: 0.1,
 				side: DoubleSide
 			}
 		]
 	},
 	_callisto: {
-		map: './../../img/textures/moon-callisto-2k.jpg'
+		map: '/img/textures/moon-callisto-2k.jpg'
 	},
 	_europa: {
-		map: './../../img/textures/moon-europa.jpg'
+		map: '/img/textures/moon-europa.jpg'
 	},
 	_ganymede: {
-		map: './../../img/textures/moon-ganymede-2k.jpg'
+		map: '/img/textures/moon-ganymede-2k.jpg'
 	},
 	_io: {
-		map: './../../img/textures/moon-io.jpg'
+		map: '/img/textures/moon-io.jpg'
 	},
 
 	_saturn: {
-		map: './../../img/textures/saturn-2k.jpg',
+		map: '/img/textures/saturn-2k.jpg',
 		shininess: 10,
 		segments: 64,
 		rings: [
 			{
-				map: './../../img/textures/saturn-rings-color.png',
-				mapAlpha: './../../img/textures/saturn-rings-alpha.png',
+				map: '/img/textures/saturn-rings-color.png',
+				mapAlpha: '/img/textures/saturn-rings-alpha.png',
 				emissive: { r: 0.2, g: 0.2, b: 0.17 },
 				side: DoubleSide
 			}
 		]
 	},
 	_uranus: {
-		map: './../../img/textures/uranus-2k.jpg',
+		map: '/img/textures/uranus-2k.jpg',
 		segments: 64,
 		rings: [
 			{
-				map: './../../img/textures/uranus-rings-color.png',
-				mapAlpha: './../../img/textures/uranus-rings-alpha.png',
+				map: '/img/textures/uranus-rings-color.png',
+				mapAlpha: '/img/textures/uranus-rings-alpha.png',
 				opacity: 0.3,
 				side: DoubleSide
 			}
 		]
 	},
 	_neptune: {
-		map: './../../img/textures/neptune-2k.jpg',
+		map: '/img/textures/neptune-2k.jpg',
 		segments: 64,
 		rings: [
 			{
-				map: './../../img/textures/neptune-rings-color.png',
-				mapAlpha: './../../img/textures/neptune-rings-alpha.png',
+				map: '/img/textures/neptune-rings-color.png',
+				mapAlpha: '/img/textures/neptune-rings-alpha.png',
 				opacity: 0.3,
 				side: DoubleSide
 			}
@@ -122,24 +122,24 @@ const materialData = {
 	},
 
 	_1ceres: {
-		map: './../../img/textures/ceres-2k.jpg'
+		map: '/img/textures/ceres-2k.jpg'
 	},
 	_136199eris: {
-		map: './../../img/textures/eris.jpg'
+		map: '/img/textures/eris.jpg'
 	},
 	_136108haumea: {
-		map: './../../img/textures/haumea.jpg'
+		map: '/img/textures/haumea.jpg'
 	},
 	_136472makemake: {
-		map: './../../img/textures/makemake.jpg',
+		map: '/img/textures/makemake.jpg',
 		shininess: 10
 	},
 	_90482orcus: {
-		map: './../../img/textures/orcus-2k.jpg',
+		map: '/img/textures/orcus-2k.jpg',
 		shininess: 5
 	},
 	_pluto: {
-		map: './../../img/textures/pluto-4k.jpg'
+		map: '/img/textures/pluto-4k.jpg'
 	}
 };
 

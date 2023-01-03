@@ -855,9 +855,10 @@ fetch('./solarSystemData.json')
 						// also stopping redundant requests being made for images that were already loaded
 						if (this.modelSidebarImages[this.clickedClassData.id] === undefined) {
 							// making the loading spinner appear after 400ms so it doesn't appear instantly after every image switch
-							this.sidebar.loadingTimeout = setTimeout(() => {
-								this.sidebar.imageLoading = true;
-							}, 400);
+							// TODO: this bugs out and it sometimes gets stuck on perma-spinner
+							// this.sidebar.loadingTimeout = setTimeout(() => {
+							// 	this.sidebar.imageLoading = true;
+							// }, 400);
 							this.sidebar.imagesQueue.push(this.clickedClassData.sidebarImage);
 						} else {
 							// image was already loaded previously, and is in the cache
