@@ -24,7 +24,6 @@ class OrbitLine {
 	constructor(data, classRef) {
 		this.data = data;
 		this.classRef = classRef;
-		this.orbitLineName = `${this.data.id} orbit line`;
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
@@ -37,6 +36,34 @@ class OrbitLine {
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
 		this.amountOfOrbitToDraw = this.data.bodyType === 'Moon' ? 180 : 330; // 360 means full circle
+	}
+
+	setColors() {
+		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
+		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
+		this.colors = this.colors || new Float32Array(this.vertexCount * 3);
+
+		if (this.data.sideralOrbitDirection === 'Prograde') {
+			for (let c = this.amountOfOrbitToDraw; c >= 0; c -= 1) {
+				const lerpColor = new THREE.Color(this.startColor);
+				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
+
+				this.colors[c * 3 + 0] = lerpColor.r;
+				this.colors[c * 3 + 1] = lerpColor.g;
+				this.colors[c * 3 + 2] = lerpColor.b;
+			}
+		} else {
+			// all because some of the moons have to go all yeehaa and orbit in the other direction
+			for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
+				const lerpColor = new THREE.Color(this.startColor);
+				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
+				this.colors[c * 3 + 0] = lerpColor.r;
+				this.colors[c * 3 + 1] = lerpColor.g;
+				this.colors[c * 3 + 2] = lerpColor.b;
+			}
+		}
+
+		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
 	}
 
 	drawLine(iterator) {
@@ -56,38 +83,8 @@ class OrbitLine {
 		this.geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
 		this.vertexCount = this.vertexCount || this.geometryLine.getAttribute('position').count;
 
-		this.colors = this.colors || this.generateColors();
-		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+		this.setColors();
 		return this.geometryLine;
-	}
-
-	generateColors() {
-		// how much fade we want, closer to 0 means fades earlier
-		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
-		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
-
-		const colors = new Float32Array(this.vertexCount * 3);
-		if (this.data.sideralOrbitDirection === 'Prograde') {
-			for (let c = this.amountOfOrbitToDraw; c >= 0; c -= 1) {
-				const lerpColor = new THREE.Color(this.startColor);
-				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
-
-				colors[c * 3 + 0] = lerpColor.r;
-				colors[c * 3 + 1] = lerpColor.g;
-				colors[c * 3 + 2] = lerpColor.b;
-			}
-		} else {
-			// all because some of the moons have to go all yeehaa and orbit in the other direction
-			for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
-				const lerpColor = new THREE.Color(this.startColor);
-				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
-				colors[c * 3 + 0] = lerpColor.r;
-				colors[c * 3 + 1] = lerpColor.g;
-				colors[c * 3 + 2] = lerpColor.b;
-			}
-		}
-
-		return colors;
 	}
 
 	build() {
@@ -102,7 +99,7 @@ class OrbitLine {
 			})
 		);
 
-		this.orbitLine.name = this.orbitLineName;
+		this.orbitLine.name = `${this.data.id} orbit line`;
 
 		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
 		// causes issues where rings will obscure orbit lines
@@ -419,7 +416,10 @@ class Entity {
 
 	resetLabelGroupPosition() {
 		this.setLabelGroupDefaultPosition();
-		if (this.OrbitLine && this.OrbitLine.orbitLine) this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(0);
+
+		if (this.OrbitLine.orbitLine) {
+			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(0);
+		}
 	}
 
 	// TODO: am unsure if should be using 'copy' on all of these...
@@ -432,7 +432,7 @@ class Entity {
 		);
 
 		// careful, this causes the memory to massively leak!
-		if (this.OrbitLine && this.OrbitLine.orbitLine) {
+		if (this.OrbitLine.orbitLine) {
 			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
 			// this.OrbitLine.colorLine(i);
 		}
@@ -794,8 +794,7 @@ class Sun extends Entity {
 	async constructEntityMesh(isGodRays) {
 		if (this.meshGroup && this.meshGroup.children.length) return;
 
-		const meshGroup = new THREE.Group();
-		meshGroup.name = this.data.id;
+		this.meshGroup.name = this.data.id;
 
 		// smaller geometry behind godRays so orbit lines don't bleed from behind it
 		const geometry = new THREE.SphereBufferGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
