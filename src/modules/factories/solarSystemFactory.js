@@ -67,7 +67,7 @@ const skybox = (texturePaths) => {
 		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
 	);
 	const skybox = new THREE.Mesh(
-		new THREE.BoxBufferGeometry(1000000000000, 1000000000000, 1000000000000),
+		new THREE.BoxGeometry(1000000000000, 1000000000000, 1000000000000),
 		skyboxMaterialArray
 	);
 	skybox.name = 'skybox';

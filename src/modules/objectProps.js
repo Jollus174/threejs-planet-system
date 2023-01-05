@@ -504,7 +504,7 @@ class Entity {
 	async constructEntityMesh() {
 		if (this.meshGroup && this.meshGroup.children.length) return null;
 
-		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, this.segments, this.segments);
+		const geometry = new THREE.SphereGeometry(this.data.diameter, this.segments, this.segments);
 		const loaderMaterial = new THREE.MeshPhongMaterial({
 			color: new THREE.Color(0x000000),
 			transparent: true,
@@ -797,7 +797,7 @@ class Sun extends Entity {
 		this.meshGroup.name = this.data.id;
 
 		// smaller geometry behind godRays so orbit lines don't bleed from behind it
-		const geometry = new THREE.SphereBufferGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
+		const geometry = new THREE.SphereGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
 		const material = new THREE.MeshStandardMaterial({
 			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
 			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,

@@ -17,7 +17,6 @@ import { asteroidBelt, skybox, starField } from './modules/factories/solarSystem
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, APIRequest } from './modules/data/api';
-import { scene } from './modules/scene';
 
 import {
 	RenderPass,
@@ -1026,11 +1025,11 @@ fetch('./solarSystemData.json')
 					const lightTypeKeys = Object.keys(orrery.lights);
 					lightTypeKeys.forEach((lightType) => {
 						orrery.lights[lightType].forEach((lightObjsArr) => {
-							lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+							lightObjsArr.forEach((lightObj) => orrery.scene.add(lightObj));
 						});
 					});
 
-					scene.add(skybox(skyboxTexturePaths));
+					orrery.scene.add(skybox(skyboxTexturePaths));
 
 					// targeting Sun by default
 					document.dispatchEvent(
@@ -1053,25 +1052,26 @@ fetch('./solarSystemData.json')
 						);
 					}
 
-					// scene.add(orrery.bodies._starField);
-					// scene.add(orrery.bodies._asteroidBelt);
+					// orrery.scene.add(orrery.bodies._starField);
+					// orrery.scene.add(orrery.bodies._asteroidBelt);
 
 					// sets z-indexing of planets to be correct
 					// checking for overlapping labels (and eventually labels behind planets...)
 					// the former needs to be done in the DOM
 					// the latter... I'm not completely sure yet
 					setInterval(() => {
-						labelRenderer.zOrder(scene);
+						labelRenderer.zOrder(orrery.scene);
 					}, 200);
 
-					const geometry = new THREE.SphereBufferGeometry(0.01, 32, 32);
-					const material = new THREE.MeshBasicMaterial({ color: /* 0xffe484 */ 'orange' });
+					const geometry = new THREE.SphereGeometry(0.01, 32, 32);
+					const material = new THREE.MeshBasicMaterial({ color: 'orange' });
 					const sphere = new THREE.Mesh(geometry, material);
-					scene.add(sphere);
+					orrery.scene.add(sphere);
 
 					// RENDER PASSES HERE
 					composer.addPass(new RenderPass(orrery.scene, orrery.camera));
-					composer.multisampling = 8;
+					// TODO: reinvestigate this. Upgrading ThreeJS caused this line to generate errors
+					// composer.multisampling = 8;
 
 					const godRaysEffect = new GodRaysEffect(orrery.camera, sphere, {
 						blurriness: 2,
@@ -1185,7 +1185,7 @@ fetch('./solarSystemData.json')
 						orrery.controls.update();
 
 						composer.render();
-						labelRenderer.render(scene, orrery.camera);
+						labelRenderer.render(orrery.scene, orrery.camera);
 
 						for (const entity of orrery.classes._allIterable) {
 							entity.draw();
