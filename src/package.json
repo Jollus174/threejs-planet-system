@@ -27,7 +27,7 @@
 		"gsap": "^3.8.0",
 		"postprocessing": "^6.24.0",
 		"skeleton-screen-css": "^1.0.1",
-		"three": "^0.132.2",
+		"three": "^0.148.0",
 		"vue-it-bigger": "^0.2.2"
 	}
 }

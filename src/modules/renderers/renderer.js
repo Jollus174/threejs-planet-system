@@ -1,5 +1,5 @@
 import { PCFSoftShadowMap, BasicShadowMap, HalfFloatType } from 'three';
-import { WebGLRenderer } from '../custom/src/renderers/WebGLRenderer';
+import { WebGLRenderer } from 'three';
 import { EffectComposer } from 'postprocessing';
 
 const renderer = new WebGLRenderer({
