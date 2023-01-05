@@ -19,6 +19,7 @@ const createBasicCube = () => {
 	};
 
 	const boxMesh = new THREE.Mesh(geometry, materials.shaderMaterial);
+	boxMesh.name = 'debug cube';
 	orrery.scene.add(boxMesh);
 };
 
