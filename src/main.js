@@ -352,7 +352,6 @@ fetch('./solarSystemData.json')
 					},
 					timeShiftReset() {
 						for (const timeShiftType of Object.keys(this.timeShiftTypes)) this.timeShiftTypes[timeShiftType] = 0;
-						// TODO: This should be an event that each one is listening for!
 						for (const entity of orrery.classes._allIterable) entity.resetLabelGroupPosition();
 					},
 					timeShiftStop() {
@@ -450,7 +449,6 @@ fetch('./solarSystemData.json')
 
 					pluralise(word, value) {
 						if (!word || !value) {
-							// TODO: I'd imagine Typescript could take care of this automatically
 							console.warn('Word and Value required.');
 							return '';
 						}
@@ -1210,7 +1208,6 @@ fetch('./solarSystemData.json')
 					});
 
 					// using window so RAF can be accessed through solution without importing
-					// TODO: can probably be tidied up in future
 					window.animate = () => {
 						render();
 						window.renderLoop = requestAnimationFrame(window.animate);

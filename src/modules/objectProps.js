@@ -792,8 +792,6 @@ class Sun extends Entity {
 	// }
 
 	async constructEntityMesh(isGodRays) {
-		if (this.meshGroup && this.meshGroup.children.length) return;
-
 		this.meshGroup.name = this.data.id;
 
 		// smaller geometry behind godRays so orbit lines don't bleed from behind it
