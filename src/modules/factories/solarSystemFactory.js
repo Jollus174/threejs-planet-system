@@ -1,8 +1,14 @@
 'use strict';
 import * as THREE from 'three';
 import { textureLoader } from '../loadManager';
-import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { createCircleTexture } from '../utilities/threeJS';
+
+import spaceFt from '/img/textures/space_ft.jpg';
+import spaceBk from '/img/textures/space_bk.jpg';
+import spaceUp from '/img/textures/space_up.jpg';
+import spaceDn from '/img/textures/space_dn.jpg';
+import spaceRt from '/img/textures/space_rt.jpg';
+import spaceLt from '/img/textures/space_lt.jpg';
 
 const asteroidBelt = () => {
 	const particles = 4000;
@@ -62,8 +68,9 @@ const asteroidBelt = () => {
 	return particleSystem;
 };
 
-const skybox = (texturePaths) => {
-	const skyboxMaterialArray = texturePaths.map(
+const skybox = () => {
+	const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
+	const skyboxMaterialArray = skyboxTexturePaths.map(
 		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
 	);
 	const skybox = new THREE.Mesh(

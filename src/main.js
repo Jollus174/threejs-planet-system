@@ -12,7 +12,6 @@ import { checkIfDesktop } from './modules/utilities/dom';
 import { randomString } from './modules/utilities/strings';
 import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { skyboxTexturePaths } from './modules/data/solarSystem';
 import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
@@ -1029,7 +1028,7 @@ fetch('./solarSystemData.json')
 						});
 					});
 
-					orrery.scene.add(skybox(skyboxTexturePaths));
+					orrery.scene.add(skybox());
 
 					// targeting Sun by default
 					document.dispatchEvent(
