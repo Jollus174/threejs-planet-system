@@ -1,12 +1,17 @@
 import { scene } from './scene';
 import { controls } from './controls';
 import { camera } from './camera';
+import { renderer, composer } from './renderers/renderer';
+import { labelRenderer } from './renderers/labelRenderer';
 import { Clock } from 'three';
 
 const orrery = {
 	scene,
 	controls,
 	camera,
+	renderer,
+	composer,
+	labelRenderer,
 	cameraState: {
 		_zoomToTarget: false,
 		_dollySpeed: null,

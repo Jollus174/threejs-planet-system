@@ -4,9 +4,6 @@ import './scss/styles.scss';
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
 import { settings } from './modules/settings';
-import { controls } from './modules/controls';
-import { renderer, composer } from './modules/renderers/renderer';
-import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo } from './modules/utilities/animation';
 import { checkIfDesktop } from './modules/utilities/dom';
 import { randomString } from './modules/utilities/strings';
@@ -39,11 +36,6 @@ import { format, add, differenceInHours } from 'date-fns';
 
 window.settings = settings;
 window.renderLoop = '';
-
-window.renderer = renderer;
-window.composer = composer;
-
-const vectorPosition = new THREE.Vector3();
 
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const clickedClass = e.detail;
@@ -99,7 +91,7 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 	orrery.mouseState._zoomedClass = zoomedClass;
 
 	orrery.cameraState._zoomToTarget = true; // to get the camera moving
-	controls.minDistance = zoomedClass.data.meanRadius * 8;
+	orrery.controls.minDistance = zoomedClass.data.meanRadius * 8;
 
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateZoomEntityVue));
 });
@@ -133,10 +125,10 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 });
 
 const updateProjectionViewSize = (width, height) => {
-	// renderer.setSize(width, height);
-	composer.setSize(width, height);
+	// orrery.renderer.setSize(width, height);
+	orrery.composer.setSize(width, height);
 
-	labelRenderer.setSize(width, height);
+	orrery.labelRenderer.setSize(width, height);
 	orrery.camera.aspect = width / height;
 	orrery.camera.updateProjectionMatrix();
 	orrery.isDesktop = checkIfDesktop();
@@ -221,8 +213,8 @@ fetch('./solarSystemData.json')
 					timeShiftTypeCurrentIndex: 0,
 					dateTimeCurrent: new Date(),
 					timeShiftSystemOnly: false,
-					orreryRendererEl: renderer.domElement,
-					labelRendererEl: labelRenderer.domElement,
+					orreryRendererEl: orrery.renderer.domElement,
+					labelRendererEl: orrery.labelRenderer.domElement,
 					sidebar: {
 						imageLoading: true,
 						imageError: true,
@@ -1181,8 +1173,8 @@ fetch('./solarSystemData.json')
 
 						orrery.controls.update();
 
-						composer.render();
-						labelRenderer.render(orrery.scene, orrery.camera);
+						orrery.composer.render();
+						orrery.labelRenderer.render(orrery.scene, orrery.camera);
 
 						for (const entity of orrery.classes._allIterable) {
 							entity.draw();
