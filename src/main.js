@@ -1049,7 +1049,7 @@ fetch('./solarSystemData.json')
 					// the former needs to be done in the DOM
 					// the latter... I'm not completely sure yet
 					setInterval(() => {
-						labelRenderer.zOrder(orrery.scene);
+						orrery.labelRenderer.zOrder(orrery.scene);
 					}, 200);
 
 					const geometry = new THREE.SphereGeometry(0.01, 32, 32);
@@ -1058,7 +1058,7 @@ fetch('./solarSystemData.json')
 					orrery.scene.add(sphere);
 
 					// RENDER PASSES HERE
-					composer.addPass(new RenderPass(orrery.scene, orrery.camera));
+					orrery.composer.addPass(new RenderPass(orrery.scene, orrery.camera));
 					// TODO: reinvestigate this. Upgrading ThreeJS caused this line to generate errors
 					// composer.multisampling = 8;
 
@@ -1093,21 +1093,11 @@ fetch('./solarSystemData.json')
 						const effects = [godRaysEffect, smaaEffect, orrery.classes._sun.godRaysEffect];
 						const effectPass = new EffectPass(orrery.camera, ...effects);
 						// effectPass.renderToScreen = true;
-						composer.addPass(effectPass);
+						orrery.composer.addPass(effectPass);
 					});
 
-					// setTimeout(() => {
-					// 	const orbitLines = window.scene.children.filter((c) => c.name.includes('orbit line'));
-					// 	orbitLines.forEach((l) => window.selectiveBloomEffect.selection.add(l));
-					// 	// window.selectiveBloomEffect.update();
-					// 	console.log(window.selectiveBloomEffect.getSelection());
-					// 	// window.selectiveBloomEffect.setEnabled = true;
-					// 	console.log('lines added!');
-					// }, 2000);
-
-					// ---
-
 					const scaleVector = new THREE.Vector3();
+					const vectorPosition = new THREE.Vector3();
 					let scaleFactor = 4;
 
 					const render = () => {
