@@ -3,6 +3,7 @@ import { controls } from './controls';
 import { camera } from './camera';
 import { renderer, composer } from './renderers/renderer';
 import { labelRenderer } from './renderers/labelRenderer';
+import { skybox } from './factories/solarSystemFactory';
 import { Clock } from 'three';
 
 const orrery = {
@@ -26,7 +27,7 @@ const orrery = {
 		_clickedClass: null,
 		_zoomedClass: null
 	},
-	skybox: null,
+	skybox: skybox(),
 	classes: {
 		_all: {},
 		_allIterable: [],

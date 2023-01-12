@@ -70,9 +70,13 @@ const asteroidBelt = () => {
 
 const skybox = () => {
 	const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
-	const skyboxMaterialArray = skyboxTexturePaths.map(
-		(image) => new THREE.MeshBasicMaterial({ map: textureLoader.load(image), side: THREE.BackSide })
-	);
+	const skyboxMaterialArray = skyboxTexturePaths.map((image) => {
+		return new THREE.MeshBasicMaterial({
+			map: textureLoader.load(image),
+			side: THREE.BackSide,
+			depthTest: false // needed or else will appear in front of shaders
+		});
+	});
 	const skybox = new THREE.Mesh(
 		new THREE.BoxGeometry(1000000000000, 1000000000000, 1000000000000),
 		skyboxMaterialArray

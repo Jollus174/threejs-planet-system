@@ -1018,7 +1018,7 @@ fetch('./solarSystemData.json')
 						});
 					});
 
-					orrery.scene.add(skybox());
+					orrery.scene.add(orrery.skybox);
 
 					// targeting Sun by default
 					document.dispatchEvent(
