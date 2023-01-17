@@ -9,7 +9,7 @@ import { checkIfDesktop } from './modules/utilities/dom';
 import { randomString } from './modules/utilities/strings';
 import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
+import { asteroidBelt, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, APIRequest } from './modules/data/api';
