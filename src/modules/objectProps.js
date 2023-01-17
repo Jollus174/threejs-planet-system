@@ -12,6 +12,8 @@ import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
+import lineVertexShader from './shaders/fadingLine/vertexShader.glsl';
+import lineFragmentShader from './shaders/fadingLine/fragmentShader.glsl';
 
 const planetRangeThreshold = 100000000;
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
@@ -32,6 +34,7 @@ class OrbitLine {
 		this.colors = null;
 		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
 		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....;
+		this.uniforms = {};
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
@@ -88,15 +91,30 @@ class OrbitLine {
 	}
 
 	build() {
+		this.uniforms = {
+			offset: { value: this.data.mainAnomaly },
+			color: { value: this.startColor },
+			logDepthBuffFC: { value: 2.0 / (Math.log(orrery.camera.far + 1.0) / Math.LN2) }
+		};
+
+		const shaderMaterial = new THREE.ShaderMaterial({
+			uniforms: this.uniforms,
+			transparent: true,
+			vertexShader: lineVertexShader,
+			fragmentShader: lineFragmentShader,
+			blending: THREE.AdditiveBlending
+		});
+
 		this.orbitLine = new THREE.Line(
 			this.drawLine(),
-			new THREE.LineBasicMaterial({
-				transparent: true,
-				opacity: this.classRef.orbitLineOpacityDefault,
-				visible: this.classRef.orbitLineVisibleAtBuild,
-				blending: THREE.AdditiveBlending,
-				vertexColors: true
-			})
+			shaderMaterial
+			// new THREE.LineBasicMaterial({
+			// 	transparent: true,
+			// 	opacity: this.classRef.orbitLineOpacityDefault,
+			// 	visible: this.classRef.orbitLineVisibleAtBuild,
+			// 	blending: THREE.AdditiveBlending,
+			// 	vertexColors: true
+			// })
 		);
 
 		this.orbitLine.name = `${this.data.id} orbit line`;
@@ -298,6 +316,7 @@ class Entity {
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group();
 		this.meshGroup = new THREE.Group();
+		this.theta = data.meanAnomaly;
 		this.surfaceMesh = null;
 		this.cloudMesh = null;
 		this.isBuilt = false;
@@ -433,7 +452,7 @@ class Entity {
 
 		// careful, this causes the memory to massively leak!
 		if (this.OrbitLine.orbitLine) {
-			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
+			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(this.theta);
 			// this.OrbitLine.colorLine(i);
 		}
 	}
