@@ -1,7 +1,9 @@
-uniform vec3 colorA; 
-uniform vec3 colorB; 
-varying vec3 vUv;
+uniform float logDepthBuffFC;
+
+in vec3 vNormal;
+in float vFragDepth;
 
 void main() {
-  gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
+  gl_FragColor = vec4(vNormal, 1.0);
+  gl_FragDepth = log2(vFragDepth) * logDepthBuffFC * 0.5;
 }

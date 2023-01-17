@@ -1,8 +1,9 @@
-varying vec3 vUv; 
+out vec3 vNormal; 
+out float vFragDepth;
 
 void main() {
-  vUv = position; 
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); 
 
-  vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-  gl_Position = projectionMatrix * modelViewPosition; 
+  vNormal = normal;
+  vFragDepth = 1.0 + gl_Position.w;
 }
