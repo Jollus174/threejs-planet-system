@@ -9,7 +9,7 @@ const loadManager = () => {
 	};
 
 	manager.onLoad = () => {
-		// 	// console.log('Loading complete!');
+		// console.log('Loading complete!');
 		// 	document.querySelector('body').classList.remove('loading');
 		// 	document.querySelector('body').classList.add('loaded');
 	};

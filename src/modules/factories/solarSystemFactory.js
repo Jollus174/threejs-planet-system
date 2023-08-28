@@ -78,7 +78,7 @@ const skybox = () => {
 		});
 	});
 	const skybox = new THREE.Mesh(
-		new THREE.BoxGeometry(1000000000000, 1000000000000, 1000000000000),
+		new THREE.BoxBufferGeometry(1000000000000, 1000000000000, 1000000000000),
 		skyboxMaterialArray
 	);
 	skybox.name = 'skybox';

@@ -1059,8 +1059,7 @@ fetch('./solarSystemData.json')
 
 					// RENDER PASSES HERE
 					orrery.composer.addPass(new RenderPass(orrery.scene, orrery.camera));
-					// TODO: reinvestigate this. Upgrading ThreeJS caused this line to generate errors
-					// composer.multisampling = 8;
+					orrery.composer.multisampling = 8; // fixes jagged lines
 
 					const godRaysEffect = new GodRaysEffect(orrery.camera, sphere, {
 						blurriness: 2,

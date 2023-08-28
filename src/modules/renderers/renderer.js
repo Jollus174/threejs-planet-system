@@ -1,9 +1,8 @@
-import { PCFSoftShadowMap, BasicShadowMap, HalfFloatType } from 'three';
-import { WebGLRenderer } from 'three';
+import { WebGLRenderer, HalfFloatType } from 'three';
 import { EffectComposer } from 'postprocessing';
 
 const renderer = new WebGLRenderer({
-	antialias: true,
+	// antialias: true, // am using the composer to add anti-aliasing instead
 	// the shader orbit lineslines seem to not like this... will always appear behind planets
 	// manually including logarithmic depth buffering in the shaders fixes this problem
 	logarithmicDepthBuffer: true
