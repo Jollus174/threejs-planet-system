@@ -20,7 +20,7 @@ const materials = {
 	})
 };
 
-const createBasicCube = (size) => {
+const createBasicCube = (size: number) => {
 	const geometry = new THREE.BoxGeometry(size, size, size, 10, 10);
 
 	const boxMesh = new THREE.Mesh(geometry, materials.shaderMaterial);
@@ -28,7 +28,7 @@ const createBasicCube = (size) => {
 	orrery.scene.add(boxMesh);
 };
 
-const createBasicSphere = (size) => {
+const createBasicSphere = (size: number) => {
 	const geometry = new THREE.SphereGeometry(size, 64, 64);
 
 	const boxMesh = new THREE.Mesh(geometry, materials.shaderMaterial);

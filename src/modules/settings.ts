@@ -47,7 +47,7 @@ const settings = {
 		_titan: hsl(48, 96, 64),
 		_triton: hsl(338, 10, 79),
 
-		_136199eris: hsl(16, null, 70),
+		_136199eris: hsl(16, 0, 70),
 		_136472makemake: hsl(28, 32, 70),
 		_136108haumea: hsl(357, 55, 74),
 		_90482orcus: hsl(0, 0, 66)

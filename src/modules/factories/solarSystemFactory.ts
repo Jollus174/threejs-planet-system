@@ -1,5 +1,18 @@
 'use strict';
-import * as THREE from 'three';
+import {
+	AdditiveBlending,
+	BackSide,
+	BoxGeometry,
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	MathUtils,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	Points,
+	PointsMaterial
+} from 'three';
 import { textureLoader } from '../loadManager';
 import { createCircleTexture } from '../utilities/threeJS';
 
@@ -12,7 +25,7 @@ import spaceLt from '/img/textures/space_lt.jpg';
 
 const asteroidBelt = () => {
 	const particles = 4000;
-	const geometry = new THREE.BufferGeometry();
+	const geometry = new BufferGeometry();
 	const positions = new Float32Array(particles * 3);
 
 	const material = {
@@ -20,15 +33,15 @@ const asteroidBelt = () => {
 		map: createCircleTexture('#FFF', 256),
 		transparent: true,
 		opacity: 0.5,
-		color: new THREE.Color(0xffffff),
+		color: new Color(0xffffff),
 		depthWrite: false
 	};
 
-	const setAsteroidPosition = (count) => {
+	const setAsteroidPosition = (count: number) => {
 		const odd = count % 2;
 		const distanceFromParentMin = 2;
 		const distanceFromParentMax = 6;
-		const distanceFromParentMedian = () => Number.parseFloat((distanceFromParentMin + distanceFromParentMax) / 2);
+		const distanceFromParentMedian = () => (distanceFromParentMin + distanceFromParentMax) / 2;
 		const orbitScale = 12;
 		const orbitRadian = 2000;
 		const distance = count % 3 ? distanceFromParentMax : odd ? distanceFromParentMedian() : distanceFromParentMin;
@@ -36,16 +49,16 @@ const asteroidBelt = () => {
 
 		d = d + count / count.toFixed(0).length;
 
-		const randomNumber = THREE.MathUtils.randInt(1, 30) * Math.random(); // controls spread
+		const randomNumber = MathUtils.randInt(1, 30) * Math.random(); // controls spread
 		const randomOffset = odd ? randomNumber * -1 : randomNumber;
 
 		// const amplitude = d + randomOffset * (2 + Math.random());
 		const amplitude = 114 + randomOffset; // will adjust the ring radius. Can apply randomness to stagger points
-		const theta = count + 1 * Math.random() * THREE.MathUtils.degToRad(orbitRadian);
+		const theta = count + 1 * Math.random() * MathUtils.degToRad(orbitRadian);
 
 		const posX = amplitude * Math.cos(theta);
 		const posY = amplitude * Math.sin(theta);
-		const posZ = THREE.MathUtils.randInt(1, 1500);
+		const posZ = MathUtils.randInt(1, 1500);
 
 		return {
 			x: posX,
@@ -61,63 +74,60 @@ const asteroidBelt = () => {
 		positions[i + 3] = z;
 	}
 
-	geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+	geometry.setAttribute('position', new BufferAttribute(positions, 3));
 	geometry.computeBoundingSphere();
 
-	const particleSystem = new THREE.Points(geometry, new THREE.PointsMaterial({ ...material }));
+	const particleSystem = new Points(geometry, new PointsMaterial({ ...material }));
 	return particleSystem;
 };
 
 const skybox = () => {
 	const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
 	const skyboxMaterialArray = skyboxTexturePaths.map((image) => {
-		return new THREE.MeshBasicMaterial({
+		return new MeshBasicMaterial({
 			map: textureLoader.load(image),
-			side: THREE.BackSide,
+			side: BackSide,
 			depthTest: false // needed or else will appear in front of shaders
 		});
 	});
-	const skybox = new THREE.Mesh(
-		new THREE.BoxBufferGeometry(1000000000000, 1000000000000, 1000000000000),
-		skyboxMaterialArray
-	);
+	const skybox = new Mesh(new BoxGeometry(1000000000000, 1000000000000, 1000000000000), skyboxMaterialArray);
 	skybox.name = 'skybox';
 
 	return skybox;
 };
 
 const starField = () => {
-	const starfieldObj = new THREE.Object3D();
+	const starfieldObj = new Object3D();
 	starfieldObj.name = 'starfield';
 
 	const stars = 18000,
 		spreadAmount = 900;
-	const geometry = new THREE.BufferGeometry();
+	const geometry = new BufferGeometry();
 	const positions = new Float32Array(stars * 3);
 
 	const material = {
 		size: 0.25,
 		map: createCircleTexture('#FFF', 256),
-		blending: THREE.AdditiveBlending,
+		blending: AdditiveBlending,
 		transparent: true,
 		opacity: 0.4,
-		color: new THREE.Color(0xffffff),
+		color: new Color(0xffffff),
 		depthWrite: false
 	};
 
-	const randFloatSpread = (x) => THREE.MathUtils.randFloatSpread(x);
+	const randFloatSpread = (x: number) => MathUtils.randFloatSpread(x);
 	for (let i = 0; i < positions.length; i += 3) {
 		const [x, y, z] = Array(3)
-			.fill()
+			// .fill()
 			.map(() => randFloatSpread(spreadAmount));
 		positions[i] = x;
 		positions[i + 1] = y;
 		positions[i + 2] = z;
 	}
 
-	geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+	geometry.setAttribute('position', new BufferAttribute(positions, 3));
 	geometry.computeBoundingSphere();
-	const starFieldSystem = new THREE.Points(geometry, new THREE.PointsMaterial({ ...material }));
+	const starFieldSystem = new Points(geometry, new PointsMaterial({ ...material }));
 	starfieldObj.add(starFieldSystem);
 
 	return starfieldObj;
