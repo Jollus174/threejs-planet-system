@@ -1,7 +1,7 @@
-'use strict';
 import { MathUtils, Vector3 } from 'three';
 
-const calculateOrbit = (index, data, parentPlanetData) => {
+// TODO: any
+const calculateOrbit = (index: number, data: any, parentPlanetData: any) => {
 	const semimajorAxis = parentPlanetData ? parentPlanetData.meanRadius + data.semimajorAxis : data.semimajorAxis;
 	// http://www.stjarnhimlen.se/comp/ppcomp.html#4
 	// finding eccentric anomaly
@@ -41,7 +41,7 @@ const calculateOrbit = (index, data, parentPlanetData) => {
 	return vec3;
 };
 
-const kmToAU = (km) => km / 149598000;
-const AUToKm = (au) => au * 149598000;
+const kmToAU = (km: number) => km / 149598000;
+const AUToKm = (au: number) => au * 149598000;
 
 export { calculateOrbit, kmToAU, AUToKm };

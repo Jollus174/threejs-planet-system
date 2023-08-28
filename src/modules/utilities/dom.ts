@@ -1,10 +1,9 @@
-'use strict';
 const getBreakpoint = () =>
-	window.getComputedStyle(document.querySelector('body'), '::before').getPropertyValue('content').replace(/["']/g, '');
+	window.getComputedStyle(document.body, '::before').getPropertyValue('content').replace(/["']/g, '');
 
 const checkIfDesktop = () => ['screen-lg', 'screen-xl'].includes(getBreakpoint());
 
-const checkDOMElementOverlap = (a, b, threshold) => {
+const checkDOMElementOverlap = (a: DOMRect, b: DOMRect, threshold: number) => {
 	const overlapThreshold = threshold || 0;
 	return !(
 		a.right < b.left + overlapThreshold ||

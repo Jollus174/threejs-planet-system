@@ -1,5 +1,3 @@
-'use strict';
-
 const currentDateTime = () => {
 	const currDate = new Date();
 	const day = currDate.getDate();
