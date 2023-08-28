@@ -4,20 +4,15 @@ import './scss/styles.scss';
 import * as THREE from 'three';
 import { orrery } from './modules/orrery';
 import { settings } from './modules/settings';
-import { controls } from './modules/controls';
-import { renderer, composer } from './modules/renderers/renderer';
-import { labelRenderer } from './modules/renderers/labelRenderer';
 import { easeTo } from './modules/utilities/animation';
 import { checkIfDesktop } from './modules/utilities/dom';
 import { randomString } from './modules/utilities/strings';
 import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { skyboxTexturePaths } from './modules/data/solarSystem';
-import { asteroidBelt, skybox, starField } from './modules/factories/solarSystemFactory';
+import { asteroidBelt, starField } from './modules/factories/solarSystemFactory';
 import { initMousePointerEvents } from './modules/events/mousePointer';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, APIRequest } from './modules/data/api';
-import { scene } from './modules/scene';
 
 import {
 	RenderPass,
@@ -41,14 +36,6 @@ import { format, add, differenceInHours } from 'date-fns';
 
 window.settings = settings;
 window.renderLoop = '';
-
-let delta;
-
-window.renderer = renderer;
-window.composer = composer;
-
-const clock = new THREE.Clock();
-const vectorPosition = new THREE.Vector3();
 
 document.addEventListener(customEventNames.updateClickTarget, (e) => {
 	const clickedClass = e.detail;
@@ -104,7 +91,7 @@ document.addEventListener(customEventNames.updateZoomTarget, (e) => {
 	orrery.mouseState._zoomedClass = zoomedClass;
 
 	orrery.cameraState._zoomToTarget = true; // to get the camera moving
-	controls.minDistance = zoomedClass.data.meanRadius * 8;
+	orrery.controls.minDistance = zoomedClass.data.meanRadius * 8;
 
 	orrery.vueTarget.dispatchEvent(new Event(customEventNames.updateZoomEntityVue));
 });
@@ -138,10 +125,10 @@ document.addEventListener(customEventNames.updateSystemMoonGroups, (e) => {
 });
 
 const updateProjectionViewSize = (width, height) => {
-	// renderer.setSize(width, height);
-	composer.setSize(width, height);
+	// orrery.renderer.setSize(width, height);
+	orrery.composer.setSize(width, height);
 
-	labelRenderer.setSize(width, height);
+	orrery.labelRenderer.setSize(width, height);
 	orrery.camera.aspect = width / height;
 	orrery.camera.updateProjectionMatrix();
 	orrery.isDesktop = checkIfDesktop();
@@ -197,12 +184,11 @@ fetch('./solarSystemData.json')
 		// MESH BUILDING
 		const buildPromises = [];
 		buildPromises.push(orrery.classes._sun.build());
-		Object.values(orrery.classes._planets).forEach((item) => buildPromises.push(item.build()));
-		Object.values(orrery.classes._dwarfPlanets).forEach((item) => buildPromises.push(item.build()));
+		for (const planet of Object.values(orrery.classes._planets)) buildPromises.push(planet.build());
+		for (const dwarfPlanet of Object.values(orrery.classes._dwarfPlanets)) buildPromises.push(dwarfPlanet.build());
 
 		Promise.all(buildPromises).then(() => {
 			orrery.classes._allIterable = Object.values(orrery.classes._all);
-			orrery.classes._allIterableLength = orrery.classes._allIterable.length;
 			orrery.classes._moonsIterable = orrery.classes._allIterable.filter((c) => c.data.bodyType === 'Moon');
 
 			Vue.component('lightbox', LightBox);
@@ -213,13 +199,13 @@ fetch('./solarSystemData.json')
 					navigationSystems: settings.navigationSystems,
 					navigationEntities: settings.navigationEntities,
 					showSearchMobile: false,
-					bottomBar: {},
 					clickedClassData: orrery.classes._all._sun.data,
 					zoomedClassData: null,
 					sidebarMobileHeight: 400,
 					sidebarDesktopWidth: 600,
 					systemClassData: orrery.classes._all._sun.data,
 					modelSystemSelection: {}, // for keeping track of what's selected between systems
+					modelSidebarImages: {}, // for keeping track of which images have been loaded, so can apply a loading spinner if needed
 					modelMoonGroups: {},
 					tabGroup: 'tab-stats', // TODO: set this to Wikipedia by default
 					vueRandomString: randomString(8),
@@ -227,8 +213,15 @@ fetch('./solarSystemData.json')
 					timeShiftTypeCurrentIndex: 0,
 					dateTimeCurrent: new Date(),
 					timeShiftSystemOnly: false,
-					orreryRendererEl: renderer.domElement,
-					labelRendererEl: labelRenderer.domElement
+					orreryRendererEl: orrery.renderer.domElement,
+					labelRendererEl: orrery.labelRenderer.domElement,
+					sidebar: {
+						imageLoading: true,
+						imageError: true,
+						imagesQueue: [], // gross, but is here to allow loading spinners to only appear when needed
+						images: [],
+						loadingTimeout: null
+					}
 				},
 				computed: {
 					nameApoapsis() {
@@ -279,7 +272,7 @@ fetch('./solarSystemData.json')
 
 						// splitting the results by bodyType, then recombining into the final Search Results
 						const sortedResults = filteredResults
-							.filter((item) => item.bodyType !== 'Asteroid')
+							.filter((item) => item.bodyType !== 'Asteroid' && item.bodyType !== 'Comet')
 							.sort((a, b) => {
 								if (a.bodyType === 'Star' || b.bodyType === 'Star') return a.bodyType === 'Star' ? -1 : 1;
 								else if (a.bodyType === 'Planet' || b.bodyType === 'Planet') return a.bodyType === 'Planet' ? -1 : 1;
@@ -351,7 +344,6 @@ fetch('./solarSystemData.json')
 					},
 					timeShiftReset() {
 						for (const timeShiftType of Object.keys(this.timeShiftTypes)) this.timeShiftTypes[timeShiftType] = 0;
-						// TODO: This should be an event that each one is listening for!
 						for (const entity of orrery.classes._allIterable) entity.resetLabelGroupPosition();
 					},
 					timeShiftStop() {
@@ -394,11 +386,12 @@ fetch('./solarSystemData.json')
 									showName: moons[0].moonGroupShowName,
 									moonGroupIndex: moons[0].moonGroupIndex,
 									moons,
-									// switch on the selected moon group if it's the first visit by default, or else just switch on first one
+									// switch on the selected moon group if it's the first visit by default, or else just switch it on if it's set to be on during the data parsing at start
 									isEnabled:
 										this.clickedClassData.bodyType === 'Moon'
 											? moonGroupId === this.clickedClassData.moonGroupId
-											: i === 0,
+											: !moons[0].hasOwnProperty('moonGroupDefaultEnabled') ||
+											  moons[0].moonGroupDefaultEnabled === true,
 									isSelected: false,
 									systemId: moons[0].systemId
 								};
@@ -448,7 +441,6 @@ fetch('./solarSystemData.json')
 
 					pluralise(word, value) {
 						if (!word || !value) {
-							// TODO: I'd imagine Typescript could take care of this automatically
 							console.warn('Word and Value required.');
 							return '';
 						}
@@ -793,7 +785,6 @@ fetch('./solarSystemData.json')
 						// checking to see if entity in prev system was already previously selected
 						const prevSystemKey = systemKeys[prevIndex];
 						const prevSystem = orrery.classes._all[prevSystemKey];
-						this.updateEntity(prevSystem.data);
 						this.updateZoomTarget(prevSystem.data);
 					},
 
@@ -807,7 +798,6 @@ fetch('./solarSystemData.json')
 						// checking to see if entity in next system was already previously selected
 						const nextSystemKey = systemKeys[nextIndex];
 						const nextSystem = orrery.classes._all[nextSystemKey];
-						this.updateEntity(nextSystem.data);
 						this.updateZoomTarget(nextSystem.data);
 					},
 
@@ -816,7 +806,6 @@ fetch('./solarSystemData.json')
 						const currentIndex = keys.indexOf(this.clickedClassData.id);
 						const prevIndex = currentIndex !== 0 ? currentIndex - 1 : keys.length - 1;
 						const prevEntity = orrery.classes._all[keys[prevIndex]];
-						this.updateEntity(prevEntity.data);
 						this.updateZoomTarget(prevEntity.data);
 					},
 
@@ -825,7 +814,6 @@ fetch('./solarSystemData.json')
 						const currentIndex = keys.indexOf(this.clickedClassData.id);
 						const nextIndex = currentIndex + 1 < keys.length ? currentIndex + 1 : 0;
 						const nextEntity = orrery.classes._all[keys[nextIndex]];
-						this.updateEntity(nextEntity.data);
 						this.updateZoomTarget(nextEntity.data);
 					},
 
@@ -851,8 +839,29 @@ fetch('./solarSystemData.json')
 							}
 						}
 
+						// checking to see if image has been loaded previously so can apply a loading spinner
+						// also stopping redundant requests being made for images that were already loaded
+						if (this.modelSidebarImages[this.clickedClassData.id] === undefined) {
+							// making the loading spinner appear after 400ms so it doesn't appear instantly after every image switch
+							// TODO: this bugs out and it sometimes gets stuck on perma-spinner
+							// this.sidebar.loadingTimeout = setTimeout(() => {
+							// 	this.sidebar.imageLoading = true;
+							// }, 400);
+							this.sidebar.imagesQueue.push(this.clickedClassData.sidebarImage);
+						} else {
+							// image was already loaded previously, and is in the cache
+							if (this.modelSidebarImages[this.clickedClassData.id] === '') {
+								// this image load had failed
+								this.sidebar.imageError = true;
+							} else {
+								// this image load was successful
+								this.sidebar.images.push(this.clickedClassData.sidebarImage);
+								this.sidebar.imageError = false;
+							}
+						}
+
 						// keeping track of what's been selected between each system
-						this.modelSystemSelection[this.clickedClassData.systemId] = this.clickedClassData.id;
+						this.modelSystemSelection[this.clickedClassData.id] = this.clickedClassData.id;
 
 						this.switchDetailTabs(); // to trigger the API loader for content (if it's needed)
 					},
@@ -883,6 +892,7 @@ fetch('./solarSystemData.json')
 					// https://github.com/vuejs/vue/issues/9777
 					updateSearchQuery(e) {
 						if (e.key === 'Enter') {
+							if (!this.searchQuery) return;
 							this.updateZoomTarget(this.searchResults[0].data);
 							e.target.value = '';
 						} else {
@@ -922,6 +932,26 @@ fetch('./solarSystemData.json')
 
 					evResizeSidebarDesktop() {
 						document.addEventListener('pointermove', this.resizeSidebarDesktop, false);
+					},
+
+					imageLoad() {
+						clearTimeout(this.sidebar.loadingTimeout);
+						this.sidebar.imageLoading = false;
+						this.sidebar.imageError = false;
+						this.sidebar.images.push(this.sidebar.imagesQueue[this.sidebar.imagesQueue.length - 1]);
+						const { id } = this.clickedClassData;
+						if (this.modelSidebarImages[id] === undefined) {
+							this.modelSidebarImages[id] = this.sidebar.imagesQueue[this.sidebar.imagesQueue.length - 1];
+						}
+					},
+					imageError() {
+						clearTimeout(this.sidebar.loadingTimeout);
+						const { id } = this.clickedClassData;
+						this.sidebar.imageLoading = false;
+						this.sidebar.imageError = true;
+						if (this.modelSidebarImages[id] === undefined) {
+							this.modelSidebarImages[id] = '';
+						}
 					}
 				},
 				mounted() {
@@ -944,27 +974,7 @@ fetch('./solarSystemData.json')
 						if (!e.target.closest('[data-selector="search"]')) {
 							this.resetSearch();
 						}
-
-						// if (this.showSearchMobile && !e.target.closest('#search-results-mobile')) {
-						// 	// this.showSearchMobile = false;
-						// 	console.log('close search mobile');
-						// 	console.log(e);
-						// }
-
-						// if (!e.target.closest('#sidebar-ui-details')) {
-						// 	setTimeout(() => {
-						// 		if (this.sidebarIsOpen) {
-						// 			this.sidebarIsOpen = false;
-						// 		}
-						// 	}, 1000);
-						// }
 					});
-
-					// document.addEventListener('keydown', (e) => {
-					// 	if (e.key === 'Escape' && !document.body.classList.contains('vib-open')) {
-					// 		this.closeSidebar();
-					// 	}
-					// });
 
 					const handleResize = () => {
 						const { width, height } = this.orreryRendererEl.getBoundingClientRect();
@@ -1004,11 +1014,11 @@ fetch('./solarSystemData.json')
 					const lightTypeKeys = Object.keys(orrery.lights);
 					lightTypeKeys.forEach((lightType) => {
 						orrery.lights[lightType].forEach((lightObjsArr) => {
-							lightObjsArr.forEach((lightObj) => scene.add(lightObj));
+							lightObjsArr.forEach((lightObj) => orrery.scene.add(lightObj));
 						});
 					});
 
-					scene.add(skybox(skyboxTexturePaths));
+					orrery.scene.add(orrery.skybox);
 
 					// targeting Sun by default
 					document.dispatchEvent(
@@ -1031,25 +1041,25 @@ fetch('./solarSystemData.json')
 						);
 					}
 
-					// scene.add(orrery.bodies._starField);
-					// scene.add(orrery.bodies._asteroidBelt);
+					// orrery.scene.add(orrery.bodies._starField);
+					// orrery.scene.add(orrery.bodies._asteroidBelt);
 
 					// sets z-indexing of planets to be correct
 					// checking for overlapping labels (and eventually labels behind planets...)
 					// the former needs to be done in the DOM
 					// the latter... I'm not completely sure yet
 					setInterval(() => {
-						labelRenderer.zOrder(scene);
+						orrery.labelRenderer.zOrder(orrery.scene);
 					}, 200);
 
-					const geometry = new THREE.SphereBufferGeometry(0.01, 32, 32);
-					const material = new THREE.MeshBasicMaterial({ color: /* 0xffe484 */ 'orange' });
+					const geometry = new THREE.SphereGeometry(0.01, 32, 32);
+					const material = new THREE.MeshBasicMaterial({ color: 'orange' });
 					const sphere = new THREE.Mesh(geometry, material);
-					scene.add(sphere);
+					orrery.scene.add(sphere);
 
 					// RENDER PASSES HERE
-					composer.addPass(new RenderPass(orrery.scene, orrery.camera));
-					composer.multisampling = 8;
+					orrery.composer.addPass(new RenderPass(orrery.scene, orrery.camera));
+					orrery.composer.multisampling = 8; // fixes jagged lines
 
 					const godRaysEffect = new GodRaysEffect(orrery.camera, sphere, {
 						blurriness: 2,
@@ -1082,29 +1092,16 @@ fetch('./solarSystemData.json')
 						const effects = [godRaysEffect, smaaEffect, orrery.classes._sun.godRaysEffect];
 						const effectPass = new EffectPass(orrery.camera, ...effects);
 						// effectPass.renderToScreen = true;
-						composer.addPass(effectPass);
+						orrery.composer.addPass(effectPass);
 					});
 
-					// setTimeout(() => {
-					// 	const orbitLines = window.scene.children.filter((c) => c.name.includes('orbit line'));
-					// 	orbitLines.forEach((l) => window.selectiveBloomEffect.selection.add(l));
-					// 	// window.selectiveBloomEffect.update();
-					// 	console.log(window.selectiveBloomEffect.getSelection());
-					// 	// window.selectiveBloomEffect.setEnabled = true;
-					// 	console.log('lines added!');
-					// }, 2000);
-
-					// ---
-
 					const scaleVector = new THREE.Vector3();
+					const vectorPosition = new THREE.Vector3();
 					let scaleFactor = 4;
 
 					const render = () => {
 						var scale = scaleVector.subVectors(sphere.position, orrery.camera.position).length() / scaleFactor;
 						sphere.scale.set(scale, scale, scale);
-
-						delta = 5 * clock.getDelta();
-						// if (state.bodies._asteroidBelt) state.bodies._asteroidBelt.rotation.y -= 0.000425 * delta;
 
 						orrery.cameraState._isInPlaneOfReference =
 							orrery.camera.position.y < 35000000 && -35000000 < orrery.camera.position.y;
@@ -1151,23 +1148,26 @@ fetch('./solarSystemData.json')
 						// making sure to account for -ve numbers, so can reverse orbits based on time if needed
 						this.timeShiftTypes[this.currentTimeShiftType] += this.timeShiftTypeCurrentIndex < 0 ? -1 : 1;
 
-						// TODO: it should ease into different time shift types
 						if (this.timeShiftTypeCurrentIndex !== 0) {
 							if (this.timeShiftSystemOnly) {
-								for (let i = 0; i < orrery.classes._moonsIterable.length; i++) {
-									orrery.classes._moonsIterable[i].iteratePosition();
+								for (const moon of orrery.classes._moonsIterable) {
+									moon.iteratePosition();
 								}
 							} else {
-								for (let i = 0; i < orrery.classes._allIterableLength; i++) {
-									orrery.classes._allIterable[i].iteratePosition();
+								for (const entity of orrery.classes._allIterable) {
+									entity.iteratePosition();
 								}
 							}
 						}
 
 						orrery.controls.update();
 
-						composer.render();
-						labelRenderer.render(scene, orrery.camera);
+						orrery.composer.render();
+						orrery.labelRenderer.render(orrery.scene, orrery.camera);
+
+						for (const entity of orrery.classes._allIterable) {
+							entity.draw();
+						}
 					};
 
 					window.pauseRender = () => document.dispatchEvent(evRenderPause);
@@ -1189,7 +1189,6 @@ fetch('./solarSystemData.json')
 					});
 
 					// using window so RAF can be accessed through solution without importing
-					// TODO: can probably be tidied up in future
 					window.animate = () => {
 						render();
 						window.renderLoop = requestAnimationFrame(window.animate);

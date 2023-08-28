@@ -1,50 +1,6 @@
 import { DoubleSide } from 'three';
-import textureSun from './../../img/textures/sun-min.jpg';
-import textureMercury from './../../img/textures/mercury.jpg';
-import textureVenus from './../../img/textures/venus.jpg';
-import textureEarth from './../../img/textures/earth.jpg';
-import textureMoon from './../../img/textures/moon.jpg';
-import textureMars from './../../img/textures/mars.jpg';
 
-import textureJupiter from './../../img/textures/jupiter.jpg';
-import textureCallisto from './../../img/textures/moon-callisto.jpg';
-import textureEuropa from './../../img/textures/moon-europa.jpg';
-import textureGanymede from './../../img/textures/moon-ganymede.jpg';
-import textureIo from './../../img/textures/moon-io.jpg';
-
-import textureSaturn from './../../img/textures/saturn.jpg';
-
-import textureUranus from './../../img/textures/uranus.jpg';
-import textureNeptune from './../../img/textures/neptune.jpg';
-
-// for smol boys
-import textureCeres from './../../img/textures/ceres.jpg';
-import textureEris from './../../img/textures/eris.jpg';
-import textureHaumea from './../../img/textures/haumea.jpg';
-import textureMakemake from './../../img/textures/makemake.jpg';
-import textureOrcus from './../../img/textures/orcus.jpg';
-import texturePluto from './../../img/textures/pluto.jpg';
-
-import textureSaturnRing from './../../img/textures/saturn-ring-alpha.png';
-// import textureSaturnRing from './../../img/textures/saturn-rings.jpg';
-// import textureRing from './../../img/textures/texture-ring.jpg';
-
-// import modelDeimos from './../../img/models/deimos.glb';
-
-// import normalMercury from './../../img/textures/normal-mercury.jpg';
-// import normalVenus from './../../img/textures/normal-venus.jpg';
-// import normalEarth from './../../img/textures/normal-earth.jpg';
-// import normalMoon from './../../img/textures/normal-moon.jpg';
-// import normalMars from './../../img/textures/normal-mars.jpg';
-
-import spaceFt from './../../img/textures/space_ft.jpg';
-import spaceBk from './../../img/textures/space_bk.jpg';
-import spaceUp from './../../img/textures/space_up.jpg';
-import spaceDn from './../../img/textures/space_dn.jpg';
-import spaceRt from './../../img/textures/space_rt.jpg';
-import spaceLt from './../../img/textures/space_lt.jpg';
-
-const skyboxTexturePaths = [spaceFt, spaceBk, spaceUp, spaceDn, spaceRt, spaceLt];
+import textureSun from '/img/textures/sun-min.jpg';
 
 const sunData = {
 	material: {}
@@ -60,77 +16,122 @@ const materialData = {
 	},
 
 	_mercury: {
-		map: textureMercury
+		map: '/img/textures/mercury-2k.jpg',
+		bumpMap: '/img/textures/mercury-bump-2k.jpg',
+		segments: 64
 	},
 	_venus: {
-		map: textureVenus
+		map: '/img/textures/venus-2k.jpg',
+		clouds: '/img/textures/venus-clouds-2k.jpg',
+		cloudsRotateX: 0.01,
+		cloudsRotateY: 0.03,
+		segments: 64
 	},
+
 	_earth: {
-		map: textureEarth
+		map: '/img/textures/earth-4k.jpg',
+		bumpMap: '/img/textures/earth-bump-4k.jpg',
+		clouds: '/img/textures/earth-clouds-4k.jpg',
+		cloudsAlpha: '/img/textures/earth-clouds-alpha-4k.jpg',
+		cloudsRotateX: 0.005,
+		cloudsRotateY: 0.0,
+		segments: 64
 	},
+	_moon: {
+		map: '/img/textures/moon-2k.jpg',
+		bumpMap: '/img/textures/moon-bump-2k.jpg'
+	},
+
 	_mars: {
-		map: textureMars
+		map: '/img/textures/mars-2k.jpg',
+		normalMap: '/img/textures/mars-normal-2k.jpg',
+		segments: 64
 	},
 
 	_jupiter: {
-		map: textureJupiter
+		map: '/img/textures/jupiter-2k.jpg',
+		shininess: 10,
+		segments: 64,
+		rings: [
+			{
+				map: '/img/textures/uranus-rings-color.png',
+				mapAlpha: '/img/textures/uranus-rings-alpha.png',
+				opacity: 0.1,
+				side: DoubleSide
+			}
+		]
 	},
 	_callisto: {
-		map: textureCallisto
+		map: '/img/textures/moon-callisto-2k.jpg'
 	},
 	_europa: {
-		map: textureEuropa
+		map: '/img/textures/moon-europa.jpg'
 	},
 	_ganymede: {
-		map: textureGanymede
+		map: '/img/textures/moon-ganymede-2k.jpg'
 	},
 	_io: {
-		map: textureIo
+		map: '/img/textures/moon-io.jpg'
 	},
 
 	_saturn: {
-		map: textureSaturn,
-		normalMap: null,
+		map: '/img/textures/saturn-2k.jpg',
+		shininess: 10,
+		segments: 64,
 		rings: [
 			{
-				map: textureSaturnRing,
-				emissive: '#FFF',
-				emissiveMap: textureSaturnRing,
-				emissiveIntensity: 1,
-				normalMap: null,
+				map: '/img/textures/saturn-rings-color.png',
+				mapAlpha: '/img/textures/saturn-rings-alpha.png',
+				emissive: { r: 0.2, g: 0.2, b: 0.17 },
 				side: DoubleSide
 			}
 		]
 	},
 	_uranus: {
-		map: textureUranus
+		map: '/img/textures/uranus-2k.jpg',
+		segments: 64,
+		rings: [
+			{
+				map: '/img/textures/uranus-rings-color.png',
+				mapAlpha: '/img/textures/uranus-rings-alpha.png',
+				opacity: 0.3,
+				side: DoubleSide
+			}
+		]
 	},
 	_neptune: {
-		map: textureNeptune
+		map: '/img/textures/neptune-2k.jpg',
+		segments: 64,
+		rings: [
+			{
+				map: '/img/textures/neptune-rings-color.png',
+				mapAlpha: '/img/textures/neptune-rings-alpha.png',
+				opacity: 0.3,
+				side: DoubleSide
+			}
+		]
 	},
 
 	_1ceres: {
-		map: textureCeres
+		map: '/img/textures/ceres-2k.jpg'
 	},
 	_136199eris: {
-		map: textureEris
+		map: '/img/textures/eris.jpg'
 	},
 	_136108haumea: {
-		map: textureHaumea
+		map: '/img/textures/haumea.jpg'
 	},
 	_136472makemake: {
-		map: textureMakemake
+		map: '/img/textures/makemake.jpg',
+		shininess: 10
 	},
 	_90482orcus: {
-		map: textureOrcus
+		map: '/img/textures/orcus-2k.jpg',
+		shininess: 5
 	},
 	_pluto: {
-		map: texturePluto
-	},
-
-	_moon: {
-		map: textureMoon
+		map: '/img/textures/pluto-4k.jpg'
 	}
 };
 
-export { skyboxTexturePaths, materialData, sunData };
+export { materialData, sunData };

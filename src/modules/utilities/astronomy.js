@@ -1,13 +1,6 @@
 'use strict';
 import { MathUtils, Vector3 } from 'three';
 
-// get deviation between a set of values stored in an array
-const getStandardDeviation = (array) => {
-	const n = array.length;
-	const mean = array.reduce((a, b) => a + b) / n;
-	return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-};
-
 const calculateOrbit = (index, data, parentPlanetData) => {
 	const semimajorAxis = parentPlanetData ? parentPlanetData.meanRadius + data.semimajorAxis : data.semimajorAxis;
 	// http://www.stjarnhimlen.se/comp/ppcomp.html#4
@@ -51,4 +44,4 @@ const calculateOrbit = (index, data, parentPlanetData) => {
 const kmToAU = (km) => km / 149598000;
 const AUToKm = (au) => au * 149598000;
 
-export { getStandardDeviation, calculateOrbit, kmToAU, AUToKm };
+export { calculateOrbit, kmToAU, AUToKm };

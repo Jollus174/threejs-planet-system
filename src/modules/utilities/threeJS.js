@@ -1,5 +1,5 @@
 'use strict';
-import { Texture, RingBufferGeometry, Vector3 } from 'three';
+import { Texture, RingGeometry, Vector3 } from 'three';
 
 // draw a circle to a new canvas so we can render a circle texture (good for Points)
 const createCircleTexture = (color, size) => {
@@ -23,7 +23,7 @@ const createCircleTexture = (color, size) => {
 
 // custom UV map so textures can curve correctly (looking at you, rings of Saturn)
 const ringUVMapGeometry = (from, to) => {
-	const geometry = new RingBufferGeometry(from, to, 90);
+	const geometry = new RingGeometry(from, to, 90);
 	const pos = geometry.attributes.position;
 	const v3 = new Vector3();
 	for (let i = 0; i < pos.count; i++) {

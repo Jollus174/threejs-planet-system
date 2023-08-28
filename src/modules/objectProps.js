@@ -7,9 +7,8 @@ import { scene } from './scene';
 import { settings } from './settings';
 import { calculateOrbit } from './utilities/astronomy';
 import { ringUVMapGeometry } from './utilities/threeJS';
-import { textureLoader } from './loadManager'; // still not 100% sure if this creates a new instantiation of it, we don't want that
+import { textureLoader, imageBitmapLoader } from './loadManager';
 import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
-import { GLTFLoader } from 'three/examples/jsm/loaders/gltfloader';
 import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
@@ -25,7 +24,6 @@ class OrbitLine {
 	constructor(data, classRef) {
 		this.data = data;
 		this.classRef = classRef;
-		this.orbitLineName = `${this.data.id} orbit line`;
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
@@ -34,18 +32,50 @@ class OrbitLine {
 		this.colors = null;
 		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
 		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....;
+		this.uniforms = {};
 		this.parentPlanetData = this.data.aroundPlanet
 			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
 			: null;
-		this.amountOfOrbitToDraw = 270; // 360 means full circle
+		this.amountOfOrbitToDraw = this.data.bodyType === 'Moon' ? 180 : 330; // 360 means full circle
+	}
+
+	setColors() {
+		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
+		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
+		this.colors = this.colors || new Float32Array(this.vertexCount * 3);
+
+		if (this.data.sideralOrbitDirection === 'Prograde') {
+			for (let c = this.amountOfOrbitToDraw; c >= 0; c -= 1) {
+				const lerpColor = new THREE.Color(this.startColor);
+				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
+
+				this.colors[c * 3 + 0] = lerpColor.r;
+				this.colors[c * 3 + 1] = lerpColor.g;
+				this.colors[c * 3 + 2] = lerpColor.b;
+			}
+		} else {
+			// all because some of the moons have to go all yeehaa and orbit in the other direction
+			for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
+				const lerpColor = new THREE.Color(this.startColor);
+				lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
+				this.colors[c * 3 + 0] = lerpColor.r;
+				this.colors[c * 3 + 1] = lerpColor.g;
+				this.colors[c * 3 + 2] = lerpColor.b;
+			}
+		}
+
+		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
 	}
 
 	drawLine(iterator) {
 		const orbitPoints = [];
 		const i = iterator || 0;
-		for (let p = this.data.meanAnomaly - i; p <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i; p += 1) {
-			const v = new THREE.Vector3();
-			orbitPoints.push(v.copy(calculateOrbit(p, this.data, this.parentPlanetData)));
+		for (
+			let theta = this.data.meanAnomaly - i;
+			theta <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i;
+			theta += 1
+		) {
+			orbitPoints.push(calculateOrbit(theta, this.data, this.parentPlanetData));
 		}
 
 		// deleting last geometry line if iterated upon, otherwise they'll start to chew up lots of memory
@@ -54,30 +84,17 @@ class OrbitLine {
 		this.geometryLine = new THREE.BufferGeometry().setFromPoints(orbitPoints);
 		this.vertexCount = this.vertexCount || this.geometryLine.getAttribute('position').count;
 
-		this.colors = this.colors || this.generateColors();
-		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+		this.setColors();
 		return this.geometryLine;
 	}
 
-	generateColors() {
-		// how much fade we want, closer to 0 means fades earlier
-		const lerpAcc = this.data.bodyType === 'Moon' ? 0.75 : 1;
-		const lerpIncrementer = 1 / this.amountOfOrbitToDraw / lerpAcc;
-
-		const colors = new Float32Array(this.vertexCount * 3);
-		for (let c = 0; c <= this.amountOfOrbitToDraw; c += 1) {
-			const lerpColor = new THREE.Color(this.startColor);
-			lerpColor.lerpColors(this.startColor, this.endColor, c * lerpIncrementer);
-
-			colors[c * 3 + 0] = lerpColor.r;
-			colors[c * 3 + 1] = lerpColor.g;
-			colors[c * 3 + 2] = lerpColor.b;
-		}
-
-		return colors;
-	}
-
 	build() {
+		this.uniforms = {
+			offset: { value: this.data.mainAnomaly },
+			color: { value: this.startColor },
+			logDepthBuffFC: { value: 2.0 / (Math.log(orrery.camera.far + 1.0) / Math.LN2) }
+		};
+
 		this.orbitLine = new THREE.Line(
 			this.drawLine(),
 			new THREE.LineBasicMaterial({
@@ -89,14 +106,7 @@ class OrbitLine {
 			})
 		);
 
-		this.orbitLine.name = this.orbitLineName;
-
-		// to prevent planet orbit lines from 'cutting through' the moon orbit lines due to the transparency fade conflicting with the render order
-		if (this.parentPlanetData) {
-			this.orbitLine.renderOrder = 2;
-		} else {
-			this.orbitLine.renderOrder = this.orbitLine.isDwarfPlanet ? 3 : 4;
-		}
+		this.orbitLine.name = `${this.data.id} orbit line`;
 
 		this.classRef.labelGroup.parent.add(this.orbitLine);
 
@@ -171,21 +181,130 @@ class OrbitLine {
 	}
 }
 
+class EquatorLine {
+	constructor(data, classRef) {
+		this.data = data;
+		this.classRef = classRef;
+		this.lineName = `${this.data.id} equator line`;
+		this.line = null;
+		this.fadingIn = false;
+		this.fadingOut = false;
+	}
+
+	build() {
+		const equatorPoints = [];
+		for (let theta = 0; theta < 360; theta++) {
+			const r = this.data.diameter * 1.1;
+			const x = Math.sin(THREE.MathUtils.degToRad(theta * -1)) * r;
+			const z = Math.cos(THREE.MathUtils.degToRad(theta)) * r;
+			equatorPoints.push(new THREE.Vector3(x, 0, z));
+		}
+		const geometryLine = new THREE.BufferGeometry().setFromPoints(equatorPoints);
+		const color = this.data.sideralRotation >= 0 ? new THREE.Color(0.933, 0.4, 0.4) : new THREE.Color(0.2, 0.8, 0.933);
+
+		this.line = new THREE.Line(
+			geometryLine,
+			new THREE.LineDashedMaterial({
+				color,
+				visible: this.classRef.orbitLineVisibleAtBuild,
+				scale: 10 / this.data.diameter,
+				dashSize: 3,
+				gapSize: 2,
+				transparent: true,
+				opacity: 0.3
+			})
+		);
+		this.line.computeLineDistances();
+
+		this.line.name = this.lineName;
+
+		this.classRef.labelGroup.add(this.line);
+	}
+
+	destroy() {
+		if (!this.equatorLine || !this.equatorLine.material) return;
+		if (!this.fadingOut) {
+			this.fadingOut = true;
+			gsap.to(this.equatorLine.material, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					this.equatorLine.removeFromParent();
+					this.fadingOut = false;
+				}
+			});
+		}
+	}
+}
+
+class PolesLine {
+	constructor(data, classRef) {
+		this.data = data;
+		this.classRef = classRef;
+		this.lineName = `${this.data.id} poles line`;
+		this.line = null;
+		this.fadingIn = false;
+		this.fadingOut = false;
+	}
+
+	build() {
+		const polesPoints = [
+			new THREE.Vector3(0, this.data.diameter * 1.15, 0),
+			new THREE.Vector3(0, this.data.diameter * -1.15, 0)
+		];
+
+		const geometryLine = new THREE.BufferGeometry().setFromPoints(polesPoints);
+		const color = new THREE.Color(0xffffff);
+
+		this.line = new THREE.Line(
+			geometryLine,
+			new THREE.LineDashedMaterial({
+				color,
+				visible: this.classRef.orbitLineVisibleAtBuild,
+				scale: 60 / this.data.diameter,
+				dashSize: 1,
+				gapSize: 1,
+				transparent: true,
+				opacity: 0.3
+			})
+		);
+		this.line.computeLineDistances();
+
+		this.line.name = this.lineName;
+
+		this.classRef.labelGroup.add(this.line);
+	}
+
+	destroy() {
+		if (!this.polesLine || !this.polesLine.material) return;
+		if (!this.fadingOut) {
+			this.fadingOut = true;
+			gsap.to(this.polesLine.material, {
+				opacity: 0,
+				duration: 0.25,
+				onComplete: () => {
+					this.polesLine.removeFromParent();
+					this.fadingOut = false;
+				}
+			});
+		}
+	}
+}
+
 class Entity {
 	constructor(data) {
 		this.data = data;
 		this.labelLink = document.createElement('a');
-		this.labelGroup = new THREE.Group({ name: `${this.data.name} group label` });
-		this.meshGroup = new THREE.Group({ name: `${this.data.name} mesh group` });
+		this.labelGroup = new THREE.Group();
+		this.meshGroup = new THREE.Group();
+		this.surfaceMesh = null;
+		this.cloudMesh = null;
 		this.isBuilt = false;
-		this.isVisible = false; // TODO: Do we really need this? Should just check the 'visible' property
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.raycaster = new THREE.Raycaster();
 		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
-
-		this.isEnabled = true;
-		this.isSelected = true;
+		this.segments = this.data.materialData ? this.data.materialData.segments : 32;
 
 		this.intervalCheckTime = 1000;
 		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
@@ -193,11 +312,15 @@ class Entity {
 		this.orbitLineVisibleAtBuild = true;
 		this.orbitLineOpacityDefault = 0.5;
 		this.OrbitLine = new OrbitLine(data, this);
+		this.EquatorLine = new EquatorLine(data, this);
+		this.PolesLine = new PolesLine(data, this);
 
 		this.raycasterEnabled = false; // can cause some pretty laggy performance issues
 
 		// for debugging
 		this.raycasterArrowEnabled = false;
+
+		this.time = orrery.time;
 		// ---
 
 		this.eventPointerDown = () => {
@@ -218,14 +341,12 @@ class Entity {
 
 		// building orbitLine after the group is added to the scene, so the group has a parent
 		this.OrbitLine.build();
-
-		// if (!this.isVisible) {
-		this.isVisible = true;
+		this.EquatorLine.build();
+		this.PolesLine.build();
 		this.labelLink.style.pointerEvents = '';
 		this.isBuilt = true;
-		// }
 
-		await this.createEntityMesh().then(() => {
+		await this.renderEntityMesh().then(() => {
 			return this;
 		});
 	}
@@ -294,11 +415,15 @@ class Entity {
 
 	resetLabelGroupPosition() {
 		this.setLabelGroupDefaultPosition();
-		if (this.OrbitLine && this.OrbitLine.orbitLine) this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(0);
+
+		if (this.OrbitLine.orbitLine) {
+			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(0);
+		}
 	}
 
 	// TODO: am unsure if should be using 'copy' on all of these...
 	iteratePosition() {
+		if (!this.meshGroup.visible) return;
 		// if (!this.isVisible) return;
 		const i = (orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
 		this.labelGroup.position.copy(
@@ -306,7 +431,7 @@ class Entity {
 		);
 
 		// careful, this causes the memory to massively leak!
-		if (this.OrbitLine && this.OrbitLine.orbitLine) {
+		if (this.OrbitLine.orbitLine) {
 			this.OrbitLine.orbitLine.geometry = this.OrbitLine.drawLine(i);
 			// this.OrbitLine.colorLine(i);
 		}
@@ -321,7 +446,6 @@ class Entity {
 			}
 		} else {
 			this.isEnabled = false;
-			// this.destroy();
 		}
 	}
 
@@ -337,55 +461,79 @@ class Entity {
 		}
 	}
 
-	async constructEntityMesh() {
-		if (this.meshGroup && this.meshGroup.children.length) return;
+	async constructTextures() {
+		// setting default fallbacks
+		const { map = null, normalMap = null, bumpMap = null, shininess = 20, side = THREE.FrontSide } = this.materialData;
 
-		const segments = this.materialData.segments || 32;
 		const materialProps = {
-			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
-			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
+			name: `${this.data.name} material`,
+			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
+			normalMap: normalMap
+				? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t))
+				: null,
+			bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new THREE.CanvasTexture(t)) : null,
+			bumpScale: bumpMap ? 0.015 : null,
+			shininess,
+			side,
 			transparent: false,
-			side: this.materialData.side || THREE.FrontSide,
-			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
-			emissive: this.materialData.emissive || null,
-			emissiveIntensity: this.materialData.emissiveIntensity || null
+			wireframe: false
 		};
 
-		const geometry = new THREE.SphereBufferGeometry(this.data.diameter, segments, segments);
-		const material = new THREE.MeshStandardMaterial(materialProps);
+		return materialProps;
+	}
 
-		const entityMesh = new THREE.Mesh(geometry, material);
+	async constructCloudTextures() {
+		if (!this.materialData || !this.materialData.clouds) return null;
+		const { clouds = null, cloudsAlpha = null } = this.materialData;
+
+		const cloudMaterialProps = {
+			name: `${this.data.name} clouds`,
+			map: clouds ? await imageBitmapLoader.loadAsync(clouds).then((t) => new THREE.CanvasTexture(t)) : null,
+			alphaMap: cloudsAlpha
+				? await imageBitmapLoader.loadAsync(cloudsAlpha).then((t) => new THREE.CanvasTexture(t))
+				: null,
+			transparent: true,
+			opacity: 0.9
+		};
+		cloudMaterialProps.map.minFilter = THREE.LinearFilter;
+
+		return cloudMaterialProps;
+	}
+
+	async constructEntityMesh() {
+		if (this.meshGroup && this.meshGroup.children.length) return null;
+
+		const geometry = new THREE.SphereGeometry(this.data.diameter, this.segments, this.segments);
+		const loaderMaterial = new THREE.MeshPhongMaterial({
+			color: new THREE.Color(0x000000),
+			transparent: true,
+			opacity: 0.2
+		});
+
+		const entityMesh = new THREE.Mesh(geometry, loaderMaterial);
 		entityMesh.name = this.data.id;
-		entityMesh.castShadow = true;
-		entityMesh.receiveShadow = true;
 
 		return entityMesh;
 	}
 
 	async constructRingMeshes(ring, i) {
 		if (!ring) return;
+		const { map = null, mapAlpha = null, opacity = 0.98, emissive = { r: 0, g: 0, b: 0 } } = ring;
 		const ringMaterial = {
-			map: ring.map ? await textureLoader.loadAsync(ring.map) : null,
-			normalMap: ring.normalMap ? await textureLoader.loadAsync(ring.normalMap) : null,
+			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
+			alphaMap: mapAlpha ? await imageBitmapLoader.loadAsync(mapAlpha).then((t) => new THREE.CanvasTexture(t)) : null,
 			transparent: true,
-			emissiveMap: ring.emissiveMap ? await textureLoader.loadAsync(ring.emissiveMap) : null,
-			emissive: ring.emissive || null,
-			emissiveIntensity: ring.emissiveIntensity || null,
+			emissive: emissive.r || emissive.g || emissive.b ? new THREE.Color(emissive.r, emissive.g, emissive.b) : null,
+			opacity,
 			side: THREE.DoubleSide
-			// blending: THREE.CustomBlending
-			// blending: THREE.AdditiveBlending
 		};
-
-		// ringMaterial.blendEquation = THREE.MaxEquation;
-		// ringMaterial.blendSrc = THREE.OneFactor;
-		// ringMaterial.blendDst = THREE.DstAlphaFactor;
 
 		const ringMesh = new THREE.Mesh(
 			ringUVMapGeometry(
 				this.data.meanRadius + this.data.rings[i].inner,
 				this.data.meanRadius + this.data.rings[i].outer
 			),
-			new THREE.MeshStandardMaterial(ringMaterial)
+			new THREE.MeshPhongMaterial(ringMaterial)
 		);
 
 		ringMesh.name = `${this.data.id} ring ${i}`;
@@ -394,31 +542,63 @@ class Entity {
 		return ringMesh;
 	}
 
-	// TODO: set distance checker to fade label when zoomed in
+	applyTextures() {
+		this.constructTextures().then((textureObj) => {
+			this.mesh.material.dispose(); // remove the pre-loader wireframe material
+			this.mesh.material = new THREE.MeshPhongMaterial(textureObj);
+		});
+	}
+	applyClouds() {
+		this.constructCloudTextures().then((textureObj) => {
+			const cloudMesh = new THREE.Mesh(
+				new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
+				new THREE.MeshPhongMaterial(textureObj)
+			);
 
-	async createEntityMesh() {
+			this.cloudMesh = cloudMesh;
+			this.cloudMesh.name = `${this.data.id} clouds`;
+			this.meshGroup.add(this.cloudMesh);
+		});
+	}
+
+	async renderEntityMesh() {
 		if (!this.materialData) return this;
 		const mesh = await this.constructEntityMesh();
+		this.mesh = mesh;
+
+		this.meshGroup.name = `${this.data.name} mesh group`;
 		this.meshGroup.add(mesh);
+
+		this.labelGroup.rotation.z = THREE.MathUtils.degToRad(this.data.axialTilt);
 		this.labelGroup.add(this.meshGroup);
 
 		if (this.materialData.rings) {
-			const ringMeshPromises = this.materialData.rings.map((ring, i) => {
-				return this.constructRingMeshes(ring, i);
-			});
+			const ringMeshPromises = this.materialData.rings.map((ring, i) => this.constructRingMeshes(ring, i));
 
 			await Promise.all(ringMeshPromises).then((ringMeshes) => {
-				ringMeshes.forEach((ringMesh) => {
-					// TODO: this will need to be adjusted later
+				for (const ringMesh of ringMeshes) {
 					ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
 					this.meshGroup.add(ringMesh);
-				});
+				}
 			});
 		}
 	}
 
 	// for updates that need to happen in the main render loop
-	// draw() {};
+	draw() {
+		if (this.meshGroup.visible) {
+			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (-1 / (this.data.sideralRotation * 10));
+
+			if (this.EquatorLine && this.EquatorLine.line) {
+				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (-1 / 50);
+			}
+
+			if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
+				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX * -1;
+				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY * -1;
+			}
+		}
+	}
 
 	// is overwritten by child classes
 	intervalCheck() {}
@@ -466,6 +646,8 @@ class Entity {
 		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
 		if (this.isBuilt) {
 			if (this.OrbitLine) this.OrbitLine.destroy();
+			if (this.EquatorLine) this.EquatorLine.destroy();
+			if (this.PolesLine) this.PolesLine.destroy();
 			setTimeout(() => {
 				clearInterval(this.intervalCheckVar);
 
@@ -480,7 +662,6 @@ class Entity {
 				this.meshGroup.visible = false;
 				if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
 			}, 100);
-			this.isVisible = false;
 			this.isBuilt = false;
 		}
 	}
@@ -519,6 +700,16 @@ class Planet extends Entity {
 				orrery.cameraState._currentPlanetInRange = this.data.id;
 				const moonsToBuild = Object.values(this.moonClasses).filter((m) => m.isEnabled && !m.isBuilt);
 				this.buildMoons(moonsToBuild);
+
+				// if a material hasn't loaded, load it and put that in
+				if (!this.mesh.material.name) {
+					this.applyTextures();
+				}
+
+				// if we need clouds, create a new mesh for them
+				if (this.materialData.clouds && !this.cloudMesh) {
+					this.applyClouds();
+				}
 			}
 		} else {
 			if (!planetIsTargeted && this.isZoomedToPlanet) {
@@ -600,13 +791,10 @@ class Sun extends Entity {
 	// }
 
 	async constructEntityMesh(isGodRays) {
-		if (this.meshGroup && this.meshGroup.children.length) return;
-
-		const meshGroup = new THREE.Group();
-		meshGroup.name = this.data.id;
+		this.meshGroup.name = this.data.id;
 
 		// smaller geometry behind godRays so orbit lines don't bleed from behind it
-		const geometry = new THREE.SphereBufferGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
+		const geometry = new THREE.SphereGeometry(isGodRays ? this.data.diameter : this.data.diameter * 0.98, 32, 32);
 		const material = new THREE.MeshStandardMaterial({
 			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
 			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
@@ -624,7 +812,7 @@ class Sun extends Entity {
 		return entityMesh;
 	}
 
-	async createEntityMesh() {
+	async renderEntityMesh() {
 		this.labelGroup.visible = true;
 
 		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
@@ -642,8 +830,12 @@ class Sun extends Entity {
 				samples: 60,
 				clampMax: 1.0
 			});
+			this.EquatorLine.line.visible = false;
+			this.PolesLine.line.visible = false;
 		});
 	}
+
+	draw() {}
 
 	intervalCheck() {
 		// Only fires if parent planet is in range
@@ -663,8 +855,6 @@ class Sun extends Entity {
 
 		// TODO: sun should glow all cool-like when zoomed out
 	}
-
-	draw() {}
 }
 
 class Moon extends Entity {
@@ -698,9 +888,11 @@ class Moon extends Entity {
 		});
 
 		this.OrbitLine.build();
+		this.EquatorLine.build();
+		this.PolesLine.build();
 
 		if (!this.meshGroup.children.length) {
-			this.createEntityMesh();
+			this.renderEntityMesh();
 		} else {
 			this.meshGroup.visible = true;
 		}
@@ -727,12 +919,20 @@ class Moon extends Entity {
 			const v3 = new THREE.Vector3();
 			const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
 			this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
-			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+			const cameraZoomedCloseToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
+			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 1000000;
 
-			if (cameraZoomedToMoon) {
+			if (cameraZoomedCloseToMoon) {
 				this.labelLink.classList.add('faded');
 			} else {
 				this.labelLink.classList.remove('faded');
+			}
+
+			if (cameraZoomedToMoon) {
+				// if a material hasn't loaded, load it and put that in
+				if (!this.mesh.material.name) {
+					this.applyTextures();
+				}
 			}
 
 			// if (this.OrbitLine) {

@@ -1,0 +1,14 @@
+$vue-fade-time: 0.5s;
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.2s ease;
+}
+
+.fade-leave-to {
+	opacity: 0;
+}
+
+.fade-leave-active {
+	z-index: 1;
+}

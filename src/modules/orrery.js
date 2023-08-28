@@ -1,11 +1,18 @@
 import { scene } from './scene';
 import { controls } from './controls';
 import { camera } from './camera';
+import { renderer, composer } from './renderers/renderer';
+import { labelRenderer } from './renderers/labelRenderer';
+import { skybox } from './factories/solarSystemFactory';
+import { Clock } from 'three';
 
 const orrery = {
 	scene,
 	controls,
 	camera,
+	renderer,
+	composer,
+	labelRenderer,
 	cameraState: {
 		_zoomToTarget: false,
 		_dollySpeed: null,
@@ -20,7 +27,7 @@ const orrery = {
 		_clickedClass: null,
 		_zoomedClass: null
 	},
-	skybox: null,
+	skybox: skybox(),
 	classes: {
 		_all: {},
 		_allIterable: [],
@@ -56,7 +63,8 @@ const orrery = {
 	},
 	isDesktop: false,
 	vueTarget: document.querySelector('#app-orrery'),
-	dateTimeDifference: 0
+	dateTimeDifference: 0,
+	time: new Clock()
 };
 
 window.orrery = orrery;
