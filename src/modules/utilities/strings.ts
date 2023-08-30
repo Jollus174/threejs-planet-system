@@ -48,6 +48,6 @@ const randomString = (length: number) => {
 	return result;
 };
 
-const hsl = (h: number, s: number, l: number) => `hsl(${h ?? 20}, ${s ?? 80}%, ${l ?? 70}%)`;
+const hsl = (h: number | null, s?: number | null, l?: number | null) => `hsl(${h ?? 20}, ${s ?? 80}%, ${l ?? 70}%)`;
 
 export { subInvalidCharacters, convertToKebabCase, convertToCamelCase, convertToId, randomString, hsl };

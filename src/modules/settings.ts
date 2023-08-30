@@ -23,9 +23,6 @@ const settings = {
 		_mouseHoverTimeoutDefault: 5, // for queueing up planet hovers
 		_mouseClickTimeoutDefault: 500 // for determining whether it's a click mouse press or a held one
 	},
-	orbitLines: {
-		_orbitVisibilityCheckbox: document.querySelector('#orbit-lines')
-	},
 	// shoutouts to F-Zero GX
 	planetColours: {
 		default: hsl(0, 0, 89),

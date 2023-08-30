@@ -3,22 +3,25 @@ import { convertToId, convertToKebabCase, hsl } from '../utilities/strings';
 import { currentDateTime } from '../utilities/time';
 import { getRandomArbitrary } from '../utilities/numeric';
 import { wikipediaKeys } from './wikipediaKeys';
+import { SolarSystemDataType, SolarSystemDataTypes } from './api';
 
-const idReplacements = (itemList) => {
+const idReplacements = (itemList: SolarSystemDataTypes) => {
 	// needing to replace the French planet IDs for each moon with English ones, same for planets, etc
 	// getting rid 'englishName', it's going to just be the 'name'. All in English and no French references in the data
 
-	const items = itemList;
+	const { bodies } = itemList;
 
 	// doing a pass for ID replacements
-	for (const item of items) {
+	for (const item of bodies) {
 		item.displayName = item.englishName;
 		item.englishId = item.englishId || convertToId(item.englishName); // temp ID so can map the French Ids to the English ones
 
 		if (item.aroundPlanet) {
-			const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-			planet.englishId = planet.englishId || convertToId(planet.englishName);
-			item.aroundPlanet.planet = planet.englishId;
+			const planet = bodies.find((i) => i.id === item.aroundPlanet?.planet);
+			if (planet) {
+				planet.englishId = planet.englishId || convertToId(planet.englishName);
+				item.aroundPlanet.planet = planet.englishId;
+			}
 
 			// TODO: remove moons around asteroids, no support for those yet
 			// if (planet.bodyType === 'Asteroid') {
@@ -26,18 +29,20 @@ const idReplacements = (itemList) => {
 			// }
 		}
 
-		if (item.moons && item.moons.length) {
+		if (item.moons?.length) {
 			for (const entityMoon of item.moons) {
-				const moonRef = items.find((i) => i.name === entityMoon.moon);
-				moonRef.englishId = moonRef.englishId || convertToId(moonRef.englishName);
-				entityMoon.moon = moonRef.englishId;
+				const moonRef = bodies.find((i) => i.name === entityMoon.moon);
+				if (moonRef) {
+					moonRef.englishId = moonRef.englishId || convertToId(moonRef.englishName);
+					entityMoon.moon = moonRef.englishId;
+				}
 			}
 		}
 	}
 
 	// doing a second pass to remove the 'englishXX' keys, they should be the normal keys
 	// also updating display names
-	for (const item of items) {
+	for (const item of bodies) {
 		item.name = item.englishName;
 		item.id = item.englishId;
 		if (item.aroundPlanet) delete item.aroundPlanet.rel;
@@ -46,8 +51,6 @@ const idReplacements = (itemList) => {
 				delete moon.rel;
 			}
 		}
-		delete item.englishName;
-		delete item.englishId;
 
 		if (item.discoveredBy && item.discoveredBy.includes('Hubble')) item.discoveredBy = 'Hubble Space Telescope';
 		if (item.name === 'Moon') item.displayName = 'The Moon';
@@ -59,28 +62,31 @@ const idReplacements = (itemList) => {
 		}
 	}
 
-	return items;
+	return bodies;
 };
 
-const generalUpdates = (item, items) => {
+const generalUpdates = (item: SolarSystemDataType, items: SolarSystemDataTypes) => {
 	// misc item replacements + updates
+	const { bodies } = items;
 
 	if (item.id === '_s20151364721') item.displayName = 'MK2';
 	if (item.name === 'S/2017 J 9') item.semimajorAxis = 21487000;
 
 	if (item.aroundPlanet) {
-		const planet = items.find((i) => i.id === item.aroundPlanet.planet);
-		planet.systemId = planet.systemId || convertToId(planet.name); // be mindful that NAME is used here instead of DISPLAY NAME
-		planet.systemName = planet.displayName;
-		item.systemId = planet.systemId;
-		item.systemName = planet.systemName;
+		const planet = bodies.find((i) => i.id === item.aroundPlanet?.planet);
+		if (planet) {
+			planet.systemId = planet.systemId || convertToId(planet.name); // be mindful that NAME is used here instead of DISPLAY NAME
+			planet.systemName = planet.displayName;
+			item.systemId = planet.systemId;
+			item.systemName = planet.systemName;
+		}
 	} else {
 		item.systemId = item.systemId || convertToId(item.name);
 		item.systemName = item.displayName;
 	}
 };
 
-const addToMoonGroup = (item) => {
+const addToMoonGroup = (item: SolarSystemDataType) => {
 	item.sideralOrbitDirection = 'Prograde'; // prograde unless specified otherwise
 
 	if (item.bodyType === 'Moon') {
@@ -301,7 +307,7 @@ const addToMoonGroup = (item) => {
 		}
 		if (['_albiorix', '_bebhionn', '_erriapus', '_tarvos'].includes(item.id)) {
 			item.moonGroupName = 'Gallic';
-			item.direction = 'prograde';
+			item.sideralOrbitDirection = 'Prograde';
 			item.moonGroupColor = hsl(43);
 			item.moonGroupShowName = true;
 			item.moonGroupIndex = 4;
@@ -434,15 +440,15 @@ const addToMoonGroup = (item) => {
 	}
 };
 
-const isInnerPlanet = (item) => {
+const isInnerPlanet = (item: SolarSystemDataType) => {
 	const innerPlanets = ['Mercury', 'Venus', 'Earth', 'Mars'];
 
-	if (item.bodyType === 'planet' && innerPlanets.includes(item.displayName)) {
+	if (item.bodyType === 'Planet' && innerPlanets.includes(item.displayName)) {
 		item.isInnerPlanet = true;
 	}
 };
 
-const setRings = (item) => {
+const setRings = (item: SolarSystemDataType) => {
 	// manually adding own ring data, API does not have this
 	if (item.id === '_jupiter') {
 		item.rings = [
@@ -483,7 +489,7 @@ const setRings = (item) => {
 	}
 };
 
-const setOrbitCalculations = (item) => {
+const setOrbitCalculations = (item: SolarSystemDataType) => {
 	// TODO: Set these values manually, as the API is incomplete
 	item.longAscNode = item.longAscNode || getRandomArbitrary(0, 360);
 	item.argPeriapsis = item.argPeriapsis || getRandomArbitrary(0, 360);
@@ -513,11 +519,12 @@ const setOrbitCalculations = (item) => {
 	if (item.displayName === 'Earth') item.sideralOrbit = 365.24;
 };
 
-const setWikipediaKeys = (item) => {
-	item.wikipediaKey = wikipediaKeys.find((w) => w.id === item.id).wikipediaKey;
+const setWikipediaKeys = (item: SolarSystemDataType) => {
+	const wikipediaObj = wikipediaKeys.find((w) => w.id === item.id);
+	item.wikipediaKey = wikipediaObj?.wikipediaKey || '';
 };
 
-const setSidebarImage = (item) => {
+const setSidebarImage = (item: SolarSystemDataType) => {
 	item.sidebarImage = `/img/sidebar-images/${convertToKebabCase(item.id.replace('_', ''))}.jpg`;
 };
 

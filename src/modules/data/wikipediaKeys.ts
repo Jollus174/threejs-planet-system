@@ -1,4 +1,10 @@
-const wikipediaKeys = [
+export type WikipediaKeyType = {
+	name: string;
+	id: string;
+	wikipediaKey: string;
+};
+
+const wikipediaKeys: WikipediaKeyType[] = [
 	{
 		name: 'Moon',
 		id: '_moon',

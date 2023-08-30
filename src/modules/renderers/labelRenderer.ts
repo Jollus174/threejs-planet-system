@@ -1,3 +1,4 @@
+// @ts-ignore
 import { CSS2DRenderer } from '../custom/jsm/renderers/CSS2DRenderer';
 
 const labelRenderer = new CSS2DRenderer();

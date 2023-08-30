@@ -15,7 +15,8 @@ const composer = new EffectComposer(renderer, {
 });
 
 // for storing effectPasses in necessary order in prep for the EffectComposer
-const effectPasses = [];
+// TODO: any
+const effectPasses = [] as any[];
 
 // renderer.shadowMap.enabled = true;
 // renderer.shadowMap.type = BasicShadowMap;

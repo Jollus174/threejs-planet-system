@@ -6,7 +6,33 @@ const sunData = {
 	material: {}
 };
 
-const materialData = {
+export type MaterialDataType = {
+	segments?: number;
+	map: string;
+	emissive?: string;
+	emissiveMap?: string;
+	emissiveIntensity?: number;
+	bumpMap?: string;
+	clouds?: string;
+	cloudsRotateX?: number;
+	cloudsRotateY?: number;
+	cloudsAlpha?: string;
+	normalMap?: string;
+	shininess?: number;
+	rings?: {
+		map: string;
+		mapAlpha: string;
+		opacity?: number;
+		emissive?: { r: number; g: number; b: number };
+		side: typeof DoubleSide;
+	}[];
+};
+
+type MaterialDataSet = {
+	[key: string]: MaterialDataType;
+};
+
+const materialData: MaterialDataSet = {
 	_sun: {
 		segments: 128,
 		map: textureSun,
