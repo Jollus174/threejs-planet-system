@@ -1,5 +1,9 @@
 'use strict';
 import * as THREE from 'three';
+
+// @ts-ignore
+import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
+
 import { GodRaysEffect } from 'postprocessing';
 import { gsap } from 'gsap';
 import { orrery } from './orrery';
@@ -8,8 +12,7 @@ import { settings } from './settings';
 import { calculateOrbit } from './utilities/astronomy';
 import { ringUVMapGeometry } from './utilities/threeJS';
 import { textureLoader, imageBitmapLoader } from './loadManager';
-import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
-import { asteroidBelt } from './factories/solarSystemFactory';
+// import { asteroidBelt } from './factories/solarSystemFactory';
 import { materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
 
@@ -954,4 +957,4 @@ class Moon extends Entity {
 	}
 }
 
-export { setOrbitVisibility, OrbitLine, Planet, DwarfPlanet, Asteroid, Sun, Moon };
+export { OrbitLine, Planet, DwarfPlanet, Asteroid, Sun, Moon };

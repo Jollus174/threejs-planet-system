@@ -6,6 +6,8 @@ import { labelRenderer } from './renderers/labelRenderer';
 import { skybox } from './factories/solarSystemFactory';
 import { Clock } from 'three';
 
+export type BodyType = '_all' | '_planet' | '_dwarfPlanet' | '_asteroid' | '_moon' | '_star';
+
 const orrery = {
 	scene,
 	controls,
@@ -45,7 +47,8 @@ const orrery = {
 			_planet: [],
 			_dwarfPlanet: [],
 			_asteroid: [],
-			_moon: []
+			_moon: [],
+			_star: []
 		},
 		_sun: null,
 		_starField: null,

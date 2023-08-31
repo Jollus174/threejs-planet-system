@@ -9,8 +9,7 @@ import { checkIfDesktop } from './modules/utilities/dom';
 import { randomString } from './modules/utilities/strings';
 import { kmToAU } from './modules/utilities/astronomy';
 import { pointLights, spotLights, ambientLights } from './modules/lights';
-import { asteroidBelt, starField } from './modules/factories/solarSystemFactory';
-import { initMousePointerEvents } from './modules/events/mousePointer';
+// import { asteroidBelt, starField } from './modules/factories/solarSystemFactory';
 import { Planet, DwarfPlanet, Asteroid, Sun, Moon } from './modules/objectProps';
 import { sortData, APIRequest } from './modules/data/api';
 
@@ -30,7 +29,8 @@ import {
 import { customEventNames } from './modules/events/customEvents';
 import { evRenderPause, evRenderStart } from './modules/events/events';
 
-import Vue from 'vue/dist/vue.js';
+// import Vue from 'vue/dist/vue.js';
+import Vue from './node_modules/vue';
 import LightBox from './modules/custom/vue-it-bigger_custom/LightBox.vue';
 import { format, add, differenceInHours } from 'date-fns';
 
@@ -140,7 +140,7 @@ fetch('./solarSystemData.json')
 		return response.json();
 	})
 	.then((data) => {
-		const sortedData = sortData(data.bodies);
+		const sortedData = sortData(data);
 		orrery.bodies._sun = sortedData.sun;
 		orrery.bodies._allPlanets = [...sortedData.planets.concat(sortedData.dwarfPlanets)];
 
