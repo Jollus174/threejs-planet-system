@@ -5,6 +5,8 @@ import { renderer, composer } from './renderers/renderer';
 import { labelRenderer } from './renderers/labelRenderer';
 import { skybox } from './factories/solarSystemFactory';
 import { Clock } from 'three';
+import { SolarSystemDataType } from './data/api';
+import { Entity } from './objectProps';
 
 export type BodyType = '_all' | '_planet' | '_dwarfPlanet' | '_asteroid' | '_moon' | '_star';
 
@@ -25,15 +27,16 @@ const orrery = {
 	mouseState: {
 		_mouseClicked: false,
 		_mousePosition: [null, null],
-		_hoveredClass: null,
-		_clickedClass: null,
-		_zoomedClass: null
+		_hoveredClass: {} as Entity | null,
+		_clickedClass: {} as Entity | null,
+		_zoomedClass: {} as Entity | null,
+		_clickedGroup: {} as THREE.Group | null
 	},
 	skybox: skybox(),
 	classes: {
 		_all: {},
 		_allIterable: [],
-		_allIterableLength: null,
+		_allIterableLength: 0,
 		_moonsIterable: [],
 		_planets: {},
 		_dwarfPlanets: {},
@@ -43,17 +46,17 @@ const orrery = {
 	},
 	bodies: {
 		types: {
-			_all: [],
-			_planet: [],
-			_dwarfPlanet: [],
-			_asteroid: [],
-			_moon: [],
-			_star: []
+			_all: [] as SolarSystemDataType[],
+			_allPlanets: [] as SolarSystemDataType[],
+			_planet: [] as SolarSystemDataType[],
+			_dwarfPlanet: [] as SolarSystemDataType[],
+			_asteroid: [] as SolarSystemDataType[],
+			_moon: [] as SolarSystemDataType[],
+			_star: [] as SolarSystemDataType[]
 		},
 		_sun: null,
 		_starField: null,
 		_asteroidBelt: null,
-		_allPlanets: [],
 		_orbitLines: []
 	},
 	orbitLines: {

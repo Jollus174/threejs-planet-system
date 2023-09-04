@@ -13,31 +13,42 @@ import { calculateOrbit } from './utilities/astronomy';
 import { ringUVMapGeometry } from './utilities/threeJS';
 import { textureLoader, imageBitmapLoader } from './loadManager';
 // import { asteroidBelt } from './factories/solarSystemFactory';
-import { materialData as rawMaterialData } from './data/solarSystem';
+import { MaterialDataType, RingDataTypes, materialData as rawMaterialData } from './data/solarSystem';
 import { customEventNames } from './events/customEvents';
+import { SolarSystemDataType } from './data/api';
 
 const planetRangeThreshold = 100000000;
 // const planetRangeThreshold = 500000000; // Jupiter moons appear from Ceres at higher range...
 
-const setOrbitVisibility = () => {
-	return (orrery.orbitLines._orbitLinesVisible = settings.orbitLines._orbitVisibilityCheckbox.checked);
-};
-
 class OrbitLine {
-	constructor(data, classRef) {
+	data: SolarSystemDataType;
+	classRef: Entity;
+	orbitLine: THREE.Line | null;
+	fadingIn: boolean;
+	fadingOut: boolean;
+	geometryLine: THREE.BufferGeometry;
+	vertexCount: number;
+	colors: Float32Array | null;
+	startColor: THREE.Color;
+	endColor: THREE.Color;
+	uniforms: any; // idk
+	parentPlanetData: SolarSystemDataType | null | undefined;
+	amountOfOrbitToDraw: number;
+
+	constructor(data: SolarSystemDataType, classRef: Entity) {
 		this.data = data;
 		this.classRef = classRef;
 		this.orbitLine = null;
 		this.fadingIn = false;
 		this.fadingOut = false;
-		this.geometryLine = null;
-		this.vertexCount = null;
+		this.geometryLine = new THREE.BufferGeometry();
+		this.vertexCount = 0;
 		this.colors = null;
 		this.startColor = new THREE.Color(this.data.moonGroupColor || this.data.labelColour);
 		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....;
 		this.uniforms = {};
 		this.parentPlanetData = this.data.aroundPlanet
-			? orrery.bodies._allPlanets.find((p) => p.id === this.data.aroundPlanet.planet)
+			? orrery.bodies.types._allPlanets.find((p) => p.id === this.data.aroundPlanet?.planet)
 			: null;
 		this.amountOfOrbitToDraw = this.data.bodyType === 'Moon' ? 180 : 330; // 360 means full circle
 	}
@@ -70,9 +81,9 @@ class OrbitLine {
 		this.geometryLine.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
 	}
 
-	drawLine(iterator) {
+	drawLine(iterator = 0) {
 		const orbitPoints = [];
-		const i = iterator || 0;
+		const i = iterator;
 		for (
 			let theta = this.data.meanAnomaly - i;
 			theta <= this.data.meanAnomaly + this.amountOfOrbitToDraw - i;
@@ -111,7 +122,7 @@ class OrbitLine {
 
 		this.orbitLine.name = `${this.data.id} orbit line`;
 
-		this.classRef.labelGroup.parent.add(this.orbitLine);
+		this.classRef.labelGroup.parent?.add(this.orbitLine);
 
 		// initial page load
 		// if (this.orbitLine.material.opacity === 0 && this.classRef.orbitLineVisibleAtBuild) {
@@ -160,7 +171,7 @@ class OrbitLine {
 		});
 	}
 	eventUnhovered() {
-		orrery.mouseState._hoveredClass = '';
+		orrery.mouseState._hoveredClass = null;
 		if (!this.orbitLine) return;
 		gsap.to(this.orbitLine.material, {
 			opacity: this.classRef.orbitLineOpacityDefault,
@@ -169,14 +180,13 @@ class OrbitLine {
 	}
 
 	destroy() {
-		if (!this.orbitLine || !this.orbitLine.material) return;
-		if (!this.fadingOut) {
+		if (this.orbitLine?.material && !this.fadingOut) {
 			this.fadingOut = true;
 			gsap.to(this.orbitLine.material, {
 				opacity: 0,
 				duration: 0.25,
 				onComplete: () => {
-					this.orbitLine.removeFromParent();
+					this.orbitLine?.removeFromParent();
 					this.fadingOut = false;
 				}
 			});
@@ -185,7 +195,14 @@ class OrbitLine {
 }
 
 class EquatorLine {
-	constructor(data, classRef) {
+	data: SolarSystemDataType;
+	classRef: Entity;
+	lineName: string;
+	line: THREE.Line | null;
+	fadingIn: boolean;
+	fadingOut: boolean;
+
+	constructor(data: SolarSystemDataType, classRef: Entity) {
 		this.data = data;
 		this.classRef = classRef;
 		this.lineName = `${this.data.id} equator line`;
@@ -225,14 +242,13 @@ class EquatorLine {
 	}
 
 	destroy() {
-		if (!this.equatorLine || !this.equatorLine.material) return;
-		if (!this.fadingOut) {
+		if (this.line?.material && !this.fadingOut) {
 			this.fadingOut = true;
-			gsap.to(this.equatorLine.material, {
+			gsap.to(this.line.material, {
 				opacity: 0,
 				duration: 0.25,
 				onComplete: () => {
-					this.equatorLine.removeFromParent();
+					this.line?.removeFromParent();
 					this.fadingOut = false;
 				}
 			});
@@ -241,7 +257,14 @@ class EquatorLine {
 }
 
 class PolesLine {
-	constructor(data, classRef) {
+	data: SolarSystemDataType;
+	classRef: Entity;
+	lineName: string;
+	line: THREE.Line | null;
+	fadingIn: boolean;
+	fadingOut: boolean;
+
+	constructor(data: SolarSystemDataType, classRef: Entity) {
 		this.data = data;
 		this.classRef = classRef;
 		this.lineName = `${this.data.id} poles line`;
@@ -279,14 +302,13 @@ class PolesLine {
 	}
 
 	destroy() {
-		if (!this.polesLine || !this.polesLine.material) return;
-		if (!this.fadingOut) {
+		if (this.line?.material && !this.fadingOut) {
 			this.fadingOut = true;
-			gsap.to(this.polesLine.material, {
+			gsap.to(this.line.material, {
 				opacity: 0,
 				duration: 0.25,
 				onComplete: () => {
-					this.polesLine.removeFromParent();
+					this.line?.removeFromParent();
 					this.fadingOut = false;
 				}
 			});
@@ -294,20 +316,58 @@ class PolesLine {
 	}
 }
 
-class Entity {
-	constructor(data) {
+export class Entity {
+	data: SolarSystemDataType;
+	labelLink: HTMLElement;
+	labelGroup: THREE.Group;
+	mesh: THREE.Mesh;
+	meshGroup: THREE.Group;
+
+	cloudMesh?: THREE.Mesh;
+
+	CSSObj: CSS2DObject;
+	raycaster: THREE.Raycaster;
+	// raycasterArrow: THREE.ArrowHelper;
+	materialData: MaterialDataType;
+	segments: number;
+	planetClass?: Entity;
+
+	intervalCheckTime: number;
+	intervalCheckVar: NodeJS.Timer;
+
+	orbitLineVisibleAtBuild: boolean;
+	orbitLineOpacityDefault: number;
+	OrbitLine: OrbitLine;
+	EquatorLine: EquatorLine;
+	PolesLine: PolesLine;
+
+	raycasterEnabled: boolean;
+	raycasterArrowEnabled: boolean;
+
+	isBuilt: boolean;
+	isEnabled: boolean;
+	isSelected: boolean;
+
+	distanceFromCamera: number | null;
+
+	eventPointerDown: () => void;
+	eventMouseOver: () => void;
+	eventMouseLeave: () => void;
+
+	constructor(data: SolarSystemDataType) {
 		this.data = data;
 		this.labelLink = document.createElement('a');
 		this.labelGroup = new THREE.Group();
+		this.mesh = new THREE.Mesh();
 		this.meshGroup = new THREE.Group();
-		this.surfaceMesh = null;
-		this.cloudMesh = null;
+		// this.surfaceMesh = null;
+		// this.cloudMesh = null;
 		this.isBuilt = false;
 		this.CSSObj = new CSS2DObject(this.labelLink, this);
 		this.raycaster = new THREE.Raycaster();
-		this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
+		// this.raycasterArrow = new THREE.ArrowHelper(0, 0, 200000000, this.data.labelColour);
 		this.materialData = this.data.materialData;
-		this.segments = this.data.materialData ? this.data.materialData.segments : 32;
+		this.segments = this.data.materialData?.segments || 32;
 
 		this.intervalCheckTime = 1000;
 		this.intervalCheckVar = setInterval(this.intervalCheck.bind(this), this.intervalCheckTime);
@@ -322,9 +382,12 @@ class Entity {
 
 		// for debugging
 		this.raycasterArrowEnabled = false;
-
-		this.time = orrery.time;
 		// ---
+
+		this.isEnabled = false;
+		this.isSelected = false;
+
+		this.distanceFromCamera = null;
 
 		this.eventPointerDown = () => {
 			document.dispatchEvent(new CustomEvent(customEventNames.updateClickTarget, { detail: this }));
@@ -356,25 +419,24 @@ class Entity {
 
 	createCSSLabel() {
 		// checking to see if a label has already been built to avoid duplicate builds + listeners
-		if (this.labelGroup.children.some((i) => i.isCSS2DObject)) return;
+		// THREEJS thinks isCSS2DObject doesn't exist...
+		if (this.labelGroup.children.some((i: any) => i.isCSS2DObject)) return;
 
 		const entityTypeClasses = [
 			this.data.id === '_sun' ? 'is-sun' : '',
 			this.data.aroundPlanet ? 'is-moon' : '',
 			this.data.isPlanet ? 'is-planet' : '',
-			this.data.isDwarfPlanet ? 'is-dwarf-planet' : '',
-			this.data.isMajorMoon ? 'is-major-moon' : '',
-			this.data.isInnerMoon ? 'is-inner-moon' : ''
+			this.data.isDwarfPlanet ? 'is-dwarf-planet' : ''
+			// this.data.isMajorMoon ? 'is-major-moon' : '',
+			// this.data.isInnerMoon ? 'is-inner-moon' : ''
 		]
 			.join(' ')
 			.trim();
 
-		// TODO: turn this back on when links are performing correctly
-		// this.labelLink.href = `/#/${this.data.id}`;
 		this.labelLink.className = `label behind-label ${entityTypeClasses}`;
 		this.labelLink.dataset.selector = 'label';
 		this.labelLink.style.color = this.data.labelColour;
-		this.labelLink.style.opacity = 0;
+		this.labelLink.style.opacity = '0';
 		this.labelLink.innerHTML = `
 			<div class="label-content">
 				<div class="label-circle"></div>
@@ -401,7 +463,7 @@ class Entity {
 	}
 
 	removeCSSLabel() {
-		if (!this.labelGroup.children.some((i) => i.isCSS2DObject)) return;
+		if (!this.labelGroup.children.some((i: any) => i.isCSS2DObject)) return;
 		this.labelLink.removeEventListener('pointerDown', this.eventPointerDown);
 		this.labelLink.removeEventListener('mouseover', this.eventMouseOver);
 		this.labelLink.removeEventListener('mouseleave', this.eventMouseLeave);
@@ -440,25 +502,24 @@ class Entity {
 		}
 	}
 
-	setEnabled(shouldEnable) {
+	setEnabled(shouldEnable = false) {
 		if (shouldEnable === true) {
 			this.isEnabled = true;
 			this.orbitLineOpacityDefault = 0.5;
-			if (this.OrbitLine.orbitLine && this.OrbitLine.orbitLine.material && this.OrbitLine.orbitLine.material.opacity) {
-				this.OrbitLine.orbitLine.material.opacity = 0.5;
-			}
+			// THREEJS being silly...
+			const material = this.OrbitLine.orbitLine?.material as THREE.Material;
+			if (material.opacity) material.opacity = 0.5;
 		} else {
 			this.isEnabled = false;
 		}
 	}
 
-	setSelected(shouldSelect) {
+	setSelected(shouldSelect = false) {
 		if (shouldSelect === true) {
 			this.isSelected = true;
 			this.orbitLineOpacityDefault = 0.7;
-			if (this.OrbitLine.orbitLine && this.OrbitLine.orbitLine.material && this.OrbitLine.orbitLine.material.opacity) {
-				this.OrbitLine.orbitLine.material.opacity = 0.7;
-			}
+			const material = this.OrbitLine.orbitLine?.material as THREE.Material;
+			if (material.opacity) material.opacity = 0.7;
 		} else {
 			this.isSelected = false;
 		}
@@ -475,7 +536,7 @@ class Entity {
 				? await imageBitmapLoader.loadAsync(normalMap).then((t) => new THREE.CanvasTexture(t))
 				: null,
 			bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new THREE.CanvasTexture(t)) : null,
-			bumpScale: bumpMap ? 0.015 : null,
+			bumpScale: bumpMap ? 0.015 : 1,
 			shininess,
 			side,
 			transparent: false,
@@ -486,7 +547,7 @@ class Entity {
 	}
 
 	async constructCloudTextures() {
-		if (!this.materialData || !this.materialData.clouds) return null;
+		if (!this.materialData?.clouds) return null;
 		const { clouds = null, cloudsAlpha = null } = this.materialData;
 
 		const cloudMaterialProps = {
@@ -498,7 +559,7 @@ class Entity {
 			transparent: true,
 			opacity: 0.9
 		};
-		cloudMaterialProps.map.minFilter = THREE.LinearFilter;
+		if (cloudMaterialProps.map) cloudMaterialProps.map.minFilter = THREE.LinearFilter;
 
 		return cloudMaterialProps;
 	}
@@ -507,7 +568,7 @@ class Entity {
 		if (this.meshGroup && this.meshGroup.children.length) return null;
 
 		const geometry = new THREE.SphereGeometry(this.data.diameter, this.segments, this.segments);
-		const loaderMaterial = new THREE.MeshPhongMaterial({
+		const loaderMaterial = new THREE.MeshStandardMaterial({
 			color: new THREE.Color(0x000000),
 			transparent: true,
 			opacity: 0.2
@@ -519,14 +580,15 @@ class Entity {
 		return entityMesh;
 	}
 
-	async constructRingMeshes(ring, i) {
+	async constructRingMeshes(ring: RingDataTypes[0], i: number) {
 		if (!ring) return;
-		const { map = null, mapAlpha = null, opacity = 0.98, emissive = { r: 0, g: 0, b: 0 } } = ring;
+		const { map = undefined, alphaMap = null, opacity = 0.98, emissive = { r: 0, g: 0, b: 0 } } = ring;
 		const ringMaterial = {
-			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : null,
-			alphaMap: mapAlpha ? await imageBitmapLoader.loadAsync(mapAlpha).then((t) => new THREE.CanvasTexture(t)) : null,
+			map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new THREE.CanvasTexture(t)) : undefined,
+			alphaMap: alphaMap ? await imageBitmapLoader.loadAsync(alphaMap).then((t) => new THREE.CanvasTexture(t)) : null,
 			transparent: true,
-			emissive: emissive.r || emissive.g || emissive.b ? new THREE.Color(emissive.r, emissive.g, emissive.b) : null,
+			emissive:
+				emissive.r || emissive.g || emissive.b ? new THREE.Color(emissive.r, emissive.g, emissive.b) : '0x000000',
 			opacity,
 			side: THREE.DoubleSide
 		};
@@ -547,12 +609,14 @@ class Entity {
 
 	applyTextures() {
 		this.constructTextures().then((textureObj) => {
-			this.mesh.material.dispose(); // remove the pre-loader wireframe material
-			this.mesh.material = new THREE.MeshPhongMaterial(textureObj);
+			// TODO: does not work like this
+			// this.mesh.material.dispose(); // remove the pre-loader wireframe material
+			if (textureObj) this.mesh.material = new THREE.MeshPhongMaterial(textureObj);
 		});
 	}
 	applyClouds() {
 		this.constructCloudTextures().then((textureObj) => {
+			if (!textureObj) return;
 			const cloudMesh = new THREE.Mesh(
 				new THREE.SphereGeometry(this.data.diameter * 1.01, this.segments, this.segments),
 				new THREE.MeshPhongMaterial(textureObj)
@@ -567,19 +631,22 @@ class Entity {
 	async renderEntityMesh() {
 		if (!this.materialData) return this;
 		const mesh = await this.constructEntityMesh();
-		this.mesh = mesh;
+		if (mesh) this.mesh = mesh;
 
 		this.meshGroup.name = `${this.data.name} mesh group`;
-		this.meshGroup.add(mesh);
+		if (mesh) this.meshGroup.add(mesh);
 
 		this.labelGroup.rotation.z = THREE.MathUtils.degToRad(this.data.axialTilt);
 		this.labelGroup.add(this.meshGroup);
 
-		if (this.materialData.rings) {
-			const ringMeshPromises = this.materialData.rings.map((ring, i) => this.constructRingMeshes(ring, i));
+		const rings = this.materialData.rings as RingDataTypes;
+
+		if (rings) {
+			const ringMeshPromises = rings.map((ring, i) => this.constructRingMeshes(ring, i));
 
 			await Promise.all(ringMeshPromises).then((ringMeshes) => {
 				for (const ringMesh of ringMeshes) {
+					if (!ringMesh) continue;
 					ringMesh.rotation.x = THREE.MathUtils.degToRad(90);
 					this.meshGroup.add(ringMesh);
 				}
@@ -596,7 +663,11 @@ class Entity {
 				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (-1 / 50);
 			}
 
-			if (this.cloudMesh && (this.materialData.cloudsRotateX || this.materialData.cloudsRotateY)) {
+			if (
+				this.cloudMesh &&
+				this.materialData.cloudsRotateX !== undefined &&
+				this.materialData.cloudsRotateY !== undefined
+			) {
 				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX * -1;
 				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY * -1;
 			}
@@ -616,8 +687,8 @@ class Entity {
 			const vDirection = new THREE.Vector3();
 			const direction = vDirection.subVectors(thisPos, cameraPos).normalize();
 			this.raycaster.set(cameraPos, direction);
-			this.raycasterArrow.position.copy(cameraPos);
-			this.raycasterArrow.setDirection(direction);
+			// this.raycasterArrow.position.copy(cameraPos);
+			// this.raycasterArrow.setDirection(direction);
 
 			// TODO: could be more efficient?
 			const intersects = this.raycaster.intersectObjects(scene.children, true);
@@ -655,15 +726,18 @@ class Entity {
 				clearInterval(this.intervalCheckVar);
 
 				// snap the camera back to the planet if the clicked group moon is deloaded
-				if (orrery.mouseState._clickedGroup && orrery.mouseState._clickedGroup.data.aroundPlanet) {
+				// TODO: what even is this??
+				/* 
+				if (orrery.mouseState._clickedGroup?.data && orrery.mouseState._clickedGroup.data.aroundPlanet) {
 					orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
 				}
+				*/
 				// all we really want is to clear the label
 				// the mesh can remain, but it should be hidden (this may change in future)
 				this.CSSObj.removeFromParent();
-				this.fadingOut = false;
+				// this.fadingOut = false;
 				this.meshGroup.visible = false;
-				if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
+				// if (this.raycasterArrowEnabled) this.raycasterArrow.removeFromParent();
 			}, 100);
 			this.isBuilt = false;
 		}
@@ -673,7 +747,13 @@ class Entity {
 // TODO: Could probably use a new class for an interval distance checker...
 
 class Planet extends Entity {
-	constructor(data) {
+	moonClasses: {
+		[key: string]: Moon;
+	};
+	isZoomedToPlanet: boolean;
+	// raycasterArrow: THREE.Raycaster;
+
+	constructor(data: SolarSystemDataType) {
 		super(data);
 		this.moonClasses = {};
 		this.isZoomedToPlanet = true;
@@ -682,7 +762,7 @@ class Planet extends Entity {
 	intervalCheck() {
 		if (this.raycasterEnabled) {
 			this.updateRaycaster();
-			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+			// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 		}
 
 		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
@@ -705,9 +785,10 @@ class Planet extends Entity {
 				this.buildMoons(moonsToBuild);
 
 				// if a material hasn't loaded, load it and put that in
-				if (!this.mesh.material.name) {
-					this.applyTextures();
-				}
+				// TODO: material.name doesn't exist... what was this for?
+				// if (!this.mesh.material.name) {
+				this.applyTextures();
+				// }
 
 				// if we need clouds, create a new mesh for them
 				if (this.materialData.clouds && !this.cloudMesh) {
@@ -742,20 +823,24 @@ class Planet extends Entity {
 		} */
 	}
 
-	buildMoons(moonsToBuild) {
+	buildMoons(moonsToBuild: Moon[]) {
 		// staggering the building of moon classes to help with performance
-		moonsToBuild.forEach((moonClass, i) => {
+		moonsToBuild.forEach((moonClass: Moon, i: number) => {
 			setTimeout(() => {
 				moonClass.createElements();
 			}, i * 10);
 		});
 	}
 
-	destroyMoons(moonsToDestroy) {
+	destroyMoons(moonsToDestroy: Moon[]) {
 		moonsToDestroy.forEach((moonClass, i) => {
 			setTimeout(() => {
 				// switch target to the base system entity if the moon currently targeted is destroyed
-				if (orrery.mouseState._clickedClass.data.id === moonClass.data.id) {
+				if (
+					orrery.mouseState._clickedClass &&
+					orrery.mouseState._clickedClass.data.id === moonClass.data.id &&
+					moonClass.planetClass
+				) {
 					orrery.mouseState._clickedClass = moonClass.planetClass;
 				}
 				moonClass.destroy();
@@ -765,21 +850,21 @@ class Planet extends Entity {
 }
 
 class DwarfPlanet extends Planet {
-	constructor(data) {
+	constructor(data: SolarSystemDataType) {
 		super(data);
-		this.planetTypeKey = '_dwarfPlanets';
 	}
 }
 
 class Asteroid extends Planet {
-	constructor(data) {
+	constructor(data: SolarSystemDataType) {
 		super(data);
-		this.planetTypeKey = '_asteroid';
 	}
 }
 
 class Sun extends Entity {
-	constructor(data) {
+	godRaysEffect: GodRaysEffect | null;
+
+	constructor(data: SolarSystemDataType) {
 		super(data);
 		// this.raycasterEnabled = false;
 
@@ -793,7 +878,8 @@ class Sun extends Entity {
 	// 	}
 	// }
 
-	async constructEntityMesh(isGodRays) {
+	async constructEntityMesh(isGodRays = false) {
+		if (this.meshGroup && this.meshGroup.children.length) return null;
 		this.meshGroup.name = this.data.id;
 
 		// smaller geometry behind godRays so orbit lines don't bleed from behind it
@@ -802,9 +888,11 @@ class Sun extends Entity {
 			map: this.materialData.map ? await textureLoader.loadAsync(this.materialData.map) : null,
 			normalMap: this.materialData.normalMap ? await textureLoader.loadAsync(this.materialData.normalMap) : null,
 			transparent: false,
-			emissiveMap: this.materialData.emissiveMap ? await textureLoader.loadAsync(this.materialData.emissiveMap) : null,
-			emissive: this.materialData.emissive || null,
-			emissiveIntensity: this.materialData.emissiveIntensity || null
+			emissiveMap: this.materialData.emissiveMap
+				? await textureLoader.loadAsync(this.materialData.emissiveMap)
+				: undefined,
+			emissive: this.materialData.emissive || undefined,
+			emissiveIntensity: this.materialData.emissiveIntensity || undefined
 		});
 
 		const entityMesh = new THREE.Mesh(geometry, material);
@@ -816,35 +904,37 @@ class Sun extends Entity {
 	}
 
 	async renderEntityMesh() {
-		this.labelGroup.visible = true;
+		if (!this.materialData) return this;
 
+		this.labelGroup.visible = true;
 		// adding mesh twice; one to occlude anything behind it, and the other for the god rays
-		const meshPromises = [this.constructEntityMesh(), this.constructEntityMesh(true)];
+		const meshPromises = [this.constructEntityMesh(false), this.constructEntityMesh(true)];
 		await Promise.all(meshPromises).then((meshes) => {
+			// if (meshes.some((mesh) => mesh === null)) return;
 			this.labelGroup.add(this.meshGroup);
-			this.meshGroup.add(meshes[0]);
-			this.meshGroup.add(meshes[1]);
-			this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
-				blurriness: 2,
-				density: 0.56,
-				decay: 0.92,
-				weight: 0.3,
-				exposure: 0.54,
-				samples: 60,
-				clampMax: 1.0
-			});
-			this.EquatorLine.line.visible = false;
-			this.PolesLine.line.visible = false;
+			if (meshes[0]) this.meshGroup.add(meshes[0]);
+			if (meshes[1]) {
+				this.meshGroup.add(meshes[1]);
+				this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
+					blur: true,
+					density: 0.56,
+					decay: 0.92,
+					weight: 0.3,
+					exposure: 0.54,
+					samples: 60,
+					clampMax: 1.0
+				});
+			}
+			if (this.EquatorLine.line) this.EquatorLine.line.visible = false;
+			if (this.PolesLine.line) this.PolesLine.line.visible = false;
 		});
 	}
-
-	draw() {}
 
 	intervalCheck() {
 		// Only fires if parent planet is in range
 		if (this.raycasterEnabled) {
 			this.updateRaycaster();
-			if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+			// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 		}
 
 		this.distanceFromCamera = orrery.camera.position.distanceTo(this.labelGroup.position);
@@ -861,12 +951,14 @@ class Sun extends Entity {
 }
 
 class Moon extends Entity {
-	constructor(data, planetClass) {
+	planetGroup: THREE.Group;
+	constructor(data: SolarSystemDataType, planetClass: Planet) {
 		super(data);
 		this.planetClass = planetClass;
 		this.planetGroup = this.planetClass.labelGroup;
 		this.materialData = this.data.materialData || rawMaterialData._moon;
-		this.orbitLineVisibleAtBuild = this.planetClass.data.moons.length < 20 || this.data.perihelion < 10000000; // orbit line limits set here
+		this.orbitLineVisibleAtBuild =
+			(this.planetClass.data.moons && this.planetClass.data.moons.length < 20) || this.data.perihelion < 10000000; // orbit line limits set here
 		// updated by event emitted by Vue when a moon group updates
 		this.isEnabled = false;
 		this.isSelected = false;
@@ -876,7 +968,7 @@ class Moon extends Entity {
 		clearInterval(this.intervalCheckVar);
 	}
 
-	build() {
+	async build() {
 		this.planetGroup.add(this.labelGroup);
 		this.setLabelGroupDefaultPosition();
 	}
@@ -913,10 +1005,10 @@ class Moon extends Entity {
 
 	intervalCheck() {
 		// Only fires if parent planet is in range
-		if (orrery.cameraState._currentPlanetInRange === this.planetClass.data.id) {
+		if (orrery.cameraState._currentPlanetInRange === this.planetClass?.data.id) {
 			if (this.raycasterEnabled) {
 				this.updateRaycaster();
-				if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
+				// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 			}
 
 			const v3 = new THREE.Vector3();
@@ -933,9 +1025,10 @@ class Moon extends Entity {
 
 			if (cameraZoomedToMoon) {
 				// if a material hasn't loaded, load it and put that in
-				if (!this.mesh.material.name) {
-					this.applyTextures();
-				}
+				// TODO: material.name doesn't exist... what was this for?
+				// if (!this.mesh.material.name) {
+				this.applyTextures();
+				// }
 			}
 
 			// if (this.OrbitLine) {

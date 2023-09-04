@@ -28,6 +28,7 @@ export interface SolarSystemDataType {
 	englishName: string;
 	englishId: string;
 	isPlanet: boolean;
+	isDwarfPlanet: boolean;
 	moons: SolarSystemDataType[] | null;
 
 	semimajorAxis: number;
@@ -181,8 +182,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 		// setting the 'entity types' here rather than further down and redoing the loop
 
 		const typeKey = ('_' + convertToCamelCase(item.bodyType)) as BodyType;
-		let orreryType: SolarSystemDataType[] = orreryTypes[typeKey];
-		orreryType = orreryTypes[typeKey] || [];
+		const orreryType = orreryTypes[typeKey] || [];
 		orreryType.push(item);
 
 		generalUpdates(item, englishifiedData);
@@ -194,11 +194,11 @@ const sortData = (data: SolarSystemDataTypes) => {
 		setSidebarImage(item);
 	}
 
-	let orreryAllType: SolarSystemDataType[] = orreryTypes['_all'];
+	let orreryAllType = orreryTypes['_all'];
 	orreryAllType = [...englishifiedData.bodies];
 	const sun = orreryTypes._star[0];
 
-	const moons = orreryTypes._moon as SolarSystemDataType[];
+	const moons = orreryTypes._moon;
 	for (const moon of moons) {
 		moon.materialData = materialData[moon.id] || null;
 		moon.startingPosition = new Vector3();
@@ -209,7 +209,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 	const setMoonsToDataEntity = (entity: SolarSystemDataType) => {
 		if (entity?.moons?.length) {
 			const eMoons = entity.moons
-				.map((eMoon: SolarSystemDataType) => moons.find((m: SolarSystemDataType) => m.id === eMoon.moon)!)
+				.map((eMoon) => moons.find((m) => m.id === eMoon.moon)!)
 				// sorting by moonGroupIndex, then by distance from planet
 				.sort((a, b) => {
 					if (!a || !b) return 0;
@@ -223,10 +223,11 @@ const sortData = (data: SolarSystemDataTypes) => {
 		}
 	};
 
-	const dwarfPlanets = orrery.bodies.types._dwarfPlanet as SolarSystemDataType[];
+	const dwarfPlanets = orrery.bodies.types._dwarfPlanet;
 	for (const dwarfPlanet of dwarfPlanets) {
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
+		dwarfPlanet.isDwarfPlanet = true;
 
 		setMoonsToDataEntity(dwarfPlanet);
 	}
@@ -241,7 +242,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 	// 	setMoonsToDataEntity(asteroid);
 	// }
 
-	const planets = orrery.bodies.types._planet as SolarSystemDataType[];
+	const planets = orrery.bodies.types._planet;
 	for (const planet of planets) {
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
@@ -253,7 +254,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 	// Building 'Entity Nav' ids with:
 	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
 	for (const navSystemName of settings.navigationSystems) {
-		const entityItem = orreryAllType.find((allItem: SolarSystemDataType) => allItem.id === navSystemName)!;
+		const entityItem = orreryAllType.find((allItem) => allItem.id === navSystemName)!;
 		const { navigationEntities }: { navigationEntities: string[] } = settings;
 		navigationEntities.push(entityItem.id);
 		if (entityItem.moons && entityItem.moons.length) {

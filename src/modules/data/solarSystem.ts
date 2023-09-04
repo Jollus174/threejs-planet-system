@@ -1,4 +1,4 @@
-import { DoubleSide } from 'three';
+import { FrontSide, DoubleSide } from 'three';
 
 import textureSun from '/img/textures/sun-min.jpg';
 
@@ -19,9 +19,10 @@ export type MaterialDataType = {
 	cloudsAlpha?: string;
 	normalMap?: string;
 	shininess?: number;
+	side?: typeof FrontSide | typeof DoubleSide;
 	rings?: {
 		map: string;
-		mapAlpha: string;
+		alphaMap: string;
 		opacity?: number;
 		emissive?: { r: number; g: number; b: number };
 		side: typeof DoubleSide;
@@ -31,6 +32,18 @@ export type MaterialDataType = {
 type MaterialDataSet = {
 	[key: string]: MaterialDataType;
 };
+
+export type RingDataTypes = {
+	opacity: number;
+	side: typeof DoubleSide;
+	map: string;
+	alphaMap: string;
+	emissive?: {
+		r: number;
+		g: number;
+		b: number;
+	};
+}[];
 
 const materialData: MaterialDataSet = {
 	_sun: {
@@ -81,11 +94,11 @@ const materialData: MaterialDataSet = {
 		rings: [
 			{
 				map: '/img/textures/uranus-rings-color.png',
-				mapAlpha: '/img/textures/uranus-rings-alpha.png',
+				alphaMap: '/img/textures/uranus-rings-alpha.png',
 				opacity: 0.1,
 				side: DoubleSide
 			}
-		]
+		] as RingDataTypes
 	},
 	_callisto: {
 		map: '/img/textures/moon-callisto-2k.jpg'
@@ -107,11 +120,11 @@ const materialData: MaterialDataSet = {
 		rings: [
 			{
 				map: '/img/textures/saturn-rings-color.png',
-				mapAlpha: '/img/textures/saturn-rings-alpha.png',
+				alphaMap: '/img/textures/saturn-rings-alpha.png',
 				emissive: { r: 0.2, g: 0.2, b: 0.17 },
 				side: DoubleSide
 			}
-		]
+		] as RingDataTypes
 	},
 	_uranus: {
 		map: '/img/textures/uranus-2k.jpg',
@@ -119,11 +132,11 @@ const materialData: MaterialDataSet = {
 		rings: [
 			{
 				map: '/img/textures/uranus-rings-color.png',
-				mapAlpha: '/img/textures/uranus-rings-alpha.png',
+				alphaMap: '/img/textures/uranus-rings-alpha.png',
 				opacity: 0.3,
 				side: DoubleSide
 			}
-		]
+		] as RingDataTypes
 	},
 	_neptune: {
 		map: '/img/textures/neptune-2k.jpg',
@@ -131,11 +144,11 @@ const materialData: MaterialDataSet = {
 		rings: [
 			{
 				map: '/img/textures/neptune-rings-color.png',
-				mapAlpha: '/img/textures/neptune-rings-alpha.png',
+				alphaMap: '/img/textures/neptune-rings-alpha.png',
 				opacity: 0.3,
 				side: DoubleSide
 			}
-		]
+		] as RingDataTypes
 	},
 
 	_1ceres: {
