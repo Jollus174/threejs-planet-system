@@ -4,13 +4,13 @@ import { camera } from './camera';
 import { renderer, composer } from './renderers/renderer';
 import { labelRenderer } from './renderers/labelRenderer';
 import { skybox } from './factories/solarSystemFactory';
-import { Clock } from 'three';
+import { AmbientLight, Clock, PointLight, SpotLight } from 'three';
 import { SolarSystemDataType } from './data/api';
-import { Entity } from './objectProps';
+import { DwarfPlanet, Entity, Moon, OrbitLine, Planet, Sun } from './objectProps';
 
 export type BodyType = '_all' | '_planet' | '_dwarfPlanet' | '_asteroid' | '_moon' | '_star';
 
-const orrery = {
+const Orrery = {
 	scene,
 	controls,
 	camera,
@@ -34,15 +34,16 @@ const orrery = {
 	},
 	skybox: skybox(),
 	classes: {
-		_all: {},
-		_allIterable: [],
+		_all: {} as { [key: string]: Entity },
+		_allIterable: [] as Entity[],
 		_allIterableLength: 0,
-		_moonsIterable: [],
-		_planets: {},
-		_dwarfPlanets: {},
+		_moonsIterable: [] as Moon[],
+		_planets: {} as { [key: string]: Planet },
+		_dwarfPlanets: {} as { [key: string]: DwarfPlanet },
 		_asteroids: {},
-		_moons: {},
-		_navigable: {}
+		_moons: {} as { [key: string]: Moon },
+		_navigable: {},
+		_sun: {} as Sun
 	},
 	bodies: {
 		types: {
@@ -54,18 +55,18 @@ const orrery = {
 			_moon: [] as SolarSystemDataType[],
 			_star: [] as SolarSystemDataType[]
 		},
-		_sun: null,
+		_sun: {} as SolarSystemDataType,
 		_starField: null,
 		_asteroidBelt: null,
-		_orbitLines: []
+		_orbitLines: [] as OrbitLine[]
 	},
 	orbitLines: {
 		_orbitLinesVisible: true
 	},
 	lights: {
-		_pointLights: [],
-		_spotLights: [],
-		_ambientLights: []
+		_pointLights: [] as PointLight[],
+		_spotLights: [] as SpotLight[],
+		_ambientLights: [] as AmbientLight[]
 	},
 	isDesktop: false,
 	vueTarget: document.querySelector('#app-orrery'),
@@ -73,6 +74,6 @@ const orrery = {
 	time: new Clock()
 };
 
-window.orrery = orrery;
+window.orrery = Orrery;
 
-export { orrery };
+export { Orrery };

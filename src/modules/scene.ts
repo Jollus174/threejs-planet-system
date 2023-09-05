@@ -1,9 +1,13 @@
 import { Scene, Color } from 'three';
+import { Settings } from './settings';
+import { Orrery } from './orrery';
 
 declare global {
 	interface Window {
 		scene: Scene;
-		orrery: any;
+		orrery: typeof Orrery;
+		settings: typeof Settings;
+		renderLoop: () => void | null;
 	}
 }
 

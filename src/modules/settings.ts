@@ -1,6 +1,7 @@
+import { Entity } from './objectProps';
 import { hsl } from './utilities/strings';
 
-const settings = {
+const Settings = {
 	camera: {
 		_fov: 50,
 		_aspect: window.innerWidth / window.innerHeight,
@@ -71,7 +72,7 @@ const settings = {
 		// '_gonggong',
 		// '_50000quaoar'
 	],
-	navigationEntities: [] // hydrated by API
+	navigationEntities: [] as Entity[] // hydrated by API
 };
 
-export { settings };
+export { Settings };

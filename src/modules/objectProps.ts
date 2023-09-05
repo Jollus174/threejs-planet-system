@@ -6,9 +6,9 @@ import { CSS2DObject } from './custom/jsm/renderers/CSS2DRenderer';
 
 import { GodRaysEffect } from 'postprocessing';
 import { gsap } from 'gsap';
-import { orrery } from './orrery';
+import { Orrery } from './orrery';
 import { scene } from './scene';
-import { settings } from './settings';
+import { Settings } from './settings';
 import { calculateOrbit } from './utilities/astronomy';
 import { ringUVMapGeometry } from './utilities/threeJS';
 import { textureLoader, imageBitmapLoader } from './loadManager';
@@ -48,7 +48,7 @@ class OrbitLine {
 		this.endColor = new THREE.Color('black'); // TODO: this really should be some sort of alpha fade... hmmm....;
 		this.uniforms = {};
 		this.parentPlanetData = this.data.aroundPlanet
-			? orrery.bodies.types._allPlanets.find((p) => p.id === this.data.aroundPlanet?.planet)
+			? Orrery.bodies.types._allPlanets.find((p) => p.id === this.data.aroundPlanet?.planet)
 			: null;
 		this.amountOfOrbitToDraw = this.data.bodyType === 'Moon' ? 180 : 330; // 360 means full circle
 	}
@@ -106,7 +106,7 @@ class OrbitLine {
 		this.uniforms = {
 			offset: { value: this.data.mainAnomaly },
 			color: { value: this.startColor },
-			logDepthBuffFC: { value: 2.0 / (Math.log(orrery.camera.far + 1.0) / Math.LN2) }
+			logDepthBuffFC: { value: 2.0 / (Math.log(Orrery.camera.far + 1.0) / Math.LN2) }
 		};
 
 		this.orbitLine = new THREE.Line(
@@ -163,7 +163,7 @@ class OrbitLine {
 	} */
 
 	eventHovered() {
-		orrery.mouseState._hoveredClass = this.classRef;
+		Orrery.mouseState._hoveredClass = this.classRef;
 		if (!this.orbitLine) return;
 		gsap.to(this.orbitLine.material, {
 			opacity: 1,
@@ -171,7 +171,7 @@ class OrbitLine {
 		});
 	}
 	eventUnhovered() {
-		orrery.mouseState._hoveredClass = null;
+		Orrery.mouseState._hoveredClass = null;
 		if (!this.orbitLine) return;
 		gsap.to(this.orbitLine.material, {
 			opacity: this.classRef.orbitLineOpacityDefault,
@@ -441,7 +441,7 @@ export class Entity {
 			<div class="label-content">
 				<div class="label-circle"></div>
 				<div class="label-text" style="color: ${
-					this.data.labelColour !== settings.planetColours.default ? this.data.labelColour : ''
+					this.data.labelColour !== Settings.planetColours.default ? this.data.labelColour : ''
 				};">${this.data.displayName}</div>
 			</div>
 			`;
@@ -490,7 +490,7 @@ export class Entity {
 	iteratePosition() {
 		if (!this.meshGroup.visible) return;
 		// if (!this.isVisible) return;
-		const i = (orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
+		const i = (Orrery.dateTimeDifference * 360) / (this.data.sideralOrbit || 360);
 		this.labelGroup.position.copy(
 			calculateOrbit(this.data.meanAnomaly - i, this.data, this.planetClass ? this.planetClass.data : null)
 		);
@@ -657,10 +657,10 @@ export class Entity {
 	// for updates that need to happen in the main render loop
 	draw() {
 		if (this.meshGroup.visible) {
-			this.meshGroup.rotation.y = orrery.time.getElapsedTime() * (-1 / (this.data.sideralRotation * 10));
+			this.meshGroup.rotation.y = Orrery.time.getElapsedTime() * (-1 / (this.data.sideralRotation * 10));
 
 			if (this.EquatorLine && this.EquatorLine.line) {
-				this.EquatorLine.line.rotation.y = orrery.time.getElapsedTime() * (-1 / 50);
+				this.EquatorLine.line.rotation.y = Orrery.time.getElapsedTime() * (-1 / 50);
 			}
 
 			if (
@@ -668,8 +668,8 @@ export class Entity {
 				this.materialData.cloudsRotateX !== undefined &&
 				this.materialData.cloudsRotateY !== undefined
 			) {
-				this.cloudMesh.rotation.y = orrery.time.getElapsedTime() * this.materialData.cloudsRotateX * -1;
-				this.cloudMesh.rotation.x = orrery.time.getElapsedTime() * this.materialData.cloudsRotateY * -1;
+				this.cloudMesh.rotation.y = Orrery.time.getElapsedTime() * this.materialData.cloudsRotateX * -1;
+				this.cloudMesh.rotation.x = Orrery.time.getElapsedTime() * this.materialData.cloudsRotateY * -1;
 			}
 		}
 	}
@@ -681,7 +681,7 @@ export class Entity {
 		// TODO: This should only run when in range of a planet?
 		// or just run it against the Sun if not in range...
 		if (this.CSSObj.inFrustum) {
-			const cameraPos = orrery.camera.position;
+			const cameraPos = Orrery.camera.position;
 			const thisPos = new THREE.Vector3();
 			this.labelGroup.getWorldPosition(thisPos);
 			const vDirection = new THREE.Vector3();
@@ -717,7 +717,7 @@ export class Entity {
 	// }, 500);
 
 	destroy() {
-		// if (orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
+		// if (Orrery.cameraState._currentPlanetInRange !== this.planetGroup.data.id && !this.fadingOut && this.isBuilt) {
 		if (this.isBuilt) {
 			if (this.OrbitLine) this.OrbitLine.destroy();
 			if (this.EquatorLine) this.EquatorLine.destroy();
@@ -728,8 +728,8 @@ export class Entity {
 				// snap the camera back to the planet if the clicked group moon is deloaded
 				// TODO: what even is this??
 				/* 
-				if (orrery.mouseState._clickedGroup?.data && orrery.mouseState._clickedGroup.data.aroundPlanet) {
-					orrery.mouseState._clickedGroup = orrery.mouseState._clickedGroup.parent;
+				if (Orrery.mouseState._clickedGroup?.data && Orrery.mouseState._clickedGroup.data.aroundPlanet) {
+					Orrery.mouseState._clickedGroup = Orrery.mouseState._clickedGroup.parent;
 				}
 				*/
 				// all we really want is to clear the label
@@ -765,13 +765,10 @@ class Planet extends Entity {
 			// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 		}
 
-		const distance = orrery.camera.position.distanceTo(this.labelGroup.position);
+		const distance = Orrery.camera.position.distanceTo(this.labelGroup.position);
 		const cameraZoomedToPlanet = distance < this.data.zoomTo + planetRangeThreshold;
-		const planetIsTargeted = orrery.mouseState._zoomedClass && orrery.mouseState._zoomedClass.data.id === this.data.id;
-		const planetMoonIsTargeted =
-			orrery.mouseState._zoomedClass &&
-			orrery.mouseState._zoomedClass.planetClass &&
-			orrery.mouseState._zoomedClass.planetClass.data.id === this.data.id;
+		const planetIsTargeted = Orrery.mouseState._zoomedClass?.data?.id === this.data.id;
+		const planetMoonIsTargeted = Orrery.mouseState._zoomedClass?.planetClass?.data?.id === this.data.id;
 
 		if (cameraZoomedToPlanet) {
 			if (!this.isZoomedToPlanet && (planetIsTargeted || planetMoonIsTargeted)) {
@@ -780,7 +777,7 @@ class Planet extends Entity {
 				// this.labelGroup.visible = true;
 				// destroying previous set of moons first
 				// this.destroyMoons(Object.values(this.moonClasses));
-				orrery.cameraState._currentPlanetInRange = this.data.id;
+				Orrery.cameraState._currentPlanetInRange = this.data.id;
 				const moonsToBuild = Object.values(this.moonClasses).filter((m) => m.isEnabled && !m.isBuilt);
 				this.buildMoons(moonsToBuild);
 
@@ -799,9 +796,9 @@ class Planet extends Entity {
 			if (!planetIsTargeted && this.isZoomedToPlanet) {
 				this.isZoomedToPlanet = false;
 				// this.labelGroup.visible = false;
-				if (orrery.cameraState._currentPlanetInRange === this.data.id) {
+				if (Orrery.cameraState._currentPlanetInRange === this.data.id) {
 					this.destroyMoons(Object.values(this.moonClasses));
-					orrery.cameraState._currentPlanetInRange = '';
+					Orrery.cameraState._currentPlanetInRange = '';
 				}
 				// const moonsToDestroy = Object.values(this.moonClasses).filter((m) => !m.isEnabled && m.isBuilt);
 				// this.destroyMoons(moonsToDestroy);
@@ -810,11 +807,11 @@ class Planet extends Entity {
 
 		/* if (this.OrbitLine) {
 			// if (
-			// !orrery.cameraState._currentPlanetInRange ||
-			// (orrery.cameraState._currentPlanetInRange && orrery.cameraState._currentPlanetInRange === this.data.id) ||
-			// !orrery.cameraState._isInPlaneOfReference ||
-			// (orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
-			// (orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
+			// !Orrery.cameraState._currentPlanetInRange ||
+			// (Orrery.cameraState._currentPlanetInRange && Orrery.cameraState._currentPlanetInRange === this.data.id) ||
+			// !Orrery.cameraState._isInPlaneOfReference ||
+			// (Orrery.mouseState._clickedClass && Orrery.mouseState._clickedClass.data.id === this.data.id) ||
+			// (Orrery.mouseState._hoveredClass && Orrery.mouseState._hoveredClass.data.id === this.data.id)
 			// ) {
 			this.OrbitLine.orbitLineFadeIn();
 			// } else {
@@ -837,11 +834,11 @@ class Planet extends Entity {
 			setTimeout(() => {
 				// switch target to the base system entity if the moon currently targeted is destroyed
 				if (
-					orrery.mouseState._clickedClass &&
-					orrery.mouseState._clickedClass.data.id === moonClass.data.id &&
+					Orrery.mouseState._clickedClass &&
+					Orrery.mouseState._clickedClass.data.id === moonClass.data.id &&
 					moonClass.planetClass
 				) {
-					orrery.mouseState._clickedClass = moonClass.planetClass;
+					Orrery.mouseState._clickedClass = moonClass.planetClass;
 				}
 				moonClass.destroy();
 			}, i * 10);
@@ -915,7 +912,7 @@ class Sun extends Entity {
 			if (meshes[0]) this.meshGroup.add(meshes[0]);
 			if (meshes[1]) {
 				this.meshGroup.add(meshes[1]);
-				this.godRaysEffect = new GodRaysEffect(orrery.camera, meshes[1], {
+				this.godRaysEffect = new GodRaysEffect(Orrery.camera, meshes[1], {
 					blur: true,
 					density: 0.56,
 					decay: 0.92,
@@ -937,7 +934,7 @@ class Sun extends Entity {
 			// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
 		}
 
-		this.distanceFromCamera = orrery.camera.position.distanceTo(this.labelGroup.position);
+		this.distanceFromCamera = Orrery.camera.position.distanceTo(this.labelGroup.position);
 		const cameraZoomed = this.distanceFromCamera < 75000000;
 
 		if (cameraZoomed) {
@@ -1005,7 +1002,7 @@ class Moon extends Entity {
 
 	intervalCheck() {
 		// Only fires if parent planet is in range
-		if (orrery.cameraState._currentPlanetInRange === this.planetClass?.data.id) {
+		if (Orrery.cameraState._currentPlanetInRange === this.planetClass?.data.id) {
 			if (this.raycasterEnabled) {
 				this.updateRaycaster();
 				// if (this.raycasterArrowEnabled) scene.add(this.raycasterArrow);
@@ -1013,7 +1010,7 @@ class Moon extends Entity {
 
 			const v3 = new THREE.Vector3();
 			const moonWorldPosition = this.labelGroup.getWorldPosition(v3);
-			this.distanceFromCamera = orrery.camera.position.distanceTo(moonWorldPosition);
+			this.distanceFromCamera = Orrery.camera.position.distanceTo(moonWorldPosition);
 			const cameraZoomedCloseToMoon = this.distanceFromCamera < this.data.zoomTo + 10000;
 			const cameraZoomedToMoon = this.distanceFromCamera < this.data.zoomTo + 1000000;
 
@@ -1037,8 +1034,8 @@ class Moon extends Entity {
 			// 	} else {
 			// 		if (
 			// 			(this.orbitLineVisibleAtBuild && this.distanceFromPlanet < planetRangeThreshold) ||
-			// 			(orrery.mouseState._clickedClass && orrery.mouseState._clickedClass.data.id === this.data.id) ||
-			// 			(orrery.mouseState._hoveredClass && orrery.mouseState._hoveredClass.data.id === this.data.id)
+			// 			(Orrery.mouseState._clickedClass && Orrery.mouseState._clickedClass.data.id === this.data.id) ||
+			// 			(Orrery.mouseState._hoveredClass && Orrery.mouseState._hoveredClass.data.id === this.data.id)
 			// 		) {
 			// 			this.OrbitLine.fadeIn();
 			// 		} else {

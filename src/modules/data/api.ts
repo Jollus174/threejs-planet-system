@@ -1,10 +1,10 @@
 'use strict';
 import { Vector3 } from 'three';
-import { settings } from '../settings';
+import { Settings } from '../settings';
 import { calculateOrbit } from '../utilities/astronomy';
 import { convertToCamelCase } from '../utilities/strings';
 
-import { BodyType, orrery } from '../orrery';
+import { BodyType, Orrery } from '../orrery';
 import { MaterialDataType, materialData } from './solarSystem';
 import {
 	addToMoonGroup,
@@ -91,8 +91,10 @@ export interface SolarSystemDataType {
 		total: number | null;
 		more: boolean;
 		loadingMore: boolean;
+		loadMoreLink: string;
 		per_page: number | null;
 		lightboxData: any[];
+		apiRequester: APIRequest;
 	};
 	description: {
 		hasLoaded: boolean;
@@ -102,6 +104,7 @@ export interface SolarSystemDataType {
 		title: string;
 		content: string;
 		image: string;
+		apiRequester: APIRequest;
 	};
 	materialData: MaterialDataType;
 	zoomTo: number;
@@ -145,7 +148,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 		bodies: idReplacements(data)
 	};
 
-	const orreryTypes = orrery.bodies.types;
+	const orreryTypes = Orrery.bodies.types;
 
 	for (const item of englishifiedData.bodies) {
 		item.media = {
@@ -158,7 +161,9 @@ const sortData = (data: SolarSystemDataTypes) => {
 			more: false,
 			loadingMore: false,
 			per_page: null,
-			lightboxData: []
+			lightboxData: [],
+			apiRequester: new APIRequest(),
+			loadMoreLink: ''
 		};
 
 		item.description = {
@@ -168,7 +173,8 @@ const sortData = (data: SolarSystemDataTypes) => {
 			errors: [],
 			title: '',
 			content: '',
-			image: ''
+			image: '',
+			apiRequester: new APIRequest()
 		};
 
 		item.materialData = materialData[item.id] || null;
@@ -176,7 +182,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 		// Math.min to account for huge bodies like Sun
 		item.zoomTo = Math.min(item.meanRadius * 8, item.meanRadius + 7000000);
 
-		const planetColours: { [key: string]: string } = settings.planetColours;
+		const planetColours: { [key: string]: string } = Settings.planetColours;
 		item.labelColour = planetColours[item.id] || planetColours[item.bodyType] || planetColours.default;
 
 		// setting the 'entity types' here rather than further down and redoing the loop
@@ -223,7 +229,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 		}
 	};
 
-	const dwarfPlanets = orrery.bodies.types._dwarfPlanet;
+	const dwarfPlanets = Orrery.bodies.types._dwarfPlanet;
 	for (const dwarfPlanet of dwarfPlanets) {
 		dwarfPlanet.startingPosition = new Vector3();
 		dwarfPlanet.startingPosition.copy(startingOrbitPosition(dwarfPlanet));
@@ -232,7 +238,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 		setMoonsToDataEntity(dwarfPlanet);
 	}
 
-	// const asteroids = orrery.bodies.types._asteroid;
+	// const asteroids = Orrery.bodies.types._asteroid;
 	// for (const asteroid of asteroids) {
 	// 	asteroid.labelColour = settings.planetColours.default;
 	// 	asteroid.bodyType = 'Asteroid';
@@ -242,7 +248,7 @@ const sortData = (data: SolarSystemDataTypes) => {
 	// 	setMoonsToDataEntity(asteroid);
 	// }
 
-	const planets = orrery.bodies.types._planet;
+	const planets = Orrery.bodies.types._planet;
 	for (const planet of planets) {
 		planet.startingPosition = new Vector3();
 		planet.startingPosition.copy(startingOrbitPosition(planet));
@@ -253,15 +259,15 @@ const sortData = (data: SolarSystemDataTypes) => {
 
 	// Building 'Entity Nav' ids with:
 	// Planets > Planet Moons > Dwarf Planets > Dwarf Planet Moons > Asteroids
-	for (const navSystemName of settings.navigationSystems) {
-		const entityItem = orreryAllType.find((allItem) => allItem.id === navSystemName)!;
-		const { navigationEntities }: { navigationEntities: string[] } = settings;
-		navigationEntities.push(entityItem.id);
-		if (entityItem.moons && entityItem.moons.length) {
-			for (const moon of entityItem.moons) navigationEntities.push(moon.id);
-		}
-	}
-	// TODO: asteroids n stuff
+	// TODO: unsure what this was for
+	// for (const navSystemName of Settings.navigationSystems) {
+	// 	const entityItem = orreryAllType.find((allItem) => allItem.id === navSystemName)!;
+	// 	const { navigationEntities } = Settings;
+	// 	navigationEntities.push(entityItem);
+	// 	if (entityItem.moons && entityItem.moons.length) {
+	// 		for (const moon of entityItem.moons) navigationEntities.push(moon.id);
+	// 	}
+	// }
 
 	return {
 		sun,
@@ -277,7 +283,7 @@ type ErrorType = {
 	message: string;
 };
 
-type APIResponseType = {
+export type APIResponseType = {
 	ok?: boolean;
 	statusText?: string;
 	result?: any;
@@ -323,5 +329,53 @@ class APIRequest {
 		}
 	}
 }
+
+export type NASAMediaType = {
+	collection: {
+		version: string;
+		href: string;
+		items: {
+			href: string;
+			data: {
+				center: string;
+				title: string;
+				keywords: string[];
+				nasa_id: string;
+				date_created: string;
+				media_type: 'image' | 'video';
+				description_508: string;
+				secondary_creator: string;
+				description: string;
+			}[];
+			links: {
+				href: string;
+				rel: string;
+				image: string;
+			}[];
+		}[];
+		metadata: {
+			total_hits: number;
+		};
+		links: {
+			rel: string;
+			prompt: string;
+			href: string;
+		}[];
+	};
+};
+
+export type WikipediaDataType = {
+	query: {
+		pages: {
+			[key: string]: {
+				pageid: number;
+				ns: number;
+				title: string;
+				extract: string;
+				content?: string;
+			};
+		};
+	};
+};
 
 export { sortData, APIRequest };
