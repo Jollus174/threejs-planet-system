@@ -1,10 +1,9 @@
-/*! purgecss start ignore */
 @import "fontface";
 @import "custom/variables";
-/*! purgecss end ignore */
 
 @import "../node_modules/bootstrap/scss/functions";
 @import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/maps";
 @import "../node_modules/bootstrap/scss/mixins";
 
 @import "../node_modules/bootstrap/scss/root";
@@ -29,8 +28,6 @@
 @import "../node_modules/fontawesome-free/scss/solid";
 @import "../node_modules/fontawesome-free/scss/brands";
 
-/*! purgecss start ignore */
-
 @import "custom/skeleton";
 @import "custom/lightbox";
 
@@ -54,44 +51,44 @@
 @import "custom/scrollbars";
 
 :root {
-	--progress-amount: 0%;
+  --progress-amount: 0%;
 
-	--bs-body-color: #{$white};
-	--bs-body-bg: #{$black};
+  --bs-body-color: #{$white};
+  --bs-body-bg: #{$black};
 }
 
 body {
-	background-color: #000;
+  background-color: #000;
 
-	@include media-breakpoint-down(lg) {
-		user-select: none;
-	}
+  @include media-breakpoint-down(lg) {
+    user-select: none;
+  }
 }
 
 main {
-	position: absolute;
-	margin: 0 auto;
-	padding: 0;
-	width: 100%;
-	height: 100%;
+  position: absolute;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 }
 
 canvas[id="bg"] {
-	visibility: visible;
+  visibility: visible;
 }
 
 .object-hovered {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 table {
-	border-spacing: 0;
+  border-spacing: 0;
 }
 
 .buttons-container {
-	position: absolute;
+  position: absolute;
 }
 
 button {
-	user-select: none;
+  user-select: none;
 }
