@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { Clock, PerspectiveCamera, WebGLRenderer, Scene, Color, Group } from 'three';
 import { EffectComposer } from 'postprocessing';
-import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { pointLights, ambientLights } from '../modules/lights';
 import type { OrreryState, CameraState, MouseState, Bodies, BodiesTypes, Lights, OrbitLines, BodyData } from '../types';
 import { sortData } from '@/modules/data/sorting';
@@ -13,11 +12,9 @@ interface OrreryContextValue
 	camera: PerspectiveCamera;
 	renderer: WebGLRenderer | null;
 	composer: EffectComposer | null;
-	labelRenderer: CSS2DRenderer | null;
 	controls: any;
 	setRenderer: (renderer: WebGLRenderer) => void;
 	setComposer: (composer: EffectComposer) => void;
-	setLabelRenderer: (labelRenderer: CSS2DRenderer) => void;
 	setControls: (controls: any) => void;
 	updateCameraState: (updates: Partial<CameraState>) => void;
 	updateMouseState: (updates: Partial<MouseState>) => void;
@@ -58,7 +55,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 
 	const rendererRef = useRef<WebGLRenderer | null>(null);
 	const composerRef = useRef<EffectComposer | null>(null);
-	const labelRendererRef = useRef<CSS2DRenderer | null>(null);
 	const controlsRef = useRef<any>(null);
 
 	const [cameraState, setCameraState] = useState<CameraState>({
@@ -173,6 +169,11 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 				// Update bodies state with sorted data
 				const bodiesData = {
 					...tempBodies,
+					types: {
+						...tempBodies.types,
+						_planet: sortedData.planets,
+						_dwarfPlanet: sortedData.dwarfPlanets
+					},
 					_sun: sortedData.sun,
 					_allPlanets: [...sortedData.planets.concat(sortedData.dwarfPlanets)]
 				};
@@ -193,10 +194,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 		composerRef.current = composer;
 	}, []);
 
-	const setLabelRenderer = useCallback((labelRenderer: CSS2DRenderer) => {
-		labelRendererRef.current = labelRenderer;
-	}, []);
-
 	const setControls = useCallback((controls: any) => {
 		controlsRef.current = controls;
 	}, []);
@@ -214,7 +211,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 		camera,
 		renderer: rendererRef.current,
 		composer: composerRef.current,
-		labelRenderer: labelRendererRef.current,
 		controls: controlsRef.current,
 		cameraState,
 		mouseState,
@@ -227,7 +223,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 		time,
 		setRenderer,
 		setComposer,
-		setLabelRenderer,
 		setControls,
 		updateCameraState,
 		updateMouseState,

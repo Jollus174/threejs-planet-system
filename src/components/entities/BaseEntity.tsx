@@ -12,7 +12,7 @@ import {
 	LinearFilter,
 	CanvasTexture
 } from 'three';
-import { CSS2DObject } from '../../modules/custom/jsm/renderers/CSS2DRenderer.js';
+import { Html } from '@react-three/drei';
 import { calculateOrbit } from '../../modules/utilities/astronomy';
 import { ringUVMapGeometry } from '../../modules/utilities/threeJS';
 import { imageBitmapLoader } from '../../modules/loadManager';
@@ -51,7 +51,6 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 }) => {
 	const labelGroupRef = useRef<Group>(null);
 	const meshGroupRef = useRef<Group>(null);
-	const cssObjRef = useRef<CSS2DObject | null>(null);
 	const labelLinkRef = useRef<HTMLAnchorElement | null>(null);
 	const meshRef = useRef<Mesh | null>(null);
 	const cloudMeshRef = useRef<Mesh | null>(null);
@@ -59,18 +58,28 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 	const { dateTimeDifference, time, updateMouseState } = useOrrery();
 
 	const [isBuilt, setIsBuilt] = useState(false);
+	const [labelOpacity, setLabelOpacity] = useState(0);
 
 	const materialData: MaterialData | null = useMemo(() => data.materialData || null, [data.materialData]);
 	const segments = useMemo(() => materialData?.segments || 32, [materialData?.segments]);
 
-	// Create CSS label
+	// Animate label opacity when built
 	useEffect(() => {
-		if (!labelGroupRef.current || !isBuilt) return;
+		if (isBuilt) {
+			const obj = { opacity: 0 };
+			gsap.to(obj, {
+				opacity: 1,
+				duration: 1,
+				onUpdate: function () {
+					setLabelOpacity(obj.opacity);
+				}
+			});
+		}
+	}, [isBuilt]);
 
-		const labelLink = document.createElement('a');
-		labelLinkRef.current = labelLink;
-
-		const entityTypeClasses = [
+	// Get entity type classes
+	const entityTypeClasses = useMemo(() => {
+		return [
 			data.id === '_sun' ? 'is-sun' : '',
 			data.aroundPlanet ? 'is-moon' : '',
 			data.isPlanet ? 'is-planet' : '',
@@ -80,59 +89,21 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 		]
 			.join(' ')
 			.trim();
+	}, [data]);
 
-		labelLink.className = `label behind-label ${entityTypeClasses}`;
-		labelLink.dataset.selector = 'label';
-		labelLink.style.color = data.labelColour || '#ffffff';
-		labelLink.style.opacity = '0';
-		labelLink.innerHTML = `
-      <div class="label-content">
-        <div class="label-circle"></div>
-        <div class="label-text" style="color: ${
-					data.labelColour !== settings.planetColours.default ? data.labelColour : ''
-				};">${data.displayName}</div>
-      </div>
-    `;
+	const handleLabelPointerDown = useCallback(() => {
+		if (onPointerDown) {
+			onPointerDown();
+		}
+	}, [onPointerDown]);
 
-		const cssObj = new CSS2DObject(labelLink, { data });
-		cssObj.name = data.id;
-		cssObj.position.set(0, 0, 0);
-		cssObjRef.current = cssObj;
+	const handleLabelMouseOver = useCallback(() => {
+		updateMouseState({ _hoveredClass: { data } as any });
+	}, [data, updateMouseState]);
 
-		labelGroupRef.current.add(cssObj);
-
-		gsap.to(labelLink, {
-			opacity: 1,
-			duration: 1
-		});
-
-		const handlePointerDown = () => {
-			if (onPointerDown) {
-				onPointerDown();
-			}
-		};
-
-		const handleMouseOver = () => {
-			updateMouseState({ _hoveredClass: { data } as any });
-		};
-
-		const handleMouseLeave = () => {
-			updateMouseState({ _hoveredClass: null });
-		};
-
-		labelLink.addEventListener('pointerdown', handlePointerDown);
-		labelLink.addEventListener('mouseover', handleMouseOver);
-		labelLink.addEventListener('mouseleave', handleMouseLeave);
-
-		return () => {
-			labelLink.removeEventListener('pointerdown', handlePointerDown);
-			labelLink.removeEventListener('mouseover', handleMouseOver);
-			labelLink.removeEventListener('mouseleave', handleMouseLeave);
-			if (cssObjRef.current) {
-				cssObjRef.current.removeFromParent();
-			}
-		};
-	}, [data, isBuilt, onPointerDown, updateMouseState]);
+	const handleLabelMouseLeave = useCallback(() => {
+		updateMouseState({ _hoveredClass: null });
+	}, [updateMouseState]);
 
 	// Set initial position
 	useEffect(() => {
@@ -147,14 +118,19 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 
 	// Create entity mesh - can be overridden by useCustomMesh
 	useEffect(() => {
-		if (!meshGroupRef.current || !materialData) return;
+		if (!meshGroupRef.current) return;
 
 		// If custom mesh hook is provided, use it instead
 		if (useCustomMesh) {
+			// Note: useCustomMesh may be async, so we set isBuilt after a short delay
+			// The actual mesh creation will happen in the custom function
 			useCustomMesh({ meshGroupRef, materialData, data, segments });
-			setIsBuilt(true);
+			// Set isBuilt after a brief delay to allow async operations to start
+			setTimeout(() => setIsBuilt(true), 100);
 			return;
 		}
+
+		if (!materialData) return;
 
 		// Default mesh creation
 		const geometry = new SphereGeometry(data.diameter || data.meanRadius * 2, segments, segments);
@@ -299,6 +275,33 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 			<group ref={meshGroupRef} name={`${data.name} mesh group`} />
 			{isBuilt && (
 				<>
+					<Html as="div" center wrapperClass="label-wrapper" style={{ pointerEvents: 'auto' }}>
+						<a
+							ref={labelLinkRef}
+							className={`label behind-label ${entityTypeClasses}`}
+							data-selector="label"
+							style={{
+								color: data.labelColour || '#ffffff',
+								opacity: labelOpacity,
+								textDecoration: 'none'
+							}}
+							onPointerDown={handleLabelPointerDown}
+							onMouseOver={handleLabelMouseOver}
+							onMouseLeave={handleLabelMouseLeave}
+						>
+							<div className="label-content">
+								<div className="label-circle"></div>
+								<div
+									className="label-text"
+									style={{
+										color: data.labelColour !== settings.planetColours.default ? data.labelColour : ''
+									}}
+								>
+									{data.displayName}
+								</div>
+							</div>
+						</a>
+					</Html>
 					<OrbitLine
 						data={data}
 						parentData={parentData}
