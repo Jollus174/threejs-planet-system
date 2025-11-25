@@ -77,18 +77,18 @@ const Tabs: React.FC<TabsProps> = ({ clickedClassData }) => {
 						<div className="content-wrapper container-fluid container-extra-gutter">
 							<table>
 								<tbody>
-									{clickedClassData.meanRadius && (
+									{clickedClassData.meanRadius ? (
 										<tr>
 											<td>Mean Radius</td>
 											<td>{clickedClassData.meanRadius} km</td>
 										</tr>
-									)}
-									{clickedClassData.sideralOrbit && (
+									) : null}
+									{clickedClassData.sideralOrbit ? (
 										<tr>
 											<td>Sideral Orbit</td>
 											<td>{clickedClassData.sideralOrbit} days</td>
 										</tr>
-									)}
+									) : null}
 								</tbody>
 							</table>
 						</div>

@@ -3,12 +3,12 @@ import { useOrrery } from '../../contexts/OrreryContext';
 
 const Navigation: React.FC = () => {
 	const { mouseState, updateMouseState } = useOrrery();
-	const clickedClassData = mouseState._clickedClass?.data;
+	const clickedEntity = mouseState._clickedEntity;
 
-	const currentSystem = clickedClassData
-		? clickedClassData.bodyType === 'Star'
-			? `The <span class="text-system-color">${clickedClassData.displayName}</span>`
-			: `<span class="text-system-color">${clickedClassData.systemName}</span> System`
+	const currentSystem = clickedEntity
+		? clickedEntity.bodyType === 'Star'
+			? `The <span class="text-system-color">${clickedEntity.displayName}</span>`
+			: `<span class="text-system-color">${clickedEntity.systemName}</span> System`
 		: 'Solar System';
 
 	const goToPreviousSystem = () => {

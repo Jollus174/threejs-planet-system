@@ -1,40 +1,65 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { useOrrery } from '../../contexts/OrreryContext';
 import BaseEntity from './BaseEntity';
 import type { BodyData } from '../../types';
+import { calculateOrbit } from '../../modules/utilities/astronomy';
 
 interface PlanetProps {
 	data: BodyData;
 	onPointerDown?: () => void;
 }
 
-const PLANET_RANGE_THRESHOLD = 100000000;
+const PLANET_RANGE_THRESHOLD = 100000000; // Distance threshold for loading textures
+const TEXTURE_LOAD_DISTANCE = 500000000; // Distance at which to load textures
 
 const Planet: React.FC<PlanetProps> = ({ data, onPointerDown }) => {
-	const { camera, cameraState, mouseState, updateCameraState } = useOrrery();
-	const [isZoomedToPlanet, setIsZoomedToPlanet] = useState(true);
-	const moonClassesRef = useRef<Record<string, any>>({});
+	const { camera, cameraState, dateTimeDifference, updateCameraState } = useOrrery();
+	const [shouldLoadTextures, setShouldLoadTextures] = useState(false);
+	const lastDistanceCheckRef = useRef<number>(0);
+	const distanceCheckInterval = 500; // Check distance every 500ms
 
-	// Distance-based moon loading/unloading and texture loading
-	useEffect(() => {
-		const interval = setInterval(() => {
-			if (!camera) return;
+	// Check distance and update texture loading
+	useFrame((state) => {
+		if (!camera) return;
 
-			// This would need access to the labelGroup position
-			// For now, this is a placeholder for the distance checking logic
-			// The actual implementation would need refs to the entity's position
+		const now = state.clock.getElapsedTime() * 1000; // Convert to milliseconds
+		if (now - lastDistanceCheckRef.current < distanceCheckInterval) return;
+		lastDistanceCheckRef.current = now;
 
-			// TODO: Implement distance-based logic:
-			// - Check camera distance to planet
-			// - Load/unload moons based on distance
-			// - Load textures/clouds when close enough
-			// - Update cameraState._currentPlanetInRange
-		}, 1000);
+		// Calculate planet position using the same method as BaseEntity
+		const i = (dateTimeDifference * 360) / (data.sideralOrbit || 360);
+		const planetPos = calculateOrbit(data.meanAnomaly - i, data, null);
 
-		return () => clearInterval(interval);
-	}, [camera, cameraState, mouseState, updateCameraState]);
+		// Calculate distance from camera to planet
+		const distance = camera.position.distanceTo(planetPos);
 
-	return <BaseEntity data={data} orbitLineVisible={true} orbitLineOpacity={0.5} onPointerDown={onPointerDown} />;
+		// Determine if we should load textures based on distance
+		const shouldLoad = distance < TEXTURE_LOAD_DISTANCE;
+
+		if (shouldLoad !== shouldLoadTextures) {
+			setShouldLoadTextures(shouldLoad);
+
+			// Update camera state if planet is in range
+			if (shouldLoad && distance < PLANET_RANGE_THRESHOLD) {
+				updateCameraState({ _currentPlanetInRange: data.id });
+			} else if (!shouldLoad || distance >= PLANET_RANGE_THRESHOLD) {
+				if (cameraState._currentPlanetInRange === data.id) {
+					updateCameraState({ _currentPlanetInRange: '' });
+				}
+			}
+		}
+	});
+
+	return (
+		<BaseEntity
+			data={data}
+			orbitLineVisible={true}
+			orbitLineOpacity={0.5}
+			onPointerDown={onPointerDown}
+			loadTextures={shouldLoadTextures}
+		/>
+	);
 };
 
 export default Planet;

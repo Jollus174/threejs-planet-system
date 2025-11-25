@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
 	const [sidebarDesktopWidth, setSidebarDesktopWidth] = useState(600);
 	const [vueRandomString] = useState(() => Math.random().toString(36).substring(2, 10));
 
-	const clickedClassData = mouseState._clickedClass?.data;
+	const clickedEntity = mouseState._clickedEntity;
 
 	return (
 		<aside id="sidebar-ui-details" className="sidebar-ui-details" key={vueRandomString}>
@@ -31,26 +31,24 @@ const Sidebar: React.FC = () => {
 				<i className="fas fa-grip-lines-vertical"></i>
 			</button>
 			<div className="ui-details">
-				{clickedClassData && (
+				{clickedEntity && (
 					<>
 						<figure className="d-none d-lg-block img-container">
-							{clickedClassData.sidebarImage && (
-								<img src={clickedClassData.sidebarImage} alt={clickedClassData.displayName} />
-							)}
+							{clickedEntity.sidebarImage && <img src={clickedEntity.sidebarImage} alt={clickedEntity.displayName} />}
 						</figure>
 						<div className="title-container">
 							<button type="button" className="btn">
 								<i className="fas fa-angle-left"></i>
 							</button>
 							<div className="title-wrapper">
-								<h3 className="h3 text-entity-color">{clickedClassData.displayName}</h3>
-								<span className="text-type">{clickedClassData.bodyType}</span>
+								<h3 className="h3 text-entity-color">{clickedEntity.displayName}</h3>
+								<span className="text-type">{clickedEntity.bodyType}</span>
 							</div>
 							<button type="button" className="btn">
 								<i className="fas fa-angle-right"></i>
 							</button>
 						</div>
-						<Tabs clickedClassData={clickedClassData} />
+						<Tabs clickedClassData={clickedEntity} />
 					</>
 				)}
 			</div>

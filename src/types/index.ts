@@ -299,9 +299,9 @@ export interface CameraState {
 export interface MouseState {
 	_mouseClicked: boolean;
 	_mousePosition: [number | null, number | null];
-	_hoveredClass: EntityClass | null;
-	_clickedClass: EntityClass | null;
-	_zoomedClass: EntityClass | null;
+	_hoveredEntity: BodyData | null;
+	_clickedEntity: BodyData | null;
+	_selectedEntity: BodyData | null;
 }
 
 export interface BodiesTypes {

@@ -68,9 +68,9 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 	const [mouseState, setMouseState] = useState<MouseState>({
 		_mouseClicked: false,
 		_mousePosition: [null, null],
-		_hoveredClass: null,
-		_clickedClass: null,
-		_zoomedClass: null
+		_hoveredEntity: null,
+		_clickedEntity: null,
+		_selectedEntity: null
 	});
 
 	const [skybox] = useState<Group>(() => new Group());
@@ -178,6 +178,15 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 					_allPlanets: [...sortedData.planets.concat(sortedData.dwarfPlanets)]
 				};
 				setBodies(bodiesData);
+
+				// Set sun as default selection if it exists
+				if (sortedData.sun) {
+					setMouseState((prev) => ({
+						...prev,
+						_clickedEntity: sortedData.sun,
+						_selectedEntity: sortedData.sun
+					}));
+				}
 			} catch (error) {
 				console.error('Failed to load solar system data:', error);
 			}

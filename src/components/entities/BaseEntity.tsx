@@ -38,6 +38,7 @@ interface BaseEntityProps {
 		segments: number;
 	}) => void;
 	hideEquatorPoles?: boolean;
+	loadTextures?: boolean; // Control whether to load textures (for distance-based loading)
 }
 
 const BaseEntity: React.FC<BaseEntityProps> = ({
@@ -47,7 +48,8 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 	orbitLineOpacity = 0.5,
 	onPointerDown,
 	useCustomMesh,
-	hideEquatorPoles = false
+	hideEquatorPoles = false,
+	loadTextures = true // Default to loading textures
 }) => {
 	const labelGroupRef = useRef<Group>(null);
 	const meshGroupRef = useRef<Group>(null);
@@ -55,10 +57,11 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 	const meshRef = useRef<Mesh | null>(null);
 	const cloudMeshRef = useRef<Mesh | null>(null);
 
-	const { dateTimeDifference, time, updateMouseState } = useOrrery();
+	const { dateTimeDifference, time, updateMouseState, mouseState } = useOrrery();
 
 	const [isBuilt, setIsBuilt] = useState(false);
 	const [labelOpacity, setLabelOpacity] = useState(0);
+	const [texturesLoaded, setTexturesLoaded] = useState(false);
 	const meshBuiltRef = useRef(false);
 
 	const materialData: MaterialData | null = useMemo(() => data.materialData || null, [data.materialData]);
@@ -80,30 +83,40 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 
 	// Get entity type classes
 	const entityTypeClasses = useMemo(() => {
+		const isSelected = mouseState._selectedEntity?.id === data.id;
 		return [
 			data.id === '_sun' ? 'is-sun' : '',
 			data.aroundPlanet ? 'is-moon' : '',
 			data.isPlanet ? 'is-planet' : '',
 			data.isDwarfPlanet ? 'is-dwarf-planet' : '',
 			data.isMajorMoon ? 'is-major-moon' : '',
-			data.isInnerMoon ? 'is-inner-moon' : ''
+			data.isInnerMoon ? 'is-inner-moon' : '',
+			isSelected ? 'label-selected' : ''
 		]
 			.join(' ')
 			.trim();
-	}, [data]);
+	}, [data, mouseState._selectedEntity]);
 
 	const handleLabelPointerDown = useCallback(() => {
 		if (onPointerDown) {
 			onPointerDown();
+		} else {
+			// Update clickedEntity for UI updates (sidebar, etc.)
+			const isSameAsSelected = mouseState._selectedEntity?.id === data.id;
+			updateMouseState({
+				_clickedEntity: data,
+				// If clicking the same entity that's already selected, update selectedEntity for zoom
+				_selectedEntity: isSameAsSelected ? data : mouseState._selectedEntity
+			});
 		}
-	}, [onPointerDown]);
+	}, [onPointerDown, data, updateMouseState, mouseState._selectedEntity]);
 
 	const handleLabelMouseOver = useCallback(() => {
-		updateMouseState({ _hoveredClass: { data } as any });
+		updateMouseState({ _hoveredEntity: data });
 	}, [data, updateMouseState]);
 
 	const handleLabelMouseLeave = useCallback(() => {
-		updateMouseState({ _hoveredClass: null });
+		updateMouseState({ _hoveredEntity: null });
 	}, [updateMouseState]);
 
 	// Set initial position
@@ -152,8 +165,16 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 		meshGroupRef.current.name = `${data.name} mesh group`;
 		meshGroupRef.current.add(entityMesh);
 
-		// Load textures
-		const loadTextures = async () => {
+		// Load textures only if loadTextures prop is true
+		if (loadTextures) {
+			loadTexturesAsync();
+		} else {
+			// Still mark as built even without textures
+			setIsBuilt(true);
+		}
+
+		async function loadTexturesAsync() {
+			if (!materialData) return;
 			const { map, normalMap, bumpMap, shininess = 20, side = FrontSide } = materialData;
 
 			const materialProps: any = {
@@ -175,12 +196,12 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 				}
 				meshRef.current.material = new MeshPhongMaterial(materialProps);
 			}
-		};
+			setTexturesLoaded(true);
+			setIsBuilt(true);
+		}
 
-		loadTextures();
-
-		// Load clouds if needed
-		if (materialData.clouds) {
+		// Load clouds if needed (only if textures are being loaded)
+		if (loadTextures && materialData.clouds) {
 			const loadClouds = async () => {
 				const { clouds, cloudsAlpha } = materialData;
 				const cloudMaterialProps: any = {
@@ -208,8 +229,8 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 			loadClouds();
 		}
 
-		// Load rings if needed
-		if (materialData.rings && meshGroupRef.current) {
+		// Load rings if needed (only if textures are being loaded)
+		if (loadTextures && materialData.rings && meshGroupRef.current) {
 			const loadRings = async () => {
 				const ringPromises = materialData.rings!.map(async (ring, i) => {
 					const { map, mapAlpha, opacity = 0.98, emissive } = ring;
@@ -244,7 +265,7 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 			loadRings();
 		}
 
-		setIsBuilt(true);
+		// isBuilt will be set by loadTexturesAsync if loading textures, or already set above if not
 
 		// Cleanup function
 		return () => {
@@ -271,7 +292,40 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 				}
 			}
 		};
-	}, [data.id, materialData, segments]); // Removed useCustomMesh from deps - it's a function that changes on every render
+	}, [data.id, materialData, segments, loadTextures]); // Removed useCustomMesh from deps - it's a function that changes on every render
+
+	// Load textures when loadTextures prop changes to true
+	useEffect(() => {
+		if (loadTextures && !texturesLoaded && meshRef.current && materialData && isBuilt) {
+			loadTexturesAsync();
+		}
+
+		async function loadTexturesAsync() {
+			const { map, normalMap, bumpMap, shininess = 20, side = FrontSide } = materialData!;
+
+			const materialProps: any = {
+				name: `${data.name} material`,
+				map: map ? await imageBitmapLoader.loadAsync(map).then((t) => new CanvasTexture(t)) : null,
+				normalMap: normalMap ? await imageBitmapLoader.loadAsync(normalMap).then((t) => new CanvasTexture(t)) : null,
+				bumpMap: bumpMap ? await imageBitmapLoader.loadAsync(bumpMap).then((t) => new CanvasTexture(t)) : null,
+				bumpScale: bumpMap ? 0.015 : null,
+				shininess,
+				side,
+				transparent: false,
+				wireframe: false
+			};
+
+			if (meshRef.current && meshRef.current.material) {
+				const oldMaterial = meshRef.current.material;
+				if (!Array.isArray(oldMaterial)) {
+					oldMaterial.dispose();
+				}
+				meshRef.current.material = new MeshPhongMaterial(materialProps);
+			}
+			setTexturesLoaded(true);
+			setIsBuilt(true);
+		}
+	}, [loadTextures, texturesLoaded, materialData, isBuilt, data.name]);
 
 	// Update position in render loop
 	useFrame(() => {
@@ -294,11 +348,11 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 	});
 
 	const handleOrbitHover = useCallback(() => {
-		updateMouseState({ _hoveredClass: { data } as any });
+		updateMouseState({ _hoveredEntity: data });
 	}, [data, updateMouseState]);
 
 	const handleOrbitUnhover = useCallback(() => {
-		updateMouseState({ _hoveredClass: null });
+		updateMouseState({ _hoveredEntity: null });
 	}, [updateMouseState]);
 
 	return (
