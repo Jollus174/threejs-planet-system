@@ -35,7 +35,17 @@ const Navigation: React.FC = () => {
 	const goToPreviousSystem = () => {
 		if (!clickedEntity || navigationEntities.length === 0) return;
 
-		const currentIndex = navigationEntities.findIndex((entity) => entity.id === clickedEntity.id);
+		// If the clicked entity is a moon, find its parent planet/system
+		let entityToNavigate = clickedEntity;
+		if (clickedEntity.bodyType === 'Moon' && clickedEntity.systemId) {
+			// Find the parent planet/system
+			const parentSystem = navigationEntities.find((entity) => entity.systemId === clickedEntity.systemId);
+			if (parentSystem) {
+				entityToNavigate = parentSystem;
+			}
+		}
+
+		const currentIndex = navigationEntities.findIndex((entity) => entity.id === entityToNavigate.id);
 		if (currentIndex === -1) return;
 
 		// Go to previous entity, wrapping to the end if at the start
@@ -51,7 +61,17 @@ const Navigation: React.FC = () => {
 	const goToNextSystem = () => {
 		if (!clickedEntity || navigationEntities.length === 0) return;
 
-		const currentIndex = navigationEntities.findIndex((entity) => entity.id === clickedEntity.id);
+		// If the clicked entity is a moon, find its parent planet/system
+		let entityToNavigate = clickedEntity;
+		if (clickedEntity.bodyType === 'Moon' && clickedEntity.systemId) {
+			// Find the parent planet/system
+			const parentSystem = navigationEntities.find((entity) => entity.systemId === clickedEntity.systemId);
+			if (parentSystem) {
+				entityToNavigate = parentSystem;
+			}
+		}
+
+		const currentIndex = navigationEntities.findIndex((entity) => entity.id === entityToNavigate.id);
 		if (currentIndex === -1) return;
 
 		// Go to next entity, wrapping to the start if at the end
