@@ -30,7 +30,7 @@ declare module "*.webp" {
   export default src;
 }
 
-declare module "*.glsl" {
+declare module "*.glsl?raw" {
   const src: string;
   export default src;
 }

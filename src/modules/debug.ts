@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Scene, PerspectiveCamera } from "three";
-import vertexShader from "./shaders/debug/vertexShader.glsl";
-import fragmentShader from "./shaders/debug/fragmentShader.glsl";
+import vertexShader from "./shaders/debug/vertexShader.glsl?raw";
+import fragmentShader from "./shaders/debug/fragmentShader.glsl?raw";
 
 interface DebugMaterials {
   shaderMaterial: THREE.ShaderMaterial;
