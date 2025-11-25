@@ -13,5 +13,3 @@ const easeTo = ({ from = null, to = null, incrementer = 10 }: EaseToOptions = {}
 };
 
 export { easeTo };
-
-

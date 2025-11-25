@@ -19,5 +19,3 @@ const currentDateTime = (): number => {
 };
 
 export { currentDateTime };
-
-

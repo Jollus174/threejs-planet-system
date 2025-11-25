@@ -8,5 +8,3 @@ const numberWithCommas = (n: number | undefined | null): string | undefined => {
 };
 
 export { getRandomArbitrary, numberWithCommas };
-
-

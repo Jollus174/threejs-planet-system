@@ -32,12 +32,12 @@ const Scene: React.FC<SceneProps> = ({ children }) => {
     <Canvas camera={camera} gl={{ logarithmicDepthBuffer: true }}>
       <color attach="background" args={["grey"]} />
       <RendererSetup />
-      <Lights />
+      {/* <Lights /> */}
       <Skybox />
-      <AsteroidBelt />
-      <StarField />
+      {/* <AsteroidBelt /> */}
+      {/* <StarField /> */}
       {children}
-      <PostProcessing />
+      {/* <PostProcessing /> */}
     </Canvas>
   );
 };

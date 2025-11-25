@@ -6,7 +6,7 @@ const createCircleTexture = (color: string, size: number): Texture => {
 	matCanvas.width = matCanvas.height = size;
 	const matContext = matCanvas.getContext('2d');
 	if (!matContext) throw new Error('Could not get 2d context');
-	
+
 	// create texture object from canvas.
 	const texture = new Texture(matCanvas);
 	// Draw a circle
@@ -46,5 +46,3 @@ const fadeTargetLineOpacity = (group: Group | Object3D, targetLine: Object3D): v
 };
 
 export { createCircleTexture, ringUVMapGeometry, fadeTargetLineOpacity };
-
-
