@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useOrrery } from '../../contexts/OrreryContext';
+import type { BodyData } from '../../types';
 
 const Navigation: React.FC = () => {
-	const { mouseState, updateMouseState } = useOrrery();
+	const { mouseState, updateMouseState, bodies } = useOrrery();
 	const clickedEntity = mouseState._clickedEntity;
 
 	const currentSystem = clickedEntity
@@ -11,12 +12,56 @@ const Navigation: React.FC = () => {
 			: `<span class="text-system-color">${clickedEntity.systemName}</span> System`
 		: 'Solar System';
 
+	// Build navigation array: Sun -> Planets (sorted by distance) -> Dwarf Planets (sorted by distance)
+	const navigationEntities = useMemo(() => {
+		const entities: BodyData[] = [];
+
+		// Add Sun first
+		if (bodies._sun) {
+			entities.push(bodies._sun);
+		}
+
+		// Add planets sorted by semimajorAxis (distance from sun)
+		const sortedPlanets = [...bodies.types._planet].sort((a, b) => a.semimajorAxis - b.semimajorAxis);
+		entities.push(...sortedPlanets);
+
+		// Add dwarf planets sorted by semimajorAxis
+		const sortedDwarfPlanets = [...bodies.types._dwarfPlanet].sort((a, b) => a.semimajorAxis - b.semimajorAxis);
+		entities.push(...sortedDwarfPlanets);
+
+		return entities;
+	}, [bodies]);
+
 	const goToPreviousSystem = () => {
-		// TODO: Implement navigation
+		if (!clickedEntity || navigationEntities.length === 0) return;
+
+		const currentIndex = navigationEntities.findIndex((entity) => entity.id === clickedEntity.id);
+		if (currentIndex === -1) return;
+
+		// Go to previous entity, wrapping to the end if at the start
+		const previousIndex = currentIndex === 0 ? navigationEntities.length - 1 : currentIndex - 1;
+		const previousEntity = navigationEntities[previousIndex];
+
+		updateMouseState({
+			_clickedEntity: previousEntity,
+			_selectedEntity: previousEntity
+		});
 	};
 
 	const goToNextSystem = () => {
-		// TODO: Implement navigation
+		if (!clickedEntity || navigationEntities.length === 0) return;
+
+		const currentIndex = navigationEntities.findIndex((entity) => entity.id === clickedEntity.id);
+		if (currentIndex === -1) return;
+
+		// Go to next entity, wrapping to the start if at the end
+		const nextIndex = currentIndex === navigationEntities.length - 1 ? 0 : currentIndex + 1;
+		const nextEntity = navigationEntities[nextIndex];
+
+		updateMouseState({
+			_clickedEntity: nextEntity,
+			_selectedEntity: nextEntity
+		});
 	};
 
 	return (
