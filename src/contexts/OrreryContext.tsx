@@ -3,17 +3,7 @@ import { Clock, PerspectiveCamera, WebGLRenderer, Scene, Color, Group } from 'th
 import { EffectComposer } from 'postprocessing';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { pointLights, ambientLights } from '../modules/lights';
-import type {
-	OrreryState,
-	CameraState,
-	MouseState,
-	Bodies,
-	BodiesTypes,
-	EntityClasses,
-	Lights,
-	OrbitLines,
-	BodyData
-} from '../types';
+import type { OrreryState, CameraState, MouseState, Bodies, BodiesTypes, Lights, OrbitLines, BodyData } from '../types';
 import { sortData } from '@/modules/data/sorting';
 import { api } from '@/modules/data/api';
 
@@ -32,7 +22,6 @@ interface OrreryContextValue
 	updateCameraState: (updates: Partial<CameraState>) => void;
 	updateMouseState: (updates: Partial<MouseState>) => void;
 	setBodies: (bodies: Bodies) => void;
-	setClasses: (classes: EntityClasses) => void;
 	setLights: (lights: Lights) => void;
 	setOrbitLines: (orbitLines: OrbitLines) => void;
 	setDateTimeDifference: (diff: number) => void;
@@ -89,19 +78,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 	});
 
 	const [skybox] = useState<Group>(() => new Group());
-
-	const [classes, setClasses] = useState<EntityClasses>({
-		_all: {},
-		_allIterable: [],
-		_allIterableLength: null,
-		_moonsIterable: [],
-		_planets: {},
-		_dwarfPlanets: {},
-		_asteroids: {},
-		_moons: {},
-		_navigable: {}
-	});
-
 	const [bodies, setBodies] = useState<Bodies>({
 		types: {
 			_all: [],
@@ -195,11 +171,12 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 				const sortedData = sortData(data.bodies, tempBodies, tempBodiesTypes);
 
 				// Update bodies state with sorted data
-				setBodies({
+				const bodiesData = {
 					...tempBodies,
 					_sun: sortedData.sun,
 					_allPlanets: [...sortedData.planets.concat(sortedData.dwarfPlanets)]
-				});
+				};
+				setBodies(bodiesData);
 			} catch (error) {
 				console.error('Failed to load solar system data:', error);
 			}
@@ -242,7 +219,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 		cameraState,
 		mouseState,
 		skybox,
-		classes,
 		bodies,
 		orbitLines,
 		lights,
@@ -256,7 +232,6 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 		updateCameraState,
 		updateMouseState,
 		setBodies,
-		setClasses,
 		setLights,
 		setOrbitLines,
 		setDateTimeDifference,

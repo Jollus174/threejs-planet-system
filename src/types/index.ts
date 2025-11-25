@@ -323,19 +323,6 @@ export interface Bodies {
 	_all: BodyData[];
 }
 
-export interface EntityClasses {
-	_all: Record<string, EntityClass>;
-	_allIterable: EntityClass[];
-	_allIterableLength: number | null;
-	_moonsIterable: EntityClass[];
-	_planets: Record<string, EntityClass>;
-	_dwarfPlanets: Record<string, EntityClass>;
-	_asteroids: Record<string, EntityClass>;
-	_moons: Record<string, EntityClass>;
-	_navigable: Record<string, EntityClass>;
-	_sun?: EntityClass;
-}
-
 export interface Lights {
 	_pointLights: any[][];
 	_spotLights: any[][];
@@ -383,7 +370,6 @@ export interface EntityClass {
 
 export interface OrreryState {
 	scene: THREE.Scene;
-	controls: any; // OrbitControls
 	camera: THREE.PerspectiveCamera;
 	renderer: THREE.WebGLRenderer;
 	composer: any; // EffectComposer
@@ -391,7 +377,6 @@ export interface OrreryState {
 	cameraState: CameraState;
 	mouseState: MouseState;
 	skybox: THREE.Group;
-	classes: EntityClasses;
 	bodies: Bodies;
 	orbitLines: OrbitLines;
 	lights: Lights;
