@@ -21,16 +21,24 @@ const Planets: React.FC = () => {
 			{bodies._allPlanets.map((planetData) => (
 				<React.Fragment key={planetData.id}>
 					<Planet data={planetData} />
-					{/* Render moons for each planet */}
+					{/* Render only major moons for each planet (for performance) */}
 					{planetData.moons &&
 						Array.isArray(planetData.moons) &&
-						planetData.moons.map((moonData) => {
-							// Check if moonData is a BodyData object (not a MoonReference)
-							if (typeof moonData === 'object' && 'id' in moonData) {
-								return <Moon key={moonData.id} data={moonData} parentData={planetData} />;
-							}
-							return null;
-						})}
+						planetData.moons
+							.filter((moonData) => {
+								// Only render major moons on initial load
+								if (typeof moonData === 'object' && 'id' in moonData) {
+									return moonData.isMajorMoon === true;
+								}
+								return false;
+							})
+							.map((moonData) => {
+								// Check if moonData is a BodyData object (not a MoonReference)
+								if (typeof moonData === 'object' && 'id' in moonData) {
+									return <Moon key={moonData.id} data={moonData} parentData={planetData} />;
+								}
+								return null;
+							})}
 				</React.Fragment>
 			))}
 		</>

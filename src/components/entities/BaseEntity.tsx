@@ -59,6 +59,7 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 
 	const [isBuilt, setIsBuilt] = useState(false);
 	const [labelOpacity, setLabelOpacity] = useState(0);
+	const meshBuiltRef = useRef(false);
 
 	const materialData: MaterialData | null = useMemo(() => data.materialData || null, [data.materialData]);
 	const segments = useMemo(() => materialData?.segments || 32, [materialData?.segments]);
@@ -118,7 +119,8 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 
 	// Create entity mesh - can be overridden by useCustomMesh
 	useEffect(() => {
-		if (!meshGroupRef.current) return;
+		if (!meshGroupRef.current || meshBuiltRef.current) return;
+		meshBuiltRef.current = true;
 
 		// If custom mesh hook is provided, use it instead
 		if (useCustomMesh) {
@@ -126,11 +128,14 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 			// The actual mesh creation will happen in the custom function
 			useCustomMesh({ meshGroupRef, materialData, data, segments });
 			// Set isBuilt after a brief delay to allow async operations to start
-			setTimeout(() => setIsBuilt(true), 100);
-			return;
+			const timeoutId = setTimeout(() => setIsBuilt(true), 100);
+			return () => clearTimeout(timeoutId);
 		}
 
-		if (!materialData) return;
+		if (!materialData) {
+			meshBuiltRef.current = false;
+			return;
+		}
 
 		// Default mesh creation
 		const geometry = new SphereGeometry(data.diameter || data.meanRadius * 2, segments, segments);
@@ -240,11 +245,37 @@ const BaseEntity: React.FC<BaseEntityProps> = ({
 		}
 
 		setIsBuilt(true);
-	}, [data, materialData, segments, useCustomMesh]);
+
+		// Cleanup function
+		return () => {
+			meshBuiltRef.current = false;
+			// Dispose of geometries and materials to prevent memory leaks
+			if (meshRef.current) {
+				if (meshRef.current.geometry) meshRef.current.geometry.dispose();
+				if (meshRef.current.material) {
+					if (Array.isArray(meshRef.current.material)) {
+						meshRef.current.material.forEach((mat) => mat.dispose());
+					} else {
+						meshRef.current.material.dispose();
+					}
+				}
+			}
+			if (cloudMeshRef.current) {
+				if (cloudMeshRef.current.geometry) cloudMeshRef.current.geometry.dispose();
+				if (cloudMeshRef.current.material) {
+					if (Array.isArray(cloudMeshRef.current.material)) {
+						cloudMeshRef.current.material.forEach((mat) => mat.dispose());
+					} else {
+						cloudMeshRef.current.material.dispose();
+					}
+				}
+			}
+		};
+	}, [data.id, materialData, segments]); // Removed useCustomMesh from deps - it's a function that changes on every render
 
 	// Update position in render loop
 	useFrame(() => {
-		if (!labelGroupRef.current || !meshGroupRef.current?.visible) return;
+		if (!labelGroupRef.current || !meshGroupRef.current?.visible || !isBuilt) return;
 
 		const i = (dateTimeDifference * 360) / (data.sideralOrbit || 360);
 		const position = calculateOrbit(data.meanAnomaly - i, data, parentData);

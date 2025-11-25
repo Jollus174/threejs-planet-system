@@ -64,13 +64,15 @@ const OrbitLine: React.FC<OrbitLineProps> = ({ data, parentData, visible, opacit
 			orbitPoints.push(calculateOrbit(theta, data, parentData));
 		}
 
-		if (geometryRef.current) {
-			geometryRef.current.dispose();
+		// Reuse geometry if it exists, just update positions
+		let geometry = geometryRef.current;
+		if (!geometry) {
+			geometry = new BufferGeometry();
+			geometryRef.current = geometry;
 		}
 
-		const geometry = new BufferGeometry().setFromPoints(orbitPoints);
-		geometryRef.current = geometry;
-		const vertexCount = vertexCountRef.current || geometry.getAttribute('position').count;
+		geometry.setFromPoints(orbitPoints);
+		const vertexCount = geometry.getAttribute('position').count;
 		vertexCountRef.current = vertexCount;
 
 		setColors(geometry, vertexCount);
@@ -94,15 +96,24 @@ const OrbitLine: React.FC<OrbitLineProps> = ({ data, parentData, visible, opacit
 	);
 
 	const { dateTimeDifference } = useOrrery();
+	const lastUpdateRef = useRef<number>(0);
+	const updateThreshold = 1; // Only update if the change is significant enough (1 degree)
 
-	// Update geometry in render loop
+	// Update geometry in render loop - throttled to prevent excessive updates
 	useFrame(() => {
-		if (!lineRef.current) return;
+		if (!lineRef.current || !visible) return;
+
 		const i = (dateTimeDifference * 360) / (data.sideralOrbit || 360);
-		const newGeometry = drawLine(i);
-		if (lineRef.current.geometry !== newGeometry) {
-			lineRef.current.geometry.dispose();
-			lineRef.current.geometry = newGeometry;
+		// Only update if the change is significant enough to warrant a redraw
+		const change = Math.abs(i - lastUpdateRef.current);
+
+		if (change > updateThreshold) {
+			drawLine(i);
+			// Update the line's geometry reference if needed
+			if (lineRef.current.geometry !== geometryRef.current && geometryRef.current) {
+				lineRef.current.geometry = geometryRef.current;
+			}
+			lastUpdateRef.current = i;
 		}
 	});
 

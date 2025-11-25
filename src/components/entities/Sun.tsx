@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Group, Mesh, SphereGeometry, MeshStandardMaterial } from 'three';
 import { textureLoader } from '../../modules/loadManager';
 import BaseEntity from './BaseEntity';
@@ -12,56 +12,63 @@ interface SunProps {
 
 const Sun: React.FC<SunProps> = ({ data, onPointerDown }) => {
 	const { setSunMesh } = useSun();
+	const meshCreatedRef = useRef(false);
 
 	// Custom mesh creation for Sun - uses MeshStandardMaterial and creates two meshes
-	const useCustomSunMesh = ({
-		meshGroupRef,
-		materialData,
-		data
-	}: {
-		meshGroupRef: React.RefObject<Group>;
-		materialData: MaterialData | null;
-		data: BodyData;
-		segments: number;
-	}) => {
-		if (!meshGroupRef.current || !materialData) return;
+	// Memoized to prevent recreation on every render
+	const useCustomSunMesh = useCallback(
+		({
+			meshGroupRef,
+			materialData,
+			data
+		}: {
+			meshGroupRef: React.RefObject<Group>;
+			materialData: MaterialData | null;
+			data: BodyData;
+			segments: number;
+		}) => {
+			if (!meshGroupRef.current || !materialData || meshCreatedRef.current) return;
+			meshCreatedRef.current = true;
+			if (!meshGroupRef.current || !materialData) return;
 
-		const createSunMesh = async (isGodRays: boolean) => {
-			const geometry = new SphereGeometry(
-				isGodRays ? data.diameter : (data.diameter || data.meanRadius * 2) * 0.98,
-				32,
-				32
-			);
-			const material = new MeshStandardMaterial({
-				map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
-				normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
-				transparent: false,
-				emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
-				emissive: materialData.emissive || undefined,
-				emissiveIntensity: materialData.emissiveIntensity || undefined
+			const createSunMesh = async (isGodRays: boolean) => {
+				const geometry = new SphereGeometry(
+					isGodRays ? data.diameter : (data.diameter || data.meanRadius * 2) * 0.98,
+					32,
+					32
+				);
+				const material = new MeshStandardMaterial({
+					map: materialData.map ? await textureLoader.loadAsync(materialData.map) : null,
+					normalMap: materialData.normalMap ? await textureLoader.loadAsync(materialData.normalMap) : null,
+					transparent: false,
+					emissiveMap: materialData.emissiveMap ? await textureLoader.loadAsync(materialData.emissiveMap) : null,
+					emissive: materialData.emissive || undefined,
+					emissiveIntensity: materialData.emissiveIntensity || undefined
+				});
+
+				const entityMesh = new Mesh(geometry, material);
+				entityMesh.name = data.id;
+				entityMesh.castShadow = true;
+				entityMesh.receiveShadow = false;
+				entityMesh.matrixAutoUpdate = false;
+				return entityMesh;
+			};
+
+			// Create two meshes: one for occlusion, one for god rays
+			const meshPromises = [createSunMesh(false), createSunMesh(true)];
+			Promise.all(meshPromises).then((meshes) => {
+				if (!meshGroupRef.current) return;
+
+				meshGroupRef.current.name = data.id;
+				meshGroupRef.current.add(meshes[0]);
+				meshGroupRef.current.add(meshes[1]);
+
+				// Store reference to the god rays mesh in context for postprocessing
+				setSunMesh(meshes[1]);
 			});
-
-			const entityMesh = new Mesh(geometry, material);
-			entityMesh.name = data.id;
-			entityMesh.castShadow = true;
-			entityMesh.receiveShadow = false;
-			entityMesh.matrixAutoUpdate = false;
-			return entityMesh;
-		};
-
-		// Create two meshes: one for occlusion, one for god rays
-		const meshPromises = [createSunMesh(false), createSunMesh(true)];
-		Promise.all(meshPromises).then((meshes) => {
-			if (!meshGroupRef.current) return;
-
-			meshGroupRef.current.name = data.id;
-			meshGroupRef.current.add(meshes[0]);
-			meshGroupRef.current.add(meshes[1]);
-
-			// Store reference to the god rays mesh in context for postprocessing
-			setSunMesh(meshes[1]);
-		});
-	};
+		},
+		[data.id, setSunMesh]
+	); // Only recreate if data.id changes
 
 	return (
 		<BaseEntity
