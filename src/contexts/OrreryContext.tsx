@@ -3,7 +3,6 @@ import { Clock, PerspectiveCamera, WebGLRenderer, Scene, Color, Group } from 'th
 import { EffectComposer } from 'postprocessing';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { pointLights, ambientLights } from '../modules/lights';
-import { sortData } from '../modules/data/api';
 import type {
 	OrreryState,
 	CameraState,
@@ -15,6 +14,8 @@ import type {
 	OrbitLines,
 	BodyData
 } from '../types';
+import { sortData } from '@/modules/data/sorting';
+import { api } from '@/modules/data/api';
 
 interface OrreryContextValue
 	extends Omit<OrreryState, 'scene' | 'camera' | 'renderer' | 'composer' | 'labelRenderer' | 'controls'> {
@@ -147,14 +148,21 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 	// Fetch and load solar system data
 	useEffect(() => {
 		const loadSolarSystemData = async () => {
-			try {
-				const response = await fetch('./solarSystemData.json');
-				if (!response.ok) {
-					throw new Error('Error retrieving Solar System data');
-				}
-				const data = await response.json();
+			// Define the expected response type
+			interface SolarSystemDataResponse {
+				bodies: BodyData[];
+			}
 
-				console.log(data);
+			try {
+				const response = await api.GET<SolarSystemDataResponse>('./solarSystemData.json');
+
+				// Check if data exists
+				if (!response.data || !response.data.bodies) {
+					console.error('Invalid solar system data structure');
+					return;
+				}
+
+				const data = response.data;
 
 				// Create temporary bodies and bodiesTypes objects for sortData
 				const tempBodies: Bodies = {
@@ -184,7 +192,7 @@ export const OrreryProvider: React.FC<OrreryProviderProps> = ({ children }) => {
 				};
 
 				// Sort and process the data
-				const sortedData = sortData(data.bodies as BodyData[], tempBodies, tempBodiesTypes);
+				const sortedData = sortData(data.bodies, tempBodies, tempBodiesTypes);
 
 				// Update bodies state with sorted data
 				setBodies({
