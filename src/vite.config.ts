@@ -5,13 +5,13 @@ export default defineConfig({
   // config options
   base: "./", // to ensure relative path is used, not absolute (I want to host this anywhere)
   plugins: [react()],
-  // css: {
-  // 	preprocessorOptions: {
-  // 		scss: {
-  // 			additionalData: `@import "./src/scss/variables";`
-  // 		}
-  // 	}
-  // },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ["color-functions", "global-builtin", "import"],
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": "/src",
