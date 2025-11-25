@@ -4,6 +4,8 @@ import { useOrrery } from "../contexts/OrreryContext";
 import Lights from "./Lights";
 import Skybox from "./Skybox";
 import PostProcessing from "./PostProcessing";
+import AsteroidBelt from "./entities/AsteroidBelt";
+import StarField from "./entities/StarField";
 import { useEffect } from "react";
 
 interface SceneProps {
@@ -32,6 +34,8 @@ const Scene: React.FC<SceneProps> = ({ children }) => {
       <RendererSetup />
       <Lights />
       <Skybox />
+      <AsteroidBelt />
+      <StarField />
       {children}
       <PostProcessing />
     </Canvas>
