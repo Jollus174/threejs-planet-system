@@ -24,7 +24,7 @@
     "bootstrap": "^5.3.2",
     "camera-controls": "^2.7.0",
     "date-fns": "^3.0.6",
-    "fontawesome-free": "^1.0.1",
+    "@fortawesome/fontawesome-free": "^6.7.1",
     "gsap": "^3.12.2",
     "postprocessing": "^6.35.3",
     "react": "^18.2.0",
